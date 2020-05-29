@@ -13,7 +13,13 @@ You'll need:
 
 ## Building
 
-First, build the module:
+First, ensure the dependencies are installed:
+ 
+```
+$ npm install
+``` 
+
+Then, build the module:
 
 ```
 $ make dist

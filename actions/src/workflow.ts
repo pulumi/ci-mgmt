@@ -40,14 +40,7 @@ export class BaseJob extends job.Job {
       name: 'Install Go',
       uses: 'actions/setup-go@v2',
       with: {
-        'go-version': '1.13.x', // FIXME make this configurable
-      },
-    },
-    {
-      name: 'Install tf2pulumi',
-      uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
-      with: {
-        repo: 'pulumi/tf2pulumi',
+        'go-version': '${{ matrix.goversion }}',
       },
     },
     {
@@ -80,6 +73,10 @@ export class MultilangJob extends BaseJob {
     'fail-fast': true,
     matrix: {
       language: ['nodejs', 'python', 'dotnet'],
+      goversion: ['1.14.x'], // FIXME make this configurable
+      dotnetversion: ['3.1.201'],
+      pythonversion: ['3.7'],
+      nodeversion: ['13.x'],
     },
   };
   steps = this.steps.concat([
@@ -87,7 +84,7 @@ export class MultilangJob extends BaseJob {
       name: 'Setup Node',
       uses: 'actions/setup-node@v1',
       with: {
-        'node-version': '13.x',
+        'node-version': '${{matrix.nodeversion}}',
         'registry-url': 'https://registry.npmjs.org',
       },
     },
@@ -95,14 +92,14 @@ export class MultilangJob extends BaseJob {
       name: 'Setup DotNet',
       uses: 'actions/setup-dotnet@v1',
       with: {
-        'dotnet-version': '3.1.201',
+        'dotnet-version': '${{matrix.dotnetverson}}',
       },
     },
     {
       name: 'Setup Python',
       uses: 'actions/setup-python@v1',
       with: {
-        'python-version': '3.x',
+        'python-version': '${{matrix.pythonversion}}',
       },
     },
     {
@@ -255,7 +252,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
             name: 'Setup Go',
             uses: 'actions/setup-go@v2',
             with: {
-              'go-version': '1.13.x',
+              'go-version': '${{ matrix.goversion }}',
             },
           },
           {
@@ -315,7 +312,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
             name: 'Setup Go',
             uses: 'actions/setup-go@v2',
             with: {
-              'go-version': '1.13.x',
+              'go-version': '${{ matrix.goversion }}',
             },
           },
           {
