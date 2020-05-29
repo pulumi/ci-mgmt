@@ -11,12 +11,13 @@ env:
   RANCHER_URL: ${{ secrets.RANCHER_URL }}
 jobs:
   build_sdk:
+    name: build_sdk
     needs: prerequisites
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Checkout scripts repo
+    - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
         path: ci-scripts
@@ -75,11 +76,12 @@ jobs:
         - python
         - dotnet
   lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Checkout scripts repo
+    - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
         path: ci-scripts
@@ -103,11 +105,12 @@ jobs:
     - name: Run golangci
       run: make -f Makefile.github lint_provider
   prerequisites:
+    name: prerequisites
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Checkout scripts repo
+    - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
         path: ci-scripts
@@ -140,7 +143,7 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Checkout scripts repo
+    - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
         path: ci-scripts
@@ -165,12 +168,13 @@ jobs:
         args: release --rm-dist --config=.goreleaser.prerelease.yaml
         version: latest
   test:
+    name: test
     needs: build_sdk
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Checkout scripts repo
+    - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
         path: ci-scripts

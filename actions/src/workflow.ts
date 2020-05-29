@@ -25,7 +25,7 @@ export class BaseJob extends job.Job {
       uses: 'actions/checkout@v2',
     },
     {
-      name: 'Checkout scripts repo',
+      name: 'Checkout Scripts Repo',
       uses: 'actions/checkout@v2',
       with: {
         path: 'ci-scripts',
@@ -64,9 +64,10 @@ export class BaseJob extends job.Job {
   ];
   'runs-on' = 'ubuntu-latest'
 
-  constructor(needs?: string) {
+  constructor(name: string, needs?: string) {
     super();
     this.needs = needs;
+    this.name = name;
   }
   addStep(step) {
     this.steps.push(step);
@@ -134,14 +135,14 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
     });
 
     this.jobs = {
-      lint: new BaseJob()
+      lint: new BaseJob('lint')
         .addStep(
           {
             name: 'Run golangci',
             run: 'make -f Makefile.github lint_provider',
           },
         ),
-      prerequisites: new BaseJob()
+      prerequisites: new BaseJob('prerequisites')
         .addStep(
           {
             name: 'Build tfgen & provider binaries',
@@ -160,7 +161,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             },
           },
         ),
-      build_sdk: new MultilangJob('prerequisites')
+      build_sdk: new MultilangJob('build_sdk', 'prerequisites')
         .addStep({
           name: 'Build SDK',
           // eslint-disable-next-line no-template-curly-in-string
@@ -180,7 +181,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
           },
         }),
-      test: new MultilangJob('build_sdk')
+      test: new MultilangJob('test','build_sdk')
         .addStep({
           name: 'Download SDK',
           uses: 'actions/download-artifact@v2',
@@ -226,7 +227,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
             uses: 'actions/checkout@v2',
           },
           {
-            name: 'Checkout scripts repo',
+            name: 'Checkout Scripts Repo',
             uses: 'actions/checkout@v2',
             with: {
               path: 'ci-scripts',
@@ -242,7 +243,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
               'aws-region': 'us-east-2',
               // eslint-disable-next-line no-template-curly-in-string
               'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
-              'role-duration-seconds': '3600',
+              'role-duration-seconds': 3600,
               'role-external-id': 'upload-pulumi-release',
               // eslint-disable-next-line no-template-curly-in-string
               'role-session-name': '${{ env.PROVIDER}}@githubActions',
@@ -286,7 +287,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
             uses: 'actions/checkout@v2',
           },
           {
-            name: 'Checkout scripts repo',
+            name: 'Checkout Scripts Repo',
             uses: 'actions/checkout@v2',
             with: {
               path: 'ci-scripts',
