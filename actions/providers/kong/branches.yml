@@ -23,11 +23,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
-    - name: Install tf2pulumi
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/tf2pulumi
+        go-version: ${{ matrix.goversion }}
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@release/v1-alpha
       with:
@@ -37,16 +33,16 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: 13.x
+        node-version: ${{matrix.nodeversion}}
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.201
+        dotnet-version: ${{matrix.dotnetverson}}
     - name: Setup Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.x
+        python-version: ${{matrix.pythonversion}}
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v2
       with:
@@ -67,10 +63,18 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        dotnetversion:
+        - 3.1.201
+        goversion:
+        - 1.14.x
         language:
         - nodejs
         - python
         - dotnet
+        nodeversion:
+        - 13.x
+        pythonversion:
+        - "3.7"
   lint:
     container: golangci/golangci-lint:v1.25.1
     name: lint
@@ -88,11 +92,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
-    - name: Install tf2pulumi
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/tf2pulumi
+        go-version: ${{ matrix.goversion }}
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@release/v1-alpha
       with:
@@ -117,11 +117,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
-    - name: Install tf2pulumi
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/tf2pulumi
+        go-version: ${{ matrix.goversion }}
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@release/v1-alpha
       with:
@@ -152,11 +148,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.13.x
-    - name: Install tf2pulumi
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/tf2pulumi
+        go-version: ${{ matrix.goversion }}
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@release/v1-alpha
       with:
@@ -166,16 +158,16 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: 13.x
+        node-version: ${{matrix.nodeversion}}
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.201
+        dotnet-version: ${{matrix.dotnetverson}}
     - name: Setup Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.x
+        python-version: ${{matrix.pythonversion}}
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v2
       with:
@@ -201,10 +193,18 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        dotnetversion:
+        - 3.1.201
+        goversion:
+        - 1.14.x
         language:
         - nodejs
         - python
         - dotnet
+        nodeversion:
+        - 13.x
+        pythonversion:
+        - "3.7"
 name: branches
 "on":
   pull_request:
