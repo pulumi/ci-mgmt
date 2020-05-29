@@ -15,7 +15,7 @@ const env = Object.assign({
     PULUMI_LOCAL_NUGET: '${{ github.workspace }}/nuget',
 }, extraEnv);
 export class BaseJob extends job.Job {
-    constructor(name, needs) {
+    constructor(name, params) {
         super();
         this.steps = [
             {
@@ -61,8 +61,8 @@ export class BaseJob extends job.Job {
             },
         ];
         this['runs-on'] = 'ubuntu-latest';
-        this.needs = needs;
         this.name = name;
+        Object.assign(this, { name }, params);
     }
     addStep(step) {
         this.steps.push(step);
@@ -128,7 +128,9 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             env,
         });
         this.jobs = {
-            lint: new BaseJob('lint')
+            lint: new BaseJob('lint', {
+                container: 'golangci/golangci-lint:v1.25.1'
+            })
                 .addStep({
                 name: 'Run golangci',
                 run: 'make -f Makefile.github lint_provider',
@@ -148,7 +150,9 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     path: '${{ github.workspace }}/bin',
                 },
             }),
-            build_sdk: new MultilangJob('build_sdk', 'prerequisites')
+            build_sdk: new MultilangJob('build_sdk', {
+                needs: 'prerequisites'
+            })
                 .addStep({
                 name: 'Build SDK',
                 // eslint-disable-next-line no-template-curly-in-string
@@ -168,7 +172,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
                 },
             }),
-            test: new MultilangJob('test', 'build_sdk')
+            test: new MultilangJob('test', { needs: 'build_sdk' })
                 .addStep({
                 name: 'Download SDK',
                 uses: 'actions/download-artifact@v2',
