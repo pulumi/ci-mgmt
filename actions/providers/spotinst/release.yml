@@ -1,7 +1,7 @@
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
-  PROVIDER: spotinist
+  PROVIDER: spotinst
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -158,7 +158,7 @@ jobs:
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        args: release --rm-dist --config=.goreleaser.prerelease.yaml
+        args: release --rm-dist
         version: latest
   test:
     needs: build_sdk
@@ -229,8 +229,8 @@ jobs:
         - nodejs
         - python
         - dotnet
-name: prerelease
+name: release
 "on":
   push:
     tags:
-    - v*.*.*-**
+    - v*.*.*
