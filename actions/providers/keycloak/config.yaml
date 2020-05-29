@@ -1,0 +1,8 @@
+provider: keycloak
+env:
+  KEYCLOAK_CLIENT_ID: ""
+  KEYCLOAK_CLIENT_SECRET: ""
+  KEYCLOAK_PASSWORD: ""
+  KEYCLOAK_URL: ""
+  KEYCLOAK_USER: ""
+
