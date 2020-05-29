@@ -1,0 +1,42 @@
+{
+  "author": "Lee Briggs",
+  "bugs": {
+    "url": "https://github.com/jaxxstorm/pulumi-action-config/issues"
+  },
+  "dependencies": {
+    "@jaxxstorm/gh-actions": "git+ssh://git@github.com/jaxxstorm/gh-actions.git#develop"
+  },
+  "description": "Generate Pulumi github actions with Typescript",
+  "devDependencies": {
+    "@babel/preset-env": "^7.4.5",
+    "@jkcfg/std": "^0.2.7",
+    "@types/jest": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.10.2",
+    "babel-jest": "^24.8.0",
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-jest": "^22.4.1",
+    "typescript": "^3.4.3"
+  },
+  "homepage": "https://github.com/jaxxstorm/pulumi-action-config#readme",
+  "keywords": [
+    "configuration",
+    "code",
+    "generation",
+    "pulumi"
+  ],
+  "license": "Apache-2.0",
+  "module": "workflow.ts",
+  "name": "@jaxxstorm/pulumi-action-config",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaxxstorm/pulumi-action-config.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint {src,tests}/**/*.ts"
+  },
+  "version": "0.1.0"
+}
