@@ -9,7 +9,7 @@ const preRelease = name => new wf.PulumiPreReleaseWorkflow('prerelease');
 const release = name => new wf.PulumiReleaseWorkflow('release');
 
 export default [
-  { value: workflow('branches'), file: `providers/${provider}/branches.yml` },
-  { value: preRelease('prerelease'), file: `providers/${provider}/prerelease.yml` },
-  { value: release('release'), file: `providers/${provider}/release.yml` },
+  { value: workflow('branches'), file: `providers/${provider}/repo/.github/workflows/branches.yml` },
+  { value: preRelease('prerelease'), file: `providers/${provider}/repo/.github/workflows/prerelease.yml` },
+  { value: release('release'), file: `providers/${provider}/repo/.github/workflows/release.yml` },
 ];

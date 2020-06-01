@@ -1,2 +1,6 @@
 provider: spotinst
+env:
+  AWS_REGION: "us-west-2"
+  SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
+  SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
 

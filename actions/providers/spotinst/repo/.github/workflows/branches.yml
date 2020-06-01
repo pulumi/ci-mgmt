@@ -1,10 +1,13 @@
 env:
+  AWS_REGION: us-west-2
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
   PROVIDER: spotinst
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
+  SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
 jobs:
   build_sdk:
     name: build_sdk
@@ -131,35 +134,6 @@ jobs:
       with:
         name: pulumi-${{ env.PROVIDER }}
         path: ${{ github.workspace }}/bin
-  publish:
-    needs: build_sdk
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v2
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v2
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-region: us-east-2
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: "3600"
-        role-external-id: upload-pulumi-release
-        role-session-name: ${{ env.PROVIDER}}@githubActions
-        role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
-    - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.goversion }}
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        args: release --rm-dist --config=.goreleaser.prerelease.yaml
-        version: latest
   test:
     name: test
     needs: build_sdk
@@ -234,8 +208,11 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: prerelease
+name: branches
 "on":
+  pull_request:
+    branches:
+    - master
   push:
-    tags:
-    - v*.*.*-**
+    branches:
+    - master
