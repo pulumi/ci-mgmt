@@ -1,8 +1,8 @@
 env:
+  DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
   GO111MODULE: "on"
-  PROVIDER: gitlab
+  PROVIDER: digitalocean
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget

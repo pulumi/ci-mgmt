@@ -1,4 +1,3 @@
 provider: gitlab
 env:
   GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-  GITLAB_BASE_URL: ${{ secrets.GITLAB_BASE_URL }}

@@ -21,5 +21,4 @@ export default [
   { value: pre(provider), file: `providers/${provider}/repo/.goreleaser.prerelease.yml` },
   { value: r(provider), file: `providers/${provider}/repo/.goreleaser.yml` },
   { value: lintConfig('lint'), file: `providers/${provider}/repo/.golangci.yml` },
-
 ];
