@@ -1,0 +1,142 @@
+export interface Build {
+    id?: string;
+    dir?: string;
+    main?: string;
+    binary?: string;
+    flags?: string[];
+    asmflags?: string[];
+    gcflags?: string[];
+    ldflags?: string[];
+    env?: string[];
+    goos?: string[];
+    goarch?: string[];
+    goarm?: string[];
+    skip?: boolean;
+}
+
+export interface FormatOverride {
+    goos?: string;
+    format?: string;
+}
+export interface Archive {
+    id?: string;
+    name_template?: string;
+    builds?: string[];
+    wrap_in_directory?: boolean;
+    format?: string;
+    format_overrides?: FormatOverride[];
+    replacements?: {[k: string]: string};
+}
+
+export interface Before {
+    hooks?: string[];
+}
+
+export interface Snapshot {
+    name_template?: string;
+}
+
+export interface Changelog {
+    skip?: boolean;
+}
+
+export interface Release {
+    disable?: boolean;
+}
+
+export interface Blob {
+    provider?: string;
+    region?: string;
+    bucket?: string;
+    folder?: string;
+    ids?: string[];
+}
+
+export class GoreleaserConfig {
+    name: string;
+    builds: Build[];
+    archives: Archive[];
+    before: Before;
+    snapshot: Snapshot;
+    changelog: Changelog;
+    release: Release;
+    blobs: Blob[];
+    constructor(params?: Partial<GoreleaserConfig>) {
+        Object.assign(this, params)
+    }
+}
+
+export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
+    before: Before;
+    builds: Build[];
+    archives: Archive[];
+    snapshot: Snapshot;
+    changelog: Changelog;
+    release: Release;
+    blobs: Blob[];
+
+    constructor(name: string) {
+        super();
+        this.before = {
+            hooks: [
+                'cd provider && go mod download'
+            ]
+        }
+        this.builds = [{
+            dir: 'provider',
+            env: [
+                'CGO_ENABLED=0',
+                'GO111MODULE=on'
+            ],
+            goos: [
+                'darwin',
+                'windows',
+                'linux',
+            ],
+            goarch: [
+                'amd64'
+            ],
+            main: `./cmd/pulumi-resource-${name}/`,
+            ldflags: [`-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}`],
+            binary: `pulumi-resource-${name}`
+        }]
+        this.archives = [{
+            name_template: '{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}',
+            format_overrides: [
+                {goos: 'windows', format: 'zip'},
+            ],
+            replacements: {
+                amd64: 'x64',
+                '386': 'x86',
+            },
+            id: 'archive',
+        }]
+        this.snapshot = {
+            name_template: '{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}'
+        }
+        this.changelog = {
+            skip: true,
+        }
+        this.release = {
+            disable: true
+        }
+        this.blobs = [{
+            provider: 's3',
+            region: 'us-west-2',
+            bucket: 'goreleaser',
+            folder: 'releases/plugins/',
+            ids: [ 'archive' ]
+        }]
+
+
+    }
+}
+
+export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
+    constructor(name: string) {
+        super(name);
+        this.release = {
+            disable: false
+        }
+    }
+}
