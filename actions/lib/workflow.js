@@ -4,6 +4,7 @@ import * as param from '@jkcfg/std/param';
 const provider = param.String('provider');
 const extraEnv = param.Object('env');
 const docker = param.Boolean('docker');
+const setupScript = param.String('setup-script');
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
@@ -67,6 +68,15 @@ export class BaseJob extends job.Job {
             this.steps.push({
                 name: 'Run docker-compose',
                 run: 'docker-compose -f testing/docker-compose.yml up --build -d'
+            });
+        }
+        return this;
+    }
+    addSetupScript(setupScript) {
+        if (setupScript) {
+            this.steps.push({
+                name: 'Run setup script',
+                run: `${setupScript}`,
             });
         }
         return this;
@@ -205,6 +215,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 run: 'make -f Makefile.github install_${{ matrix.language}}_sdk',
             })
                 .addDocker(docker)
+                .addSetupScript(setupScript)
                 .addStep({
                 name: 'Run tests',
                 // eslint-disable-next-line no-template-curly-in-string

@@ -1,4 +1,5 @@
 provider: keycloak
+setup-script: 'testing/setup.sh'
 env:
   KEYCLOAK_CLIENT_ID: ""
   KEYCLOAK_CLIENT_SECRET: ""
