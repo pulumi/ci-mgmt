@@ -1,4 +1,5 @@
 provider: keycloak
+docker: true
 setup-script: 'testing/setup.sh'
 env:
   KEYCLOAK_CLIENT_ID: ""
