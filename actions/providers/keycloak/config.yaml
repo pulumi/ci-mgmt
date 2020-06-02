@@ -1,10 +1,10 @@
 provider: keycloak
 docker: true
 setup-script: 'testing/setup.sh'
-env:
-  KEYCLOAK_CLIENT_ID: ""
-  KEYCLOAK_CLIENT_SECRET: ""
-  KEYCLOAK_PASSWORD: ""
-  KEYCLOAK_URL: ""
-  KEYCLOAK_USER: ""
+env: # these are in plaintext in the setup script
+  KEYCLOAK_CLIENT_ID: "terraform"
+  KEYCLOAK_CLIENT_SECRET: "884e0f95-0f42-4a63-9b1f-94274655669e"
+  KEYCLOAK_PASSWORD: "password"
+  KEYCLOAK_URL: "http://localhost:8080"
+  KEYCLOAK_USER: "keycloak"
 
