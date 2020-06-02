@@ -1,0 +1,3 @@
+provider: mailgun
+env:
+  MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
