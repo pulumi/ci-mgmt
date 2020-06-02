@@ -201,6 +201,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
           },
         }),
+      lint_sdk: new BaseJob('lint-sdk', {
+        container: 'golangci/golangci-lint:v1.25.1',
+        needs: 'build_sdk'
+      })
+        .addStep(
+            {
+              name: 'Run golangci',
+              run: 'cd sdk/go/' + provider + " && golangci-lint run -c ../../../.golangci.yml",
+            },
+        ),
       test: new MultilangJob('test', { needs: 'build_sdk'})
         .addStep({
           name: 'Download SDK',
