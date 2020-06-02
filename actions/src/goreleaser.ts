@@ -1,3 +1,7 @@
+import * as param from '@jkcfg/std/param';
+
+const majVersion = param.Number('major-version', 2);
+
 export interface Build {
     id?: string;
     dir?: string;
@@ -77,6 +81,15 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
 
     constructor(name: string) {
         super();
+
+        let ldflags: string[];
+
+        if (majVersion! > 1 ) {
+            ldflags = [ `-X github.com/pulumi/pulumi-${name}/provider/v${majVersion}/pkg/version.Version={{.Tag}}` ]
+        } else {
+            ldflags = [ `-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}` ]
+        }
+
         this.before = {
             hooks: [
                 'cd provider && go mod download'
@@ -97,7 +110,7 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
                 'amd64'
             ],
             main: `./cmd/pulumi-resource-${name}/`,
-            ldflags: [`-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}`],
+            ldflags: ldflags,
             binary: `pulumi-resource-${name}`
         }]
         this.archives = [{
