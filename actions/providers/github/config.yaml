@@ -3,3 +3,5 @@ major-version: 1
 env:
   GITHUB_ORGANIZATION: ${{ secrets.GITHUB_ORGANIZATION }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TESTING_TOKEN: ${{ secrets.GITHUB_TESTING_TOKEN }}
+
