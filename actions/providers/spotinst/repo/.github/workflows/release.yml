@@ -4,6 +4,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PROVIDER: spotinst
@@ -13,6 +14,7 @@ env:
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
   SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
+  TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
     name: build_sdk
@@ -79,6 +81,7 @@ jobs:
         - nodejs
         - python
         - dotnet
+        - go
         nodeversion:
         - 13.x
         pythonversion:
@@ -219,11 +222,22 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        always-auth: true
+        registry-url: https://registry.npmjs.org
+    - name: Setup DotNet
+      uses: actions/setup-dotnet@v1
+    - name: Setup Python
+      uses: actions/setup-python@v1
     - name: Download Python SDK
       uses: actions/download-artifact@v2
       with:
         name: python-sdk
         path: ${{ github.workspace}}/sdk/python
+    - name: Install Twine
+      run: python -m pip install pip twine
     - name: Download NodeJS SDK
       uses: actions/download-artifact@v2
       with:
@@ -233,8 +247,10 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: dotnet-sdk
-        path: ${{ github.workspace}}/sdk/nodejs
-    - name: Publish SDKs
+        path: ${{ github.workspace}}/sdk/dotnet
+    - env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      name: Publish SDKs
       run: ./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
   test:
     name: test
@@ -306,6 +322,7 @@ jobs:
         - nodejs
         - python
         - dotnet
+        - go
         nodeversion:
         - 13.x
         pythonversion:

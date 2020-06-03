@@ -18,9 +18,12 @@ const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     NPM_TOKEN: '${{ secrets.NPM_TOKEN }}',
     // eslint-disable-next-line no-template-curly-in-string
+    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}',
+    // eslint-disable-next-line no-template-curly-in-string
     NUGET_PUBLISH_KEY: '${{ secrets.NUGET_PUBLISH_KEY }}',
     // eslint-disable-next-line no-template-curly-in-string
     PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
+    TRAVIS_OS_NAME: 'linux',
 }, extraEnv);
 export class BaseJob extends job.Job {
     constructor(name, params) {
@@ -236,23 +239,22 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .',
             }),
             publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
-                /*
                 .addStep({
-                  name: 'Setup Node',
-                  uses: 'actions/setup-node@v1',
-                  with: {
+                name: 'Setup Node',
+                uses: 'actions/setup-node@v1',
+                with: {
                     'registry-url': 'https://registry.npmjs.org',
-                  },
-                })
+                    'always-auth': true,
+                },
+            })
                 .addStep({
-                  name: 'Setup DotNet',
-                  uses: 'actions/setup-dotnet@v1',
-                })
+                name: 'Setup DotNet',
+                uses: 'actions/setup-dotnet@v1',
+            })
                 .addStep({
-                  name: 'Setup Python',
-                  uses: 'actions/setup-python@v1',
-                })
-                 */
+                name: 'Setup Python',
+                uses: 'actions/setup-python@v1',
+            })
                 .addStep({
                 name: 'Download Python SDK',
                 uses: 'actions/download-artifact@v2',
@@ -260,6 +262,10 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     name: 'python-sdk',
                     path: '${{ github.workspace}}/sdk/python'
                 }
+            })
+                .addStep({
+                name: 'Install Twine',
+                run: 'python -m pip install pip twine',
             })
                 .addStep({
                 name: 'Download NodeJS SDK',
@@ -274,12 +280,15 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 uses: 'actions/download-artifact@v2',
                 with: {
                     name: 'dotnet-sdk',
-                    path: '${{ github.workspace}}/sdk/nodejs'
+                    path: '${{ github.workspace}}/sdk/dotnet'
                 }
             })
                 .addStep({
                 name: 'Publish SDKs',
-                run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}'
+                run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
+                env: {
+                    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+                }
             })
         };
     }
