@@ -74,6 +74,7 @@ jobs:
         - nodejs
         - python
         - dotnet
+        - go
         nodeversion:
         - 13.x
         pythonversion:
@@ -260,6 +261,7 @@ jobs:
         - nodejs
         - python
         - dotnet
+        - go
         nodeversion:
         - 13.x
         pythonversion:
