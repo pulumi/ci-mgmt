@@ -94,7 +94,7 @@ export class MultilangJob extends BaseJob {
         this.strategy = {
             'fail-fast': true,
             matrix: {
-                language: ['nodejs', 'python', 'dotnet'],
+                language: ['nodejs', 'python', 'dotnet', 'go'],
                 goversion: ['1.14.x'],
                 dotnetversion: ['3.1.201'],
                 pythonversion: ['3.7'],
