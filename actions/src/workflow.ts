@@ -17,7 +17,12 @@ const env = Object.assign({
   PULUMI_API: 'https://api.pulumi-staging.io',
   // eslint-disable-next-line no-template-curly-in-string
   PULUMI_LOCAL_NUGET: '${{ github.workspace }}/nuget',
-
+  // eslint-disable-next-line no-template-curly-in-string
+  NPM_TOKEN: '${{ secrets.NPM_TOKEN }}',
+  // eslint-disable-next-line no-template-curly-in-string
+  NUGET_PUBLISH_KEY: '${{ secrets.NUGET_PUBLISH_KEY }}',
+  // eslint-disable-next-line no-template-curly-in-string
+  PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
 }, extraEnv);
 
 export class BaseJob extends job.Job {
@@ -243,6 +248,52 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
           // eslint-disable-next-line no-template-curly-in-string
           run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .',
         }),
+      publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
+          /*
+          .addStep({
+            name: 'Setup Node',
+            uses: 'actions/setup-node@v1',
+            with: {
+              'registry-url': 'https://registry.npmjs.org',
+            },
+          })
+          .addStep({
+            name: 'Setup DotNet',
+            uses: 'actions/setup-dotnet@v1',
+          })
+          .addStep({
+            name: 'Setup Python',
+            uses: 'actions/setup-python@v1',
+          })
+           */
+          .addStep({
+            name: 'Download Python SDK',
+            uses: 'actions/download-artifact@v2',
+            with: {
+              name: 'python-sdk',
+              path: '${{ github.workspace}}/sdk/python'
+            }
+          })
+          .addStep({
+            name: 'Download NodeJS SDK',
+            uses: 'actions/download-artifact@v2',
+            with: {
+              name: 'nodejs-sdk',
+              path: '${{ github.workspace}}/sdk/nodejs'
+            }
+          })
+          .addStep({
+            name: 'Download DotNet SDK',
+            uses: 'actions/download-artifact@v2',
+            with: {
+              name: 'dotnet-sdk',
+              path: '${{ github.workspace}}/sdk/nodejs'
+            }
+          })
+          .addStep({
+            name: 'Publish SDKs',
+            run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}'
+          })
     };
   }
 }
