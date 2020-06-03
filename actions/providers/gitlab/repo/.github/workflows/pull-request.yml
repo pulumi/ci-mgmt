@@ -1,11 +1,16 @@
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
   GO111MODULE: "on"
-  PAGERDUTY_TOKEN: ${{ secrets.PAGERDUTY_TOKEN }}
-  PROVIDER: pagerduty
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+  PROVIDER: gitlab
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
     name: build_sdk
@@ -129,7 +134,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/pagerduty && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/gitlab && golangci-lint run -c ../../../.golangci.yml
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -235,11 +240,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: branches
+name: pull-request
 "on":
   pull_request:
-    branches:
-    - master
-  push:
     branches:
     - master

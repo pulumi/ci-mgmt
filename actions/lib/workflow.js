@@ -15,6 +15,15 @@ const env = Object.assign({
     PULUMI_API: 'https://api.pulumi-staging.io',
     // eslint-disable-next-line no-template-curly-in-string
     PULUMI_LOCAL_NUGET: '${{ github.workspace }}/nuget',
+    // eslint-disable-next-line no-template-curly-in-string
+    NPM_TOKEN: '${{ secrets.NPM_TOKEN }}',
+    // eslint-disable-next-line no-template-curly-in-string
+    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}',
+    // eslint-disable-next-line no-template-curly-in-string
+    NUGET_PUBLISH_KEY: '${{ secrets.NUGET_PUBLISH_KEY }}',
+    // eslint-disable-next-line no-template-curly-in-string
+    PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
+    TRAVIS_OS_NAME: 'linux',
 }, extraEnv);
 export class BaseJob extends job.Job {
     constructor(name, params) {
@@ -139,7 +148,6 @@ export class MultilangJob extends BaseJob {
 export class PulumiBaseWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
-            push: { branches: ['master'] },
             pull_request: { branches: ['master'] },
         }, {
             env,
@@ -232,6 +240,70 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
         };
     }
 }
+export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
+    constructor(name, jobs) {
+        super(name, jobs);
+        this.on = {
+            push: {
+                branches: ["master"]
+            },
+        };
+        this.jobs = Object.assign(this.jobs, {
+            publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
+                .addStep({
+                name: 'Setup Node',
+                uses: 'actions/setup-node@v1',
+                with: {
+                    'registry-url': 'https://registry.npmjs.org',
+                    'always-auth': true,
+                },
+            })
+                .addStep({
+                name: 'Setup DotNet',
+                uses: 'actions/setup-dotnet@v1',
+            })
+                .addStep({
+                name: 'Setup Python',
+                uses: 'actions/setup-python@v1',
+            })
+                .addStep({
+                name: 'Download Python SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'python-sdk',
+                    path: '${{ github.workspace}}/sdk/python'
+                }
+            })
+                .addStep({
+                name: 'Install Twine',
+                run: 'python -m pip install pip twine',
+            })
+                .addStep({
+                name: 'Download NodeJS SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'nodejs-sdk',
+                    path: '${{ github.workspace}}/sdk/nodejs'
+                }
+            })
+                .addStep({
+                name: 'Download DotNet SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'dotnet-sdk',
+                    path: '${{ github.workspace}}/sdk/dotnet'
+                }
+            })
+                .addStep({
+                name: 'Publish SDKs',
+                run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
+                env: {
+                    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+                }
+            })
+        });
+    }
+}
 export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
     constructor(name, jobs) {
         super(name, jobs);
@@ -288,6 +360,59 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                 ],
             },
+        }, {
+            publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
+                .addStep({
+                name: 'Setup Node',
+                uses: 'actions/setup-node@v1',
+                with: {
+                    'registry-url': 'https://registry.npmjs.org',
+                    'always-auth': true,
+                },
+            })
+                .addStep({
+                name: 'Setup DotNet',
+                uses: 'actions/setup-dotnet@v1',
+            })
+                .addStep({
+                name: 'Setup Python',
+                uses: 'actions/setup-python@v1',
+            })
+                .addStep({
+                name: 'Download Python SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'python-sdk',
+                    path: '${{ github.workspace}}/sdk/python'
+                }
+            })
+                .addStep({
+                name: 'Install Twine',
+                run: 'python -m pip install pip twine',
+            })
+                .addStep({
+                name: 'Download NodeJS SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'nodejs-sdk',
+                    path: '${{ github.workspace}}/sdk/nodejs'
+                }
+            })
+                .addStep({
+                name: 'Download DotNet SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'dotnet-sdk',
+                    path: '${{ github.workspace}}/sdk/dotnet'
+                }
+            })
+                .addStep({
+                name: 'Publish SDKs',
+                run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
+                env: {
+                    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+                }
+            })
         });
     }
 }
@@ -347,6 +472,59 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                 ],
             },
+        }, {
+            publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
+                .addStep({
+                name: 'Setup Node',
+                uses: 'actions/setup-node@v1',
+                with: {
+                    'registry-url': 'https://registry.npmjs.org',
+                    'always-auth': true,
+                },
+            })
+                .addStep({
+                name: 'Setup DotNet',
+                uses: 'actions/setup-dotnet@v1',
+            })
+                .addStep({
+                name: 'Setup Python',
+                uses: 'actions/setup-python@v1',
+            })
+                .addStep({
+                name: 'Download Python SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'python-sdk',
+                    path: '${{ github.workspace}}/sdk/python'
+                }
+            })
+                .addStep({
+                name: 'Install Twine',
+                run: 'python -m pip install pip twine',
+            })
+                .addStep({
+                name: 'Download NodeJS SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'nodejs-sdk',
+                    path: '${{ github.workspace}}/sdk/nodejs'
+                }
+            })
+                .addStep({
+                name: 'Download DotNet SDK',
+                uses: 'actions/download-artifact@v2',
+                with: {
+                    name: 'dotnet-sdk',
+                    path: '${{ github.workspace}}/sdk/dotnet'
+                }
+            })
+                .addStep({
+                name: 'Publish SDKs',
+                run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
+                env: {
+                    NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+                }
+            })
         });
     }
 }

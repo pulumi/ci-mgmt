@@ -1,11 +1,20 @@
 env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_REGION: us-west-2
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
-  MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-  PROVIDER: mailgun
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+  PROVIDER: spotinst
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
+  SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
+  TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
     name: build_sdk
@@ -129,7 +138,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/mailgun && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/spotinst && golangci-lint run -c ../../../.golangci.yml
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -235,11 +244,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: branches
+name: pull-request
 "on":
   pull_request:
-    branches:
-    - master
-  push:
     branches:
     - master
