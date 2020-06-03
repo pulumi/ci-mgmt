@@ -18,7 +18,7 @@ blobs:
   provider: s3
   region: us-west-2
 builds:
-- binary: pulumi-resource-gitlab
+- binary: pulumi-resource-github
   dir: provider
   env:
   - CGO_ENABLED=0
@@ -30,8 +30,8 @@ builds:
   - windows
   - linux
   ldflags:
-  - -X github.com/pulumi/pulumi-gitlab/provider/v2/pkg/version.Version={{.Tag}}
-  main: ./cmd/pulumi-resource-gitlab/
+  - -X github.com/pulumi/pulumi-github/provider/pkg/version.Version={{.Tag}}
+  main: ./cmd/pulumi-resource-github/
 changelog:
   skip: true
 release:
