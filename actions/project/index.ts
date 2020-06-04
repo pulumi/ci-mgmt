@@ -13,18 +13,32 @@ const repoFiles = [
     '.github/workflows/prerelease.yml',
     '.github/workflows/pull-request.yml',
     '.github/workflows/release.yml',
+    '.github/workflows/pr-automation.yml'
 ]
 
+// const providers = fs.readdirSync('../providers');
+const providers = ['kong', 'rancher2']
 
-for (let file of repoFiles) {
-    let name_array = file.split('/')
-    let name = name_array[name_array.length - 1]
-    const gitFile = new github.RepositoryFile(`kong-${name}`, {
-        repository: 'pulumi-kong',
-        file: `../providers/kong/repo/${file}`,
-        content: fs.readFileSync(`../providers/kong/repo/${file}`).toString(),
-        branch: 'pulumi-test',
+for (let provider of providers) {
+
+    const automationBranch = new github.Branch(`${provider}-automated`, {
+        repository: `pulumi-${provider}`,
+        branch: 'pulumi-automation',
+        sourceBranch: 'pulumi-test',
     })
+
+    for (let file of repoFiles) {
+        let name_array = file.split('/')
+        let name = name_array[name_array.length - 1]
+
+        const repoFile = new github.RepositoryFile(`${provider}-${name.split('.').join('-')}`, {
+            repository: `pulumi-${provider}`,
+            file: `${file}`,
+            content: fs.readFileSync(`../providers/${provider}/repo/${file}`).toString(),
+            branch: automationBranch.ref,
+        }, { parent: automationBranch })
+
+    }
 }
 
 

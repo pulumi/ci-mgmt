@@ -544,3 +544,38 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
     push: { tags: ['v*.*.*-**'] },
   }
 }
+
+export class PulumiAutomationWorkflow {
+  env = {
+    GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+  }
+  name = 'pr-automation';
+  on = {
+    push: {
+      branches: [ 'pulumi-automation' ]
+    }
+  }
+  jobs = {
+    'open-pull-request': {
+      name: 'open pull request for pulumi-automation changes',
+      'runs-on': 'ubuntu-latest',
+      steps: [
+        {
+          name: 'Checkout Repo',
+          uses: 'actions/checkout@v2'
+        },
+        {
+          name: 'Create Pull Request',
+          uses: 'repo-sync/pull-request@v2',
+          with: {
+            github_token: '${{ secrets.GITHUB_TOKEN }}',
+            pr_title: "🤖 automated pull-request from pulumi",
+            pr_body: "🚀 This PR has been opened because changes have been pushed to ${{ github.ref }}, please review them carefully!",
+            pr_reviewer: "jaxxstorm,stack72",
+            pr_label: "automation/pull-request",
+          }
+        }
+      ]
+    }
+  }
+}
