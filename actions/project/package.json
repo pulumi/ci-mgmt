@@ -1,0 +1,11 @@
+{
+    "name": "ci-mgmt-actions",
+    "devDependencies": {
+        "@types/node": "^10.0.0"
+    },
+    "dependencies": {
+        "@pulumi/github": "^1.3.1",
+        "@pulumi/pulumi": "^2.0.0",
+        "@types/glob": "^7.1.1"
+    }
+}
