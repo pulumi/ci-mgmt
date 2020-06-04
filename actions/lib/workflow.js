@@ -154,7 +154,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
         });
         this.jobs = {
             lint: new BaseJob('lint', {
-                container: 'golangci/golangci-lint:v1.25.1'
+                container: 'golangci/golangci-lint:latest'
             })
                 .addStep({
                 name: 'Run golangci',
@@ -198,7 +198,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 },
             }),
             lint_sdk: new BaseJob('lint-sdk', {
-                container: 'golangci/golangci-lint:v1.25.1',
+                container: 'golangci/golangci-lint:latest',
                 needs: 'build_sdk'
             })
                 .addStep({
