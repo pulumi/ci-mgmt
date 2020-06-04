@@ -1,7 +1,7 @@
 provider: rancher2
+docker: true
+setup-script: testing/setup.sh
 env:
-  RANCHER_ACCESS_KEY: token-74zzn
   RANCHER_INSECURE: "true"
-  RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
-  RANCHER_URL: ${{ secrets.RANCHER_URL }}
+  RANCHER_URL: https://localhost # docker
 

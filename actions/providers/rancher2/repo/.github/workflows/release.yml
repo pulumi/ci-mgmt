@@ -9,10 +9,8 @@ env:
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-  RANCHER_ACCESS_KEY: token-74zzn
   RANCHER_INSECURE: "true"
-  RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
-  RANCHER_URL: ${{ secrets.RANCHER_URL }}
+  RANCHER_URL: https://localhost
   TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
@@ -307,6 +305,10 @@ jobs:
       uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
       run: make -f Makefile.github install_${{ matrix.language}}_sdk
+    - name: Run docker-compose
+      run: docker-compose -f testing/docker-compose.yml up --build -d
+    - name: Run setup script
+      run: testing/setup.sh
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
         }} -parallel 4 .

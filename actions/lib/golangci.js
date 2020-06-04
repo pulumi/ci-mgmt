@@ -1,7 +1,9 @@
+import * as param from '@jkcfg/std/param';
+const timeout = param.String('golangci-timeout', '10m');
 export class PulumiGolangCIConfig {
     constructor() {
         this.run = {
-            timeout: '5m',
+            timeout: timeout,
             'skip-files': [
                 'schema.go',
                 'pulumiManifest.go',
