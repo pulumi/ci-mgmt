@@ -24,7 +24,7 @@ for (let provider of providers) {
     const automationBranch = new github.Branch(`${provider}-automated`, {
         repository: `pulumi-${provider}`,
         branch: 'pulumi-automation',
-        sourceBranch: 'pulumi-test',
+        sourceBranch: 'master',
     })
 
     for (let file of repoFiles) {
@@ -36,7 +36,7 @@ for (let provider of providers) {
             file: `${file}`,
             content: fs.readFileSync(`../providers/${provider}/repo/${file}`).toString(),
             branch: automationBranch.ref,
-        }, { parent: automationBranch })
+        }, { parent: automationBranch} )
 
     }
 }

@@ -1,6 +1,6 @@
-import * as wf from 'lib/workflow';
-import * as goreleaser from 'lib/goreleaser';
-import * as lint from 'lib/golangci';
+import * as wf from './lib/workflow';
+import * as goreleaser from './lib/goreleaser';
+import * as lint from './lib/golangci';
 import * as param from '@jkcfg/std/param';
 
 const provider = param.String('provider');
@@ -10,7 +10,7 @@ const pullRequest = name => new wf.PulumiBaseWorkflow('pull-request');
 const master = name => new wf.PulumiMasterWorkflow('master');
 const preRelease = name => new wf.PulumiPreReleaseWorkflow('prerelease');
 const release = name => new wf.PulumiReleaseWorkflow('release');
-const automation = name => new wf.PulumiAutomationWorkflow('automation')
+const automation = name => new wf.PulumiAutomationWorkflow('automation');
 const pre = name => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = name => new goreleaser.PulumiGoreleaserConfig(provider);
 const lintConfig = name => new lint.PulumiGolangCIConfig()
