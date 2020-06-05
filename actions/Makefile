@@ -6,7 +6,7 @@ dist:
 	npx tsc
 
 %: 
-	rm -rvf providers/$@/*.yml
+	rm -rvf providers/$@/repo
 	jk generate generate.ts -f providers/$@/config.yaml
 
 providers := $(shell ls providers)

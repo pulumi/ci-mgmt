@@ -556,7 +556,7 @@ export class PulumiAutomationWorkflow {
                             pr_title: "🤖 automated pull-request from pulumi",
                             pr_body: "🚀 This PR has been opened because changes have been pushed to ${{ github.ref }}, please review them carefully!",
                             pr_reviewer: "jaxxstorm,stack72",
-                            pr_label: "automation/pull-request",
+                            pr_label: "automation/pull-request,impact/no-changelog-required",
                         }
                     }
                 ]

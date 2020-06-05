@@ -13,7 +13,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         pr_body: "\U0001F680 This PR has been opened because changes have been pushed
           to ${{ github.ref }}, please review them carefully!"
-        pr_label: automation/pull-request
+        pr_label: automation/pull-request,impact/no-changelog-required
         pr_reviewer: jaxxstorm,stack72
         pr_title: "\U0001F916 automated pull-request from pulumi"
 name: pr-automation
