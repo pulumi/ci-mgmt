@@ -12,7 +12,7 @@ dist:
 providers := $(shell ls providers)
 
 define provider-target
-providers::
+providers:: dist
 	@tput setaf 6
 	@echo "GENERATING PROVIDER $1"
 	@tput sgr0

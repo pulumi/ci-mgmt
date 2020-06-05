@@ -9,6 +9,7 @@ env:
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
@@ -65,6 +66,12 @@ jobs:
       with:
         name: ${{ matrix.language  }}-sdk
         path: ${{ github.workspace}}/sdk/${{ matrix.language }}
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
     strategy:
       fail-fast: true
       matrix:
@@ -107,6 +114,12 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
       run: make -f Makefile.github lint_provider
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
   lint_sdk:
     container: golangci/golangci-lint:latest
     name: lint-sdk
@@ -134,6 +147,12 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
       run: cd sdk/go/kong && golangci-lint run -c ../../../.golangci.yml
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -164,6 +183,12 @@ jobs:
       with:
         name: pulumi-${{ env.PROVIDER }}
         path: ${{ github.workspace }}/bin
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
   publish_sdk:
     name: publish_sdk
     needs: test
@@ -218,6 +243,12 @@ jobs:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       name: Publish SDKs
       run: ./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
   test:
     name: test
     needs: build_sdk
@@ -279,6 +310,12 @@ jobs:
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
         }} -parallel 4 .
+    - if: '!success()'
+      name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        fields: repo,commit,author
+        status: ${{ job.status }}
     strategy:
       fail-fast: true
       matrix:

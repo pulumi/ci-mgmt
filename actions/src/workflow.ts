@@ -26,6 +26,7 @@ const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
     TRAVIS_OS_NAME: 'linux',
+    SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
 }, extraEnv);
 
 export class BaseJob extends job.Job {
@@ -170,6 +171,17 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Run golangci',
                         run: 'make -f Makefile.github lint_provider',
                     },
+                )
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
                 ),
             prerequisites: new BaseJob('prerequisites')
                 .addStep(
@@ -189,6 +201,17 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                             path: '${{ github.workspace }}/bin',
                         },
                     },
+                )
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
                 ),
             build_sdk: new MultilangJob('build_sdk', {
                 needs: 'prerequisites'
@@ -211,7 +234,18 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         // eslint-disable-next-line no-template-curly-in-string
                         path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
                     },
-                }),
+                })
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
+                ),
             lint_sdk: new BaseJob('lint-sdk', {
                 container: 'golangci/golangci-lint:latest',
                 needs: 'build_sdk'
@@ -221,6 +255,17 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Run golangci',
                         run: 'cd sdk/go/' + provider + " && golangci-lint run -c ../../../.golangci.yml",
                     },
+                )
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
                 ),
             test: new MultilangJob('test', {needs: 'build_sdk'})
                 .addStep({
@@ -253,7 +298,18 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     name: 'Run tests',
                     // eslint-disable-next-line no-template-curly-in-string
                     run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .',
-                }),
+                })
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
+                ),
         };
     }
 }
@@ -314,6 +370,17 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                     }
                 })
+                    .addStep(
+                        {
+                            name: 'Notify Slack',
+                            uses: '8398a7/action-slack@v3',
+                            with: {
+                                status: '${{ job.status }}',
+                                fields: 'repo,commit,author',
+                            },
+                            if: '!success()',
+                        }
+                    ),
         })
     }
 
@@ -430,6 +497,17 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                     }
                 })
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
+                ),
         });
     }
 
@@ -544,6 +622,17 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                     }
                 })
+                .addStep(
+                    {
+                        name: 'Notify Slack',
+                        uses: '8398a7/action-slack@v3',
+                        with: {
+                            status: '${{ job.status }}',
+                            fields: 'repo,commit,author',
+                        },
+                        if: '!success()',
+                    }
+                ),
         });
     }
 
