@@ -24,6 +24,7 @@ const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
     TRAVIS_OS_NAME: 'linux',
+    SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
 }, extraEnv);
 export class BaseJob extends job.Job {
     constructor(name, params) {
@@ -159,6 +160,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep({
                 name: 'Run golangci',
                 run: 'make -f Makefile.github lint_provider',
+            })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in linting provider",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
             }),
             prerequisites: new BaseJob('prerequisites')
                 .addStep({
@@ -174,6 +185,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     // eslint-disable-next-line no-template-curly-in-string
                     path: '${{ github.workspace }}/bin',
                 },
+            })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in building provider prerequisites",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
             }),
             build_sdk: new MultilangJob('build_sdk', {
                 needs: 'prerequisites'
@@ -196,6 +217,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     // eslint-disable-next-line no-template-curly-in-string
                     path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
                 },
+            })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in building ${{ matrix.language }} sdk",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
             }),
             lint_sdk: new BaseJob('lint-sdk', {
                 container: 'golangci/golangci-lint:latest',
@@ -204,6 +235,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep({
                 name: 'Run golangci',
                 run: 'cd sdk/go/' + provider + " && golangci-lint run -c ../../../.golangci.yml",
+            })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in linting go sdk",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
             }),
             test: new MultilangJob('test', { needs: 'build_sdk' })
                 .addStep({
@@ -236,6 +277,16 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 name: 'Run tests',
                 // eslint-disable-next-line no-template-curly-in-string
                 run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .',
+            })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in running ${{ matrix.language }} tests",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
             }),
         };
     }
@@ -301,6 +352,16 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                 }
             })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in publishing SDK",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
+            }),
         });
     }
 }
@@ -413,6 +474,16 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                 }
             })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in publishing SDK",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
+            }),
         });
     }
 }
@@ -525,6 +596,16 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
                 }
             })
+                .addStep({
+                name: 'Notify Slack',
+                uses: '8398a7/action-slack@v3',
+                with: {
+                    author_name: "Failure in publishing SDK",
+                    status: '${{ job.status }}',
+                    fields: 'repo,commit,author,action',
+                },
+                if: 'failure()',
+            }),
         });
     }
 }
