@@ -177,10 +177,11 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in linting provider",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
             prerequisites: new BaseJob('prerequisites')
@@ -207,10 +208,11 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in building provider prerequisites",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
             build_sdk: new MultilangJob('build_sdk', {
@@ -240,10 +242,11 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in building ${{ matrix.language }} sdk",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
             lint_sdk: new BaseJob('lint-sdk', {
@@ -261,10 +264,11 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in linting go sdk",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
             test: new MultilangJob('test', {needs: 'build_sdk'})
@@ -304,10 +308,11 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in running ${{ matrix.language }} tests",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
         };
@@ -375,10 +380,11 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                             name: 'Notify Slack',
                             uses: '8398a7/action-slack@v3',
                             with: {
+                                author_name: "Failure in publishing SDK",
                                 status: '${{ job.status }}',
-                                fields: 'repo,commit,author',
+                                fields: 'repo,commit,author,action',
                             },
-                            if: '!success()',
+                            if: 'failure()',
                         }
                     ),
         })
@@ -516,10 +522,11 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in publishing SDK",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
         }, {
@@ -662,10 +669,11 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Notify Slack',
                         uses: '8398a7/action-slack@v3',
                         with: {
+                            author_name: "Failure in publishing SDK",
                             status: '${{ job.status }}',
-                            fields: 'repo,commit,author',
+                            fields: 'repo,commit,author,action',
                         },
-                        if: '!success()',
+                        if: 'failure()',
                     }
                 ),
         });
