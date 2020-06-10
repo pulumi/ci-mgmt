@@ -393,7 +393,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
     on = {
         push: {
             branches: ["master"],
-            'tags-ignore': [ '*' ]
+            'tags-ignore': [ 'v*', 'sdk/*', '**' ]
         },
     }
 }

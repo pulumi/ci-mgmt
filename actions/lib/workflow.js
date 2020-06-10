@@ -297,7 +297,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
         this.on = {
             push: {
                 branches: ["master"],
-                'tags-ignore': ['*']
+                'tags-ignore': ['v*', 'sdk/*', '**']
             },
         };
         this.jobs = Object.assign(this.jobs, {

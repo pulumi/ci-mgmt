@@ -1,0 +1,3 @@
+provider: fastly
+env:
+  FASTLY_API_KEY: ${{ secrets.FASTLY_API_KEY }}
