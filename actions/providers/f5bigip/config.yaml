@@ -1,0 +1,4 @@
+provider: f5bigip
+env:
+  AWS_REGION: us-west-2
+  AWS_SDK_LOAD_CONFIG: true
