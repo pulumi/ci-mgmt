@@ -338,3 +338,5 @@ name: master
   push:
     branches:
     - master
+    tags-ignore:
+    - '*'

@@ -17,7 +17,7 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
         }
         this.before = {
             hooks: [
-                'cd provider && go mod download'
+                'make -f Makefile.github tfgen'
             ]
         };
         this.builds = [{
@@ -40,17 +40,10 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
             }];
         this.archives = [{
                 name_template: '{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}',
-                format_overrides: [
-                    { goos: 'windows', format: 'zip' },
-                ],
-                replacements: {
-                    amd64: 'x64',
-                    '386': 'x86',
-                },
                 id: 'archive',
             }];
         this.snapshot = {
-            name_template: '{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}'
+            name_template: '{{ .Tag }}-SNAPSHOT'
         };
         this.changelog = {
             skip: true,
@@ -61,7 +54,7 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
         this.blobs = [{
                 provider: 's3',
                 region: 'us-west-2',
-                bucket: 'goreleaser',
+                bucket: 'get.pulumi.com',
                 folder: 'releases/plugins/',
                 ids: ['archive']
             }];

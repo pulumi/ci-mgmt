@@ -190,7 +190,8 @@ jobs:
         fields: repo,commit,author
         status: ${{ job.status }}
   publish:
-    needs: build_sdk
+    needs: test
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
@@ -220,7 +221,7 @@ jobs:
         version: latest
   publish_sdk:
     name: publish_sdk
-    needs: test
+    needs: publish
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo

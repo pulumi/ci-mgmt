@@ -17,14 +17,13 @@ const repoFiles = [
 ]
 
 // const providers = fs.readdirSync('../providers');
-const providers = ['kong', 'rancher2']
+const providers = ['kong', 'rancher2', 'keycloak']
 
 for (let provider of providers) {
 
     const automationBranch = new github.Branch(`${provider}-automated`, {
         repository: `pulumi-${provider}`,
         branch: 'pulumi-automation',
-        sourceBranch: 'master',
     })
 
     for (let file of repoFiles) {

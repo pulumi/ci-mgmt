@@ -386,7 +386,8 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
 
     on = {
         push: {
-            branches: ["master"]
+            branches: ["master"],
+            'tags-ignore': [ '*' ]
         },
     }
 }
@@ -396,7 +397,9 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
         super(name, jobs);
         this.jobs = Object.assign(this.jobs, {
             publish: {
-                needs: 'build_sdk',
+                name: 'publish',
+                'runs-on': 'ubuntu-latest',
+                needs: 'test',
                 steps: [
                     {
                         name: 'Checkout Repo',
@@ -435,6 +438,17 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         },
                     },
                     {
+                        name: 'Install pulumictl',
+                        uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                        with: {
+                            repo:'pulumi/pulumictl'
+                        }
+                    },
+                    {
+                        name: 'Install Pulumi CLI',
+                        uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+                    },
+                    {
                         name: 'Run GoReleaser',
                         uses: 'goreleaser/goreleaser-action@v2',
                         with: {
@@ -445,7 +459,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 ],
             },
         }, {
-            publish_sdk: new BaseJob('publish_sdk', {needs: 'test'})
+            publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
                 .addStep({
                     name: 'Setup Node',
                     uses: 'actions/setup-node@v1',
@@ -508,6 +522,26 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         if: '!success()',
                     }
                 ),
+        }, {
+            create_docs_build: {
+                name: "Create docs build",
+                'runs-on': 'ubuntu-latest',
+                needs: 'publish_sdk',
+                steps: [{
+                    name: 'Install pulumictl',
+                    uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                    with: {
+                        repo: 'pulumi/pulumictl',
+                    },
+                }, {
+                    name: 'Dispatch event',
+                    run: 'pulumictl create docs-build pulumi-${{ env.PROVIDER }} ${GITHUB_REF#refs/tags/}',
+                    env: {
+                        GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
+                    }
+
+                }],
+            }
         });
     }
 
@@ -521,7 +555,8 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
         super(name, jobs);
         this.jobs = Object.assign(this.jobs, {
             publish: {
-                needs: 'build_sdk',
+                needs: 'test',
+                'runs-on': 'ubuntu-latest',
                 steps: [
                     {
                         name: 'Checkout Repo',
@@ -570,7 +605,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 ],
             },
         }, {
-            publish_sdk: new BaseJob('publish_sdk', {needs: 'test'})
+            publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
                 .addStep({
                     name: 'Setup Node',
                     uses: 'actions/setup-node@v1',
@@ -643,17 +678,17 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
 
 export class PulumiAutomationWorkflow {
     env = {
-        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
     }
     name = 'pr-automation';
     on = {
         push: {
-            branches: ['pulumi-automation']
+            branches: ['pulumi-automation', 'automation/pulumi-provider-ci']
         }
     }
     jobs = {
         'open-pull-request': {
-            name: 'open pull request for pulumi-automation changes',
+            name: 'open pull request for ci changes',
             'runs-on': 'ubuntu-latest',
             steps: [
                 {
@@ -664,7 +699,7 @@ export class PulumiAutomationWorkflow {
                     name: 'Create Pull Request',
                     uses: 'repo-sync/pull-request@v2',
                     with: {
-                        github_token: '${{ secrets.GITHUB_TOKEN }}',
+                        github_token: '${{ secrets.PULUMI_BOT_TOKEN }}',
                         pr_title: "🤖 automated pull-request from pulumi",
                         pr_body: "🚀 This PR has been opened because changes have been pushed to ${{ github.ref }}, please review them carefully!",
                         pr_reviewer: "jaxxstorm,stack72",
