@@ -17,7 +17,7 @@ const repoFiles = [
 ]
 
 // const providers = fs.readdirSync('../providers');
-const providers = ['kong', 'rancher2', 'keycloak']
+const providers = ['kong', 'rancher2', 'keycloak', 'gitlab']
 
 for (let provider of providers) {
 

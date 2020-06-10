@@ -22,7 +22,7 @@ endef
 $(foreach dir,$(providers),$(eval $(call provider-target,$(dir))))
 
 deploy: providers
-	pulumi up -C project --refresh
+	pulumi up -C project
 
 clean:
 	rm -rf providers/*/repo
