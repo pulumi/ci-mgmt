@@ -12,7 +12,7 @@ blobs:
   provider: s3
   region: us-west-2
 builds:
-- binary: pulumi-resource-spotinst
+- binary: pulumi-resource-dnsimple
   dir: provider
   env:
   - CGO_ENABLED=0
@@ -24,8 +24,8 @@ builds:
   - windows
   - linux
   ldflags:
-  - -X github.com/pulumi/pulumi-spotinst/provider/v2/pkg/version.Version={{.Tag}}
-  main: ./cmd/pulumi-resource-spotinst/
+  - -X github.com/pulumi/pulumi-dnsimple/provider/v2/pkg/version.Version={{.Tag}}
+  main: ./cmd/pulumi-resource-dnsimple/
 changelog:
   skip: true
 release:

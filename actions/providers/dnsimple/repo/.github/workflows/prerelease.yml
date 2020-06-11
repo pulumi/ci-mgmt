@@ -1,20 +1,17 @@
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_REGION: us-west-2
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+  DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: spotinst
+  PROVIDER: dnsimple
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
-  SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
   TRAVIS_OS_NAME: linux
 jobs:
   build_sdk:
@@ -94,19 +91,6 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-  create_docs_build:
-    name: Create docs build
-    needs: publish_sdk
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/pulumictl
-    - env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-      name: Dispatch event
-      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }} ${GITHUB_REF#refs/tags/}
   lint:
     container: golangci/golangci-lint:latest
     name: lint
@@ -166,7 +150,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/spotinst && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/dnsimple && golangci-lint run -c ../../../.golangci.yml
     - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
@@ -212,7 +196,6 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
   publish:
-    name: publish
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -229,7 +212,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 3600
+        role-duration-seconds: "3600"
         role-external-id: upload-pulumi-release
         role-session-name: ${{ env.PROVIDER}}@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
@@ -237,16 +220,10 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.goversion }}
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        args: release --rm-dist
+        args: release --rm-dist --config=.goreleaser.prerelease.yaml
         version: latest
   publish_sdk:
     name: publish_sdk
@@ -391,8 +368,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: release
+name: prerelease
 "on":
   push:
     tags:
-    - v*.*.*
+    - v*.*.*-**

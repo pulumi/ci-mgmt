@@ -16,8 +16,8 @@ const repoFiles = [
     '.github/workflows/pr-automation.yml'
 ]
 
-// const providers = fs.readdirSync('../providers');
-const providers = [ 'aiven', 'auth0', 'consul', 'digitalocean', 'f5bigip', 'fastly', 'github', 'gitlab', 'kong', 'mailgun', 'mongodbatlas', 'pagerduty', 'rabbitmq', 'rancher2', 'keycloak']
+const providers = fs.readdirSync('../providers');
+// const providers = [ 'aiven', 'auth0', 'consul', 'digitalocean', 'f5bigip', 'fastly', 'github', 'gitlab', 'kong', 'mailgun', 'mongodbatlas', 'pagerduty', 'rabbitmq', 'rancher2', 'keycloak']
 
 for (let provider of providers) {
 

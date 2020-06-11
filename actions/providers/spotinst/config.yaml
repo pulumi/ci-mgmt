@@ -1,8 +1,0 @@
-provider: spotinst
-env:
-  AWS_REGION: "us-west-2"
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
-  SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
-
