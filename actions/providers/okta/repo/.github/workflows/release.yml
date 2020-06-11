@@ -4,7 +4,10 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: consul
+  OKTA_API_TOKEN: ${{ secrets.OKTA_API_TOKEN }}
+  OKTA_BASE_URL: ${{ secrets.OKTA_BASE_URL }}
+  OKTA_ORG_NAME: ${{ secrets.OKTA_ORG_NAME }}
+  PROVIDER: okta
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -89,6 +92,19 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
+  create_docs_build:
+    name: Create docs build
+    needs: publish_sdk
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
+      with:
+        repo: pulumi/pulumictl
+    - env:
+        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+      name: Dispatch event
+      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }} ${GITHUB_REF#refs/tags/}
   lint:
     container: golangci/golangci-lint:latest
     name: lint
@@ -148,7 +164,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/consul && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/okta && golangci-lint run -c ../../../.golangci.yml
     - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
@@ -194,6 +210,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
   publish:
+    name: publish
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -210,7 +227,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: "3600"
+        role-duration-seconds: 3600
         role-external-id: upload-pulumi-release
         role-session-name: ${{ env.PROVIDER}}@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
@@ -218,10 +235,16 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.goversion }}
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
+      with:
+        repo: pulumi/pulumictl
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        args: release --rm-dist --config=.goreleaser.prerelease.yaml
+        args: release --rm-dist
         version: latest
   publish_sdk:
     name: publish_sdk
@@ -340,8 +363,6 @@ jobs:
       uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
       run: make -f Makefile.github install_${{ matrix.language}}_sdk
-    - name: Run docker-compose
-      run: docker-compose -f testing/docker-compose.yml up --build -d
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
         }} -parallel 4 .
@@ -368,8 +389,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: prerelease
+name: release
 "on":
   push:
     tags:
-    - v*.*.*-**
+    - v*.*.*

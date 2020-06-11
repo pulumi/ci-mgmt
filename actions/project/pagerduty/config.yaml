@@ -1,0 +1,5 @@
+provider: okta
+env:
+  OKTA_BASE_URL: ${{ secrets.OKTA_BASE_URL }}
+  OKTA_ORG_NAME: ${{ secrets.OKTA_ORG_NAME }}
+  OKTA_API_TOKEN: ${{ secrets.OKTA_API_TOKEN }}

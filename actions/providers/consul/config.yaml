@@ -1,1 +1,2 @@
 provider: consul
+docker: true
