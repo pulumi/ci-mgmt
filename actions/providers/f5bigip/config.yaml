@@ -1,4 +1,5 @@
 provider: f5bigip
+aws: true
 env:
   AWS_REGION: us-west-2
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

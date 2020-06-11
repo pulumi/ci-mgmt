@@ -1,0 +1,2 @@
+provider: kafka
+docker: true
