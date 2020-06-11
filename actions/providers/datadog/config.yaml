@@ -1,2 +1,1 @@
-provider: consul
-docker: true
+provider: datadog
