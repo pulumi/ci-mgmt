@@ -4,6 +4,7 @@ import * as param from '@jkcfg/std/param';
 const provider = param.String('provider');
 const extraEnv = param.Object('env');
 const docker = param.Boolean('docker');
+const aws = param.Boolean('aws');
 const setupScript = param.String('setup-script');
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
@@ -78,6 +79,23 @@ export class BaseJob extends job.Job {
             this.steps.push({
                 name: 'Run docker-compose',
                 run: 'docker-compose -f testing/docker-compose.yml up --build -d'
+            });
+        }
+        return this;
+    }
+    addAWS(aws) {
+        if (aws) {
+            this.steps.push({
+                name: 'Configure AWS Credentials',
+                uses: 'aws-actions/configure-aws-credentials@v1',
+                with: {
+                    'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
+                    'aws-region': '${{ env.AWS_REGION }}',
+                    'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
+                    'role-duration-seconds': 3600,
+                    'role-session-name': '${{ env.PROVIDER }}@githubActions',
+                    'role-to-assume': '${{ secrets.AWS_CI_ROLE_ARN }}'
+                }
             });
         }
         return this;
@@ -271,6 +289,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 // eslint-disable-next-line no-template-curly-in-string
                 run: 'make -f Makefile.github install_${{ matrix.language}}_sdk',
             })
+                .addAWS(aws)
                 .addDocker(docker)
                 .addSetupScript(setupScript)
                 .addStep({
