@@ -1,1 +1,2 @@
 provider: datadog
+golangci-timeout: 20m
