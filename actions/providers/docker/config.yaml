@@ -1,0 +1,4 @@
+provider: docker
+aws: true
+env:
+  AWS_REGION: us-west-2
