@@ -187,7 +187,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
             prerequisites: new BaseJob('prerequisites')
                 .addStep({
@@ -212,7 +212,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
             build_sdk: new MultilangJob('build_sdk', {
                 needs: 'prerequisites'
@@ -244,7 +244,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
             lint_sdk: new BaseJob('lint-sdk', {
                 container: 'golangci/golangci-lint:latest',
@@ -262,7 +262,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
             test: new MultilangJob('test', { needs: 'build_sdk' })
                 .addStep({
@@ -305,7 +305,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
         };
     }
@@ -380,7 +380,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
         });
     }
@@ -515,7 +515,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
         }, {
             create_docs_build: {
@@ -657,7 +657,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     status: '${{ job.status }}',
                     fields: 'repo,commit,author,action',
                 },
-                if: 'failure()',
+                if: 'failure() && github.event_name == \'push\'',
             }),
         });
     }
