@@ -1,0 +1,8 @@
+provider: gcp
+gcp: true
+version: 3
+env:
+  GOOGLE_PROJECT: "pulumi-ci-gcp-provider"
+  GOOGLE_REGION: "us-central1"
+  GOOGLE_ZONE: "us-central1-a"
+

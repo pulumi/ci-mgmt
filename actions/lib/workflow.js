@@ -5,6 +5,7 @@ const provider = param.String('provider');
 const extraEnv = param.Object('env');
 const docker = param.Boolean('docker');
 const aws = param.Boolean('aws');
+const gcp = param.Boolean('gcp');
 const setupScript = param.String('setup-script');
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
@@ -95,6 +96,21 @@ export class BaseJob extends job.Job {
                     'role-duration-seconds': 3600,
                     'role-session-name': '${{ env.PROVIDER }}@githubActions',
                     'role-to-assume': '${{ secrets.AWS_CI_ROLE_ARN }}'
+                }
+            });
+        }
+        return this;
+    }
+    addGCP(gcp) {
+        if (gcp) {
+            this.steps.push({
+                name: 'Configure GCP credentials',
+                uses: 'GoogleCloudPlatform/github-actions/setup-gcloud@master',
+                with: {
+                    'version': '285.0.0',
+                    'project_id': '${{ secrets.GCP_PROJECT_ID }}',
+                    'service_account_email': '${{ secrets.GCP_SA_EMAIL }}',
+                    'service_account_key': '${{ secrets.GCP_SA_KEY }}',
                 }
             });
         }
@@ -290,6 +306,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 run: 'make -f Makefile.github install_${{ matrix.language}}_sdk',
             })
                 .addAWS(aws)
+                .addGCP(gcp)
                 .addDocker(docker)
                 .addSetupScript(setupScript)
                 .addStep({
