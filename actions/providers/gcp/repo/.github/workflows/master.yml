@@ -285,6 +285,8 @@ name: master
   push:
     branches:
     - master
+    paths-ignore:
+    - CHANGELOG.md
     tags-ignore:
     - v*
     - sdk/*

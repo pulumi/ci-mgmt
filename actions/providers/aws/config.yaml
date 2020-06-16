@@ -1,0 +1,5 @@
+provider: aws
+lint: false
+aws: true
+env:
+  AWS_REGION: us-west-2
