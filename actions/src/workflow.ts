@@ -439,7 +439,10 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
     on = {
         push: {
             branches: ["master"],
-            'tags-ignore': ['v*', 'sdk/*', '**']
+            'tags-ignore': [ 'v*', 'sdk/*', '**' ],
+            'paths-ignore': [
+                "CHANGELOG.md"
+            ]
         },
     }
 }
@@ -726,7 +729,9 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
     }
 
     on = {
-        push: {tags: ['v*.*.*-**']},
+        push: {
+            tags: ['v*.*.*-**'],
+        },
     }
 }
 

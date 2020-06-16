@@ -340,7 +340,10 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
         this.on = {
             push: {
                 branches: ["master"],
-                'tags-ignore': ['v*', 'sdk/*', '**']
+                'tags-ignore': ['v*', 'sdk/*', '**'],
+                'paths-ignore': [
+                    "CHANGELOG.md"
+                ]
             },
         };
         this.jobs = Object.assign(this.jobs, {
@@ -567,7 +570,9 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
     constructor(name, jobs) {
         super(name, jobs);
         this.on = {
-            push: { tags: ['v*.*.*-**'] },
+            push: {
+                tags: ['v*.*.*-**'],
+            },
         };
         this.jobs = Object.assign(this.jobs, {
             publish: {
