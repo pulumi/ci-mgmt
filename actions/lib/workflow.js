@@ -6,6 +6,7 @@ const extraEnv = param.Object('env');
 const docker = param.Boolean('docker');
 const aws = param.Boolean('aws');
 const gcp = param.Boolean('gcp');
+const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
@@ -108,9 +109,10 @@ export class BaseJob extends job.Job {
                 uses: 'GoogleCloudPlatform/github-actions/setup-gcloud@master',
                 with: {
                     'version': '285.0.0',
-                    'project_id': '${{ secrets.GCP_PROJECT_ID }}',
+                    'project_id': '${{ env.GOOGLE_PROJECT }}',
                     'service_account_email': '${{ secrets.GCP_SA_EMAIL }}',
                     'service_account_key': '${{ secrets.GCP_SA_KEY }}',
+                    'export_default_credentials': true,
                 }
             });
         }
@@ -188,23 +190,6 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             env,
         });
         this.jobs = {
-            lint: new BaseJob('lint', {
-                container: 'golangci/golangci-lint:latest'
-            })
-                .addStep({
-                name: 'Run golangci',
-                run: 'make -f Makefile.github lint_provider',
-            })
-                .addStep({
-                name: 'Notify Slack',
-                uses: '8398a7/action-slack@v3',
-                with: {
-                    author_name: "Failure in linting provider",
-                    status: '${{ job.status }}',
-                    fields: 'repo,commit,author,action',
-                },
-                if: 'failure() && github.event_name == \'push\'',
-            }),
             prerequisites: new BaseJob('prerequisites')
                 .addStep({
                 name: 'Build tfgen & provider binaries',
@@ -262,24 +247,6 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 },
                 if: 'failure() && github.event_name == \'push\'',
             }),
-            lint_sdk: new BaseJob('lint-sdk', {
-                container: 'golangci/golangci-lint:latest',
-                needs: 'build_sdk'
-            })
-                .addStep({
-                name: 'Run golangci',
-                run: 'cd sdk/go/' + provider + " && golangci-lint run -c ../../../.golangci.yml",
-            })
-                .addStep({
-                name: 'Notify Slack',
-                uses: '8398a7/action-slack@v3',
-                with: {
-                    author_name: "Failure in linting go sdk",
-                    status: '${{ job.status }}',
-                    fields: 'repo,commit,author,action',
-                },
-                if: 'failure() && github.event_name == \'push\'',
-            }),
             test: new MultilangJob('test', { needs: 'build_sdk' })
                 .addStep({
                 name: 'Download SDK',
@@ -325,6 +292,46 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 if: 'failure() && github.event_name == \'push\'',
             }),
         };
+        if (lint) {
+            this.jobs = Object.assign(this.jobs, {
+                lint: new BaseJob('lint', {
+                    container: 'golangci/golangci-lint:latest',
+                })
+                    .addStep({
+                    name: 'Run golangci',
+                    run: 'make -f Makefile.github lint_provider',
+                })
+                    .addStep({
+                    name: 'Notify Slack',
+                    uses: '8398a7/action-slack@v3',
+                    with: {
+                        author_name: "Failure in linting provider",
+                        status: '${{ job.status }}',
+                        fields: 'repo,commit,author,action',
+                    },
+                    if: 'failure() && github.event_name == \'push\'',
+                }),
+            }, {
+                lint_sdk: new BaseJob('lint-sdk', {
+                    container: 'golangci/golangci-lint:latest',
+                    needs: 'build_sdk'
+                })
+                    .addStep({
+                    name: 'Run golangci',
+                    run: 'cd sdk/go/' + provider + " && golangci-lint run -c ../../../.golangci.yml",
+                })
+                    .addStep({
+                    name: 'Notify Slack',
+                    uses: '8398a7/action-slack@v3',
+                    with: {
+                        author_name: "Failure in linting go sdk",
+                        status: '${{ job.status }}',
+                        fields: 'repo,commit,author,action',
+                    },
+                    if: 'failure() && github.event_name == \'push\'',
+                }),
+            });
+        }
     }
 }
 export class PulumiMasterWorkflow extends PulumiBaseWorkflow {

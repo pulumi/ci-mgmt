@@ -1,10 +1,16 @@
 env:
+  ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_ENVIRONMENT: public
+  ARM_LOCATION: northcentralus
+  ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
+  ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: datadog
+  PROVIDER: azure
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -89,19 +95,6 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-  create_docs_build:
-    name: Create docs build
-    needs: publish_sdk
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/pulumictl
-    - env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-      name: Dispatch event
-      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }} ${GITHUB_REF#refs/tags/}
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -140,7 +133,6 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
   publish:
-    name: publish
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -157,7 +149,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 3600
+        role-duration-seconds: "3600"
         role-external-id: upload-pulumi-release
         role-session-name: ${{ env.PROVIDER}}@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
@@ -165,16 +157,10 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.goversion }}
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
-      with:
-        repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        args: release --rm-dist
+        args: release --rm-dist --config=.goreleaser.prerelease.yaml
         version: latest
   publish_sdk:
     name: publish_sdk
@@ -319,8 +305,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: release
+name: prerelease
 "on":
   push:
     tags:
-    - v*.*.*
+    - v*.*.*-**
