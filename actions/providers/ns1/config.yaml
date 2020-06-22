@@ -1,0 +1,4 @@
+provider: ns1
+major-version: 1
+env:
+  NS1_APIKEY: ${{ secrets.NS1_APIKEY }}
