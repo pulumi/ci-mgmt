@@ -34,7 +34,7 @@ for provider in $( ls ${WORKDIR}/providers ); do
     hub branch "${BRANCH_NAME}"
     hub add -A
     hub commit -m "${COMMIT_MSG}"
-    hub push "${BRANCH_NAME}"
+    hub push origin "${BRANCH_NAME}"
     hub pull-request --labels "impact/no-changelog-required" -a "stack72,jaxxstorm"
 done
 
