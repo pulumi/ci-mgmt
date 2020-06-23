@@ -264,8 +264,9 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 run: 'echo ::add-path::${{ github.workspace }}/bin',
             })
                 .addStep({
-                name: 'Install pipenv',
-                uses: 'dschep/install-pipenv-action@v1',
+                name: 'Install Python deps',
+                run: `pip3 install virtualenv==20.0.23
+pip3 install pipenv`,
             })
                 .addStep({
                 name: 'Install dependencies',
