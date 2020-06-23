@@ -1,4 +1,4 @@
 provider: newrelic
 major-version: 3
 env:
-  NEWRELIC_API_KEY: ${{ secrets.NEWRELIC_API_KEY }}
+  NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
