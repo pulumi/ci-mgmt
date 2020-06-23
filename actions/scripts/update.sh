@@ -31,7 +31,7 @@ for provider in $( ls ${WORKDIR}/providers ); do
     rsync -avzP ${PROVIDER_CONFIG_PATH} ${TMPDIR}/pulumi-${provider}/
 
     echo "Adding & committing changes"
-    git checkout -b "${BRANCH_NAME}"
+    git checkout -b "${BRANCH_NAME}" || git checkout "${BRANCH_NAME}"
     git add -A
     git commit -a -m "${COMMIT_MSG}"
     git status
