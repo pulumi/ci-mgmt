@@ -39,3 +39,4 @@ for provider in $( ls ${WORKDIR}/providers ); do
     #hub pull-request --labels "impact/no-changelog-required" -a "stack72,jaxxstorm"
 done
 
+rm -rf ${TMPDIR}
