@@ -35,8 +35,8 @@ for provider in $( ls ${WORKDIR}/providers ); do
     git add -A
     git commit -a -m "${COMMIT_MSG}"
     git status
+    rm -rf ${TMPDIR}
     #git push origin "${BRANCH_NAME}"
     #hub pull-request --labels "impact/no-changelog-required" -a "stack72,jaxxstorm"
 done
 
-rm -rf ${TMPDIR}
