@@ -31,10 +31,11 @@ for provider in $( ls ${WORKDIR}/providers ); do
     rsync -avzP ${PROVIDER_CONFIG_PATH} ${TMPDIR}/pulumi-${provider}/
 
     echo "Adding & committing changes"
-    hub branch "${BRANCH_NAME}"
-    hub add -A
-    hub commit -m "${COMMIT_MSG}"
-    hub push origin "${BRANCH_NAME}"
-    hub pull-request --labels "impact/no-changelog-required" -a "stack72,jaxxstorm"
+    git checkout -b "${BRANCH_NAME}"
+    git add -A
+    git commit -a -m "${COMMIT_MSG}"
+    git status
+    #git push origin "${BRANCH_NAME}"
+    #hub pull-request --labels "impact/no-changelog-required" -a "stack72,jaxxstorm"
 done
 
