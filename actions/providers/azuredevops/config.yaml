@@ -1,5 +1,6 @@
 provider: azuredevops
 major-version: 1
+lint: false
 env:
   AZDO_ORG_SERVICE_URL: ${{ secrets.AZDO_ORG_SERVICE_URL }}
-  AZDO_PERSONAL_ACCESS_TOKEN: ${{ secrets.AZDO_ORG_SERVICE_URL }}
+  AZDO_PERSONAL_ACCESS_TOKEN: ${{ secrets.AZDO_PERSONAL_ACCESS_TOKEN }}
