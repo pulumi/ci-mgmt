@@ -1,18 +1,18 @@
 env:
-  AIVEN_API_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
-  AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: aiven
+  PROVIDER: wavefront
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
+  WAVEFRONT_ADDRESS: ${{ secrets.WAVEFRONT_ADDRESS }}
+  WAVEFRONT_TOKEN: ${{ secrets.WAVEFRONT_TOKEN }}
 jobs:
   build_sdk:
     name: build_sdk
@@ -150,7 +150,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/aiven && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/wavefront && golangci-lint run -c ../../../.golangci.yml
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: 8398a7/action-slack@v3

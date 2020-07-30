@@ -1,18 +1,18 @@
 env:
-  AIVEN_API_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
-  AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GO111MODULE: "on"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: aiven
+  PROVIDER: wavefront
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
+  WAVEFRONT_ADDRESS: ${{ secrets.WAVEFRONT_ADDRESS }}
+  WAVEFRONT_TOKEN: ${{ secrets.WAVEFRONT_TOKEN }}
 jobs:
   build_sdk:
     name: build_sdk
@@ -91,6 +91,19 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
+  create_docs_build:
+    name: Create docs build
+    needs: publish_sdk
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
+      with:
+        repo: pulumi/pulumictl
+    - env:
+        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+      name: Dispatch event
+      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }} ${GITHUB_REF#refs/tags/}
   lint:
     container: golangci/golangci-lint:latest
     name: lint
@@ -150,7 +163,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@releases/v1
     - name: Run golangci
-      run: cd sdk/go/aiven && golangci-lint run -c ../../../.golangci.yml
+      run: cd sdk/go/wavefront && golangci-lint run -c ../../../.golangci.yml
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: 8398a7/action-slack@v3
@@ -195,9 +208,46 @@ jobs:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
         status: ${{ job.status }}
+  publish:
+    name: publish
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+    - name: Checkout Scripts Repo
+      uses: actions/checkout@v2
+      with:
+        path: ci-scripts
+        repository: pulumi/scripts
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-region: us-east-2
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-duration-seconds: 3600
+        role-external-id: upload-pulumi-release
+        role-session-name: ${{ env.PROVIDER}}@githubActions
+        role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.goversion }}
+    - name: Install pulumictl
+      uses: jaxxstorm/action-install-gh-release@release/v1-alpha
+      with:
+        repo: pulumi/pulumictl
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@releases/v1
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        args: release --rm-dist
+        version: latest
   publish_sdk:
     name: publish_sdk
-    needs: test
+    needs: publish
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
@@ -340,14 +390,8 @@ jobs:
         - 13.x
         pythonversion:
         - "3.7"
-name: master
+name: release
 "on":
   push:
-    branches:
-    - master
-    paths-ignore:
-    - CHANGELOG.md
-    tags-ignore:
-    - v*
-    - sdk/*
-    - '**'
+    tags:
+    - v*.*.*
