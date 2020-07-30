@@ -47,7 +47,7 @@ export class BaseJob extends job.Job {
             },
             {
                 name: 'Unshallow clone for tags',
-                run: 'git fetch --prune --unshallow',
+                run: 'git fetch --prune --unshallow --tags',
             },
             {
                 name: 'Install Go',
