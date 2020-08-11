@@ -136,7 +136,7 @@ export class MultilangJob extends BaseJob {
             matrix: {
                 language: ['nodejs', 'python', 'dotnet', 'go'],
                 goversion: ['1.14.x'],
-                dotnetversion: ['3.1.201'],
+                dotnetversion: ['3.1.301'],
                 pythonversion: ['3.7'],
                 nodeversion: ['13.x'],
             },
