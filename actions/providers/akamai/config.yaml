@@ -1,0 +1,7 @@
+provider: akamai
+major-version: 1
+env:
+  AKAMAI_HOST: ${{ secrets.AKAMAI_HOST }}
+  AKAMAI_ACCESS_TOKEN: ${{ secrets.AKAMAI_ACCESS_TOKEN }}
+  AKAMAI_CLIENT_TOKEN: ${{ secrets.AKAMAI_CLIENT_TOKEN }}
+  AKAMAI_CLIENT_SECRET: ${{ secrets.AKAMAI_CLIENT_SECRET }}
