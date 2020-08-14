@@ -17,7 +17,7 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
         }
         this.before = {
             hooks: [
-                'make -f Makefile.github tfgen'
+                'make tfgen'
             ]
         };
         this.builds = [{

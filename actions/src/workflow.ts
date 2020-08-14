@@ -205,7 +205,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep(
                     {
                         name: 'Build tfgen & provider binaries',
-                        run: 'make -f Makefile.github provider',
+                        run: 'make provider',
                     },
                 )
                 .addStep(
@@ -238,7 +238,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep({
                     name: 'Build SDK',
                     // eslint-disable-next-line no-template-curly-in-string
-                    run: 'make -f Makefile.github build_${{ matrix.language }}',
+                    run: 'make build_${{ matrix.language }}',
                 })
                 .addStep({
                     name: 'Check worktree clean',
@@ -290,7 +290,7 @@ pip3 install pipenv`,
                 .addStep({
                     name: 'Install dependencies',
                     // eslint-disable-next-line no-template-curly-in-string
-                    run: 'make -f Makefile.github install_${{ matrix.language}}_sdk',
+                    run: 'make install_${{ matrix.language}}_sdk',
                 })
                 .addAWS(aws)
                 .addGCP(gcp)
@@ -323,7 +323,7 @@ pip3 install pipenv`,
                     .addStep(
                         {
                             name: 'Run golangci',
-                            run: 'make -f Makefile.github lint_provider',
+                            run: 'make lint_provider',
                         },
                     )
                     .addStep(
