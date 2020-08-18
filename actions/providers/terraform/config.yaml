@@ -1,0 +1,9 @@
+provider: terraform
+major-version: 3
+lint: false
+skipTfGen: true
+aws: true
+env:
+  AWS_REGION: us-west-2
+  TFE_ORGANIZATION: ${{ secrets.TFE_ORGANIZATION }}
+  TFE_TOKEN: ${{ secrets.TFE_TOKEN }}
