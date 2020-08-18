@@ -1,5 +1,6 @@
 import * as param from '@jkcfg/std/param';
 const majVersion = param.Number('major-version', 2);
+const skipTfGen = param.Boolean('skipTfGen', false);
 export class GoreleaserConfig {
     constructor(params) {
         Object.assign(this, params);
@@ -15,11 +16,13 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
         else {
             ldflags = [`-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}`];
         }
-        this.before = {
-            hooks: [
-                'make tfgen'
-            ]
-        };
+        if (!skipTfGen) {
+            this.before = {
+                hooks: [
+                    'make tfgen'
+                ]
+            };
+        }
         this.builds = [{
                 dir: 'provider',
                 env: [
