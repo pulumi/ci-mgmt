@@ -47,6 +47,7 @@ export interface Changelog {
 
 export interface Release {
     disable?: boolean;
+    prerelease?: boolean;
 }
 
 export interface Blob {
@@ -146,6 +147,7 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
         super(name);
         this.release = {
             disable: false
+
         }
     }
 }

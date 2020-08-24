@@ -348,7 +348,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
             },
         };
         this.jobs = Object.assign(this.jobs, {
-            publish_sdk: new BaseJob('publish_sdk', { needs: 'test' })
+            publish_sdk: new BaseJob('publish_sdk', { needs: 'publish' })
                 .addStep({
                 name: 'Setup Node',
                 uses: 'actions/setup-node@v1',
@@ -410,6 +410,77 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                 },
                 if: 'failure() && github.event_name == \'push\'',
             }),
+        }, {
+            publish: {
+                name: 'publish',
+                'runs-on': 'ubuntu-latest',
+                needs: 'test',
+                steps: [
+                    {
+                        name: 'Checkout Repo',
+                        uses: 'actions/checkout@v2',
+                    },
+                    {
+                        name: 'Unshallow clone for tags',
+                        run: 'git fetch --prune --unshallow --tags',
+                    },
+                    {
+                        name: 'Checkout Scripts Repo',
+                        uses: 'actions/checkout@v2',
+                        with: {
+                            path: 'ci-scripts',
+                            repository: 'pulumi/scripts',
+                        },
+                    },
+                    {
+                        name: 'Configure AWS Credentials',
+                        uses: 'aws-actions/configure-aws-credentials@v1',
+                        with: {
+                            // eslint-disable-next-line no-template-curly-in-string
+                            'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
+                            'aws-region': 'us-east-2',
+                            // eslint-disable-next-line no-template-curly-in-string
+                            'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
+                            'role-duration-seconds': 3600,
+                            'role-external-id': 'upload-pulumi-release',
+                            // eslint-disable-next-line no-template-curly-in-string
+                            'role-session-name': '${{ env.PROVIDER}}@githubActions',
+                            // eslint-disable-next-line no-template-curly-in-string
+                            'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}',
+                        },
+                    },
+                    {
+                        name: 'Setup Go',
+                        uses: 'actions/setup-go@v2',
+                        with: {
+                            'go-version': '${{ matrix.goversion }}',
+                        },
+                    },
+                    {
+                        name: 'Install pulumictl',
+                        uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                        with: {
+                            repo: 'pulumi/pulumictl'
+                        }
+                    },
+                    {
+                        name: 'Install Pulumi CLI',
+                        uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+                    },
+                    {
+                        name: 'Set PreRelease Version',
+                        run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic -o)"`
+                    },
+                    {
+                        name: 'Run GoReleaser',
+                        uses: 'goreleaser/goreleaser-action@v2',
+                        with: {
+                            args: '-f .goreleaser.prerelease.yml --rm-dist --skip-validate',
+                            version: 'latest',
+                        },
+                    },
+                ],
+            },
         });
     }
 }
