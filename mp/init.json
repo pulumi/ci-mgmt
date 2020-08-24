@@ -92,12 +92,6 @@
             "Provider": "github"
         },
         {
-            "Name": "pulumi-openstack",
-            "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-openstack",
-            "Provider": "github"
-        },
-        {
             "Name": "pulumi-docker",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-docker",
@@ -131,12 +125,6 @@
             "Name": "pulumi-gitlab",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-gitlab",
-            "Provider": "github"
-        },
-        {
-            "Name": "pulumi-random",
-            "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-random",
             "Provider": "github"
         },
         {
@@ -185,12 +173,6 @@
             "Name": "pulumi-mysql",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-mysql",
-            "Provider": "github"
-        },
-        {
-            "Name": "pulumi-signalfx",
-            "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-signalfx",
             "Provider": "github"
         },
         {
