@@ -809,33 +809,51 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
 }
 
 export class PulumiAutomationWorkflow {
-    env = {
-        GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
-    }
     name = 'pr-automation';
     on = {
-        push: {
-            branches: ['pulumi-automation', 'automation/pulumi-provider-ci']
-        }
+        'pull_request': {
+            'types': [
+                'labeled',
+                'unlabeled',
+                'synchronize',
+                'opened',
+                'edited',
+                'ready_for_review',
+                'reopened',
+                'unlocked',
+            ]
+        },
+        'pull_request_review': {
+            'types': [
+                'submitted',
+            ]
+        },
+        'check_suite': {
+            'types': [
+                'completed',
+            ]
+        },
+        status: {}
     }
     jobs = {
-        'open-pull-request': {
-            name: 'open pull request for ci changes',
+        'automerge': {
+            name: 'automerge labelled pull-requests',
             'runs-on': 'ubuntu-latest',
             steps: [
                 {
-                    name: 'Checkout Repo',
-                    uses: 'actions/checkout@v2'
-                },
-                {
-                    name: 'Create Pull Request',
-                    uses: 'repo-sync/pull-request@v2',
-                    with: {
-                        github_token: '${{ secrets.PULUMI_BOT_TOKEN }}',
-                        pr_title: "🤖 automated pull-request from pulumi",
-                        pr_body: "🚀 This PR has been opened because changes have been pushed to ${{ github.ref }}, please review them carefully!",
-                        pr_reviewer: "jaxxstorm,stack72",
-                        pr_label: "automation/pull-request,impact/no-changelog-required",
+                    name: 'Automerge',
+                    uses: 'pascalgn/automerge-action@4775c532c615e0491d53bc42c0893840ae7cc07a',
+                    env: {
+                        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+                        MERGE_LABELS: "automation/merge,impact/no-changelog-required",
+                        MERGE_REMOVE_LABELS: "automation/merge",
+                        MERGE_METHOD: "squash",
+                        MERGE_COMMIT_MESSAGE: "pull-request-titlem ",
+                        MERGE_FORKS: "false",
+                        MERGE_RETRIES: "30",
+                        MERGE_RETRY_SLEEP: "60000",
+                        UPDATE_LABELS: "automation/update",
+                        UPDATE_METHOD: "rebase",
                     }
                 }
             ]
