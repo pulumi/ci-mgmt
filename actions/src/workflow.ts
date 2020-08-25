@@ -848,7 +848,7 @@ export class PulumiAutomationWorkflow {
                         MERGE_LABELS: "automation/merge,impact/no-changelog-required",
                         MERGE_REMOVE_LABELS: "automation/merge",
                         MERGE_METHOD: "squash",
-                        MERGE_COMMIT_MESSAGE: "pull-request-title",
+                        MERGE_COMMIT_MESSAGE: "pull-request-titlem ",
                         MERGE_FORKS: "false",
                         MERGE_RETRIES: "30",
                         MERGE_RETRY_SLEEP: "60000",
