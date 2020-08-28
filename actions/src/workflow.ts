@@ -300,6 +300,9 @@ pip3 install pipenv`,
                     name: 'Run tests',
                     // eslint-disable-next-line no-template-curly-in-string
                     run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .',
+                    env: {
+                        GOPATH: '${{ github.workspace }}'
+                    }
                 })
                 .addStep(
                     {
