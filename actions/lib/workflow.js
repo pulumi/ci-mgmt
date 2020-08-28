@@ -228,13 +228,17 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 run: './ci-scripts/ci/check-worktree-is-clean',
             })
                 .addStep({
+                name: 'Compress SDK folder',
+                run: 'tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .'
+            })
+                .addStep({
                 name: 'Upload artifacts',
                 uses: 'actions/upload-artifact@v2',
                 with: {
                     // eslint-disable-next-line no-template-curly-in-string
-                    name: '${{ matrix.language  }}-sdk',
+                    name: '${{ matrix.language  }}-sdk.tar.gz',
                     // eslint-disable-next-line no-template-curly-in-string
-                    path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
+                    path: '${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz',
                 },
             })
                 .addStep({
@@ -253,10 +257,14 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 uses: 'actions/download-artifact@v2',
                 with: {
                     // eslint-disable-next-line no-template-curly-in-string
-                    name: '${{ matrix.language  }}-sdk',
+                    name: '${{ matrix.language  }}-sdk.tar.gz',
                     // eslint-disable-next-line no-template-curly-in-string
-                    path: '${{ github.workspace}}/sdk/${{ matrix.language }}',
+                    path: '${{ github.workspace}}/sdk/',
                 },
+            })
+                .addStep({
+                name: 'Uncompress SDK folder',
+                run: 'tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{ github.workspace}}/sdk/${{ matrix.language}}',
             })
                 .addStep({
                 name: 'Update path',
