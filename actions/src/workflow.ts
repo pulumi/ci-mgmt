@@ -399,9 +399,13 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     name: 'Download Python SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'python-sdk',
-                        path: '${{ github.workspace}}/sdk/python'
+                        name: 'python-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip Python SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/python.tar.gz -C ${{ github.workspace}}/sdk/python',
                 })
                 .addStep({
                     name: 'Install Twine',
@@ -411,17 +415,25 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     name: 'Download NodeJS SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'nodejs-sdk',
-                        path: '${{ github.workspace}}/sdk/nodejs'
+                        name: 'nodejs-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip NodeJS SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/nodejs.tar.gz -C ${{ github.workspace}}/sdk/nodejs',
                 })
                 .addStep({
                     name: 'Download DotNet SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'dotnet-sdk',
-                        path: '${{ github.workspace}}/sdk/dotnet'
+                        name: 'dotnet-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip DotNet SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/dotnet.tar.gz -C ${{ github.workspace}}/sdk/dotnet',
                 })
                 .addStep({
                     name: 'Publish SDKs',
@@ -616,9 +628,13 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     name: 'Download Python SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'python-sdk',
-                        path: '${{ github.workspace}}/sdk/python'
+                        name: 'python-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip Python SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/python.tar.gz -C ${{ github.workspace}}/sdk/python',
                 })
                 .addStep({
                     name: 'Install Twine',
@@ -628,17 +644,25 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     name: 'Download NodeJS SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'nodejs-sdk',
-                        path: '${{ github.workspace}}/sdk/nodejs'
+                        name: 'nodejs-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip NodeJS SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/nodejs.tar.gz -C ${{ github.workspace}}/sdk/nodejs',
                 })
                 .addStep({
                     name: 'Download DotNet SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'dotnet-sdk',
-                        path: '${{ github.workspace}}/sdk/dotnet'
+                        name: 'dotnet-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip DotNet SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/dotnet.tar.gz -C ${{ github.workspace}}/sdk/dotnet',
                 })
                 .addStep({
                     name: 'Publish SDKs',
@@ -763,9 +787,13 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     name: 'Download Python SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'python-sdk',
-                        path: '${{ github.workspace}}/sdk/python'
+                        name: 'python-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip Python SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/python.tar.gz -C ${{ github.workspace}}/sdk/python',
                 })
                 .addStep({
                     name: 'Install Twine',
@@ -775,17 +803,25 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     name: 'Download NodeJS SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'nodejs-sdk',
-                        path: '${{ github.workspace}}/sdk/nodejs'
+                        name: 'nodejs-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip NodeJS SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/nodejs.tar.gz -C ${{ github.workspace}}/sdk/nodejs',
                 })
                 .addStep({
                     name: 'Download DotNet SDK',
                     uses: 'actions/download-artifact@v2',
                     with: {
-                        name: 'dotnet-sdk',
-                        path: '${{ github.workspace}}/sdk/dotnet'
+                        name: 'dotnet-sdk.tar.gz',
+                        path: '${{ github.workspace}}/sdk'
                     }
+                })
+                .addStep({
+                    name: 'Unzip DotNet SDK',
+                    run: 'tar -zxf ${{ github.workspace}}/sdk/dotnet.tar.gz -C ${{ github.workspace}}/sdk/dotnet',
                 })
                 .addStep({
                     name: 'Publish SDKs',
