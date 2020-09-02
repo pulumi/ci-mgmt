@@ -248,6 +248,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-terraform",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-terraform",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-tls",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-tls",
