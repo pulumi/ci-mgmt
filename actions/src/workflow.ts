@@ -177,10 +177,14 @@ export class MultilangJob extends BaseJob {
             uses: 'actions/download-artifact@v2',
             with: {
                 // eslint-disable-next-line no-template-curly-in-string
-                name: 'pulumi-${{ env.PROVIDER }}',
+                name: '${{ env.PROVIDER }}-provider.tar.gz',
                 // eslint-disable-next-line no-template-curly-in-string
                 path: '${{ github.workspace }}/bin',
             },
+        },
+        {
+            name: 'Untar provider binaries',
+            run: 'tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin'
         },
         {
             name: 'Restore binary perms',
@@ -208,15 +212,19 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                         run: 'make provider',
                     },
                 )
+                .addStep({
+                    name: 'Tar provider binaries',
+                    run: 'tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-tfgen-${{ env.PROVIDER }}',
+                })
                 .addStep(
                     {
                         name: 'Upload artifacts',
                         uses: 'actions/upload-artifact@v2',
                         with: {
                             // eslint-disable-next-line no-template-curly-in-string
-                            name: 'pulumi-${{ env.PROVIDER }}',
+                            name: '${{ env.PROVIDER }}-provider.tar.gz',
                             // eslint-disable-next-line no-template-curly-in-string
-                            path: '${{ github.workspace }}/bin',
+                            path: '${{ github.workspace }}/bin/provider.tar.gz',
                         },
                     },
                 )
