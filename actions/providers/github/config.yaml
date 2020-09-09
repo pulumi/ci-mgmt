@@ -1,5 +1,4 @@
 provider: github
-major-version: 1
 env:
   GH_ORGANIZATION: ${{ secrets.GH_ORGANIZATION }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
