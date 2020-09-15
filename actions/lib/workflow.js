@@ -815,6 +815,31 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
         });
     }
 }
+export class PulumiArtifactCleanupWorkflow {
+    constructor() {
+        this.name = 'cleanup';
+        this.on = {
+            schedule: [{
+                    "cron": "0 1 * * *",
+                }]
+        };
+        this.jobs = {
+            'remove-old-artifacts': {
+                'runs-on': 'ubuntu-latest',
+                steps: [
+                    {
+                        name: 'Remove old artifacts',
+                        uses: 'c-hive/gha-remove-artifacts@v1',
+                        with: {
+                            age: '1 month',
+                            'skip-tags': true,
+                        }
+                    }
+                ]
+            }
+        };
+    }
+}
 export class PulumiAutomationWorkflow {
     constructor() {
         this.name = 'pr-automation';
