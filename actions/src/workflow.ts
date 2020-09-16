@@ -386,153 +386,153 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
     constructor(name: string, jobs: { [k: string]: job.Job }) {
         super(name, jobs);
         this.jobs = Object.assign(this.jobs, {
-            publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
-                .addStep({
-                    name: 'Setup Node',
-                    uses: 'actions/setup-node@v1',
-                    with: {
-                        'registry-url': 'https://registry.npmjs.org',
-                        'always-auth': true,
-                    },
-                })
-                .addStep({
-                    name: 'Setup DotNet',
-                    uses: 'actions/setup-dotnet@v1',
-                })
-                .addStep({
-                    name: 'Setup Python',
-                    uses: 'actions/setup-python@v1',
-                })
-                .addStep({
-                    name: 'Download Python SDK',
-                    uses: 'actions/download-artifact@v2',
-                    with: {
-                        name: 'python-sdk.tar.gz',
-                        path: '${{ github.workspace}}/sdk'
-                    }
-                })
-                .addStep({
-                    name: 'Unzip Python SDK',
-                    run: 'tar -zxf ${{ github.workspace}}/sdk/python.tar.gz -C ${{ github.workspace}}/sdk/python',
-                })
-                .addStep({
-                    name: 'Install Twine',
-                    run: 'python -m pip install pip twine',
-                })
-                .addStep({
-                    name: 'Download NodeJS SDK',
-                    uses: 'actions/download-artifact@v2',
-                    with: {
-                        name: 'nodejs-sdk.tar.gz',
-                        path: '${{ github.workspace}}/sdk'
-                    }
-                })
-                .addStep({
-                    name: 'Unzip NodeJS SDK',
-                    run: 'tar -zxf ${{ github.workspace}}/sdk/nodejs.tar.gz -C ${{ github.workspace}}/sdk/nodejs',
-                })
-                .addStep({
-                    name: 'Download DotNet SDK',
-                    uses: 'actions/download-artifact@v2',
-                    with: {
-                        name: 'dotnet-sdk.tar.gz',
-                        path: '${{ github.workspace}}/sdk'
-                    }
-                })
-                .addStep({
-                    name: 'Unzip DotNet SDK',
-                    run: 'tar -zxf ${{ github.workspace}}/sdk/dotnet.tar.gz -C ${{ github.workspace}}/sdk/dotnet',
-                })
-                .addStep({
-                    name: 'Publish SDKs',
-                    run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
-                    env: {
-                        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-                    }
-                })
-                .addStep(
-                    {
-                        name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
+                    .addStep({
+                        name: 'Setup Node',
+                        uses: 'actions/setup-node@v1',
                         with: {
-                            author_name: "Failure in publishing SDK",
-                            status: '${{ job.status }}',
-                            fields: 'repo,commit,author,action',
+                            'registry-url': 'https://registry.npmjs.org',
+                            'always-auth': true,
                         },
-                        if: 'failure() && github.event_name == \'push\'',
-                    }
-                ),
-        }, {
-            publish: {
-                name: 'publish',
-                'runs-on': 'ubuntu-latest',
-                needs: 'test',
-                steps: [
-                    {
-                        name: 'Checkout Repo',
-                        uses: 'actions/checkout@v2',
-                    },
-                    {
-                        name: 'Unshallow clone for tags',
-                        run: 'git fetch --prune --unshallow --tags',
-                    },
-                    {
-                        name: 'Checkout Scripts Repo',
-                        uses: 'actions/checkout@v2',
+                    })
+                    .addStep({
+                        name: 'Setup DotNet',
+                        uses: 'actions/setup-dotnet@v1',
+                    })
+                    .addStep({
+                        name: 'Setup Python',
+                        uses: 'actions/setup-python@v1',
+                    })
+                    .addStep({
+                        name: 'Download Python SDK',
+                        uses: 'actions/download-artifact@v2',
                         with: {
-                            path: 'ci-scripts',
-                            repository: 'pulumi/scripts',
-                        },
-                    },
-                    {
-                        name: 'Configure AWS Credentials',
-                        uses: 'aws-actions/configure-aws-credentials@v1',
-                        with: {
-                            // eslint-disable-next-line no-template-curly-in-string
-                            'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
-                            'aws-region': 'us-east-2',
-                            // eslint-disable-next-line no-template-curly-in-string
-                            'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
-                            'role-duration-seconds': 3600,
-                            'role-external-id': 'upload-pulumi-release',
-                            // eslint-disable-next-line no-template-curly-in-string
-                            'role-session-name': '${{ env.PROVIDER}}@githubActions',
-                            // eslint-disable-next-line no-template-curly-in-string
-                            'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}',
-                        },
-                    },
-                    {
-                        name: 'Setup Go',
-                        uses: 'actions/setup-go@v2',
-                        with: {
-                            'go-version': '${{ matrix.goversion }}',
-                        },
-                    },
-                    {
-                        name: 'Install pulumictl',
-                        uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
-                        with: {
-                            repo: 'pulumi/pulumictl'
+                            name: 'python-sdk.tar.gz',
+                            path: '${{ github.workspace}}/sdk'
                         }
-                    },
-                    {
-                        name: 'Install Pulumi CLI',
-                        uses: 'pulumi/action-install-pulumi-cli@releases/v1',
-                    },
-                    {
-                        name: 'Set PreRelease Version',
-                        run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic -o)"`
-                    },
-                    {
-                        name: 'Run GoReleaser',
-                        uses: 'goreleaser/goreleaser-action@v2',
+                    })
+                    .addStep({
+                        name: 'Unzip Python SDK',
+                        run: 'tar -zxf ${{ github.workspace}}/sdk/python.tar.gz -C ${{ github.workspace}}/sdk/python',
+                    })
+                    .addStep({
+                        name: 'Install Twine',
+                        run: 'python -m pip install pip twine',
+                    })
+                    .addStep({
+                        name: 'Download NodeJS SDK',
+                        uses: 'actions/download-artifact@v2',
                         with: {
-                            args: '-f .goreleaser.prerelease.yml --rm-dist --skip-validate',
-                            version: 'latest',
+                            name: 'nodejs-sdk.tar.gz',
+                            path: '${{ github.workspace}}/sdk'
+                        }
+                    })
+                    .addStep({
+                        name: 'Unzip NodeJS SDK',
+                        run: 'tar -zxf ${{ github.workspace}}/sdk/nodejs.tar.gz -C ${{ github.workspace}}/sdk/nodejs',
+                    })
+                    .addStep({
+                        name: 'Download DotNet SDK',
+                        uses: 'actions/download-artifact@v2',
+                        with: {
+                            name: 'dotnet-sdk.tar.gz',
+                            path: '${{ github.workspace}}/sdk'
+                        }
+                    })
+                    .addStep({
+                        name: 'Unzip DotNet SDK',
+                        run: 'tar -zxf ${{ github.workspace}}/sdk/dotnet.tar.gz -C ${{ github.workspace}}/sdk/dotnet',
+                    })
+                    .addStep({
+                        name: 'Publish SDKs',
+                        run: './ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}',
+                        env: {
+                            NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+                        }
+                    })
+                    .addStep(
+                        {
+                            name: 'Notify Slack',
+                            uses: '8398a7/action-slack@v3',
+                            with: {
+                                author_name: "Failure in publishing SDK",
+                                status: '${{ job.status }}',
+                                fields: 'repo,commit,author,action',
+                            },
+                            if: 'failure() && github.event_name == \'push\'',
+                        }
+                    ),
+            }, {
+                publish: {
+                    name: 'publish',
+                    'runs-on': 'ubuntu-latest',
+                    needs: 'test',
+                    steps: [
+                        {
+                            name: 'Checkout Repo',
+                            uses: 'actions/checkout@v2',
                         },
-                    },
-                ],
-            },
+                        {
+                            name: 'Unshallow clone for tags',
+                            run: 'git fetch --prune --unshallow --tags',
+                        },
+                        {
+                            name: 'Checkout Scripts Repo',
+                            uses: 'actions/checkout@v2',
+                            with: {
+                                path: 'ci-scripts',
+                                repository: 'pulumi/scripts',
+                            },
+                        },
+                        {
+                            name: 'Configure AWS Credentials',
+                            uses: 'aws-actions/configure-aws-credentials@v1',
+                            with: {
+                                // eslint-disable-next-line no-template-curly-in-string
+                                'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
+                                'aws-region': 'us-east-2',
+                                // eslint-disable-next-line no-template-curly-in-string
+                                'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
+                                'role-duration-seconds': 3600,
+                                'role-external-id': 'upload-pulumi-release',
+                                // eslint-disable-next-line no-template-curly-in-string
+                                'role-session-name': '${{ env.PROVIDER}}@githubActions',
+                                // eslint-disable-next-line no-template-curly-in-string
+                                'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}',
+                            },
+                        },
+                        {
+                            name: 'Setup Go',
+                            uses: 'actions/setup-go@v2',
+                            with: {
+                                'go-version': '${{ matrix.goversion }}',
+                            },
+                        },
+                        {
+                            name: 'Install pulumictl',
+                            uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                            with: {
+                                repo: 'pulumi/pulumictl'
+                            }
+                        },
+                        {
+                            name: 'Install Pulumi CLI',
+                            uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+                        },
+                        {
+                            name: 'Set PreRelease Version',
+                            run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic -o)"`
+                        },
+                        {
+                            name: 'Run GoReleaser',
+                            uses: 'goreleaser/goreleaser-action@v2',
+                            with: {
+                                args: '-f .goreleaser.prerelease.yml --rm-dist --skip-validate',
+                                version: 'latest',
+                            },
+                        },
+                    ],
+                },
             }
         )
     }
@@ -857,6 +857,30 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
         push: {
             tags: ['v*.*.*-**'],
         },
+    }
+}
+
+export class PulumiArtifactCleanupWorkflow {
+    name = 'cleanup';
+    on = {
+        schedule: [{
+            "cron": "0 1 * * *",
+        }]
+    }
+    jobs = {
+        'remove-old-artifacts': {
+            'runs-on': 'ubuntu-latest',
+            steps: [
+                {
+                    name: 'Remove old artifacts',
+                    uses: 'c-hive/gha-remove-artifacts@v1',
+                    with: {
+                        age: '1 month',
+                        'skip-tags': true,
+                    }
+                }
+            ]
+        }
     }
 }
 
