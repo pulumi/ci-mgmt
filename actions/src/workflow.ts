@@ -143,7 +143,7 @@ export class MultilangJob extends BaseJob {
         'fail-fast': true,
         matrix: {
             language: ['nodejs', 'python', 'dotnet', 'go'],
-            goversion: ['1.14.x'], // FIXME make this configurable
+            goversion: ['1.15.x'],
             dotnetversion: ['3.1.301'],
             pythonversion: ['3.7'],
             nodeversion: ['13.x'],
