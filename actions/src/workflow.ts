@@ -521,7 +521,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         },
                         {
                             name: 'Set PreRelease Version',
-                            run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic -o)"`
+                            run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic)"`
                         },
                         {
                             name: 'Run GoReleaser',
