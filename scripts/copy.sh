@@ -9,5 +9,5 @@ then
     exit 1
 fi
 
-rsync -azveP ${CI_MGMT_DIR}/actions/providers/${REPO}/repo/ .
+rsync -azveP ${CI_MGMT_DIR}/actions/tf-providers/${REPO}/repo/ .
 

@@ -21,7 +21,7 @@ fi
 
 for provider in $( ls ${WORKDIR}/providers ); do
 
-    PROVIDER_CONFIG_PATH=${WORKDIR}/providers/${provider}/repo/
+    PROVIDER_CONFIG_PATH=${WORKDIR}/tf-providers/${provider}/repo/
 
     echo "Processing provider" ${provider}
     echo "Cloning new provider copy to ${TMPDIR}/pulumi-${provider}"
