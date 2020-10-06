@@ -61,8 +61,8 @@ copy_ci_files() {
     local repoPath=$1
     local providerName=$2
 
-    echo "Copying files from providers/${providerName}/repo/ to ${repoPath}"
-    rsync -avzP providers/${providerName}/repo/ ${repoPath}
+    echo "Copying files from tf-providers/${providerName}/repo/ to ${repoPath}"
+    rsync -avzP tf-providers/${providerName}/repo/ ${repoPath}
 }
 
 commit_changes() {
@@ -107,7 +107,7 @@ push_and_pull_request() {
 	EOF
 }
 
-PROVIDERS=$(ls providers)
+PROVIDERS=$(ls tf-providers)
 
 for PROVIDER_SUFFIX in ${PROVIDERS}
 do

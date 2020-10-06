@@ -10,6 +10,23 @@ const gcp = param.Boolean('gcp');
 const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
 
+const installAction = "";
+const installPulumiCli = "pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed";
+const installPulumictl = "jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a";
+const setupGo = "actions/setup-go@v2";
+const setupNode = "actions/setup-node@v1";
+const setupDotNet = "actions/setup-dotnet@v1";
+const setupPython = "actions/setup-python@v1";
+const setupGcloud = "GoogleCloudPlatform/github-actions/setup-gcloud@master";
+const checkout = "actions/checkout@v2";
+const configureAwsCredentials = "aws-actions/configure-aws-credentials@v1";
+const downloadArtifact = "actions/download-artifact@v2";
+const uploadArtifact = "actions/upload-artifact@v2";
+const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
+const notifySlack = "8398a7/action-slack@v3";
+const goReleaser = "goreleaser/goreleaser-action@v2";
+const automerge = "pascalgn/automerge-action@4775c532c615e0491d53bc42c0893840ae7cc07a";
+
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
@@ -36,11 +53,11 @@ export class BaseJob extends job.Job {
     steps = [
         {
             name: 'Checkout Repo',
-            uses: 'actions/checkout@v2',
+            uses: checkout,
         },
         {
             name: 'Checkout Scripts Repo',
-            uses: 'actions/checkout@v2',
+            uses: checkout,
             with: {
                 path: 'ci-scripts',
                 repository: 'pulumi/scripts',
@@ -52,21 +69,21 @@ export class BaseJob extends job.Job {
         },
         {
             name: 'Install Go',
-            uses: 'actions/setup-go@v2',
+            uses: setupGo,
             with: {
                 'go-version': '${{ matrix.goversion }}',
             },
         },
         {
             name: 'Install pulumictl',
-            uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+            uses: installPulumictl,
             with: {
                 repo: 'pulumi/pulumictl',
             },
         },
         {
             name: 'Install Pulumi CLI',
-            uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+            uses: installPulumiCli,
         },
     ] as any;
     'runs-on' = 'ubuntu-latest'
@@ -96,7 +113,7 @@ export class BaseJob extends job.Job {
         if (aws) {
             this.steps.push({
                 name: 'Configure AWS Credentials',
-                uses: 'aws-actions/configure-aws-credentials@v1',
+                uses: configureAwsCredentials,
                 with: {
                     'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
                     'aws-region': '${{ env.AWS_REGION }}',
@@ -114,7 +131,7 @@ export class BaseJob extends job.Job {
         if (gcp) {
             this.steps.push({
                 name: 'Configure GCP credentials',
-                uses: 'GoogleCloudPlatform/github-actions/setup-gcloud@master',
+                uses: setupGcloud,
                 with: {
                     'version': '285.0.0',
                     'project_id': '${{ env.GOOGLE_PROJECT }}',
@@ -152,7 +169,7 @@ export class MultilangJob extends BaseJob {
     steps = this.steps.concat([
         {
             name: 'Setup Node',
-            uses: 'actions/setup-node@v1',
+            uses: setupNode,
             with: {
                 'node-version': '${{matrix.nodeversion}}',
                 'registry-url': 'https://registry.npmjs.org',
@@ -160,21 +177,21 @@ export class MultilangJob extends BaseJob {
         },
         {
             name: 'Setup DotNet',
-            uses: 'actions/setup-dotnet@v1',
+            uses: setupDotNet,
             with: {
                 'dotnet-version': '${{matrix.dotnetverson}}',
             },
         },
         {
             name: 'Setup Python',
-            uses: 'actions/setup-python@v1',
+            uses: setupPython,
             with: {
                 'python-version': '${{matrix.pythonversion}}',
             },
         },
         {
             name: 'Download provider + tfgen binaries',
-            uses: 'actions/download-artifact@v2',
+            uses: downloadArtifact,
             with: {
                 // eslint-disable-next-line no-template-curly-in-string
                 name: '${{ env.PROVIDER }}-provider.tar.gz',
@@ -219,7 +236,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep(
                     {
                         name: 'Upload artifacts',
-                        uses: 'actions/upload-artifact@v2',
+                        uses: uploadArtifact,
                         with: {
                             // eslint-disable-next-line no-template-curly-in-string
                             name: '${{ env.PROVIDER }}-provider.tar.gz',
@@ -231,7 +248,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep(
                     {
                         name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                        uses: notifySlack,
                         with: {
                             author_name: "Failure in building provider prerequisites",
                             status: '${{ job.status }}',
@@ -258,7 +275,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 })
                 .addStep({
                     name: 'Upload artifacts',
-                    uses: 'actions/upload-artifact@v2',
+                    uses: uploadArtifact,
                     with: {
                         // eslint-disable-next-line no-template-curly-in-string
                         name: '${{ matrix.language  }}-sdk.tar.gz',
@@ -269,7 +286,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep(
                     {
                         name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                        uses: notifySlack,
                         with: {
                             author_name: "Failure in building ${{ matrix.language }} sdk",
                             status: '${{ job.status }}',
@@ -281,7 +298,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
             test: new MultilangJob('test', {needs: 'build_sdk'})
                 .addStep({
                     name: 'Download SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         // eslint-disable-next-line no-template-curly-in-string
                         name: '${{ matrix.language  }}-sdk.tar.gz',
@@ -320,7 +337,7 @@ pip3 install pipenv`,
                 .addStep(
                     {
                         name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                        uses: notifySlack,
                         with: {
                             author_name: "Failure in running ${{ matrix.language }} tests",
                             status: '${{ job.status }}',
@@ -345,7 +362,7 @@ pip3 install pipenv`,
                     .addStep(
                         {
                             name: 'Notify Slack',
-                            uses: '8398a7/action-slack@v3',
+                            uses: notifySlack,
                             with: {
                                 author_name: "Failure in linting provider",
                                 status: '${{ job.status }}',
@@ -368,7 +385,7 @@ pip3 install pipenv`,
                     .addStep(
                         {
                             name: 'Notify Slack',
-                            uses: '8398a7/action-slack@v3',
+                            uses: notifySlack,
                             with: {
                                 author_name: "Failure in linting go sdk",
                                 status: '${{ job.status }}',
@@ -389,7 +406,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                 publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
                     .addStep({
                         name: 'Setup Node',
-                        uses: 'actions/setup-node@v1',
+                        uses: setupNode,
                         with: {
                             'registry-url': 'https://registry.npmjs.org',
                             'always-auth': true,
@@ -397,15 +414,15 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     })
                     .addStep({
                         name: 'Setup DotNet',
-                        uses: 'actions/setup-dotnet@v1',
+                        uses: setupDotNet,
                     })
                     .addStep({
                         name: 'Setup Python',
-                        uses: 'actions/setup-python@v1',
+                        uses: setupPython,
                     })
                     .addStep({
                         name: 'Download Python SDK',
-                        uses: 'actions/download-artifact@v2',
+                        uses: downloadArtifact,
                         with: {
                             name: 'python-sdk.tar.gz',
                             path: '${{ github.workspace}}/sdk'
@@ -421,7 +438,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     })
                     .addStep({
                         name: 'Download NodeJS SDK',
-                        uses: 'actions/download-artifact@v2',
+                        uses: downloadArtifact,
                         with: {
                             name: 'nodejs-sdk.tar.gz',
                             path: '${{ github.workspace}}/sdk'
@@ -433,7 +450,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     })
                     .addStep({
                         name: 'Download DotNet SDK',
-                        uses: 'actions/download-artifact@v2',
+                        uses: downloadArtifact,
                         with: {
                             name: 'dotnet-sdk.tar.gz',
                             path: '${{ github.workspace}}/sdk'
@@ -453,7 +470,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     .addStep(
                         {
                             name: 'Notify Slack',
-                            uses: '8398a7/action-slack@v3',
+                            uses: notifySlack,
                             with: {
                                 author_name: "Failure in publishing SDK",
                                 status: '${{ job.status }}',
@@ -470,7 +487,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                     steps: [
                         {
                             name: 'Checkout Repo',
-                            uses: 'actions/checkout@v2',
+                            uses: checkout,
                         },
                         {
                             name: 'Unshallow clone for tags',
@@ -478,7 +495,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         },
                         {
                             name: 'Checkout Scripts Repo',
-                            uses: 'actions/checkout@v2',
+                            uses: checkout,
                             with: {
                                 path: 'ci-scripts',
                                 repository: 'pulumi/scripts',
@@ -486,7 +503,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         },
                         {
                             name: 'Configure AWS Credentials',
-                            uses: 'aws-actions/configure-aws-credentials@v1',
+                            uses: configureAwsCredentials,
                             with: {
                                 // eslint-disable-next-line no-template-curly-in-string
                                 'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
@@ -503,21 +520,21 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         },
                         {
                             name: 'Setup Go',
-                            uses: 'actions/setup-go@v2',
+                            uses: setupGo,
                             with: {
                                 'go-version': '${{ matrix.goversion }}',
                             },
                         },
                         {
                             name: 'Install pulumictl',
-                            uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                            uses: installPulumictl,
                             with: {
                                 repo: 'pulumi/pulumictl'
                             }
                         },
                         {
                             name: 'Install Pulumi CLI',
-                            uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+                            uses: installPulumiCli,
                         },
                         {
                             name: 'Set PreRelease Version',
@@ -559,11 +576,11 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 steps: [
                     {
                         name: 'Checkout Repo',
-                        uses: 'actions/checkout@v2',
+                        uses: checkout,
                     },
                     {
                         name: 'Checkout Scripts Repo',
-                        uses: 'actions/checkout@v2',
+                        uses: checkout,
                         with: {
                             path: 'ci-scripts',
                             repository: 'pulumi/scripts',
@@ -571,7 +588,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                     {
                         name: 'Configure AWS Credentials',
-                        uses: 'aws-actions/configure-aws-credentials@v1',
+                        uses: configureAwsCredentials,
                         with: {
                             // eslint-disable-next-line no-template-curly-in-string
                             'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
@@ -588,25 +605,25 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                     {
                         name: 'Setup Go',
-                        uses: 'actions/setup-go@v2',
+                        uses: setupGo,
                         with: {
                             'go-version': '${{ matrix.goversion }}',
                         },
                     },
                     {
                         name: 'Install pulumictl',
-                        uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                        uses: installPulumictl,
                         with: {
                             repo: 'pulumi/pulumictl'
                         }
                     },
                     {
                         name: 'Install Pulumi CLI',
-                        uses: 'pulumi/action-install-pulumi-cli@releases/v1',
+                        uses: installPulumiCli,
                     },
                     {
                         name: 'Run GoReleaser',
-                        uses: 'goreleaser/goreleaser-action@v2',
+                        uses: goReleaser,
                         with: {
                             args: 'release --rm-dist',
                             version: 'latest',
@@ -618,7 +635,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
             publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
                 .addStep({
                     name: 'Setup Node',
-                    uses: 'actions/setup-node@v1',
+                    uses: setupNode,
                     with: {
                         'registry-url': 'https://registry.npmjs.org',
                         'always-auth': true,
@@ -626,15 +643,15 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Setup DotNet',
-                    uses: 'actions/setup-dotnet@v1',
+                    uses: setupDotNet,
                 })
                 .addStep({
                     name: 'Setup Python',
-                    uses: 'actions/setup-python@v1',
+                    uses: setupPython,
                 })
                 .addStep({
                     name: 'Download Python SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'python-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -650,7 +667,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Download NodeJS SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'nodejs-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -662,7 +679,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Download DotNet SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'dotnet-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -682,7 +699,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 .addStep(
                     {
                         name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                        uses: notifySlack,
                         with: {
                             author_name: "Failure in publishing SDK",
                             status: '${{ job.status }}',
@@ -698,7 +715,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 needs: 'publish_sdk',
                 steps: [{
                     name: 'Install pulumictl',
-                    uses: 'jaxxstorm/action-install-gh-release@release/v1-alpha',
+                    uses: installPulumictl,
                     with: {
                         repo: 'pulumi/pulumictl',
                     },
@@ -729,11 +746,11 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 steps: [
                     {
                         name: 'Checkout Repo',
-                        uses: 'actions/checkout@v2',
+                        uses: checkout,
                     },
                     {
                         name: 'Checkout Scripts Repo',
-                        uses: 'actions/checkout@v2',
+                        uses: checkout,
                         with: {
                             path: 'ci-scripts',
                             repository: 'pulumi/scripts',
@@ -741,7 +758,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                     {
                         name: 'Configure AWS Credentials',
-                        uses: 'aws-actions/configure-aws-credentials@v1',
+                        uses: configureAwsCredentials,
                         with: {
                             // eslint-disable-next-line no-template-curly-in-string
                             'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
@@ -758,14 +775,14 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                     },
                     {
                         name: 'Setup Go',
-                        uses: 'actions/setup-go@v2',
+                        uses: setupGo,
                         with: {
                             'go-version': '${{ matrix.goversion }}',
                         },
                     },
                     {
                         name: 'Run GoReleaser',
-                        uses: 'goreleaser/goreleaser-action@v2',
+                        uses: goReleaser,
                         with: {
                             args: 'release --rm-dist --config=.goreleaser.prerelease.yaml',
                             version: 'latest',
@@ -777,7 +794,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
             publish_sdk: new BaseJob('publish_sdk', {needs: 'publish'})
                 .addStep({
                     name: 'Setup Node',
-                    uses: 'actions/setup-node@v1',
+                    uses: setupNode,
                     with: {
                         'registry-url': 'https://registry.npmjs.org',
                         'always-auth': true,
@@ -785,15 +802,15 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Setup DotNet',
-                    uses: 'actions/setup-dotnet@v1',
+                    uses: setupDotNet,
                 })
                 .addStep({
                     name: 'Setup Python',
-                    uses: 'actions/setup-python@v1',
+                    uses: setupPython,
                 })
                 .addStep({
                     name: 'Download Python SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'python-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -809,7 +826,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Download NodeJS SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'nodejs-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -821,7 +838,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 })
                 .addStep({
                     name: 'Download DotNet SDK',
-                    uses: 'actions/download-artifact@v2',
+                    uses: downloadArtifact,
                     with: {
                         name: 'dotnet-sdk.tar.gz',
                         path: '${{ github.workspace}}/sdk'
@@ -841,7 +858,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                 .addStep(
                     {
                         name: 'Notify Slack',
-                        uses: '8398a7/action-slack@v3',
+                        uses: notifySlack,
                         with: {
                             author_name: "Failure in publishing SDK",
                             status: '${{ job.status }}',
@@ -873,7 +890,7 @@ export class PulumiArtifactCleanupWorkflow {
             steps: [
                 {
                     name: 'Remove old artifacts',
-                    uses: 'c-hive/gha-remove-artifacts@v1',
+                    uses: cleanupArtifact,
                     with: {
                         age: '1 month',
                         'skip-tags': true,
@@ -918,7 +935,7 @@ export class PulumiAutomationWorkflow {
             steps: [
                 {
                     name: 'Automerge',
-                    uses: 'pascalgn/automerge-action@4775c532c615e0491d53bc42c0893840ae7cc07a',
+                    uses: automerge,
                     env: {
                         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
                         MERGE_LABELS: "automation/merge,impact/no-changelog-required",
