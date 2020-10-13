@@ -9,6 +9,7 @@ const aws = param.Boolean('aws');
 const gcp = param.Boolean('gcp');
 const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
+const parallelism = param.Number('parallel', 4)
 
 const installAction = "";
 const installPulumiCli = "pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed";
@@ -544,7 +545,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                             name: 'Run GoReleaser',
                             uses: 'goreleaser/goreleaser-action@v2',
                             with: {
-                                args: '-f .goreleaser.prerelease.yml --rm-dist --skip-validate',
+                                args: `-p ${parallelism} -f .goreleaser.prerelease.yml --rm-dist --skip-validate`,
                                 version: 'latest',
                             },
                         },
@@ -625,7 +626,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Run GoReleaser',
                         uses: goReleaser,
                         with: {
-                            args: 'release --rm-dist',
+                            args: `-p ${parallelism} release --rm-dist`,
                             version: 'latest',
                         },
                     },
@@ -784,7 +785,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Run GoReleaser',
                         uses: goReleaser,
                         with: {
-                            args: 'release --rm-dist --config=.goreleaser.prerelease.yaml',
+                            args: `-p ${parallelism} release --rm-dist --config=.goreleaser.prerelease.yaml`,
                             version: 'latest',
                         },
                     },
