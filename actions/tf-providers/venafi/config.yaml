@@ -1,0 +1,7 @@
+provider: venafi
+major-version: 1
+env:
+  VENAFI_URL: ${{ secrets.VENAFI_URL }}
+  VENAFI_USER: ${{ secrets.VENAFI_USER }}
+  VENAFI_PASS: ${{ secrets.VENAFI_PASS }}
+  VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
