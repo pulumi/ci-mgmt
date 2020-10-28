@@ -1,2 +1,3 @@
 provider: vault
 docker: true
+major-version: 3
