@@ -49,6 +49,12 @@ const env = Object.assign({
 export class BaseJob extends job.Job {
     constructor(name, params) {
         super();
+        this.strategy = {
+            'fail-fast': true,
+            matrix: {
+                goversion: ['1.15.x'],
+            },
+        };
         this.steps = [
             {
                 name: 'Checkout Repo',

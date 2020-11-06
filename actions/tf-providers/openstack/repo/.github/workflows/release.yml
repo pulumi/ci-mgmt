@@ -150,6 +150,11 @@ jobs:
         author_name: Failure in linting provider
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   lint_sdk:
     container: golangci/golangci-lint:latest
     name: lint-sdk
@@ -184,6 +189,11 @@ jobs:
         author_name: Failure in linting go sdk
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -225,6 +235,11 @@ jobs:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   publish:
     name: publish
     needs: test
@@ -329,6 +344,11 @@ jobs:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   test:
     name: test
     needs: build_sdk

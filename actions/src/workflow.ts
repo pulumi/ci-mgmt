@@ -51,6 +51,12 @@ const env = Object.assign({
 }, extraEnv);
 
 export class BaseJob extends job.Job {
+    strategy = {
+        'fail-fast': true,
+        matrix: {
+            goversion: ['1.15.x'],
+        },
+    };
     steps = [
         {
             name: 'Checkout Repo',

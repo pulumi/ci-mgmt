@@ -139,6 +139,11 @@ jobs:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   publish:
     name: publish
     needs: test
@@ -248,6 +253,11 @@ jobs:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.15.x
   test:
     name: test
     needs: build_sdk
