@@ -1,0 +1,6 @@
+provider: nsxt
+major-version: 1
+env:
+  NSXT_MANAGER_HOST: ${{ secrets.NSXT_MANAGER_HOST }}
+  NSXT_USERNAME: ${{ secrets.NSXT_USERNAME }}
+  NSXT_PASSWORD: ${{ secrets.NSXT_PASSWORD }}
