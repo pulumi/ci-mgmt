@@ -33,11 +33,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
@@ -48,7 +48,7 @@ jobs:
       with:
         dotnet-version: ${{matrix.dotnetverson}}
     - name: Setup Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
     - name: Download provider + tfgen binaries
@@ -116,11 +116,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Run golangci
       run: make lint_provider
     - if: failure() && github.event_name == 'push'
@@ -152,11 +152,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Run golangci
       run: cd sdk/go/newrelic && golangci-lint run -c ../../../.golangci.yml
     - if: failure() && github.event_name == 'push'
@@ -186,11 +186,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Build tfgen & provider binaries
       run: make provider
     - name: Tar provider binaries
@@ -240,11 +240,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Set PreRelease Version
       run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)"
         >> $GITHUB_ENV
@@ -272,11 +272,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
@@ -285,7 +285,7 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
     - name: Setup Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
     - name: Download Python SDK
       uses: actions/download-artifact@v2
       with:
@@ -341,11 +341,11 @@ jobs:
       with:
         go-version: 1.15.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
+      uses: jaxxstorm/action-install-gh-release@v1.1.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed
+      uses: pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
@@ -356,7 +356,7 @@ jobs:
       with:
         dotnet-version: ${{matrix.dotnetverson}}
     - name: Setup Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
     - name: Download provider + tfgen binaries

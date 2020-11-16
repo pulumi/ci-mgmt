@@ -10,12 +10,12 @@ const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
 const parallelism = param.Number('parallel', 4);
 const installAction = "";
-const installPulumiCli = "pulumi/action-install-pulumi-cli@b811287a6e06bb7e5d8b91132b839c67e3f9c6ed";
-const installPulumictl = "jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a";
+const installPulumiCli = "pulumi/action-install-pulumi-cli@59780a25b75ef714621d632455e1f30b788730b5";
+const installPulumictl = "jaxxstorm/action-install-gh-release@v1.1.0";
 const setupGo = "actions/setup-go@v2";
 const setupNode = "actions/setup-node@v1";
 const setupDotNet = "actions/setup-dotnet@v1";
-const setupPython = "actions/setup-python@v1";
+const setupPython = "actions/setup-python@v2";
 const setupGcloud = "GoogleCloudPlatform/github-actions/setup-gcloud@master";
 const checkout = "actions/checkout@v2";
 const configureAwsCredentials = "aws-actions/configure-aws-credentials@v1";
@@ -24,7 +24,7 @@ const uploadArtifact = "actions/upload-artifact@v2";
 const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
 const notifySlack = "8398a7/action-slack@v3";
 const goReleaser = "goreleaser/goreleaser-action@v2";
-const automerge = "pascalgn/automerge-action@4775c532c615e0491d53bc42c0893840ae7cc07a";
+const automerge = "pascalgn/automerge-action@v0.12.0";
 const env = Object.assign({
     // eslint-disable-next-line no-template-curly-in-string
     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
