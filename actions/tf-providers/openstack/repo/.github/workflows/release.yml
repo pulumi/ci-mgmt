@@ -38,7 +38,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -134,7 +134,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -152,9 +152,6 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
-      matrix:
-        goversion:
-        - 1.15.x
   lint_sdk:
     container: golangci/golangci-lint:latest
     name: lint-sdk
@@ -173,7 +170,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -191,9 +188,6 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
-      matrix:
-        goversion:
-        - 1.15.x
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -210,7 +204,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -237,9 +231,6 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
-      matrix:
-        goversion:
-        - 1.15.x
   publish:
     name: publish
     needs: test
@@ -265,7 +256,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -294,7 +285,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -346,9 +337,6 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
-      matrix:
-        goversion:
-        - 1.15.x
   test:
     name: test
     needs: build_sdk
@@ -366,7 +354,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.goversion }}
+        go-version: 1.15.x
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@d62853bc9e466834c74cefb34fad78535582e21a
       with:
@@ -406,7 +394,7 @@ jobs:
       run: tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{
         github.workspace}}/sdk/${{ matrix.language}}
     - name: Update path
-      run: echo ::add-path::${{ github.workspace }}/bin
+      run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23

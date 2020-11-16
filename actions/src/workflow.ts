@@ -53,9 +53,6 @@ const env = Object.assign({
 export class BaseJob extends job.Job {
     strategy = {
         'fail-fast': true,
-        matrix: {
-            goversion: ['1.15.x'],
-        },
     };
     steps = [
         {
@@ -78,7 +75,7 @@ export class BaseJob extends job.Job {
             name: 'Install Go',
             uses: setupGo,
             with: {
-                'go-version': '${{ matrix.goversion }}',
+                'go-version': '1.15.x',
             },
         },
         {
@@ -320,7 +317,7 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 .addStep({
                     name: 'Update path',
                     // eslint-disable-next-line no-template-curly-in-string
-                    run: 'echo ::add-path::${{ github.workspace }}/bin',
+                    run: 'echo "${{ github.workspace }}/bin" >> $GITHUB_PATH',
                 })
                 .addStep({
                     name: 'Install Python deps',
@@ -529,7 +526,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                             name: 'Setup Go',
                             uses: setupGo,
                             with: {
-                                'go-version': '${{ matrix.goversion }}',
+                                'go-version': '1.15.x',
                             },
                         },
                         {
@@ -545,7 +542,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         },
                         {
                             name: 'Set PreRelease Version',
-                            run: `echo "::set-env name=GORELEASER_CURRENT_TAG::v$(pulumictl get version --language generic)"`
+                            run: `echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV`
                         },
                         {
                             name: 'Run GoReleaser',
@@ -614,7 +611,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Setup Go',
                         uses: setupGo,
                         with: {
-                            'go-version': '${{ matrix.goversion }}',
+                            'go-version': '1.15.x',
                         },
                     },
                     {
@@ -784,7 +781,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Setup Go',
                         uses: setupGo,
                         with: {
-                            'go-version': '${{ matrix.goversion }}',
+                            'go-version': '1.15.x',
                         },
                     },
                     {
