@@ -266,6 +266,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-venafi",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-venafi",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-vsphere",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-vsphere",
