@@ -1,5 +1,5 @@
 provider: terraform
-major-version: 3
+major-version: 4
 lint: false
 skipTfGen: true
 aws: true
