@@ -1,6 +1,6 @@
 import * as param from '@jkcfg/std/param';
 
-const timeout = param.String('golangci-timeout', '10m');
+const timeout = param.String('golangci-timeout', '20m');
 
 export interface RunConfig {
     timeout: string;
