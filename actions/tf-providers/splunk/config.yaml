@@ -1,0 +1,6 @@
+provider: splunk
+major-version: 1
+env:
+  SPLUNK_URL: localhost:8089
+  SPLUNK_USERNAME: admin
+  SPLUNK_PASSWORD: password
