@@ -1,4 +1,5 @@
 provider: splunk
+docker: true
 major-version: 1
 env:
   SPLUNK_URL: localhost:8089
