@@ -98,6 +98,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-equinix-metal",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-equinix-metal",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-f5bigip",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-f5bigip",
@@ -200,12 +206,6 @@
             "Provider": "github"
         },
         {
-            "Name": "pulumi-packet",
-            "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-packet",
-            "Provider": "github"
-        },
-        {
             "Name": "pulumi-pagerduty",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-pagerduty",
@@ -248,9 +248,9 @@
             "Provider": "github"
         },
         {
-            "Name": "pulumi-terraform",
+            "Name": "pulumi-splunk",
             "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-terraform",
+            "CloneURL": "git@github.com:pulumi/pulumi-splunk",
             "Provider": "github"
         },
         {
