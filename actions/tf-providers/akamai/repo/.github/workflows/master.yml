@@ -425,3 +425,4 @@ name: master
     - v*
     - sdk/*
     - '**'
+  workflow_dispatch: {}

@@ -375,6 +375,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
     constructor(name, jobs) {
         super(name, jobs);
         this.on = {
+            workflow_dispatch: {},
             push: {
                 branches: ["master"],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
