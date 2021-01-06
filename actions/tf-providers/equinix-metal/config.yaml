@@ -1,4 +1,5 @@
 provider: equinix-metal
 major-version: 1
+lint: false
 env:
   PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}
