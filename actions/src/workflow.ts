@@ -215,6 +215,42 @@ export class MultilangJob extends BaseJob {
     ]);
 }
 
+export class BasicScaffold extends BaseJob {
+    strategy = {
+        'fail-fast': true,
+        matrix: {
+            goversion: ['1.15.x'],
+            dotnetversion: ['3.1.301'],
+            pythonversion: ['3.7'],
+            nodeversion: ['13.x'],
+        },
+    };
+    steps = this.steps.concat([
+        {
+            name: 'Setup Node',
+            uses: setupNode,
+            with: {
+                'node-version': '${{matrix.nodeversion}}',
+                'registry-url': 'https://registry.npmjs.org',
+            },
+        },
+        {
+            name: 'Setup DotNet',
+            uses: setupDotNet,
+            with: {
+                'dotnet-version': '${{matrix.dotnetverson}}',
+            },
+        },
+        {
+            name: 'Setup Python',
+            uses: setupPython,
+            with: {
+                'python-version': '${{matrix.pythonversion}}',
+            },
+        },
+    ]);
+}
+
 export class PulumiBaseWorkflow extends g.GithubWorkflow {
     jobs: { [k: string]: job.Job }
 
@@ -399,6 +435,82 @@ pip3 install pipenv`,
                         }
                     ),
             })
+        }
+    }
+}
+
+export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
+    jobs: { [k: string]: job.Job }
+
+    constructor(name: string, jobs: { [k: string]: job.Job }) {
+        super(name, jobs, {
+            repository_dispatch: {
+                types: ['update-bridge'],
+            },
+        }, {
+            env,
+        });
+        this.jobs = {
+            update_bridge: new BasicScaffold('update-bridge', {})
+            .addStep(
+                {
+                    name: 'Install Chg for changelog',
+                    run: 'sudo npm install -g chg',
+                },
+            )
+            .addStep({
+                name: "Update Dependency",
+                run: "cd provider && go mod edit -require github.com/pulumi/pulumi-terraform-bridge/v2@${{ github.event.client_payload.ref }} && go mod tidy && cd ../",
+                "working-directory": "${{ github.workspace }}"
+            })
+            .addStep(
+                {
+                    name: "Build tfgen & provider binaries",
+                    run: "make build_sdks",
+                }
+            )
+            .addStep(
+                {
+                    name: "Create changelog entry",
+                    run: `chg add "Upgrading pulumi-terraform-bridge to \${{ github.event.client_payload.ref }}"`
+                }
+            )
+            .addStep(
+                {
+                    run: "git status"
+                }
+            )
+            .addStep(
+                {
+                    name: "commit changes",
+                    uses: "EndBug/add-and-commit@v4",
+                    with: {
+                        ref: "update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}",
+                        author_name: "pulumi-bot",
+                        author_email: "bot@pulumi.com",
+                    }
+                }
+            )
+            .addStep(
+                {
+                    name: "pull-request",
+                    uses: "repo-sync/pull-request@v2",
+                    with: {
+                        source_branch: "update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}",
+                        destination_branch: "master",
+                        pr_title: "Upgrade to ${{ github.event.client_payload.ref }} of pulumi-terraform-bridge",
+                        pr_body: "*Automated PR*",
+                        pr_label: "automation/merge",
+                        pr_allow_empty: true,
+                        github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                        pr_assignee: "stack72",
+                        pr_reviewer: "stack72",
+                    },
+                    env: {
+                        GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}"
+                    }
+                }
+            )
         }
     }
 }

@@ -15,6 +15,7 @@ const pre = name => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = name => new goreleaser.PulumiGoreleaserConfig(provider);
 const lintConfig = name => new lint.PulumiGolangCIConfig();
 const cleanup = name => new wf.PulumiArtifactCleanupWorkflow();
+const updatePulumiTerraformBridge = name => new wf.UpdatePulumiTerraformBridgeWorkflow();
 
 
 export default [
@@ -24,6 +25,7 @@ export default [
   { value: release('release'), file: `tf-providers/${provider}/repo/.github/workflows/release.yml` },
   { value: automation('automation'), file: `tf-providers/${provider}/repo/.github/workflows/pr-automation.yml` },
   { value: cleanup('cleanup'), file: `tf-providers/${provider}/repo/.github/workflows/artifact-cleanup.yml`},
+  { value: updatePulumiTerraformBridge('update-pulumi-terraform-bridge'), file: `tf-providers/${provider}/repo/.github/workflows/update-bridge.yml`},
   { value: pre(provider), file: `tf-providers/${provider}/repo/.goreleaser.prerelease.yml` },
   { value: r(provider), file: `tf-providers/${provider}/repo/.goreleaser.yml` },
   { value: lintConfig('lint'), file: `tf-providers/${provider}/repo/.golangci.yml` },
