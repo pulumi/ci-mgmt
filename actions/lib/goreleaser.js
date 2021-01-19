@@ -35,7 +35,8 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
                     'linux',
                 ],
                 goarch: [
-                    'amd64'
+                    'amd64',
+                    'arm',
                 ],
                 main: `./cmd/pulumi-resource-${name}/`,
                 ldflags: ldflags,
