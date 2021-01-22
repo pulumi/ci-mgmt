@@ -742,7 +742,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Run GoReleaser',
                         uses: goReleaser,
                         with: {
-                            args: `-p ${parallelism} release --rm-dist`,
+                            args: `-p ${parallelism} release --rm-dist --timeout 60m0s`,
                             version: 'latest',
                         },
                     },
@@ -901,7 +901,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Run GoReleaser',
                         uses: goReleaser,
                         with: {
-                            args: `-p ${parallelism} release --rm-dist --config=.goreleaser.prerelease.yaml`,
+                            args: `-p ${parallelism} release --rm-dist --config=.goreleaser.prerelease.yaml  --timeout 60m0s`,
                             version: 'latest',
                         },
                     },
