@@ -1018,6 +1018,54 @@ export class PulumiArtifactCleanupWorkflow {
     }
 }
 
+export class PulumiProviderPublish extends g.GithubWorkflow {
+    jobs: { [k: string]: job.Job }
+
+    constructor(name: string, jobs: { [k: string]: job.Job }) {
+        super(name, jobs, {
+            repository_dispatch: {
+                types: ['publish_provider'],
+            },
+        }, {
+            env,
+        });
+        this.jobs = {
+            publish_provider: new BasicScaffold('publish-provider', {})
+                .addStep(
+                    {
+                        name: 'Install Chg for changelog',
+                        run: 'sudo npm install -g chg',
+                    },
+                )
+                .addStep(
+                    {
+                        name: 'Update Changelog with Release Version',
+                        run: 'chg release ${{ github.event.client_payload.ref }}'
+                    }
+                )
+                .addStep(
+                    {
+                        run: "git --no-pager diff"
+                    }
+                )
+                .addStep(
+                    {
+                        name: "Stage + Commit",
+                        run: "git config --local user.name \"pulumi-bot\"\n" +
+                            "git config --local user.email \"bot@pulumi.com\"\n" +
+                            "git add .\n" +
+                            "git commit -m \"Prepare for v\${{ github.event.client_payload.ref }} release\"\n" +
+                            "git push origin master\n" +
+                            "git tag v\${{ github.event.client_payload.ref }}\n" +
+                            "git tag sdk/v\${{ github.event.client_payload.ref }}\n" +
+                            "git push origin v\${{ github.event.client_payload.ref }}\n" +
+                            "git push origin sdk/v\${{ github.event.client_payload.ref }}\n",
+                    }
+                )
+            }
+    }
+}
+
 export class PulumiAutomationWorkflow {
     name = 'pr-automation';
     on = {
