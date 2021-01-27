@@ -23,6 +23,7 @@ env:
 jobs:
   kubernetes:
     name: smoke-test-cli-on-kubernetes
+    needs: test-infra-setup
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -210,8 +211,9 @@ jobs:
         - ubuntu-latest
         python-version:
         - "3.7"
-  testInfraDestroy:
+  test-infra-destroy:
     name: test-infra-destroy
+    needs: kubernetes
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -292,7 +294,7 @@ jobs:
         - ubuntu-latest
         python-version:
         - "3.7"
-  testInfraSetup:
+  test-infra-setup:
     name: test-infra-setup
     runs-on: ${{ matrix.platform }}
     steps:

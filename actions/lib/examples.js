@@ -263,6 +263,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
             },
         };
         this['runs-on'] = '${{ matrix.platform }}';
+        this.needs = "kubernetes";
         this.steps = this.steps.concat([
             {
                 name: 'Install Latest Stable Pulumi CLI',
@@ -292,6 +293,7 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
             },
         };
         this['runs-on'] = '${{ matrix.platform }}';
+        this.needs = 'test-infra-setup';
         this.steps = this.steps.concat([
             {
                 name: 'Install Latest Stable Pulumi CLI',
@@ -330,6 +332,7 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
             },
         };
         this['runs-on'] = '${{ matrix.platform }}';
+        this.needs = 'test-infra-setup';
         this.steps = this.steps.concat([
             {
                 name: 'Install Specific Pulumi CLI',
@@ -414,6 +417,41 @@ export class CronProviderTestJob extends EnvironmentSetup {
         ]);
     }
 }
+export class RunProviderTestForPrTestJob extends EnvironmentSetup {
+    constructor() {
+        super(...arguments);
+        this.strategy = {
+            'fail-fast': false,
+            matrix: {
+                'go-version': ['1.15.x'],
+                'dotnet-version': ['3.1.301'],
+                'python-version': ['3.7'],
+                'node-version': ['13.x'],
+                platform: ['ubuntu-latest'],
+                languages: ["Cs", "Js", "Ts", "Py", "Fs"],
+                clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Linode", "Cloud"],
+            },
+        };
+        this['runs-on'] = '${{ matrix.platform }}';
+        this.steps = this.steps.concat([
+            {
+                name: 'Install Latest Stable Pulumi CLI',
+                uses: 'pulumi/action-install-pulumi-cli@v1.0.1'
+            },
+            {
+                run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+            },
+            {
+                name: "Install Testing Dependencies",
+                run: `make ensure`
+            },
+            {
+                name: "Running ${{ matrix.clouds }}${{ matrix.languages }} Tests",
+                run: "make specific_test_set TestSet=${{ matrix.clouds }}${{ matrix.languages }}"
+            }
+        ]);
+    }
+}
 export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
     constructor() {
         super(...arguments);
@@ -467,8 +505,8 @@ export class CronWorkflow extends g.GithubWorkflow {
         this.jobs = {
             providers: new CronProviderTestJob('providers', {}),
             linting: new Linting('lint'),
-            testInfraSetup: new TestInfraSetup('test-infra-setup'),
-            testInfraDestroy: new TestInfraDestroy('test-infra-destroy'),
+            'test-infra-setup': new TestInfraSetup('test-infra-setup'),
+            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new KubernetesProviderTestJob('kubernetes'),
         };
     }
@@ -484,8 +522,8 @@ export class SmokeTestCliWorkflow extends g.GithubWorkflow {
         });
         this.jobs = {
             providers: new SmokeTestCliForProvidersJob('smoke-test-cli-on-providers', {}),
-            testInfraSetup: new TestInfraSetup('test-infra-setup'),
-            testInfraDestroy: new TestInfraDestroy('test-infra-destroy'),
+            'test-infra-setup': new TestInfraSetup('test-infra-setup'),
+            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new SmokeTestCliForKubernetesProviderTestJob('smoke-test-cli-on-kubernetes'),
         };
     }
@@ -546,6 +584,11 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
         });
         this.jobs = {
             'comment-notification': new ResultsCommentJob('comment-notification', {}),
+            'test-infra-setup': new TestInfraSetup('test-infra-setup'),
+            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
+            linting: new Linting('lint'),
+            kubernetes: new KubernetesProviderTestJob('kubernetes'),
+            providers: new RunProviderTestForPrTestJob('run-provider-tests', {}),
         };
     }
 }
