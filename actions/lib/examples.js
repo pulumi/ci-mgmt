@@ -13,7 +13,7 @@ const env = Object.assign({
     ARM_CLIENT_ID: '${{ secrets.ARM_CLIENT_ID }}',
     ARM_CLIENT_SECRET: '${{ secrets.ARM_CLIENT_SECRET }}',
     ARM_SUBSCRIPTION_ID: '${{ secrets.ARM_SUBSCRIPTION_ID }}',
-    ARM_TENANT_ID: ' ${{ secrets.ARM_TENANT_ID }}',
+    ARM_TENANT_ID: '${{ secrets.ARM_TENANT_ID }}',
     ARM_ENVIRONMENT: "public",
     ARM_LOCATION: "westus",
     DIGITALOCEAN_TOKEN: ' ${{ secrets.DIGITALOCEAN_TOKEN }}',
