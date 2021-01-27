@@ -26,3 +26,9 @@ deploy: tf-providers
 
 clean:
 	rm -rf tf-providers/*/repo
+
+# Generate the GitHub Actions for the examples repo
+# It will generate the files to a platform directory and then examples directory
+examples: dist
+	rm -rvf platform/examples/repo
+	jk generate generate-examples.ts
