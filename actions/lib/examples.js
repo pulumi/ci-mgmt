@@ -462,7 +462,7 @@ export class CronWorkflow extends g.GithubWorkflow {
                 types: ['trigger-cron'],
             },
         }, {
-            env,
+            env: Object.assign(Object.assign({}, env), { 'PULUMI_ENABLE_RESOURCE_REFERENCES': '1' })
         });
         this.jobs = {
             providers: new CronProviderTestJob('providers', {}),
@@ -480,9 +480,7 @@ export class SmokeTestCliWorkflow extends g.GithubWorkflow {
                 types: ['smoke-test-cli'],
             },
         }, {
-            env: Object.assign(env, {
-                'PULUMI_VERSION': '${{ github.event.client_payload.ref }}',
-            })
+            env: Object.assign(Object.assign({}, env), { 'PULUMI_VERSION': '${{ github.event.client_payload.ref }}' })
         });
         this.jobs = {
             providers: new SmokeTestCliForProvidersJob('smoke-test-cli-on-providers', {}),
@@ -506,9 +504,9 @@ export class CommandDispatchWorkflow {
     constructor() {
         this.name = 'Command Dispatch for testing';
         this.on = {
-            issue_comment: [{
-                    types: ['created', 'edited']
-                }]
+            issue_comment: {
+                types: ['created', 'edited']
+            }
         };
         this.jobs = {
             'command-dispatch-for-testing': {
@@ -544,9 +542,7 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
                 branches: ['master']
             }
         }, {
-            env: Object.assign(env, {
-                'PR_COMMIT_SHA': '${{ github.event.client_payload.pull_request.head.sha }}',
-            })
+            env: Object.assign(Object.assign({}, env), { 'PR_COMMIT_SHA': '${{ github.event.client_payload.pull_request.head.sha }}' })
         });
         this.jobs = {
             'comment-notification': new ResultsCommentJob('comment-notification', {}),

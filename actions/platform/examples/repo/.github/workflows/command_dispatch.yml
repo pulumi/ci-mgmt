@@ -15,6 +15,6 @@ jobs:
 name: Command Dispatch for testing
 "on":
   issue_comment:
-  - types:
+    types:
     - created
     - edited
