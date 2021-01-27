@@ -18,7 +18,7 @@ env:
   PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_TEST_OWNER: ${{ secrets.PULUMI_TEST_OWNER }}
+  PULUMI_TEST_OWNER: moolumi
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   comment-notification:
@@ -113,7 +113,7 @@ jobs:
     - name: Setup Config
       run: |-
         mkdir -p "$HOME/.kube/"
-        pulumi stack -s "${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config
+        pulumi stack -s "${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config
     - name: Run ${{ matrix.tests-set }} Tests
       run: make specific_test_set TestSet=Kubernetes
     strategy:
@@ -257,6 +257,7 @@ jobs:
         python-version:
         - "3.7"
   test-infra-destroy:
+    if: 'if: ${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository'
     name: test-infra-destroy
     needs: kubernetes
     runs-on: ${{ matrix.platform }}
@@ -324,8 +325,8 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Destroy test infra
-      run: make destroy_test_infra StackName="${{ secrets.PULUMI_TEST_OWNER }}/${{
-        github.sha }}-${{ github.run_number }}"
+      run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
+        }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
@@ -406,7 +407,7 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Create Test Infrastructure
-      run: make setup_test_infra StackName="${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha
+      run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
         }}-${{ github.run_number }}"
     strategy:
       fail-fast: false

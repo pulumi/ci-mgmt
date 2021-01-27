@@ -5,7 +5,7 @@ import * as param from '@jkcfg/std/param';
 const extraEnv = param.Object('env');
 
 const env = Object.assign({
-    PULUMI_TEST_OWNER: '${{ secrets.PULUMI_TEST_OWNER }}',
+    PULUMI_TEST_OWNER: 'moolumi',
     PULUMI_ACCESS_TOKEN: '${{ secrets.PULUMI_ACCESS_TOKEN }}',
     PULUMI_API: 'https://api.pulumi-staging.io',
     SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
@@ -254,7 +254,7 @@ export class TestInfraSetup extends EnvironmentSetup {
         },
         {
             name: "Create Test Infrastructure",
-            run: "make setup_test_infra StackName=\"${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\""
+            run: "make setup_test_infra StackName=\"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\""
         }
     ])
 }
@@ -272,6 +272,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
     }
     'runs-on' = '${{ matrix.platform }}'
     needs = "kubernetes"
+    if = "if: ${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository"
     steps = this.steps.concat([
         {
             name: 'Install Latest Stable Pulumi CLI',
@@ -282,7 +283,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
         },
         {
             name: "Destroy test infra",
-            run: "make destroy_test_infra StackName=\"${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\""
+            run: "make destroy_test_infra StackName=\"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\""
         }
     ])
 }
@@ -315,7 +316,7 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
         {
             name: "Setup Config",
             run: "mkdir -p \"$HOME/.kube/\"\n" +
-                "pulumi stack -s \"${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config",
+                "pulumi stack -s \"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config",
         },
         {
             name: "Run ${{ matrix.tests-set }} Tests",
@@ -355,7 +356,7 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
         {
             name: "Setup Config",
             run: "mkdir -p \"$HOME/.kube/\"\n" +
-                "pulumi stack -s \"${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config",
+                "pulumi stack -s \"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config",
         },
         {
             name: "Run ${{ matrix.tests-set }} Tests",
