@@ -264,7 +264,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
         };
         this['runs-on'] = '${{ matrix.platform }}';
         this.needs = "kubernetes";
-        this.if = "if: ${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
+        this.if = "${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
         this.steps = this.steps.concat([
             {
                 name: 'Install Latest Stable Pulumi CLI',
@@ -398,7 +398,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
             },
             {
                 name: 'Running ci-scripts/run-at-head with ${{ matrix.examples-test-matrix }} configuration',
-                uses: './ci-scripts/ci/run-at-head ${{ matrix.examples-test-matrix }}'
+                run: './ci-scripts/ci/run-at-head ${{ matrix.examples-test-matrix }}'
             },
             {
                 if: 'matrix.examples-test-matrix == \'no-latest-packages\'',
