@@ -375,7 +375,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
             'node-version': ['13.x'],
             platform: ['ubuntu-latest'],
             languages: ["Cs", "Js", "Ts", "Py", "Fs"],
-            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Linode", "Cloud"],
+            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Cloud"],
             'examples-test-matrix': ['no-latest-cli', 'no-latest-packages', 'default'],
         },
     }
@@ -430,7 +430,7 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
             'node-version': ['13.x'],
             platform: ['ubuntu-latest'],
             languages: ["Cs", "Js", "Ts", "Py", "Fs"],
-            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Linode", "Cloud"],
+            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Cloud"],
         },
     }
     'runs-on' = '${{ matrix.platform }}'
@@ -463,7 +463,7 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
             'node-version': ['13.x'],
             platform: ['ubuntu-latest'],
             languages: ["Cs", "Js", "Ts", "Py", "Fs"],
-            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Linode", "Cloud"],
+            clouds: ["DigitalOcean", "Aws", "Azure", "Gcp", "Packet", "Cloud"],
         },
     }
     'runs-on' = '${{ matrix.platform }}'
