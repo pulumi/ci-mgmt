@@ -72,6 +72,13 @@ export class Linting extends job.Job {
         this.name = name;
         Object.assign(this, {name}, params)
     }
+
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+        }
+        return this;
+    }
 }
 
 export class CommentOnPrJob extends job.Job {
@@ -121,7 +128,7 @@ export class ResultsCommentJob extends job.Job {
         },
     ] as any;
 
-    constructor(name: string, params?: Partial<Linting>) {
+    constructor(name: string, params?: Partial<ResultsCommentJob>) {
         super();
         this.name = name;
         Object.assign(this, {name}, params)
@@ -220,7 +227,7 @@ export class EnvironmentSetup extends job.Job {
         }
     ] as any;
 
-    constructor(name: string, params?: Partial<EnvironmentSetup>) {
+    constructor(name: string, params?: Partial<EnvironmentSetup>, isCommandDispatch?: boolean) {
         super();
         this.name = name;
         Object.assign(this, {name}, params)
@@ -230,9 +237,43 @@ export class EnvironmentSetup extends job.Job {
         this.steps.push(step);
         return this;
     }
+
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+        }
+        return this;
+    }
 }
 
 export class TestInfraSetup extends EnvironmentSetup {
+    strategy = {
+        'fail-fast': false,
+        matrix: {
+            'go-version': ['1.15.x'],
+            'dotnet-version': ['3.1.301'],
+            'python-version': ['3.7'],
+            'node-version': ['13.x'],
+            platform: ['ubuntu-latest'],
+        },
+    }
+    'runs-on' = '${{ matrix.platform }}'
+    steps = this.steps.concat([
+        {
+            name: 'Install Latest Stable Pulumi CLI',
+            uses: 'pulumi/action-install-pulumi-cli@v1.0.1'
+        },
+        {
+            run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+        },
+        {
+            name: "Create Test Infrastructure",
+            run: "make setup_test_infra StackName=\"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\""
+        }
+    ])
+}
+
+export class ConditionalTestInfraSetup extends EnvironmentSetup {
     strategy = {
         'fail-fast': false,
         matrix: {
@@ -601,12 +642,12 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
             }
         });
         this.jobs = {
-            'comment-notification': new ResultsCommentJob('comment-notification', {}),
-            'test-infra-setup': new TestInfraSetup('test-infra-setup'),
+            'comment-notification': new ResultsCommentJob('comment-notification'),
+            'test-infra-setup': new TestInfraSetup('test-infra-setup').addDispatchConditional(true),
             'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
-            linting: new Linting('lint'),
-            kubernetes: new KubernetesProviderTestJob('kubernetes'),
-            providers: new RunProviderTestForPrTestJob('run-provider-tests', {}),
+            linting: new Linting('lint').addDispatchConditional(true),
+            kubernetes: new KubernetesProviderTestJob('kubernetes').addDispatchConditional(true),
+            providers: new RunProviderTestForPrTestJob('run-provider-tests').addDispatchConditional(true),
         }
     }
 }
