@@ -10,6 +10,7 @@ const gcp = param.Boolean('gcp');
 const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
 const parallelism = param.Number('parallel', 4)
+const triggerReleaseSmokeTest = param.Boolean('trigger-smoke-test', false)
 
 const installAction = "";
 const installPulumiCli = "pulumi/action-install-pulumi-cli@v1.0.1";
@@ -844,8 +845,39 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                     }
 
                 }],
-            }
+            },
+
         });
+
+        if (triggerReleaseSmokeTest) {
+            this.jobs = Object.assign(this.jobs, {
+                smoke_test_deployment: {
+                    name: 'smoke-test-deployment',
+                    'runs-on': 'ubuntu-latest',
+                    needs: 'publish_sdk',
+                    steps: [
+                        {
+                            name: 'Checkout Repo',
+                            uses: checkout,
+                        },
+                        {
+                            name: 'Install pulumictl',
+                            uses: installPulumictl,
+                            with: {
+                                repo: 'pulumi/pulumictl'
+                            }
+                        },
+                        {
+                            name: 'Trigger Smoke Tests',
+                            run: 'pulumictl dispatch -r pulumi/examples -c run-example-tests-command $(pulumictl get version --language generic -o)',
+                            env: {
+                                'GITHUB_TOKEN': '${{ secrets.PULUMI_BOT_TOKEN}}'
+                            },
+                        },
+                    ],
+                },
+            })
+        }
     }
 
     on = {
