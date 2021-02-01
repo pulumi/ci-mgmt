@@ -444,7 +444,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
             run: './ci-scripts/ci/run-at-head --${{ matrix.examples-test-matrix }}'
         },
         {
-            if: 'matrix.examples-test-matrix == \'no-latest-packages\' || \'matrix.examples-test-matrix == \'default\'',
+            if: 'matrix.examples-test-matrix == \'no-latest-packages\' || matrix.examples-test-matrix == \'default\'',
             run: 'echo "$HOME/.pulumi/bin" >> $GITHUB_PATH', //we need to set the dev version of Pulumi to PATH
         },
         {
