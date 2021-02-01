@@ -439,7 +439,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
             },
             {
                 name: 'Running ci-scripts/run-at-head with ${{ matrix.examples-test-matrix }} configuration',
-                run: './ci-scripts/ci/run-at-head ${{ matrix.examples-test-matrix }}'
+                run: './ci-scripts/ci/run-at-head --${{ matrix.examples-test-matrix }}'
             },
             {
                 if: 'matrix.examples-test-matrix == \'no-latest-packages\'',
