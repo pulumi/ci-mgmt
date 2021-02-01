@@ -8,7 +8,8 @@ const cron = name => new wf.CronWorkflow('Run Examples Cron Job');
 const commandDispatch = name => new wf.CommandDispatchWorkflow();
 const pr = name => new wf.PrWorkFlow('New Pull request Open');
 const runTestsCommand = name => new wf.RunTestsCommandWorkflow('Run Examples Tests From PR');
-const smokeTestCli = name => new wf.SmokeTestCliWorkflow('Smoke Specific Version of CLI');
+const smokeTestCli = name => new wf.SmokeTestCliWorkflow('Smoke Test Specific Version of CLI');
+const smokeTestProvider = name => new wf.SmokeTestProvidersWorkflow('Smoke Test Latest Provider Release');
 
 
 export default [
@@ -17,4 +18,5 @@ export default [
   { value: pr('pr'), file: `platform/examples/repo/.github/workflows/pr.yml` },
   { value: runTestsCommand('run-tests-command'), file: `platform/examples/repo/.github/workflows/run-tests-command.yml` },
   { value: smokeTestCli('smoke-test-cli'), file: `platform/examples/repo/.github/workflows/smoke-test-cli-command.yml` },
+  { value: smokeTestProvider('smoke-test-provider'), file: `platform/examples/repo/.github/workflows/smoke-test-provider-command.yml` },
 ];

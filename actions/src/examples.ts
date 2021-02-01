@@ -530,6 +530,81 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
     ])
 }
 
+export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
+    strategy = {
+        'fail-fast': false,
+        matrix: {
+            'go-version': ['1.15.x'],
+            'dotnet-version': ['3.1.301'],
+            'python-version': ['3.7'],
+            'node-version': ['13.x'],
+            platform: ['ubuntu-latest'],
+        },
+    }
+    'runs-on' = '${{ matrix.platform }}'
+    needs = 'test-infra-setup'
+    steps = this.steps.concat([
+        {
+            name: 'Install Specific Pulumi CLI',
+            uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            with: {
+                'pulumi-version': '${{ env.PULUMI_VERSION }}'
+            }
+        },
+        {
+            run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+        },
+        {
+            name: "Install Go Dependencies",
+            run: "make ensure"
+        },
+        {
+            name: "Setup Config",
+            run: "mkdir -p \"$HOME/.kube/\"\n" +
+                "pulumi stack -s \"${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}\" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config",
+        },
+        {
+            name: "Run Kubernetes Smoke Tests",
+            run: "make specific_tag_set TagSet=Kubernetes"
+        }
+    ])
+}
+
+export class SmokeTestProvidersJob extends EnvironmentSetup {
+    strategy = {
+        'fail-fast': false,
+        matrix: {
+            'go-version': ['1.15.x'],
+            'dotnet-version': ['3.1.301'],
+            'python-version': ['3.7'],
+            'node-version': ['13.x'],
+            platform: ['ubuntu-latest'],
+            languages: ["Cs", "Js", "Ts", "Py", "Fs"],
+        },
+    }
+    'runs-on' = '${{ matrix.platform }}'
+    steps = this.steps.concat([
+        {
+            name: 'Install Specific Pulumi CLI',
+            uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            with: {
+                'pulumi-version': '${{ env.PULUMI_VERSION }}'
+            }
+        },
+        {
+            run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+        },
+        {
+            name: "Install Testing Dependencies",
+            run: `make ensure`
+        },
+        {
+            name: "Running ${{ env.PROVIDER_TESTS_TAG }}${{ matrix.languages }} Smoke Tests",
+            run: "make specific_tag_set TestSet=${{ matrix.languages }} TagSet=${{ env.PROVIDER_TESTS_TAG }}"
+        }
+    ])
+}
+
 export class CronWorkflow extends g.GithubWorkflow {
     jobs: { [k: string]: job.Job }
 
@@ -576,6 +651,29 @@ export class SmokeTestCliWorkflow extends g.GithubWorkflow {
             'test-infra-setup': new TestInfraSetup('test-infra-setup'),
             'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new SmokeTestCliForKubernetesProviderTestJob('smoke-test-cli-on-kubernetes'),
+        }
+    }
+}
+
+export class SmokeTestProvidersWorkflow extends g.GithubWorkflow {
+    jobs: { [k: string]: job.Job }
+
+    constructor(name: string, jobs: { [k: string]: job.Job }) {
+        super(name, jobs, {
+            repository_dispatch: {
+                types: ['smoke-test-cli'],
+            },
+        }, {
+            env: {
+                ...env,
+                'PROVIDER_TESTS_TAG': '${{ github.event.client_payload.ref }}',
+            }
+        });
+        this.jobs = {
+            providers: new SmokeTestProvidersJob('smoke-test-providers'),
+            'test-infra-setup': new TestInfraSetup('test-infra-setup'),
+            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
+            kubernetes: new SmokeTestKubernetesProviderTestJob('smoke-test-kubernetes-provider'),
         }
     }
 }

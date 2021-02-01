@@ -802,7 +802,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                 smoke_test_deployment: {
                     name: 'smoke-test-deployment',
                     'runs-on': 'ubuntu-latest',
-                    needs: 'publish-sdk',
+                    needs: 'publish_sdk',
                     steps: [
                         {
                             name: 'Checkout Repo',
