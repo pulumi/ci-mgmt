@@ -1,0 +1,4 @@
+provider: opsgenie
+major-version: 1
+env:
+  OPSGENIE_API_KEY: ${{ secrets.OPSGENIE_API_KEY }}
