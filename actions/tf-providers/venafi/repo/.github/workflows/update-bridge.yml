@@ -11,9 +11,8 @@ env:
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
-  VENAFI_PASS: ${{ secrets.VENAFI_PASS }}
+  VENAFI_TOKEN: ${{ secrets.VENAFI_TOKEN }}
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
-  VENAFI_USER: ${{ secrets.VENAFI_USER }}
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
 jobs:
   update_bridge:
