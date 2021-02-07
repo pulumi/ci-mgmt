@@ -305,7 +305,6 @@ export class TestInfraDestroy extends EnvironmentSetup {
         };
         this['runs-on'] = '${{ matrix.platform }}';
         this.needs = "kubernetes";
-        this.if = "${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
         this.steps = this.steps.concat([
             {
                 name: 'Install Latest Stable Pulumi CLI',
@@ -723,7 +722,7 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
         this.jobs = {
             'comment-notification': new ResultsCommentJob('comment-notification'),
             'test-infra-setup': new TestInfraSetup('test-infra-setup').addDispatchConditional(true),
-            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
+            'test-infra-destroy': new TestInfraDestroy('test-infra-destroy').addDispatchConditional(true),
             linting: new Linting('lint').addDispatchConditional(true),
             kubernetes: new KubernetesProviderTestJob('kubernetes').addDispatchConditional(true),
             providers: new RunProviderTestForPrTestJob('run-provider-tests').addDispatchConditional(true),
