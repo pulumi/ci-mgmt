@@ -1,5 +1,5 @@
 provider: aiven
 lint: false
 env:
-  AIVEN_API_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
+  AIVEN_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
   AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
