@@ -660,7 +660,7 @@ export class SmokeTestProvidersWorkflow extends g.GithubWorkflow {
     constructor(name: string, jobs: { [k: string]: job.Job }) {
         super(name, jobs, {
             repository_dispatch: {
-                types: ['smoke-test-cli'],
+                types: ['smoke-test-provider'],
             },
         }, {
             env: {
