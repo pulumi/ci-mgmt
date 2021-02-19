@@ -68,6 +68,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-cloudinit",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-cloudinit",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-consul",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-consul",
@@ -206,6 +212,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-opsgenie",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-opsgenie",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-pagerduty",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-pagerduty",
@@ -242,15 +254,15 @@
             "Provider": "github"
         },
         {
-            "Name": "pulumi-spotinst",
-            "Owner": "pulumi",
-            "CloneURL": "git@github.com:pulumi/pulumi-spotinst",
-            "Provider": "github"
-        },
-        {
             "Name": "pulumi-splunk",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-splunk",
+            "Provider": "github"
+        },
+        {
+            "Name": "pulumi-spotinst",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-spotinst",
             "Provider": "github"
         },
         {
