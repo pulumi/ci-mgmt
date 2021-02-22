@@ -1,0 +1,17 @@
+export const installPulumiCli = "pulumi/action-install-pulumi-cli@v1.0.1";
+export const installPulumictl = "jaxxstorm/action-install-gh-release@v1.1.0";
+export const setupGo = "actions/setup-go@v2";
+export const setupNode = "actions/setup-node@v2";
+export const setupDotNet = "actions/setup-dotnet@v1";
+export const setupPython = "actions/setup-python@v2";
+export const setupGcloud = "GoogleCloudPlatform/github-actions/setup-gcloud@master";
+export const checkout = "actions/checkout@v2";
+export const configureAwsCredentials = "aws-actions/configure-aws-credentials@v1";
+export const downloadArtifact = "actions/download-artifact@v2";
+export const uploadArtifact = "actions/upload-artifact@v2";
+export const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
+export const notifySlack = "8398a7/action-slack@v3";
+export const goReleaser = "goreleaser/goreleaser-action@v2";
+export const automerge = "pascalgn/automerge-action@v0.13.1";
+export const addAndCommit = "EndBug/add-and-commit@v7";
+export const pullRequest = "repo-sync/pull-request@v2";
