@@ -74,7 +74,7 @@ export class BaseJob extends job.Job {
                 name: 'Install Go',
                 uses: setupGo,
                 with: {
-                    'go-version': '1.15.x',
+                    'go-version': '1.16.x',
                 },
             },
             {
@@ -156,7 +156,7 @@ export class MultilangJob extends BaseJob {
             'fail-fast': true,
             matrix: {
                 language: ['nodejs', 'python', 'dotnet', 'go'],
-                goversion: ['1.15.x'],
+                goversion: ['1.16.x'],
                 dotnetversion: ['3.1.301'],
                 pythonversion: ['3.7'],
                 nodeversion: ['13.x'],
@@ -213,7 +213,7 @@ export class BasicScaffold extends BaseJob {
         this.strategy = {
             'fail-fast': true,
             matrix: {
-                goversion: ['1.15.x'],
+                goversion: ['1.16.x'],
                 dotnetversion: ['3.1.301'],
                 pythonversion: ['3.7'],
                 nodeversion: ['13.x'],
@@ -602,7 +602,7 @@ export class PulumiMasterWorkflow extends PulumiBaseWorkflow {
                         name: 'Setup Go',
                         uses: setupGo,
                         with: {
-                            'go-version': '1.15.x',
+                            'go-version': '1.16.x',
                         },
                     },
                     {
@@ -678,7 +678,7 @@ export class PulumiReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Setup Go',
                         uses: setupGo,
                         with: {
-                            'go-version': '1.15.x',
+                            'go-version': '1.16.x',
                         },
                     },
                     {
@@ -874,7 +874,7 @@ export class PulumiPreReleaseWorkflow extends PulumiBaseWorkflow {
                         name: 'Setup Go',
                         uses: setupGo,
                         with: {
-                            'go-version': '1.15.x',
+                            'go-version': '1.16.x',
                         },
                     },
                     {
