@@ -15,14 +15,14 @@ for (let provider of providers) {
     const contexts: string[] = [
         "Update Changelog",
         "prerequisites",
-        "test (3.1.301, 1.15.x, dotnet, 13.x, 3.7)",
-        "test (3.1.301, 1.15.x, go, 13.x, 3.7)",
-        "test (3.1.301, 1.15.x, nodejs, 13.x, 3.7)",
-        "test (3.1.301, 1.15.x, python, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.15.x, dotnet, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.15.x, go, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.15.x, nodejs, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.15.x, python, 13.x, 3.7)",
+        "test (3.1.301, 1.16.x, dotnet, 13.x, 3.7)",
+        "test (3.1.301, 1.16.x, go, 13.x, 3.7)",
+        "test (3.1.301, 1.16.x, nodejs, 13.x, 3.7)",
+        "test (3.1.301, 1.16.x, python, 13.x, 3.7)",
+        "build_sdk (3.1.301 1.16.x, dotnet, 13.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, go, 13.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, nodejs, 13.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, python, 13.x, 3.7)",
     ];
 
     // If the lint step is null then we are using the default which is true
