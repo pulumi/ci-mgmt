@@ -238,7 +238,7 @@ export class TestInfraSetup extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -267,7 +267,7 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -296,7 +296,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -326,7 +326,7 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -365,7 +365,7 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -407,7 +407,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -464,7 +464,7 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -499,7 +499,7 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -537,7 +537,7 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -579,7 +579,7 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
         this.strategy = {
             'fail-fast': false,
             matrix: {
-                'go-version': ['1.15.x'],
+                'go-version': ['1.16.x'],
                 'dotnet-version': ['3.1.301'],
                 'python-version': ['3.7'],
                 'node-version': ['13.x'],
@@ -610,6 +610,174 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
         ]);
     }
 }
+export class UnitTestingJob extends job.Job {
+    constructor(isCommandDispatch) {
+        super();
+        this['runs-on'] = '${{ matrix.platform }}';
+        this.name = 'Running ${{ matrix.source-dir }} test';
+    }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+        }
+        return this;
+    }
+}
+export class UnitTestDotNetJob extends UnitTestingJob {
+    constructor() {
+        super(...arguments);
+        this.strategy = {
+            'fail-fast': false,
+            matrix: {
+                'dotnet-version': ['3.1.x'],
+                platform: ['ubuntu-latest'],
+                'source-dir': ['testing-unit-cs', 'testing-unit-cs-mocks', 'testing-unit-fs-mocks']
+            },
+        };
+        this.steps = [
+            {
+                name: 'Install DotNet ${{ matrix.dotnet-version }}',
+                uses: 'actions/setup-dotnet@v1',
+                with: {
+                    'dotnet-version': '${{matrix.dotnet-version}}',
+                },
+            },
+            {
+                name: 'Install Latest Pulumi CLI',
+                uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            },
+            {
+                run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+            },
+            {
+                uses: 'actions/checkout@v2',
+            },
+            {
+                run: "dotnet test",
+                'working-directory': '${{ matrix.source-dir }}',
+            }
+        ];
+    }
+}
+export class UnitTestPythonJob extends UnitTestingJob {
+    constructor() {
+        super(...arguments);
+        this.strategy = {
+            'fail-fast': false,
+            matrix: {
+                'python-version': ['3.7.x'],
+                platform: ['ubuntu-latest'],
+                'source-dir': ['testing-unit-py']
+            },
+        };
+        this.steps = [
+            {
+                name: 'Install Python ${{ matrix.python-version }}',
+                uses: 'actions/setup-python@v1',
+                with: {
+                    'python-version': '${{matrix.python-version}}',
+                },
+            },
+            {
+                name: 'Install Python Deps',
+                run: "pip3 install virtualenv==20.0.23\n" +
+                    "pip3 install pipenv",
+            },
+            {
+                name: 'Install Latest Pulumi CLI',
+                uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            },
+            {
+                run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+            },
+            {
+                uses: 'actions/checkout@v2',
+            },
+            {
+                run: "python3 -m venv venv\n" +
+                    "source venv/bin/activate\n" +
+                    "pip3 install -r requirements.txt\n" +
+                    "python -m unittest",
+                'working-directory': '${{ matrix.source-dir }}',
+            }
+        ];
+    }
+}
+export class UnitTestNodeJSJob extends UnitTestingJob {
+    constructor() {
+        super(...arguments);
+        this.strategy = {
+            'fail-fast': false,
+            matrix: {
+                'node-version': ['13.x'],
+                platform: ['ubuntu-latest'],
+                'source-dir': ['testing-unit-ts']
+            },
+        };
+        this.steps = [
+            {
+                name: 'Install Node.js ${{ matrix.node-version }}',
+                uses: 'actions/setup-node@v1',
+                with: {
+                    'node-version': '${{matrix.node-version}}',
+                },
+            },
+            {
+                name: 'Install Latest Pulumi CLI',
+                uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            },
+            {
+                run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+            },
+            {
+                uses: 'actions/checkout@v2',
+            },
+            {
+                run: "npm install\n" +
+                    "npm install --global mocha\n" +
+                    "npm install --global ts-node\n" +
+                    "mocha -r ts-node/register ec2tests.ts",
+                'working-directory': '${{ matrix.source-dir }}',
+            }
+        ];
+    }
+}
+export class UnitTestGoJob extends UnitTestingJob {
+    constructor() {
+        super(...arguments);
+        this.strategy = {
+            'fail-fast': false,
+            matrix: {
+                'go-version': ['1.16.x'],
+                platform: ['ubuntu-latest'],
+                'source-dir': ['testing-unit-go']
+            },
+        };
+        this.steps = [
+            {
+                name: 'Install Go ${{ matrix.go-version }}',
+                uses: 'actions/setup-go@v1',
+                with: {
+                    'go-version': '${{matrix.go-version}}',
+                },
+            },
+            {
+                name: 'Install Latest Pulumi CLI',
+                uses: 'pulumi/action-install-pulumi-cli@v1.0.1',
+            },
+            {
+                run: "echo \"Currently Pulumi $(pulumi version) is installed\"",
+            },
+            {
+                uses: 'actions/checkout@v2',
+            },
+            {
+                run: "go test",
+                'working-directory': '${{ matrix.source-dir }}',
+            }
+        ];
+    }
+}
 export class CronWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
@@ -628,6 +796,10 @@ export class CronWorkflow extends g.GithubWorkflow {
             'test-infra-setup': new TestInfraSetup('test-infra-setup'),
             'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new KubernetesProviderTestJob('kubernetes'),
+            'dotnet-unit-testing': new UnitTestDotNetJob(),
+            'ts-unit-testing': new UnitTestNodeJSJob(),
+            'go-unit-testing': new UnitTestGoJob(),
+            'python-unit-testing': new UnitTestPythonJob(),
         };
     }
 }
@@ -645,6 +817,10 @@ export class SmokeTestCliWorkflow extends g.GithubWorkflow {
             'test-infra-setup': new TestInfraSetup('test-infra-setup'),
             'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new SmokeTestCliForKubernetesProviderTestJob('smoke-test-cli-on-kubernetes'),
+            'dotnet-unit-testing': new UnitTestDotNetJob(),
+            'ts-unit-testing': new UnitTestNodeJSJob(),
+            'go-unit-testing': new UnitTestGoJob(),
+            'python-unit-testing': new UnitTestPythonJob(),
         };
     }
 }
@@ -662,6 +838,10 @@ export class SmokeTestProvidersWorkflow extends g.GithubWorkflow {
             'test-infra-setup': new TestInfraSetup('test-infra-setup'),
             'test-infra-destroy': new TestInfraDestroy('test-infra-destroy'),
             kubernetes: new SmokeTestKubernetesProviderTestJob('smoke-test-kubernetes-provider'),
+            'dotnet-unit-testing': new UnitTestDotNetJob(),
+            'ts-unit-testing': new UnitTestNodeJSJob(),
+            'go-unit-testing': new UnitTestGoJob(),
+            'python-unit-testing': new UnitTestPythonJob(),
         };
     }
 }
@@ -726,6 +906,10 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
             linting: new Linting('lint').addDispatchConditional(true),
             kubernetes: new KubernetesProviderTestJob('kubernetes').addDispatchConditional(true),
             providers: new RunProviderTestForPrTestJob('run-provider-tests').addDispatchConditional(true),
+            'dotnet-unit-testing': new UnitTestDotNetJob().addDispatchConditional(true),
+            'ts-unit-testing': new UnitTestNodeJSJob().addDispatchConditional(true),
+            'go-unit-testing': new UnitTestGoJob().addDispatchConditional(true),
+            'python-unit-testing': new UnitTestPythonJob().addDispatchConditional(true),
         };
     }
 }
