@@ -9,7 +9,7 @@ const aws = param.Boolean('aws');
 const gcp = param.Boolean('gcp');
 const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
-const parallelism = param.Number('parallel', 4)
+const parallelism = param.Number('parallel', 3)
 const triggerReleaseSmokeTest = param.Boolean('trigger-smoke-test', false)
 
 const installAction = "";
