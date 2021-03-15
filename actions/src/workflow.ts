@@ -338,6 +338,9 @@ export class PulumiBaseWorkflow extends g.GithubWorkflow {
                 ),
             test: new MultilangJob('test', {needs: 'build_sdk'})
                 .addStep({
+                    run: "dotnet nuget add source ${{ github.workspace }}/nuget",
+                })
+                .addStep({
                     name: 'Download SDK',
                     uses: downloadArtifact,
                     with: {
