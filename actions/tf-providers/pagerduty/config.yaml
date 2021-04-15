@@ -1,4 +1,3 @@
 provider: pagerduty
-major-version: 1
 env:
   PAGERDUTY_TOKEN: ${{ secrets.PAGERDUTY_TOKEN }}
