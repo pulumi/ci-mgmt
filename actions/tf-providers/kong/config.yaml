@@ -1,3 +1,4 @@
 provider: kong
+major-version: 3
 docker: true
 
