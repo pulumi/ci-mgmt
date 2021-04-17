@@ -1,4 +1,5 @@
 provider: rancher2
+major-version: 3
 docker: true
 lint: false
 setup-script: testing/setup.sh
