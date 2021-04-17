@@ -1,4 +1,5 @@
 provider: spotinst
+major-version: 3
 aws: true
 env:
   SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
