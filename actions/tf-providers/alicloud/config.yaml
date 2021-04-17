@@ -1,4 +1,5 @@
 provider: alicloud
+major-version: 3
 lint: false
 env:
   ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
