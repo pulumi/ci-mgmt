@@ -1,1 +1,2 @@
 provider: cloudamqp
+major-version: 3
