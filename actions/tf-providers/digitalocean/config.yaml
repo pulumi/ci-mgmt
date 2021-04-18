@@ -1,4 +1,4 @@
 provider: digitalocean
-major-version: 3
+major-version: 4
 env:
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
