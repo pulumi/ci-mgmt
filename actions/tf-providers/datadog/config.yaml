@@ -1,2 +1,3 @@
 provider: datadog
+major-version: 3
 lint: false
