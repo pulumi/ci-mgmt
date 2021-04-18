@@ -1,2 +1,3 @@
 provider: kafka
+major-version: 3
 docker: true
