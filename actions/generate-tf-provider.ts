@@ -1,4 +1,5 @@
-import * as wf from './lib/workflow';
+import * as shared from './lib/shared-workflows';
+import * as wf from './lib/workflows';
 import * as goreleaser from './lib/goreleaser';
 import * as lint from './lib/golangci';
 import * as param from '@jkcfg/std/param';
@@ -6,17 +7,16 @@ import * as param from '@jkcfg/std/param';
 const provider = param.String('provider');
 
 // eslint-disable-next-line no-template-curly-in-string
-const pullRequest = name => new wf.PulumiBaseWorkflow('pull-request');
-const master = name => new wf.PulumiMasterWorkflow('master');
-const preRelease = name => new wf.PulumiPreReleaseWorkflow('prerelease');
-const release = name => new wf.PulumiReleaseWorkflow('release');
-const automation = name => new wf.PulumiAutomationWorkflow();
+const pullRequest = name => new wf.PullRequestWorkflow('pull-request');
+const master = name => new wf.MasterWorkflow('master');
+const preRelease = name => new wf.PrereleaseWorkflow('prerelease');
+const release = name => new wf.ReleaseWorkflow('release');
+const updatePulumiTerraformBridge = name => new wf.UpdatePulumiTerraformBridgeWorkflow();
 const pre = name => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = name => new goreleaser.PulumiGoreleaserConfig(provider);
 const lintConfig = name => new lint.PulumiGolangCIConfig();
-const cleanup = name => new wf.PulumiArtifactCleanupWorkflow();
-const updatePulumiTerraformBridge = name => new wf.UpdatePulumiTerraformBridgeWorkflow();
-
+const cleanup = name => new shared.ArtifactCleanupWorkflow();
+const automation = name => new shared.AutoMergeWorkflow();
 
 export default [
   { value: pullRequest('pull-request'), file: `tf-providers/${provider}/repo/.github/workflows/pull-request.yml` },
