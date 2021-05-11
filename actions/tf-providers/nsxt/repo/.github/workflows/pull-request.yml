@@ -1,6 +1,5 @@
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GO111MODULE: "on"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NSXT_MANAGER_HOST: ${{ secrets.NSXT_MANAGER_HOST }}
@@ -32,22 +31,22 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16.x
+        go-version: ${{matrix.goversion}}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.1.0
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
+      uses: pulumi/action-install-pulumi-cli@v1
     - name: Setup Node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{matrix.nodeversion}}
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetverson}}
+        dotnet-version: ${{matrix.dotnetversion}}
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
@@ -58,11 +57,9 @@ jobs:
         name: ${{ env.PROVIDER }}-provider.tar.gz
         path: ${{ github.workspace }}/bin
     - name: Untar provider binaries
-      run: tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
-        }}/bin
-    - name: Restore binary perms
-      run: find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print
-        -exec chmod +x {} \;
+      run: |-
+        tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin
+        find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \;
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
@@ -75,7 +72,7 @@ jobs:
       with:
         name: ${{ matrix.language  }}-sdk.tar.gz
         path: ${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz
-    - if: failure() && github.event_name == 'push'
+    - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
@@ -95,7 +92,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 13.x
+        - 14.x
         pythonversion:
         - "3.7"
   lint:
@@ -115,16 +112,15 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16.x
+        go-version: ${{matrix.goversion}}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.1.0
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - name: Run golangci
-      run: make lint_provider
-    - if: failure() && github.event_name == 'push'
+      uses: pulumi/action-install-pulumi-cli@v1
+    - run: make lint_provider
+    - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
@@ -133,6 +129,9 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
+      matrix:
+        goversion:
+        - 1.16.x
   lint_sdk:
     container: golangci/golangci-lint:latest
     name: lint-sdk
@@ -151,16 +150,15 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16.x
+        go-version: ${{matrix.goversion}}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.1.0
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - name: Run golangci
-      run: cd sdk/go/nsxt && golangci-lint run -c ../../../.golangci.yml
-    - if: failure() && github.event_name == 'push'
+      uses: pulumi/action-install-pulumi-cli@v1
+    - run: cd sdk/go/nsxt && golangci-lint run -c ../../../.golangci.yml
+    - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
@@ -169,6 +167,9 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
+      matrix:
+        goversion:
+        - 1.16.x
   prerequisites:
     name: prerequisites
     runs-on: ubuntu-latest
@@ -185,13 +186,13 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16.x
+        go-version: ${{matrix.goversion}}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.1.0
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
+      uses: pulumi/action-install-pulumi-cli@v1
     - name: Build tfgen & provider binaries
       run: make provider
     - name: Tar provider binaries
@@ -203,7 +204,7 @@ jobs:
       with:
         name: ${{ env.PROVIDER }}-provider.tar.gz
         path: ${{ github.workspace }}/bin/provider.tar.gz
-    - if: failure() && github.event_name == 'push'
+    - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
@@ -212,6 +213,15 @@ jobs:
         status: ${{ job.status }}
     strategy:
       fail-fast: true
+      matrix:
+        dotnetversion:
+        - 3.1.301
+        goversion:
+        - 1.16.x
+        nodeversion:
+        - 13.x
+        pythonversion:
+        - "3.7"
   test:
     name: test
     needs: build_sdk
@@ -229,22 +239,22 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16.x
+        go-version: ${{matrix.goversion}}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.1.0
+      uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
+      uses: pulumi/action-install-pulumi-cli@v1
     - name: Setup Node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{matrix.nodeversion}}
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetverson}}
+        dotnet-version: ${{matrix.dotnetversion}}
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
@@ -255,20 +265,18 @@ jobs:
         name: ${{ env.PROVIDER }}-provider.tar.gz
         path: ${{ github.workspace }}/bin
     - name: Untar provider binaries
-      run: tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
-        }}/bin
-    - name: Restore binary perms
-      run: find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print
-        -exec chmod +x {} \;
+      run: |-
+        tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin
+        find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \;
     - run: dotnet nuget add source ${{ github.workspace }}/nuget
     - name: Download SDK
       uses: actions/download-artifact@v2
       with:
-        name: ${{ matrix.language  }}-sdk.tar.gz
+        name: ${{ matrix.language }}-sdk.tar.gz
         path: ${{ github.workspace}}/sdk/
     - name: Uncompress SDK folder
-      run: tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{
-        github.workspace}}/sdk/${{ matrix.language}}
+      run: tar -zxf ${{ github.workspace }}/sdk/${{ matrix.language }}.tar.gz -C ${{
+        github.workspace }}/sdk/${{ matrix.language }}
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
     - name: Install Python deps
@@ -280,7 +288,7 @@ jobs:
     - name: Run tests
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language
         }} -parallel 4 .
-    - if: failure() && github.event_name == 'push'
+    - if: failure()
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
@@ -300,7 +308,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 13.x
+        - 14.x
         pythonversion:
         - "3.7"
 name: pull-request
@@ -308,3 +316,5 @@ name: pull-request
   pull_request:
     branches:
     - master
+    paths-ignore:
+    - CHANGELOG.md
