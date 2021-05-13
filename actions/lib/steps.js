@@ -141,9 +141,22 @@ export class InstallPulumiCtl extends step.Step {
         super();
         return {
             name: 'Install pulumictl',
-            uses: action.installPulumictl,
+            uses: action.installGhRelease,
             with: {
                 repo: 'pulumi/pulumictl',
+            },
+        };
+    }
+}
+export class InstallSchemaChecker extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: 'Install Schema Tools',
+            uses: action.installGhRelease,
+            with: {
+                repo: 'mikhailshilkov/schema-tools',
             },
         };
     }
@@ -325,7 +338,7 @@ export class NotifySlack extends step.Step {
     constructor(name) {
         super();
         return {
-            if: 'failure()',
+            if: 'failure() && github.event_name == \'push\'',
             name: 'Notify Slack',
             uses: action.notifySlack,
             with: {
@@ -456,6 +469,33 @@ export class PullRequest extends step.Step {
             },
             env: {
                 GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
+            }
+        };
+    }
+}
+export class CheckSchemaChanges extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: 'Check Schema is Valid',
+            run: "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
+                "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+                "echo 'EOF' >> $GITHUB_ENV",
+        };
+    }
+}
+export class CommentSchemaChangesOnPR extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: "Comment on PR with Details of Schema Check",
+            uses: action.prComment,
+            with: {
+                message: "### Does the PR have any schema changes?\n\n" +
+                    "${{ env.SCHEMA_CHANGES }}\n",
+                GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
         };
     }

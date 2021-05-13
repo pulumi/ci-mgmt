@@ -1,5 +1,6 @@
 export const installPulumiCli = "pulumi/action-install-pulumi-cli@v1";
-export const installPulumictl = "jaxxstorm/action-install-gh-release@v1.2.0";
+export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.2.0";
+export const prComment = "jaxxstorm/action-install-gh-release@v1.2.0";
 export const setupGo = "actions/setup-go@v2";
 export const setupNode = "actions/setup-node@v2";
 export const setupDotNet = "actions/setup-dotnet@v1";

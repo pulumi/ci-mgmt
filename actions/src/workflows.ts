@@ -259,10 +259,10 @@ export class PrerequisitesJob extends job.Job {
     strategy = {
         'fail-fast': true,
         matrix: {
-            goversion: ['1.16.x'],
-            dotnetversion: ['3.1.301'],
-            pythonversion: ['3.7'],
-            nodeversion: ['13.x'],
+            goversion: [goVersion],
+            dotnetversion: [dotnetVersion],
+            pythonversion: [pythonVersion],
+            nodeversion: [nodeVersion],
         },
     }
     steps = [
@@ -272,11 +272,14 @@ export class PrerequisitesJob extends job.Job {
         new steps.InstallGo(),
         new steps.InstallPulumiCtl(),
         new steps.InstallPulumiCli(),
+        new steps.InstallSchemaChecker(),
         new steps.BuildBinariesStep(),
+        new steps.CheckSchemaChanges(),
+        new steps.CommentSchemaChangesOnPR(),
         new steps.ZipProviderBinariesStep(),
         new steps.UploadProviderBinariesStep(),
         new steps.NotifySlack('Failure in building provider prerequisites'),
-    ] as any;
+    ].filter(step => step.uses !== undefined || step.run !== undefined) as any;
 
     constructor(name: string) {
         super();
