@@ -9,6 +9,18 @@ export class CheckoutRepoStep extends step.Step {
         };
     }
 }
+export class CheckoutRepoStepAtPR extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: "Checkout Repo",
+            uses: action.checkout,
+            with: {
+                ref: '${{ env.PR_COMMIT_SHA }}'
+            }
+        };
+    }
+}
 export class CheckoutScriptsRepoStep extends step.Step {
     constructor() {
         super();
@@ -497,6 +509,63 @@ export class CommentSchemaChangesOnPR extends step.Step {
                     "${{ env.SCHEMA_CHANGES }}\n",
                 GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
+        };
+    }
+}
+export class CommandDispatchStep extends step.Step {
+    constructor(providerName) {
+        super();
+        return {
+            uses: action.slashCommand,
+            with: {
+                token: '${{ secrets.PULUMI_BOT_TOKEN }}',
+                'reaction-token': '${{ secrets.GITHUB_TOKEN }}',
+                commands: 'run-acceptance-tests',
+                permission: 'write',
+                'issue-type': 'pull-request',
+                'repository': `pulumi/pulumi-${providerName}`,
+            }
+        };
+    }
+}
+export class UpdatePRWithResultsStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Update with Result',
+            uses: action.createOrUpdateComment,
+            with: {
+                token: '${{ secrets.PULUMI_BOT_TOKEN }}',
+                repository: '${{ github.event.client_payload.github.payload.repository.full_name }}',
+                'issue-number': '${{ github.event.client_payload.github.payload.issue.number }}',
+                body: 'Please view the PR build - ${{ steps.vars.outputs.run-url }}',
+            }
+        };
+    }
+}
+export class CommentPRWithSlashCommandStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Comment PR',
+            uses: action.prComment,
+            with: {
+                with: {
+                    message: "PR is now waiting for a maintainer to run the acceptance tests.\n" +
+                        "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
+                    GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                }
+            }
+        };
+    }
+}
+export class CreateCommentsUrlStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Create URL to the run output',
+            id: 'var',
+            run: 'echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID',
         };
     }
 }
