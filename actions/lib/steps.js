@@ -49,7 +49,7 @@ export class ConfigureGcpCredentials extends step.Step {
         }
     }
 }
-export class ConfigureAwsCredentials extends step.Step {
+export class ConfigureAwsCredentialsForTests extends step.Step {
     constructor(requiresAws) {
         super();
         if (requiresAws) {
@@ -66,6 +66,24 @@ export class ConfigureAwsCredentials extends step.Step {
                 }
             };
         }
+    }
+}
+export class ConfigureAwsCredentialsForPublish extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Configure AWS Credentials',
+            uses: action.configureAwsCredentials,
+            with: {
+                'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
+                'aws-region': '${{ env.AWS_REGION }}',
+                'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
+                'role-duration-seconds': 3600,
+                'role-session-name': '${{ env.PROVIDER }}@githubActions',
+                'role-external-id': 'upload-pulumi-release',
+                'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}'
+            }
+        };
     }
 }
 export class InstallGo extends step.Step {

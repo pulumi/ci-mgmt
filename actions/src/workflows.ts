@@ -317,7 +317,7 @@ export class TestsJob extends job.Job {
         new steps.InstallPythonDeps(),
         new steps.RunDockerComposeStep(docker),
         new steps.RunSetUpScriptStep(setupScript),
-        new steps.ConfigureAwsCredentials(aws),
+        new steps.ConfigureAwsCredentialsForTests(aws),
         new steps.ConfigureGcpCredentials(gcp),
         new steps.InstallSDKDeps(),
         new steps.RunTests(),
@@ -349,7 +349,7 @@ export class PublishPrereleaseJob extends job.Job {
         new steps.InstallGo(),
         new steps.InstallPulumiCtl(),
         new steps.InstallPulumiCli(),
-        new steps.ConfigureAwsCredentials(true),
+        new steps.ConfigureAwsCredentialsForPublish(),
         new steps.SetPreReleaseVersion(),
         new steps.RunGoReleaserWithArgs(`-p ${parallelism} -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout ${goReleaserTimeout}m0s`),
     ] as any;
@@ -379,7 +379,7 @@ export class PublishJob extends job.Job {
         new steps.InstallGo(),
         new steps.InstallPulumiCtl(),
         new steps.InstallPulumiCli(),
-        new steps.ConfigureAwsCredentials(true),
+        new steps.ConfigureAwsCredentialsForPublish(),
         new steps.SetPreReleaseVersion(),
         new steps.RunGoReleaserWithArgs(`-p ${parallelism} release --rm-dist --timeout ${goReleaserTimeout}m0s`),
     ] as any;
