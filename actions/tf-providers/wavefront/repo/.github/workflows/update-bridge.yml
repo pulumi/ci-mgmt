@@ -14,7 +14,9 @@ env:
   WAVEFRONT_TOKEN: ${{ secrets.WAVEFRONT_TOKEN }}
 jobs:
   update_bridge:
+    if: ""
     name: update-bridge
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2

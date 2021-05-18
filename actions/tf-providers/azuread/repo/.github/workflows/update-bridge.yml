@@ -17,7 +17,9 @@ env:
   TRAVIS_OS_NAME: linux
 jobs:
   update_bridge:
+    if: ""
     name: update-bridge
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
