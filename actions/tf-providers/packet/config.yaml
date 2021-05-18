@@ -1,4 +1,0 @@
-provider: packet
-major-version: 3
-env:
-  PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}

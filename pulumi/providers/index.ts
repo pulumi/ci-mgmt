@@ -14,32 +14,33 @@ for (let provider of providers) {
 
     const contexts: string[] = [
         "Update Changelog",
-        "prerequisites",
-        "test (3.1.301, 1.16.x, dotnet, 13.x, 3.7)",
-        "test (3.1.301, 1.16.x, go, 13.x, 3.7)",
-        "test (3.1.301, 1.16.x, nodejs, 13.x, 3.7)",
-        "test (3.1.301, 1.16.x, python, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.16.x, dotnet, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.16.x, go, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.16.x, nodejs, 13.x, 3.7)",
-        "build_sdk (3.1.301, 1.16.x, python, 13.x, 3.7)",
+        "prerequisites (3.1.301, 1.16.x, 14.x, 3.7)",
+        "test (3.1.301, 1.16.x, dotnet, 14.x, 3.7)",
+        "test (3.1.301, 1.16.x, go, 14.x, 3.7)",
+        "test (3.1.301, 1.16.x, nodejs, 14.x, 3.7)",
+        "test (3.1.301, 1.16.x, python, 14.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, dotnet, 14.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, go, 14.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, nodejs, 14.x, 3.7)",
+        "build_sdk (3.1.301, 1.16.x, python, 14.x, 3.7)",
     ];
 
     // If the lint step is null then we are using the default which is true
     // if we pass a lint value, it's more than likely to set it to false
     if (providerConfig.lint == null) {
-        contexts.push("lint")
-        contexts.push("lint-sdk")
+        contexts.push("lint (1.16.x)")
+        contexts.push("lint-sdk (1.16.x)")
     } else {
         console.log(`Skipping linting for ${provider}: ${providerConfig.lint}`)
     }
 
     // enable branchProtection
     const branchProtection = new github.BranchProtection(`${provider}-branchprotection`, {
-        repository: `pulumi-${provider}`,
-        branch: 'master',
-        requiredStatusChecks: {
+        repositoryId: `pulumi-${provider}`,
+        pattern: 'master',
+        requiredStatusChecks: [{
+            strict: false,
             contexts: contexts,
-        }
+        }]
     })
 }

@@ -1,2 +1,2 @@
 config:
-  github:organization: pulumi
+  github:owner: pulumi
