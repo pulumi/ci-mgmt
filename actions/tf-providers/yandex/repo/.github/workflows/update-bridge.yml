@@ -15,7 +15,6 @@ env:
   YC_SERVICE_ACCOUNT_KEY_FILE: ${{ secrets.YC_SERVICE_ACCOUNT_KEY_FILE }}
 jobs:
   update_bridge:
-    if: ""
     name: update-bridge
     runs-on: ubuntu-latest
     steps:

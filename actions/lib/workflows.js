@@ -210,7 +210,6 @@ export class EmptyJob extends job.Job {
     constructor(name, params) {
         super();
         this.steps = [];
-        this.if = '';
         this['runs-on'] = 'ubuntu-latest';
         this.strategy = {};
         this.name = name;

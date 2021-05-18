@@ -15,7 +15,6 @@ env:
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
 jobs:
   update_bridge:
-    if: ""
     name: update-bridge
     runs-on: ubuntu-latest
     steps:

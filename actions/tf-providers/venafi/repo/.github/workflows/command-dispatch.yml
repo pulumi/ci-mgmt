@@ -15,7 +15,6 @@ env:
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
 jobs:
   command-dispatch-for-testing:
-    if: ""
     name: command-dispatch-for-testing
     runs-on: ubuntu-latest
     steps:

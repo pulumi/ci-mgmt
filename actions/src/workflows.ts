@@ -242,7 +242,6 @@ export class CommandDispatchWorkflow extends g.GithubWorkflow {
 
 export class EmptyJob extends job.Job {
     steps = [] as any;
-    if = ''
     'runs-on' = 'ubuntu-latest'
     strategy = {}
 

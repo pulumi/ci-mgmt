@@ -13,7 +13,6 @@ env:
   TRAVIS_OS_NAME: linux
 jobs:
   command-dispatch-for-testing:
-    if: ""
     name: command-dispatch-for-testing
     runs-on: ubuntu-latest
     steps:
