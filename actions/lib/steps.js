@@ -76,7 +76,7 @@ export class ConfigureAwsCredentialsForPublish extends step.Step {
             uses: action.configureAwsCredentials,
             with: {
                 'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
-                'aws-region': '${{ env.AWS_REGION }}',
+                'aws-region': 'us-east-2',
                 'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
                 'role-duration-seconds': 3600,
                 'role-session-name': '${{ env.PROVIDER }}@githubActions',
