@@ -105,9 +105,12 @@ export class PrereleaseWorkflow extends g.GithubWorkflow {
         }
     }
 }
-export class PullRequestWorkflow extends g.GithubWorkflow {
+export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
+            repository_dispatch: {
+                types: ['run-acceptance-tests-command']
+            },
             pull_request: {
                 branches: ["master"],
                 'paths-ignore': [
@@ -115,19 +118,38 @@ export class PullRequestWorkflow extends g.GithubWorkflow {
                 ]
             },
         }, {
-            env,
+            env: Object.assign(Object.assign({}, env), { 'PR_COMMIT_SHA': '${{ github.event.client_payload.pull_request.head.sha }}' })
         });
         this.jobs = {
-            'prerequisites': new PrerequisitesJob('prerequisites'),
-            'build_sdk': new BuildSdkJob('build_sdk'),
-            'test': new TestsJob('test'),
+            'comment-notification': new EmptyJob('comment-notification')
+                .addConditional('github.event_name == \'repository_dispatch\'')
+                .addStep(new steps.CreateCommentsUrlStep())
+                .addStep(new steps.UpdatePRWithResultsStep()),
+            'prerequisites': new PrerequisitesJob('prerequisites').addDispatchConditional(true),
+            'build_sdk': new BuildSdkJob('build_sdk').addDispatchConditional(true),
+            'test': new TestsJob('test').addDispatchConditional(true),
         };
         if (lint) {
             this.jobs = Object.assign(this.jobs, {
-                'lint': new LintProviderJob('lint'),
-                'lint_sdk': new LintSDKJob('lint-sdk'),
+                'lint': new LintProviderJob('lint').addDispatchConditional(true),
+                'lint_sdk': new LintSDKJob('lint-sdk').addDispatchConditional(true),
             });
         }
+    }
+}
+export class PullRequestWorkflow extends g.GithubWorkflow {
+    constructor(name, jobs) {
+        super(name, jobs, {
+            pull_request_target: {},
+        }, {
+            env,
+        });
+        this.jobs = {
+            'comment-on-pr': new EmptyJob('comment-on-pr')
+                .addConditional('github.event.pull_request.head.repo.full_name != github.repository')
+                .addStep(new steps.CheckoutRepoStep())
+                .addStep(new steps.CommentPRWithSlashCommandStep()),
+        };
     }
 }
 export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
@@ -168,10 +190,28 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
         };
     }
 }
+export class CommandDispatchWorkflow extends g.GithubWorkflow {
+    constructor(name, jobs) {
+        super(name, jobs, {
+            issue_comment: {
+                types: ["created", "edited"],
+            },
+        }, {
+            env,
+        });
+        this.jobs = {
+            'command-dispatch-for-testing': new EmptyJob('command-dispatch-for-testing')
+                .addStep(new steps.CheckoutRepoStep())
+                .addStep(new steps.CommandDispatchStep(`${provider}`))
+        };
+    }
+}
 export class EmptyJob extends job.Job {
     constructor(name, params) {
         super();
         this.steps = [];
+        this.if = '';
+        this['runs-on'] = 'ubuntu-latest';
         this.strategy = {};
         this.name = name;
         Object.assign(this, { name }, params);
@@ -182,6 +222,10 @@ export class EmptyJob extends job.Job {
     }
     addStrategy(strategy) {
         this.strategy = strategy;
+        return this;
+    }
+    addConditional(conditional) {
+        this.if = conditional;
         return this;
     }
 }
@@ -221,6 +265,14 @@ export class BuildSdkJob extends job.Job {
         this.name = name;
         Object.assign(this, { name });
     }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo');
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
+        }
+        return this;
+    }
 }
 export class PrerequisitesJob extends job.Job {
     constructor(name) {
@@ -229,10 +281,10 @@ export class PrerequisitesJob extends job.Job {
         this.strategy = {
             'fail-fast': true,
             matrix: {
-                goversion: ['1.16.x'],
-                dotnetversion: ['3.1.301'],
-                pythonversion: ['3.7'],
-                nodeversion: ['13.x'],
+                goversion: [goVersion],
+                dotnetversion: [dotnetVersion],
+                pythonversion: [pythonVersion],
+                nodeversion: [nodeVersion],
             },
         };
         this.steps = [
@@ -242,13 +294,24 @@ export class PrerequisitesJob extends job.Job {
             new steps.InstallGo(),
             new steps.InstallPulumiCtl(),
             new steps.InstallPulumiCli(),
+            new steps.InstallSchemaChecker(),
             new steps.BuildBinariesStep(),
+            new steps.CheckSchemaChanges(),
+            new steps.CommentSchemaChangesOnPR(),
             new steps.ZipProviderBinariesStep(),
             new steps.UploadProviderBinariesStep(),
             new steps.NotifySlack('Failure in building provider prerequisites'),
-        ];
+        ].filter(step => step.uses !== undefined || step.run !== undefined);
         this.name = name;
         Object.assign(this, { name });
+    }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo');
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
+        }
+        return this;
     }
 }
 export class TestsJob extends job.Job {
@@ -293,6 +356,14 @@ export class TestsJob extends job.Job {
         ].filter(step => step.uses !== undefined || step.run !== undefined);
         this.name = name;
         Object.assign(this, { name });
+    }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo');
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
+        }
+        return this;
     }
 }
 export class PublishPrereleaseJob extends job.Job {
@@ -426,6 +497,14 @@ export class LintProviderJob extends job.Job {
         this.name = name;
         Object.assign(this, { name });
     }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo');
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
+        }
+        return this;
+    }
 }
 export class LintSDKJob extends job.Job {
     constructor(name) {
@@ -451,5 +530,13 @@ export class LintSDKJob extends job.Job {
         ];
         this.name = name;
         Object.assign(this, { name });
+    }
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo');
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
+        }
+        return this;
     }
 }

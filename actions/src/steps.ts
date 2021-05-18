@@ -11,6 +11,19 @@ export class CheckoutRepoStep extends step.Step {
     }
 }
 
+export class CheckoutRepoStepAtPR extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: "Checkout Repo",
+            uses: action.checkout,
+            with: {
+                ref: '${{ env.PR_COMMIT_SHA }}'
+            }
+        }
+    }
+}
+
 export class CheckoutScriptsRepoStep extends step.Step {
     constructor() {
         super();
@@ -172,9 +185,23 @@ export class InstallPulumiCtl extends step.Step {
         super();
         return {
             name: 'Install pulumictl',
-            uses: action.installPulumictl,
+            uses: action.installGhRelease,
             with: {
                 repo: 'pulumi/pulumictl',
+            },
+        }
+    }
+}
+
+export class InstallSchemaChecker extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: 'Install Schema Tools',
+            uses: action.installGhRelease,
+            with: {
+                repo: 'mikhailshilkov/schema-tools',
             },
         }
     }
@@ -374,7 +401,7 @@ export class NotifySlack extends step.Step {
     constructor(name: string) {
         super();
         return {
-            if: 'failure()',
+            if: 'failure() && github.event_name == \'push\'',
             name: 'Notify Slack',
             uses: action.notifySlack,
             with: {
@@ -517,6 +544,96 @@ export class PullRequest extends step.Step {
             env: {
                 GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
             }
+        }
+    }
+}
+
+export class CheckSchemaChanges extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: 'Check Schema is Valid',
+            run: "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
+                "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+                "echo 'EOF' >> $GITHUB_ENV",
+        }
+    }
+}
+
+export class CommentSchemaChangesOnPR extends step.Step {
+    constructor() {
+        super();
+        return {
+            if: 'github.event_name == \'pull_request\'',
+            name: "Comment on PR with Details of Schema Check",
+            uses: action.prComment,
+            with: {
+                message: "### Does the PR have any schema changes?\n\n" +
+                    "${{ env.SCHEMA_CHANGES }}\n",
+                GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+            }
+        }
+    }
+}
+
+export class CommandDispatchStep extends step.Step {
+    constructor(providerName: string) {
+        super();
+        return {
+            uses: action.slashCommand,
+            with: {
+                token: '${{ secrets.PULUMI_BOT_TOKEN }}',
+                'reaction-token': '${{ secrets.GITHUB_TOKEN }}',
+                commands: 'run-acceptance-tests',
+                permission: 'write',
+                'issue-type': 'pull-request',
+                'repository': `pulumi/pulumi-${providerName}`,
+            }
+        }
+    }
+}
+
+export class UpdatePRWithResultsStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Update with Result',
+            uses: action.createOrUpdateComment,
+            with: {
+                token: '${{ secrets.PULUMI_BOT_TOKEN }}',
+                repository: '${{ github.event.client_payload.github.payload.repository.full_name }}',
+                'issue-number': '${{ github.event.client_payload.github.payload.issue.number }}',
+                body: 'Please view the PR build - ${{ steps.vars.outputs.run-url }}',
+            }
+        }
+    }
+}
+
+export class CommentPRWithSlashCommandStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Comment PR',
+            uses: action.prComment,
+            with: {
+                with: {
+                    message: "PR is now waiting for a maintainer to run the acceptance tests.\n" +
+                        "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
+                    GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                }
+            }
+        }
+    }
+}
+
+export class CreateCommentsUrlStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Create URL to the run output',
+            id: 'var',
+            run: 'echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID',
         }
     }
 }
