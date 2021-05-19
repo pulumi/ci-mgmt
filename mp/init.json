@@ -248,6 +248,12 @@
             "Provider": "github"
         },
         {
+            "Name": "pulumi-rke",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-rke",
+            "Provider": "github"
+        },
+        {
             "Name": "pulumi-signalfx",
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-signalfx",
