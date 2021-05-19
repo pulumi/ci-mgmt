@@ -300,6 +300,12 @@
             "Owner": "pulumi",
             "CloneURL": "git@github.com:pulumi/pulumi-wavefront",
             "Provider": "github"
+        },
+        {
+            "Name": "pulumi-yandex",
+            "Owner": "pulumi",
+            "CloneURL": "git@github.com:pulumi/pulumi-yandex",
+            "Provider": "github"
         }
     ]
 }
