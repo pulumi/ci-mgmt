@@ -1,6 +1,6 @@
 provider: gcp
 gcp: true
-major-version: 4
+major-version: 5
 lint: false
 env:
   GOOGLE_PROJECT: "pulumi-ci-gcp-provider"

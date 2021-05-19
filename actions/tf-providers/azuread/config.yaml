@@ -1,5 +1,5 @@
 provider: azuread
-major-version: 3
+major-version: 4
 env:
   ARM_CLIENT_ID: "30e520fa-12b4-4e21-b473-9426c5ac2e1e"
   ARM_ENVIRONMENT: "public"

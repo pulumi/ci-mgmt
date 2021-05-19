@@ -1,6 +1,6 @@
 provider: aws
 lint: false
-major-version: 3
+major-version: 4
 aws: true
 parallel: 2
 env:
