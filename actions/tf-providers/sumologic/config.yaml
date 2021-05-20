@@ -1,0 +1,6 @@
+provider: sumologic
+major-version: 1
+env:
+  SUMOLOGIC_ACCESSID: ${{ secrets.SUMOLOGIC_ACCESSID }}
+  SUMOLOGIC_ACCESSKEY: ${{ secrets.SUMOLOGIC_ACCESSKEY }}
+  SUMOLOGIC_ENVIRONMENT: ${{ secrets.SUMOLOGIC_ENVIRONMENT }}
