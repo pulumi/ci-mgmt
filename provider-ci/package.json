@@ -1,7 +1,7 @@
 {
   "author": "Lee Briggs",
   "bugs": {
-    "url": "https://github.com/jaxxstorm/pulumi-action-config/issues"
+    "url": "https://github.com/pulumi/ci-mgmt/issues"
   },
   "dependencies": {
     "@jaxxstorm/gh-actions": "git+ssh://git@github.com/jaxxstorm/gh-actions.git#develop"
@@ -20,7 +20,7 @@
     "eslint-plugin-jest": "^22.4.1",
     "typescript": "^3.4.3"
   },
-  "homepage": "https://github.com/jaxxstorm/pulumi-action-config#readme",
+  "homepage": "https://github.com/pulumi/ci-mgmt#readme",
   "keywords": [
     "configuration",
     "code",
@@ -32,7 +32,7 @@
   "name": "@jaxxstorm/pulumi-action-config",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jaxxstorm/pulumi-action-config.git"
+    "url": "git+https://github.com/pulumi/ci-mgmt.git"
   },
   "scripts": {
     "build": "tsc",
