@@ -1,0 +1,3 @@
+provider: nomad
+major-version: 1
+docker: true
