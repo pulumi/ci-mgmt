@@ -10,6 +10,7 @@ env:
   PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
+  VAULT_ADDR: http://127.0.0.1:4646
 jobs:
   command-dispatch-for-testing:
     name: command-dispatch-for-testing
