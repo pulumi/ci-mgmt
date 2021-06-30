@@ -1,0 +1,8 @@
+provider: minio
+major-version: 1
+docker: true
+env:
+  MINIO_ENDPOINT: localhost:9000
+  MINIO_ACCESS_KEY: minio
+  MINIO_SECRET_KEY: minio123
+  MINIO_ENABLE_HTTPS: false
