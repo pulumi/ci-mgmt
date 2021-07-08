@@ -2,6 +2,7 @@ provider: azure
 lint: false
 major-version: 4
 parallel: 2
+customLdFlag: "-X github.com/terraform-providers/terraform-provider-azurerm/version.ProviderVersion=${VERSION}"
 env:
   ARM_CLIENT_ID: "30e520fa-12b4-4e21-b473-9426c5ac2e1e"
   ARM_ENVIRONMENT: "public"

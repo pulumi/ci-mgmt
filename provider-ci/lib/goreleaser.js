@@ -1,6 +1,7 @@
 import * as param from '@jkcfg/std/param';
 const majVersion = param.Number('major-version', 2);
 const skipTfGen = param.Boolean('skipTfGen', false);
+const customLdFlag = param.String('customLdFlag') || "";
 export class GoreleaserConfig {
     constructor(params) {
         Object.assign(this, params);
@@ -15,6 +16,9 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
         }
         else {
             ldflags = [`-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}`];
+        }
+        if (customLdFlag != "") {
+            ldflags.push(customLdFlag);
         }
         if (!skipTfGen) {
             this.before = {
