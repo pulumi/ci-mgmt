@@ -27,6 +27,7 @@ const env = Object.assign({
     PYPI_PASSWORD: '${{ secrets.PYPI_PASSWORD }}',
     TRAVIS_OS_NAME: 'linux',
     SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
+    PULUMI_GO_DEP_ROOT: '${{ github.workspace }}/..',
 }, extraEnv);
 export class MasterWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
