@@ -568,11 +568,9 @@ export class CommentPRWithSlashCommandStep extends step.Step {
             name: 'Comment PR',
             uses: action.prComment,
             with: {
-                with: {
-                    message: "PR is now waiting for a maintainer to run the acceptance tests.\n" +
-                        "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
-                    GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-                }
+                message: "PR is now waiting for a maintainer to run the acceptance tests.\n" +
+                    "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
+                GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
         };
     }
