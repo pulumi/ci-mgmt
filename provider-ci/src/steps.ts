@@ -180,6 +180,16 @@ export class InstallSDKDeps extends step.Step {
     }
 }
 
+export class InstallPlugins extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Install Plugins',
+            run: 'make install_plugins',
+        }
+    }
+}
+
 export class InstallPulumiCtl extends step.Step {
     constructor() {
         super();

@@ -256,6 +256,8 @@ export class BuildSdkJob extends job.Job {
             new steps.InstallPython(),
             new steps.DownloadProviderStep(),
             new steps.UnzipProviderBinariesStep(),
+            new steps.SetProvidersToPATH(),
+            new steps.InstallPlugins(),
             new steps.BuildSdksStep(),
             new steps.CheckCleanWorkTreeStep(),
             new steps.ZipSDKsStep(),

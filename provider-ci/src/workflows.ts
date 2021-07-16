@@ -2,6 +2,7 @@ import * as g from '@jaxxstorm/gh-actions';
 import * as job from '@jaxxstorm/gh-actions/lib/job';
 import * as param from '@jkcfg/std/param';
 import * as steps from './steps';
+import {InstallPlugins} from "./steps";
 
 const pythonVersion = "3.7"
 const goVersion = "1.16.x"
@@ -293,6 +294,8 @@ export class BuildSdkJob extends job.Job {
         new steps.InstallPython(),
         new steps.DownloadProviderStep(),
         new steps.UnzipProviderBinariesStep(),
+        new steps.SetProvidersToPATH(),
+        new steps.InstallPlugins(),
         new steps.BuildSdksStep(),
         new steps.CheckCleanWorkTreeStep(),
         new steps.ZipSDKsStep(),
