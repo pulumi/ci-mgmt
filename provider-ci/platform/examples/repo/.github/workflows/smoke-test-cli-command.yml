@@ -110,7 +110,7 @@ jobs:
         helm init -c
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ env.GOOGLE_PROJECT }}
         service_account_email: ${{ secrets.GCP_SA_EMAIL }}
@@ -199,7 +199,7 @@ jobs:
         helm init -c
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ env.GOOGLE_PROJECT }}
         service_account_email: ${{ secrets.GCP_SA_EMAIL }}
@@ -331,7 +331,7 @@ jobs:
         helm init -c
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ env.GOOGLE_PROJECT }}
         service_account_email: ${{ secrets.GCP_SA_EMAIL }}
@@ -413,7 +413,7 @@ jobs:
         helm init -c
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ env.GOOGLE_PROJECT }}
         service_account_email: ${{ secrets.GCP_SA_EMAIL }}

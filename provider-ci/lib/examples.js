@@ -182,7 +182,7 @@ export class EnvironmentSetup extends job.Job {
             },
             {
                 name: 'Configure GCP credentials',
-                uses: 'GoogleCloudPlatform/github-actions/setup-gcloud@master',
+                uses: 'google-github-actions/setup-gcloud@master',
                 with: {
                     'version': '285.0.0',
                     'project_id': '${{ env.GOOGLE_PROJECT }}',
