@@ -585,3 +585,48 @@ export class CreateCommentsUrlStep extends step.Step {
         };
     }
 }
+export class EchoCoverageOutputDirStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Echo Coverage Output Dir',
+            run: 'echo "Coverage output directory: $COVERAGE_OUTPUT_DIR"',
+        };
+    }
+}
+export class GenerateCoverageDataStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Generate Coverage Data',
+            run: 'make tfgen',
+        };
+    }
+}
+export class GetCoverageSummaryNameStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Get coverage summary name',
+            run: 'summaryName="${PROVIDER}_summary_`date +"%Y-%m-%d_%H-%M-%S"`.json"',
+        };
+    }
+}
+export class GetCoverageS3UploadURLStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Get coverage S3 upload URL',
+            run: 's3FullURI="s3://${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/${summaryName}"',
+        };
+    }
+}
+export class RenameAndUploadSummaryStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Rename and upload summary to AWS',
+            run: 'aws s3 cp ${COVERAGE_OUTPUT_DIR}/summary.json ${s3FullURI} --acl bucket-owner-full-control',
+        };
+    }
+}

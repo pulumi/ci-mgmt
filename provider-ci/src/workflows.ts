@@ -31,6 +31,7 @@ const env = Object.assign({
     TRAVIS_OS_NAME: 'linux',
     SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
     PULUMI_GO_DEP_ROOT: '${{ github.workspace }}/..',
+    COVERAGE_OUTPUT_DIR: '${{ secrets.COVERAGE_OUTPUT_DIR }}'
 }, extraEnv);
 
 export class MasterWorkflow extends g.GithubWorkflow {
@@ -54,6 +55,8 @@ export class MasterWorkflow extends g.GithubWorkflow {
             'test': new TestsJob('test'),
             'publish': new PublishPrereleaseJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
+            'generate_coverage_data': new GenerateCoverageDataJob('generate_coverage_data'),
+            'upload_coverage_data': new UploadCoverageDataJob('upload_coverage_data'),
         }
 
         if (lint) {
@@ -588,6 +591,64 @@ export class LintSDKJob extends job.Job {
         new steps.InstallPulumiCli(),
         new steps.RunCommand(`cd sdk/go/${provider} && golangci-lint run -c ../../../.golangci.yml`),
         new steps.NotifySlack('Failure in linting go sdk'),
+    ] as any;
+
+    constructor(name: string) {
+        super();
+        this.name = name;
+        Object.assign(this, {name})
+    }
+
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+        }
+        return this;
+    }
+}
+
+export class GenerateCoverageDataJob extends job.Job {
+    'runs-on' = 'ubuntu-latest'
+    'continue-on-error' = true
+    needs = 'prerequisites'
+    steps = [
+        new steps.EchoCoverageOutputDirStep(),
+        new steps.GenerateCoverageDataStep(),
+    ] as any;
+
+    constructor(name: string) {
+        super();
+        this.name = name;
+        Object.assign(this, {name})
+    }
+
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+        }
+        return this;
+    }
+}
+
+export class UploadCoverageDataJob extends job.Job {
+    'runs-on' = 'ubuntu-latest'
+    'continue-on-error' = true
+    needs = 'generate_coverage_data'
+    env = {
+        summaryName: "summary",
+        s3FulurllURI: "url",
+    }
+    steps = [
+        new steps.GetCoverageSummaryNameStep(),
+        new steps.GetCoverageS3UploadURLStep(),
+        new steps.ConfigureAwsCredentialsForTests(true),
+        new steps.RenameAndUploadSummaryStep(),
     ] as any;
 
     constructor(name: string) {
