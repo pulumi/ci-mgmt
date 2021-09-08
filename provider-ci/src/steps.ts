@@ -656,6 +656,16 @@ export class GenerateCoverageDataStep extends step.Step {
     }
 }
 
+export class PrintCoverageDataStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Summarize Provider Coverage Results',
+            run: 'cat $COVERAGE_OUTPUT_DIR/shortSummary.txt',
+        }
+    }
+}
+
 export class GetCoverageSummaryNameStep extends step.Step {
     constructor() {
         super();

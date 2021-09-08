@@ -56,6 +56,7 @@ export class MasterWorkflow extends g.GithubWorkflow {
             'publish': new PublishPrereleaseJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
             'generate_coverage_data': new GenerateCoverageDataJob('generate_coverage_data'),
+            'print_coverage_data': new PrintCoverageDataJob('print_coverage_data'),
             'upload_coverage_data': new UploadCoverageDataJob('upload_coverage_data'),
         }
 
@@ -617,6 +618,31 @@ export class GenerateCoverageDataJob extends job.Job {
     steps = [
         new steps.EchoCoverageOutputDirStep(),
         new steps.GenerateCoverageDataStep(),
+    ] as any;
+
+    constructor(name: string) {
+        super();
+        this.name = name;
+        Object.assign(this, {name})
+    }
+
+    addDispatchConditional(isWorkflowDispatch) {
+        if (isWorkflowDispatch) {
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+
+            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+        }
+        return this;
+    }
+}
+
+export class PrintCoverageDataJob extends job.Job {
+    'runs-on' = 'ubuntu-latest'
+    'continue-on-error' = true
+    needs = 'generate_coverage_data'
+    steps = [
+        new steps.PrintCoverageDataStep(),
     ] as any;
 
     constructor(name: string) {
