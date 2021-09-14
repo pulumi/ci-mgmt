@@ -31,7 +31,6 @@ const env = Object.assign({
     TRAVIS_OS_NAME: 'linux',
     SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
     PULUMI_GO_DEP_ROOT: '${{ github.workspace }}/..',
-    COVERAGE_OUTPUT_DIR: '${{ secrets.COVERAGE_OUTPUT_DIR }}'
 }, extraEnv);
 
 export class MasterWorkflow extends g.GithubWorkflow {
@@ -56,8 +55,6 @@ export class MasterWorkflow extends g.GithubWorkflow {
             'publish': new PublishPrereleaseJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
             'generate_coverage_data': new GenerateCoverageDataJob('generate_coverage_data'),
-            'print_coverage_data': new PrintCoverageDataJob('print_coverage_data'),
-            'upload_coverage_data': new UploadCoverageDataJob('upload_coverage_data'),
         }
 
         if (lint) {
@@ -615,66 +612,27 @@ export class GenerateCoverageDataJob extends job.Job {
     'runs-on' = 'ubuntu-latest'
     'continue-on-error' = true
     needs = 'prerequisites'
+    env = {
+        COVERAGE_OUTPUT_DIR: '${{ secrets.COVERAGE_OUTPUT_DIR }}'
+    }
     steps = [
+        // Setting up prerequisites needed to run the coverage tracker
+        new steps.CheckoutRepoStep(),
+        new steps.ConfigureAwsCredentialsForPublish(),
+        new steps.CheckoutScriptsRepoStep(),
+        new steps.CheckoutTagsStep(),
+        new steps.InstallGo(),
+        new steps.InstallPulumiCtl(),
+        new steps.InstallPulumiCli(),
+        new steps.InstallSchemaChecker(),
+
+        // Generating and summarizing coverage data
         new steps.EchoCoverageOutputDirStep(),
         new steps.GenerateCoverageDataStep(),
-    ] as any;
-
-    constructor(name: string) {
-        super();
-        this.name = name;
-        Object.assign(this, {name})
-    }
-
-    addDispatchConditional(isWorkflowDispatch) {
-        if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
-
-            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
-        }
-        return this;
-    }
-}
-
-export class PrintCoverageDataJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    'continue-on-error' = true
-    needs = 'generate_coverage_data'
-    steps = [
         new steps.PrintCoverageDataStep(),
-    ] as any;
-
-    constructor(name: string) {
-        super();
-        this.name = name;
-        Object.assign(this, {name})
-    }
-
-    addDispatchConditional(isWorkflowDispatch) {
-        if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
-
-            this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
-        }
-        return this;
-    }
-}
-
-export class UploadCoverageDataJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    'continue-on-error' = true
-    needs = 'generate_coverage_data'
-    env = {
-        summaryName: "summary",
-        s3FulurllURI: "url",
-    }
-    steps = [
-        new steps.GetCoverageSummaryNameStep(),
-        new steps.GetCoverageS3UploadURLStep(),
-        new steps.ConfigureAwsCredentialsForTests(true),
-        new steps.RenameAndUploadSummaryStep(),
+        
+        // Uploading coverage data
+        new steps.UploadCoverageDataStep(),
     ] as any;
 
     constructor(name: string) {
