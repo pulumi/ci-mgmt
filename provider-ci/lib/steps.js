@@ -590,7 +590,7 @@ export class EchoCoverageOutputDirStep extends step.Step {
         super();
         return {
             name: 'Echo Coverage Output Dir',
-            run: 'echo "Coverage output directory: $COVERAGE_OUTPUT_DIR"',
+            run: 'echo "Coverage output directory: ${{ env.COVERAGE_OUTPUT_DIR }}"',
         };
     }
 }
@@ -603,30 +603,23 @@ export class GenerateCoverageDataStep extends step.Step {
         };
     }
 }
-export class GetCoverageSummaryNameStep extends step.Step {
+export class PrintCoverageDataStep extends step.Step {
     constructor() {
         super();
         return {
-            name: 'Get coverage summary name',
-            run: 'summaryName="${PROVIDER}_summary_`date +"%Y-%m-%d_%H-%M-%S"`.json"',
+            name: 'Summarize Provider Coverage Results',
+            run: 'cat ${{ env.COVERAGE_OUTPUT_DIR }}/shortSummary.txt',
         };
     }
 }
-export class GetCoverageS3UploadURLStep extends step.Step {
+export class UploadCoverageDataStep extends step.Step {
     constructor() {
         super();
         return {
-            name: 'Get coverage S3 upload URL',
-            run: 's3FullURI="s3://${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/${summaryName}"',
-        };
-    }
-}
-export class RenameAndUploadSummaryStep extends step.Step {
-    constructor() {
-        super();
-        return {
-            name: 'Rename and upload summary to AWS',
-            run: 'aws s3 cp ${COVERAGE_OUTPUT_DIR}/summary.json ${s3FullURI} --acl bucket-owner-full-control',
+            name: 'Upload coverage data to S3',
+            run: `summaryName="\${PROVIDER}_summary_\`date +"%Y-%m-%d_%H-%M-%S"\`.json"
+s3FullURI="s3://\${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/\${summaryName}"
+aws s3 cp \${{ env.COVERAGE_OUTPUT_DIR }}/summary.json \${s3FullURI} --acl bucket-owner-full-control`,
         };
     }
 }
