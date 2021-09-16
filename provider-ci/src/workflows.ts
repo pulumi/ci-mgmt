@@ -2,6 +2,7 @@ import * as g from '@jaxxstorm/gh-actions';
 import * as job from '@jaxxstorm/gh-actions/lib/job';
 import * as param from '@jkcfg/std/param';
 import * as steps from './steps';
+import {ConfigureAwsCredentialsForCoverageDataUpload} from "./steps";
 
 const pythonVersion = "3.7"
 const goVersion = "1.16.x"
@@ -618,7 +619,7 @@ export class GenerateCoverageDataJob extends job.Job {
     steps = [
         // Setting up prerequisites needed to run the coverage tracker
         new steps.CheckoutRepoStep(),
-        new steps.ConfigureAwsCredentialsForPublish(),
+        new steps.ConfigureAwsCredentialsForCoverageDataUpload(),
         new steps.CheckoutScriptsRepoStep(),
         new steps.CheckoutTagsStep(),
         new steps.InstallGo(),

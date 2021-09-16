@@ -553,7 +553,7 @@ export class GenerateCoverageDataJob extends job.Job {
         this.steps = [
             // Setting up prerequisites needed to run the coverage tracker
             new steps.CheckoutRepoStep(),
-            new steps.ConfigureAwsCredentialsForPublish(),
+            new steps.ConfigureAwsCredentialsForCoverageDataUpload(),
             new steps.CheckoutScriptsRepoStep(),
             new steps.CheckoutTagsStep(),
             new steps.InstallGo(),

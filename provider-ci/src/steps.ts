@@ -106,6 +106,21 @@ export class ConfigureAwsCredentialsForPublish extends step.Step {
     }
 }
 
+export class ConfigureAwsCredentialsForCoverageDataUpload extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Configure AWS Credentials',
+            uses: action.configureAwsCredentials,
+            with: {
+                'aws-access-key-id': '${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}',
+                'aws-region': 'us-west-2',
+                'aws-secret-access-key': '${{ AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY.AWS_SECRET_ACCESS_KEY }}'
+            }
+        }
+    }
+}
+
 export class InstallGo extends step.Step {
     constructor(version?: string) {
         super();
