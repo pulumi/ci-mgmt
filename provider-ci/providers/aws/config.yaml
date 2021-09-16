@@ -2,6 +2,6 @@ provider: aws
 lint: false
 major-version: 4
 aws: true
-parallel: 2
+parallel: 1
 env:
   AWS_REGION: us-west-2

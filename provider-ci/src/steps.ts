@@ -115,7 +115,7 @@ export class ConfigureAwsCredentialsForCoverageDataUpload extends step.Step {
             with: {
                 'aws-access-key-id': '${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}',
                 'aws-region': 'us-west-2',
-                'aws-secret-access-key': '${{ AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY.AWS_SECRET_ACCESS_KEY }}'
+                'aws-secret-access-key': '${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}'
             }
         }
     }
@@ -170,6 +170,16 @@ export class InstallPython extends step.Step {
             with: {
                 'python-version': version || '${{matrix.pythonversion}}'
             },
+        }
+    }
+}
+
+export class InstallPlugins extends step.Step {
+    constructor(version?: string) {
+        super();
+        return {
+            name: 'Install plugins',
+            run: 'make install_plugins',
         }
     }
 }

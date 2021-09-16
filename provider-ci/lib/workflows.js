@@ -257,6 +257,8 @@ export class BuildSdkJob extends job.Job {
             new steps.InstallPython(),
             new steps.DownloadProviderStep(),
             new steps.UnzipProviderBinariesStep(),
+            new steps.InstallPlugins(),
+            new steps.SetProvidersToPATH(),
             new steps.BuildSdksStep(),
             new steps.CheckCleanWorkTreeStep(),
             new steps.ZipSDKsStep(),
@@ -549,6 +551,12 @@ export class GenerateCoverageDataJob extends job.Job {
         this.needs = 'prerequisites';
         this.env = {
             COVERAGE_OUTPUT_DIR: '${{ secrets.COVERAGE_OUTPUT_DIR }}'
+        };
+        this.strategy = {
+            'fail-fast': true,
+            matrix: {
+                goversion: [goVersion],
+            },
         };
         this.steps = [
             // Setting up prerequisites needed to run the coverage tracker

@@ -2,7 +2,7 @@ env:
   ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_ENVIRONMENT: public
-  ARM_LOCATION: northcentralus
+  ARM_LOCATION: westus2
   ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
   ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,6 +69,10 @@ jobs:
       run: |-
         tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin
         find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \;
+    - name: Install plugins
+      run: make install_plugins
+    - name: Update path
+      run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
