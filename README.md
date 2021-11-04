@@ -1,103 +1,112 @@
 # Pulumi CI Management
 
-This repository is a 1 stop shop for the enablement of CI / CD process for the Pulumi provider ecosystem. The list of providers
-this repository covers can be found in provider. The repository has 3 parts to it:
+This repository contains code to manage CI/CD for the many Pulumi providers in a consistent and (mostly) automated manner.  The repo's intended audience are Pulumi Corp engineers, but its contents may also serve as a helpful example for Pulumi community members looking to maintain their own providers with a similar CI/CD process to Pulumi Corp.  The full list of providers this repository covers can be found in `provider-ci/providers`.  This repository has the following components:
 
-* provider-ci
-* mp
-* infra
+* `provider-ci/` contains code to generate GitHub Actions workflow files for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
+* `mp/` contains code using [microplane](https://github.com/Clever/microplane) to deploy the generated files in `provider-ci` to the many provider repositories.
+* `infra/providers/` contains a Pulumi program which uses [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
 
-## Provider CI
+  Because the code in this folder is a standard Pulumi program, we do not document its usage.  Refer to [the Pulumi docs](https://www.pulumi.com/docs/) for an overview if necessary.
 
-This will generate github action workflow files for all Pulumi providers
+## Prerequisites
 
-### Dependencies
+The following tools are required for generating and deploying GitHub Actions workflows:
 
-You'll need:
+* [jkcfg](https://github.com/jkcfg/jk/releases)  (Download the binary release for your system and manually copy to your `$PATH`.)
+* [TypeScript](https://www.typescriptlang.org/)
+* [Make](https://www.gnu.org/software/make/)
+* [npm](https://www.npmjs.com/)
+* [microplane v0.0.23](https://github.com/Clever/microplane/releases/tag/v0.0.23)  Note that the binary must manually installed because we require an older version of microplane and the Homebrew formula does not support older versions.
 
-- [jkcfg](https://github.com/jkcfg/jk/releases)
-- typescript
-- Make
-- npm
+## Building
 
-### Building
+Before generating any workflow files, run the following commands:
 
-First, ensure the dependencies are installed:
+1. Ensure the dependencies are installed:
 
-```
-$ npm install
-``` 
+  ```bash
+  cd provider && npm install
+  ```
 
-Then, build the module:
+1. Build the module:
 
-```
-$ make dist
-npx tsc
-```
+  ```bash
+  make dist
+  ```
 
-This will generate the module into `lib`
+  This will generate the module into `provider-ci/lib`
 
-### Config
+## Adding a New Provider
 
-The configuration for each provider lives in `providers/<name>/config.yaml`.
+To add a new provider:
 
-It takes  a few parameters, a `provider` string and a map, `env` with extra environment variables the provider needs. Here's an example:
+1. Create a new directory and config file for the provider:
 
-```
-provider: rancher2
-env:
-  RANCHER_INSECURE: true
-  AWS_REGION: us-west-2
-```
+  ```bash
+  # Change the value of PROVIDER_NAME below:
+  PROVIDER_NAME=foo && mkdir providers/${PROVIDER_NAME} && touch providers/${PROVIDER_NAME}/config.yaml
+  ```
 
-There are also optional configuration values:
+1. In the `config.yaml` you created, add the configuration to be applied to the generated GitHub Actions workflows for the provider:
 
-```
-docker: true # whether the provider's test use docker to run, it expects a file `testing/docker-compose.yml`
-setup-script: testing/setup.sh # path to a script that's used for testing bootstraps
-```
+  ```yaml
+  # Required values:
+  provider: foo
+  env: # A map of required configuration for any integration tests, etc.
+    AN_OPTION: value
+    ANOTHER_OPTION: true
+    # etc.
+  lint: true # Linting should be true in most cases, unless failing rules in the upstream provider makes this impractical.
 
-Once you have the configuration, you can generate a single provider like so:
+  # Optional values:
+  docker: true # Whether the provider's test use docker to run, if true, a a file `testing/docker-compose.yml` must be present in the provider repository.
+  setup-script: testing/setup.sh # Path to a script that's used for testing bootstraps
+  ```
 
-```
-make rancher2
-```
+1. Generate the configuration:
 
-Or, alternatively, generate all the providers in one go:
+  ```bash
+  make foo
+  ```
 
-```
-make providers
-```
+  The generated files will be writen to `providers/foo/repo/`.
 
+1. Copy the generated files in to the provider repository.  Note that we do not use microplane (which deploys all files to all repositories) to deploy changes for a single repo for blast radius concerns.
 
-## MP
+## Upgrading All Providers
 
-Is where we deploy the actions changes above. We use https://github.com/Clever/microplane - currently v0.0.23 - for the deployment. To use it, you can run:
+If the underlying code generation has changed and we need to generate and deploy the workflows to all the providers:
 
-```
-mp clone
-```
+1. Generate the code for all providers:
 
-This will clone the repositories to the mp folder. From there, we can run a plan of the changes across of the repositories
+  ```bash
+  make providers
+  ```
 
-```
-mp plan -b <branch name> -m "<commit message>" -- ~/code/go/src/github.com/pulumi/ci-mgmt/scripts/copy.sh ~/code/go/src/github.com/pulumi/ci-mgmt
-```
+1. From the root of the repository, run:
 
-we can then see a detail of the plan
+  ```bash
+  mp clone
+  ```
 
-```
-mp status -r <repo-name>
-```
+  This will clone the repositories to the `mp/` folder. 
+  
+1. Run a plan of the changes across all affected the repositories:
 
-When we are happy, we can deploy the changes to the repository
+  ```bash
+  mp plan -b <branch name> -m "<commit message>" -- ~/code/go/src/github.com/pulumi/ci-mgmt/scripts/copy.sh ~/code/go/src/github.com/pulumi/ci-mgmt
+  ```
 
-```
-mp push -b <branch name> -t 180s
-```
+1. View a detail of the plan and ensure all propsed changes conform with expectations:
 
-If we omit the `-t` command then we will flood the GitHub API and cause our actions to go into a waiting state
+  ```bash
+  mp status -r <repo-name>
+  ```
 
-## Infra
+1. When we are happy, we can deploy the changes to the repository
 
-This is a way of being able to manage the GitHub repository for each of the providers
+  ```bash
+  mp push -b <branch name> -t 180s
+  ```
+
+  If we omit the `-t` command, we risk triggering rate-limiting for the GitHub API, which will cause our Actions to go into a waiting state.
