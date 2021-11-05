@@ -59,7 +59,7 @@ To add a new provider:
   lint: true # Linting should be true in most cases, unless failing rules in the upstream provider makes this impractical.
 
   # Optional values:
-  docker: true # Whether the provider's test use docker to run, if true, a a file `testing/docker-compose.yml` must be present in the provider repository.
+  docker: true # Whether the provider's tests use Docker to run. If set to true, a file `testing/docker-compose.yml` must be present in the provider repository.
   setup-script: testing/setup.sh # Path to a script that's used for testing bootstraps
   ```
 
