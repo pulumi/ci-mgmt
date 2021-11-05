@@ -2,11 +2,11 @@
 
 This repository contains code to manage CI/CD for the many Pulumi providers in a consistent and (mostly) automated manner.  The repo's intended audience are Pulumi Corp engineers, but its contents may also serve as a helpful example for Pulumi community members looking to maintain their own providers with a similar CI/CD process to Pulumi Corp.  The full list of providers this repository covers can be found in `provider-ci/providers`.  This repository has the following components:
 
-* `provider-ci/` contains code to generate GitHub Actions workflow files for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
-* `mp/` contains code using [microplane](https://github.com/Clever/microplane) to deploy the generated files in `provider-ci` to the many provider repositories.
-* `infra/providers/` contains a Pulumi program which uses [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
+* The `provider-ci` directory contains code to generate GitHub Actions workflow files for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
+* The `mp` directory contains code using [microplane](https://github.com/Clever/microplane) to deploy the generated files in `provider-ci` to the many provider repositories.
+* The `infra/providers/` directory contains a Pulumi program which uses the [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
 
-  Because the code in this folder is a standard Pulumi program, we do not document its usage.  Refer to [the Pulumi docs](https://www.pulumi.com/docs/) for an overview if necessary.
+  For an overview of how Pulumi programs work, see [the Pulumi docs](https://www.pulumi.com/docs/).
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Before generating any workflow files, run the following commands:
 1. Ensure the dependencies are installed:
 
   ```bash
-  cd provider && npm install
+  cd provider-ci && npm install
   ```
 
 1. Build the module:
@@ -40,11 +40,11 @@ Before generating any workflow files, run the following commands:
 
 To add a new provider:
 
-1. Create a new directory and config file for the provider:
+1. Create a new directory and config file for the provider.  From the root of the repository, run:
 
   ```bash
   # Change the value of PROVIDER_NAME below:
-  PROVIDER_NAME=foo && mkdir providers/${PROVIDER_NAME} && touch providers/${PROVIDER_NAME}/config.yaml
+  PROVIDER_NAME=foo && mkdir provider-ci/providers/${PROVIDER_NAME} && touch providers/${PROVIDER_NAME}/config.yaml
   ```
 
 1. In the `config.yaml` you created, add the configuration to be applied to the generated GitHub Actions workflows for the provider:
