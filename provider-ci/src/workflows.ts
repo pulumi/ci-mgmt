@@ -34,13 +34,13 @@ const env = Object.assign({
     PULUMI_GO_DEP_ROOT: '${{ github.workspace }}/..',
 }, extraEnv);
 
-export class MasterWorkflow extends g.GithubWorkflow {
+export class DefaultBranchWorkflow extends g.GithubWorkflow {
     jobs: { [k: string]: job.Job }
 
     constructor(name: string, jobs: { [k: string]: job.Job }) {
         super(name, jobs, {
             push: {
-                branches: ["master"],
+                branches: ["master", "main"],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
                     "CHANGELOG.md"
