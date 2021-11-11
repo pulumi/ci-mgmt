@@ -1,4 +1,3 @@
 provider: civo
-major-version: 1
 env:
   CIVO_TOKEN: ${{ secrets.CIVO_TOKEN }}
