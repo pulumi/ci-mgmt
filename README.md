@@ -1,8 +1,21 @@
 # Pulumi CI Management
 
-This repository contains code to manage CI/CD for the many Pulumi providers in a consistent and (mostly) automated manner.  The repo's intended audience are Pulumi Corp engineers, but its contents may also serve as a helpful example for Pulumi community members looking to maintain their own providers with a similar CI/CD process to Pulumi Corp.  The full list of providers this repository covers can be found in `provider-ci/providers`.  This repository has the following components:
+## Purpose
 
-* The `provider-ci` directory contains code to generate GitHub Actions workflow files for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
+This repository contains code to manage CI/CD for the many Pulumi providers in a consistent and (mostly) automated manner.  The repo's intended audience are Pulumi Corp engineers, but its contents may also serve as a helpful example for Pulumi community members looking to maintain their own providers with a similar CI/CD process to Pulumi Corp.
+
+Pulumi providers use [GitHub Actions](https://docs.github.com/en/actions) for CI/CD. Because we maintain a long list of providers, we use this repository to:
+
+* Generate GitHub Actions Workflow files for any provider. These can be manually copied to new providers. We look forward to automating this step in the future.
+* Keep an [inventory of existing Pulumi providers](./provider-ci/providers).
+* Maintain logic for branch protection across provider repositories
+* Bulk update all Pulumi Corp provider workflows when necessary.
+
+## Usage
+
+This repository has the following component directories:
+
+* The `provider-ci` directory contains code to generate [GitHub Actions workflow files](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions) for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
 * The `mp` directory contains code using [microplane](https://github.com/Clever/microplane) to deploy the generated files in `provider-ci` to the many provider repositories.
 * The `infra/providers/` directory contains a Pulumi program which uses the [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
 
