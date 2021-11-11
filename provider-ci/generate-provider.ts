@@ -9,7 +9,8 @@ const provider = param.String('provider');
 // eslint-disable-next-line no-template-curly-in-string
 const runAcceptanceTests = name => new wf.RunAcceptanceTestsWorkflow('run-acceptance-tests');
 const pullRequest = name => new wf.PullRequestWorkflow('pull-request');
-const master = name => new wf.MasterWorkflow('master');
+const master = name => new wf.DefaultBranchWorkflow('master');
+const main = name => new wf.DefaultBranchWorkflow('main');
 const preRelease = name => new wf.PrereleaseWorkflow('prerelease');
 const release = name => new wf.ReleaseWorkflow('release');
 const updatePulumiTerraformBridge = name => new wf.UpdatePulumiTerraformBridgeWorkflow();
@@ -24,6 +25,7 @@ export default [
   { value: runAcceptanceTests('run-acceptance-tests'), file: `providers/${provider}/repo/.github/workflows/run-acceptance-tests.yml` },
   { value: pullRequest('pull-request'), file: `providers/${provider}/repo/.github/workflows/pull-request.yml` },
   { value: master('master'), file: `providers/${provider}/repo/.github/workflows/master.yml`},
+  { value: main('main'), file: `providers/${provider}/repo/.github/workflows/main.yml`},
   { value: preRelease('prerelease'), file: `providers/${provider}/repo/.github/workflows/prerelease.yml` },
   { value: release('release'), file: `providers/${provider}/repo/.github/workflows/release.yml` },
   { value: automation('automation'), file: `providers/${provider}/repo/.github/workflows/pr-automation.yml` },

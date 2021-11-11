@@ -29,11 +29,11 @@ const env = Object.assign({
     SLACK_WEBHOOK_URL: '${{ secrets.SLACK_WEBHOOK_URL }}',
     PULUMI_GO_DEP_ROOT: '${{ github.workspace }}/..',
 }, extraEnv);
-export class MasterWorkflow extends g.GithubWorkflow {
+export class DefaultBranchWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
             push: {
-                branches: ["master"],
+                branches: [name],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
                     "CHANGELOG.md"

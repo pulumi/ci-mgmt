@@ -1,4 +1,4 @@
-export const installPulumiCli = "pulumi/action-install-pulumi-cli@v1";
+export const installPulumiCli = "pulumi/action-install-pulumi-cli@v2";
 export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.2.0";
 export const prComment = "thollander/actions-comment-pull-request@1.0.1";
 export const slashCommand = "peter-evans/slash-command-dispatch@v2";
