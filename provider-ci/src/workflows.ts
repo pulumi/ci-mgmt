@@ -40,7 +40,7 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
     constructor(name: string, jobs: { [k: string]: job.Job }) {
         super(name, jobs, {
             push: {
-                branches: ["master", "main"],
+                branches: [name],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
                     "CHANGELOG.md"
