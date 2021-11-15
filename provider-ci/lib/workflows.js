@@ -114,7 +114,7 @@ export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
                 types: ['run-acceptance-tests-command']
             },
             pull_request: {
-                branches: ["master"],
+                branches: ["master", "main"],
                 'paths-ignore': [
                     "CHANGELOG.md"
                 ]

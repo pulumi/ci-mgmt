@@ -380,6 +380,7 @@ name: run-acceptance-tests
   pull_request:
     branches:
     - master
+    - main
     paths-ignore:
     - CHANGELOG.md
   repository_dispatch:
