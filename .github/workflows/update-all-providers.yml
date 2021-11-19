@@ -5,8 +5,10 @@ jobs:
   generate-providers-list:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - id: get-providers
-        run: echo "::set-output name=providers::$(python -c 'import os, json; print json.dumps(sorted(os.listdir(".")))'"
+        run: echo "::set-output name=providers::$(python generate_providers_list.py)'"
+        working-directory: scripts
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
 
