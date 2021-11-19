@@ -1,0 +1,20 @@
+name: Update All Providers
+on:
+  - workflow_dispatch
+jobs:
+  generate-providers-list:
+    runs-on: ubuntu-latest
+    steps:
+      - id: get-providers
+        run: echo "::set-output name=providers::$(python -c 'import os, json; print json.dumps(sorted(os.listdir(".")))'"
+    outputs:
+      providers: ${{ steps.get-providers.outputs.providers }}
+
+  update_all:
+    needs: generate-providers-list
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
+    steps:
+      - run: echo "${{ matrix.provider }}"
