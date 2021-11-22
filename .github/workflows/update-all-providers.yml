@@ -1,6 +1,8 @@
 name: Update All Providers
 on:
   - workflow_dispatch
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
   generate-providers-list:
     runs-on: ubuntu-latest
@@ -12,11 +14,42 @@ jobs:
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
 
-  update_all:
+  update-provider:
     needs: generate-providers-list
     runs-on: ubuntu-latest
     strategy:
+      # GitHub recommends only issuing 1 API request per second, and never
+      # concurrently.  For more information, see:
+      # https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      max-parallel: 1
       matrix:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
-      - run: echo "${{ matrix.provider }}"
+      - name: Clone ci-mgmt
+        uses: actions/checkout@v2
+        with:
+          path: ci-mgmt
+      - name: Clone pulumi-${{ matrix.provider }}
+        uses: actions/checkout@v2
+        with:
+          repository: pulumi/pulumi-${{ matrix.provider }}
+          path: pulumi-${{ matrix.provider }}
+      - name: Copy files from ci-mgmt to pulumi-${{ matrix.provider }}
+        run: |
+          cp -r ci-mgmt/provider-ci/providers/${{ matrix.provider }}/repo/. pulumi-${{ matrix.provider }}/.
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          path: pulumi-${{ matrix.provider }}
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          committer: Pulumi Bot <bot@pulumi.com>
+          author: Pulumi Bot <bot@pulumi.com>
+          commit-message: "Update GitHub Actions workflow files"
+          # TODO: Add the automation/merge label to automatically merge the PR if it passes all the tests.
+          labels: "impact/no-changelog-required"
+          title: "Update GitHub Actions workflows."
+          body: ""
+          branch: "update-github-actions-workflows-${{ github.run_number }}"
+      # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      - name: Sleep to prevent hitting secondary rate limits
+        run: sleep 1
