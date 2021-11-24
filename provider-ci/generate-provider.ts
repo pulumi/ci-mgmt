@@ -11,6 +11,7 @@ const runAcceptanceTests = name => new wf.RunAcceptanceTestsWorkflow('run-accept
 const pullRequest = name => new wf.PullRequestWorkflow('pull-request');
 const master = name => new wf.DefaultBranchWorkflow('master');
 const main = name => new wf.DefaultBranchWorkflow('main');
+const cron = name => new wf.NightlyCronWorkflow('cron');
 const preRelease = name => new wf.PrereleaseWorkflow('prerelease');
 const release = name => new wf.ReleaseWorkflow('release');
 const updatePulumiTerraformBridge = name => new wf.UpdatePulumiTerraformBridgeWorkflow();
@@ -28,6 +29,7 @@ export default [
   { value: main('main'), file: `providers/${provider}/repo/.github/workflows/main.yml`},
   { value: preRelease('prerelease'), file: `providers/${provider}/repo/.github/workflows/prerelease.yml` },
   { value: release('release'), file: `providers/${provider}/repo/.github/workflows/release.yml` },
+  { value: cron('cron'), file: `providers/${provider}/repo/.github/workflows/nightly-test.yml` },
   { value: automation('automation'), file: `providers/${provider}/repo/.github/workflows/pr-automation.yml` },
   { value: cleanup('cleanup'), file: `providers/${provider}/repo/.github/workflows/artifact-cleanup.yml`},
   { value: commandDispatch('command-dispatch'), file: `providers/${provider}/repo/.github/workflows/command-dispatch.yml`},

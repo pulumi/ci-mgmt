@@ -58,6 +58,22 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
         }
     }
 }
+export class NightlyCronWorkflow extends g.GithubWorkflow {
+    constructor(name, jobs) {
+        super(name, jobs, {
+            schedule: [{
+                    "cron": "0 6 * * *",
+                }],
+        }, {
+            env,
+        });
+        this.jobs = {
+            'prerequisites': new PrerequisitesJob('prerequisites'),
+            'build_sdk': new BuildSdkJob('build_sdk'),
+            'test': new TestsJob('test'),
+        };
+    }
+}
 export class ReleaseWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
