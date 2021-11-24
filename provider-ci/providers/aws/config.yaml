@@ -3,5 +3,6 @@ lint: false
 major-version: 4
 aws: true
 parallel: 1
+customLdFlag: "-X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion={{.Tag}}"
 env:
   AWS_REGION: us-west-2
