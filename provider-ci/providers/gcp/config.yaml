@@ -1,6 +1,6 @@
 provider: gcp
 gcp: true
-major-version: 5
+major-version: 6
 lint: false
 parallel: 2
 customLdFlag: "-X github.com/hashicorp/terraform-provider-google-beta/version.ProviderVersion={{.Tag}}"
