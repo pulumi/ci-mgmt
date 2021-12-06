@@ -472,7 +472,7 @@ export class RunTests extends step.Step {
         super();
         return {
             name: 'Run tests',
-            run: 'cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .'
+            run: 'cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt'
         }
     }
 }
@@ -699,6 +699,19 @@ export class UploadCoverageDataStep extends step.Step {
             run: `summaryName="\${PROVIDER}_summary_\`date +"%Y-%m-%d_%H-%M-%S"\`.json"
 s3FullURI="s3://\${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/\${summaryName}"
 aws s3 cp \${{ env.COVERAGE_OUTPUT_DIR }}/summary.json \${s3FullURI} --acl bucket-owner-full-control`,
+        }
+    }
+}
+
+export class SetupGotestfmt extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Set up gotestfmt',
+            uses: 'haveyoudebuggedit/gotestfmt-action@v2',
+            with: {
+                token: "${{ secrets.GITHUB_TOKEN }}"
+            }
         }
     }
 }
