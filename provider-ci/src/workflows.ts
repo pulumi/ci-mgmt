@@ -419,6 +419,7 @@ export class TestsJob extends job.Job {
         new steps.ConfigureAwsCredentialsForTests(aws),
         new steps.ConfigureGcpCredentials(gcp),
         new steps.InstallSDKDeps(),
+        new steps.SetupGotestfmt(),
         new steps.RunTests(),
         new steps.NotifySlack('Failure in running ${{ matrix.language }} tests'),
     ].filter(step => step.uses !== undefined || step.run !== undefined) as any;
