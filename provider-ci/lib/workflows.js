@@ -3,7 +3,7 @@ import * as job from '@jaxxstorm/gh-actions/lib/job';
 import * as param from '@jkcfg/std/param';
 import * as steps from './steps';
 const pythonVersion = "3.7";
-const goVersion = "1.16.x";
+const goVersion = "1.17.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
 const provider = param.String('provider');
@@ -370,6 +370,7 @@ export class TestsJob extends job.Job {
             new steps.ConfigureAwsCredentialsForTests(aws),
             new steps.ConfigureGcpCredentials(gcp),
             new steps.InstallSDKDeps(),
+            new steps.SetupGotestfmt(),
             new steps.RunTests(),
             new steps.NotifySlack('Failure in running ${{ matrix.language }} tests'),
         ].filter(step => step.uses !== undefined || step.run !== undefined);
