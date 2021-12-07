@@ -1,6 +1,6 @@
 export const installPulumiCli = "pulumi/action-install-pulumi-cli@v2";
 export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.2.0";
-export const prComment = "thollander/actions-comment-pull-request@1.0.4";
+export const prComment = "thollander/actions-comment-pull-request@1";
 export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const createOrUpdateComment = "peter-evans/create-or-update-comment@v1";
 export const setupGo = "actions/setup-go@v2";
