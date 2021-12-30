@@ -707,11 +707,11 @@ export class SetupGotestfmt extends step.Step {
     constructor() {
         super();
         return {
-            name: 'Set up gotestfmt',
-            uses: 'haveyoudebuggedit/gotestfmt-action@v2',
+            name: 'Install gotestfmt',
+            uses: action.installGhRelease,
             with: {
-                token: "${{ secrets.GITHUB_TOKEN }}"
-            }
+                repo: 'haveyoudebuggedit/gotestfmt',
+            },
         }
     }
 }
