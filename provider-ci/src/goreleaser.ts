@@ -44,6 +44,8 @@ export interface Snapshot {
 
 export interface Changelog {
     skip?: boolean;
+    use?: string;
+    sort?: string;
 }
 
 export interface Release {
@@ -131,7 +133,9 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
             name_template: '{{ .Tag }}-SNAPSHOT'
         }
         this.changelog = {
-            skip: true,
+            use: 'git',
+            sort: 'asc'
+
         }
         this.release = {
             disable: true
