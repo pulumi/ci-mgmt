@@ -44,6 +44,13 @@ export interface Snapshot {
 
 export interface Changelog {
     skip?: boolean;
+    use?: string;
+    sort?: string;
+    filters?: Filters,
+}
+
+export interface Filters {
+    exclude?: string[];
 }
 
 export interface Release {
@@ -153,7 +160,16 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
         super(name);
         this.release = {
             disable: false
-
+        }
+        this.changelog = {
+            use: 'git',
+            sort: 'asc',
+            filters: {
+                exclude: [
+                    "Merge branch",
+                    "Merge pull request"
+                ],
+            },
         }
     }
 }
