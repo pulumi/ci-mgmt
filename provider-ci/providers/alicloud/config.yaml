@@ -1,6 +1,7 @@
 provider: alicloud
 major-version: 3
 lint: false
+parallel: 2
 env:
   ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
   ALICLOUD_REGION: "us-west-1"
