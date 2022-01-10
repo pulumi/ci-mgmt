@@ -28,7 +28,12 @@ builds:
   - -X github.com/pulumi/pulumi-venafi/provider/pkg/version.Version={{.Tag}}
   main: ./cmd/pulumi-resource-venafi/
 changelog:
-  skip: true
+  filters:
+    exclude:
+    - Merge branch
+    - Merge pull request
+  sort: asc
+  use: git
 release:
   disable: false
 snapshot:

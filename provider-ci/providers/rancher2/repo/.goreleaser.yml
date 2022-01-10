@@ -28,7 +28,12 @@ builds:
   - -X github.com/pulumi/pulumi-rancher2/provider/v3/pkg/version.Version={{.Tag}}
   main: ./cmd/pulumi-resource-rancher2/
 changelog:
-  skip: true
+  filters:
+    exclude:
+    - Merge branch
+    - Merge pull request
+  sort: asc
+  use: git
 release:
   disable: false
 snapshot:

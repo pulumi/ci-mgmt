@@ -74,5 +74,15 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
         this.release = {
             disable: false
         };
+        this.changelog = {
+            use: 'git',
+            sort: 'asc',
+            filters: {
+                exclude: [
+                    "Merge branch",
+                    "Merge pull request"
+                ],
+            },
+        };
     }
 }

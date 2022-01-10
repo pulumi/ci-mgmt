@@ -29,7 +29,12 @@ builds:
   - -X github.com/hashicorp/terraform-provider-google-beta/version.ProviderVersion={{.Tag}}
   main: ./cmd/pulumi-resource-gcp/
 changelog:
-  skip: true
+  filters:
+    exclude:
+    - Merge branch
+    - Merge pull request
+  sort: asc
+  use: git
 release:
   disable: false
 snapshot:

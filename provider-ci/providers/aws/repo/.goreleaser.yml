@@ -29,7 +29,12 @@ builds:
   - -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion={{.Tag}}
   main: ./cmd/pulumi-resource-aws/
 changelog:
-  skip: true
+  filters:
+    exclude:
+    - Merge branch
+    - Merge pull request
+  sort: asc
+  use: git
 release:
   disable: false
 snapshot:
