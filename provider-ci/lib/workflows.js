@@ -36,7 +36,7 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
                 branches: [name],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
-                    "CHANGELOG.md"
+                    "*.md"
                 ]
             },
         }, {
@@ -132,7 +132,7 @@ export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
             pull_request: {
                 branches: ["master", "main"],
                 'paths-ignore': [
-                    "CHANGELOG.md"
+                    "*.md"
                 ]
             },
         }, {
