@@ -167,7 +167,10 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
             filters: {
                 exclude: [
                     "Merge branch",
-                    "Merge pull request"
+                    "Merge pull request",
+                    "[internal]",
+                    "[ci]",
+                    "[chore]",
                 ],
             },
         }
