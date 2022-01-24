@@ -44,12 +44,13 @@ jobs:
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
           committer: Pulumi Bot <bot@pulumi.com>
           author: Pulumi Bot <bot@pulumi.com>
-          commit-message: "Update GitHub Actions workflow files"
+          commit-message: "[internal] Update GitHub Actions workflow files"
           # TODO: Add the automation/merge label to automatically merge the PR if it passes all the tests.
           labels: "impact/no-changelog-required"
           title: "Update GitHub Actions workflows."
           body: ""
           branch: "update-github-actions-workflows-${{ github.run_number }}"
+          reviewers: "pulumi/platform-integrations"
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
