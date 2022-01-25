@@ -455,7 +455,7 @@ name: main
     branches:
     - main
     paths-ignore:
-    - CHANGELOG.md
+    - '*.md'
     tags-ignore:
     - v*
     - sdk/*

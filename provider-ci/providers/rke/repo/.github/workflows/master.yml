@@ -537,7 +537,7 @@ name: master
     branches:
     - master
     paths-ignore:
-    - CHANGELOG.md
+    - '*.md'
     tags-ignore:
     - v*
     - sdk/*

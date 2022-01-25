@@ -2,12 +2,13 @@ import * as g from '@jaxxstorm/gh-actions';
 import * as job from '@jaxxstorm/gh-actions/lib/job';
 import * as param from '@jkcfg/std/param';
 import * as steps from './steps';
-import {ConfigureAwsCredentialsForCoverageDataUpload, SetProvidersToPATH} from "./steps";
+import * as step from '@jaxxstorm/gh-actions/lib/step';
+import { ConfigureAwsCredentialsForCoverageDataUpload, SetProvidersToPATH } from "./steps";
 
-const pythonVersion = "3.7"
-const goVersion = "1.17.x"
-const nodeVersion = "14.x"
-const dotnetVersion = "3.1.301"
+const pythonVersion = "3.7";
+const goVersion = "1.17.x";
+const nodeVersion = "14.x";
+const dotnetVersion = "3.1.301";
 
 const provider = param.String('provider');
 const extraEnv = param.Object('env');
@@ -16,8 +17,8 @@ const aws = param.Boolean('aws', false);
 const gcp = param.Boolean('gcp', false);
 const lint = param.Boolean('lint', true);
 const setupScript = param.String('setup-script');
-const parallelism = param.Number('parallel', 3)
-const goReleaserTimeout = param.Number('timeout', 60)
+const parallelism = param.Number('parallel', 3);
+const goReleaserTimeout = param.Number('timeout', 60);
 
 const env = Object.assign({
     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
@@ -35,9 +36,9 @@ const env = Object.assign({
 }, extraEnv);
 
 export class DefaultBranchWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             push: {
                 branches: [name],
@@ -46,7 +47,7 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
                     "*.md"
                 ]
             },
-        },{
+        }, {
             env,
         });
         this.jobs = {
@@ -56,45 +57,45 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
             'publish': new PublishPrereleaseJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
             'generate_coverage_data': new GenerateCoverageDataJob('generate_coverage_data'),
-        }
+        };
 
         if (lint) {
             this.jobs = Object.assign(this.jobs, {
                 'lint': new LintProviderJob('lint'),
                 'lint_sdk': new LintSDKJob('lint-sdk'),
-            })
+            });
         }
     }
 }
 
 export class NightlyCronWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             schedule: [{
                 "cron": "0 6 * * *",
             }],
-        },{
+        }, {
             env,
         });
         this.jobs = {
             'prerequisites': new PrerequisitesJob('prerequisites'),
             'build_sdk': new BuildSdkJob('build_sdk'),
             'test': new TestsJob('test'),
-        }
+        };
     }
 }
 
 export class ReleaseWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             push: {
                 tags: ["v*.*.*", "!v*.*.*-**"],
             },
-        },{
+        }, {
             env,
         });
         this.jobs = {
@@ -104,26 +105,26 @@ export class ReleaseWorkflow extends g.GithubWorkflow {
             'publish': new PublishJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
             'create_docs_build': new DocsBuildJob('create_docs_build'),
-        }
+        };
 
         if (lint) {
             this.jobs = Object.assign(this.jobs, {
                 'lint': new LintProviderJob('lint'),
                 'lint_sdk': new LintSDKJob('lint-sdk'),
-            })
+            });
         }
     }
 }
 
 export class PrereleaseWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             push: {
                 tags: ["v*.*.*-**"],
             },
-        },{
+        }, {
             env,
         });
         this.jobs = {
@@ -132,21 +133,21 @@ export class PrereleaseWorkflow extends g.GithubWorkflow {
             'test': new TestsJob('test'),
             'publish': new PublishPrereleaseJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
-        }
+        };
 
         if (lint) {
             this.jobs = Object.assign(this.jobs, {
                 'lint': new LintProviderJob('lint'),
                 'lint_sdk': new LintSDKJob('lint-sdk'),
-            })
+            });
         }
     }
 }
 
 export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             repository_dispatch: {
                 types: ['run-acceptance-tests-command']
@@ -157,7 +158,7 @@ export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
                     "CHANGELOG.md"
                 ]
             },
-        },{
+        }, {
             env: {
                 ...env,
                 'PR_COMMIT_SHA': '${{ github.event.client_payload.pull_request.head.sha }}',
@@ -171,24 +172,24 @@ export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
             'prerequisites': new PrerequisitesJob('prerequisites').addDispatchConditional(true),
             'build_sdk': new BuildSdkJob('build_sdk').addDispatchConditional(true),
             'test': new TestsJob('test').addDispatchConditional(true),
-        }
+        };
 
         if (lint) {
             this.jobs = Object.assign(this.jobs, {
                 'lint': new LintProviderJob('lint').addDispatchConditional(true),
                 'lint_sdk': new LintSDKJob('lint-sdk').addDispatchConditional(true),
-            })
+            });
         }
     }
 }
 
 export class PullRequestWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             pull_request_target: {},
-        },{
+        }, {
             env,
         });
         this.jobs = {
@@ -196,20 +197,41 @@ export class PullRequestWorkflow extends g.GithubWorkflow {
                 .addConditional('github.event.pull_request.head.repo.full_name != github.repository')
                 .addStep(new steps.CheckoutRepoStep())
                 .addStep(new steps.CommentPRWithSlashCommandStep()),
-        }
+        };
     }
 }
 
 export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
-            repository_dispatch: {
-                types: ["update-bridge"],
-            },
-        },{
-            env,
+            workflow_dispatch: {
+                inputs: {
+                    bridge_version: {
+                        required: true,
+                        description: "The version of pulumi/pulumi-terraform-bridge to update to. Do not include the 'v' prefix. Must be major version 3.",
+                        type: "string",
+                    },
+                    sdk_version: {
+                        required: true,
+                        description: "The version of pulumi/pulumi/sdk to update to. Do not include the 'v' prefix. Must be major version 3.",
+                        type: "string"
+                    },
+                }
+            }
+        }, {
+            env: {
+                GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
+                // If there are missing or extra mappings, they can not have been
+                // introduced by updating the bridge, so for this workflow we'll
+                // ignore mapping errors.
+                //
+                // At the time of writing, the bridge checks for _any_ value
+                // assigned to the following env var, so we cannot be as
+                // explicit as we might like in the workflow:
+                // PULUMI_PROVIDER_MAP_ERROR: false,
+            }
         });
         this.jobs = {
             'update_bridge': new EmptyJob('update-bridge')
@@ -223,7 +245,6 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                     },
                 })
                 .addStep(new steps.CheckoutRepoStep())
-                .addStep(new steps.CheckoutScriptsRepoStep())
                 .addStep(new steps.CheckoutTagsStep())
                 .addStep(new steps.InstallGo())
                 .addStep(new steps.InstallPulumiCtl())
@@ -231,46 +252,68 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                 .addStep(new steps.InstallDotNet())
                 .addStep(new steps.InstallNodeJS())
                 .addStep(new steps.InstallPython())
-                .addStep(new steps.RunCommand('sudo npm install -g chg'))
-                .addStep(new steps.UpdatePulumiTerraformBridgeDependency())
+                .addStep({
+                    name: "Update pulumi-terraform-bridge",
+                    run: "cd provider && go mod edit -require github.com/pulumi/pulumi-terraform-bridge/v3@v${{ github.event.inputs.bridge_version }} && go mod tidy",
+                })
+                .addStep({
+                    name: "Update Pulumi SDK (provider/go.mod)",
+                    run: "cd provider && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{ github.event.inputs.sdk_version }} && go mod tidy",
+                })
+                .addStep({
+                    name: "Update Pulumi SDK (sdk/go.mod)",
+                    run: "cd sdk && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{ github.event.inputs.sdk_version }} && go mod tidy",
+                })
+                .addStep(new steps.RunCommand('make tfgen'))
                 .addStep(new steps.RunCommand('make build_sdks'))
-                .addStep(new steps.RunCommand('chg add "Upgrading pulumi-terraform-bridge to ${{ github.event.client_payload.ref }}'))
-                .addStep(new steps.CommitChanges('update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}'))
-                .addStep(new steps.PullRequest('update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}',
-                    'Upgrade to ${{ github.event.client_payload.ref }} of pulumi-terraform-bridge', 'stack72'))
-
-        }
+                .addStep({
+                    name: "Create PR",
+                    uses: "peter-evans/create-pull-request@v3.12.0",
+                    with: {
+                        "commit-message": "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
+                        committer: "pulumi-bot <bot@pulumi.com>",
+                        author: "pulumi-bot <bot@pulumi.com>",
+                        branch: "pulumi-bot/bridge-v${{ github.event.inputs.bridge_version }}-${{ github.run_id}}",
+                        base: "master",
+                        labels: "impact/no-changelog-required",
+                        title: "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
+                        body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
+                        reviewers: "pulumi/platform-integrations",
+                        token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                    }
+                })
+        };
     }
 }
 
 export class CommandDispatchWorkflow extends g.GithubWorkflow {
-    jobs: { [k: string]: job.Job }
+    jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job }) {
+    constructor(name: string, jobs: { [k: string]: job.Job; }) {
         super(name, jobs, {
             issue_comment: {
                 types: ["created", "edited"],
             },
-        },{
+        }, {
             env,
         });
         this.jobs = {
             'command-dispatch-for-testing': new EmptyJob('command-dispatch-for-testing')
                 .addStep(new steps.CheckoutRepoStep())
                 .addStep(new steps.CommandDispatchStep(`${provider}`))
-        }
+        };
     }
 }
 
 export class EmptyJob extends job.Job {
     steps = [] as any;
-    'runs-on' = 'ubuntu-latest'
-    strategy = {}
+    'runs-on' = 'ubuntu-latest';
+    strategy = {};
 
     constructor(name: string, params?: Partial<EmptyJob>) {
         super();
         this.name = name;
-        Object.assign(this, {name}, params)
+        Object.assign(this, { name }, params);
     }
 
     addStep(step) {
@@ -279,19 +322,19 @@ export class EmptyJob extends job.Job {
     }
 
     addStrategy(strategy) {
-        this.strategy = strategy
+        this.strategy = strategy;
         return this;
     }
 
     addConditional(conditional) {
-        this.if = conditional
+        this.if = conditional;
         return this;
     }
 }
 
 export class BuildSdkJob extends job.Job {
-    needs = 'prerequisites'
-    'runs-on' = 'ubuntu-latest'
+    needs = 'prerequisites';
+    'runs-on' = 'ubuntu-latest';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -299,9 +342,9 @@ export class BuildSdkJob extends job.Job {
             dotnetversion: [dotnetVersion],
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
-            language: ['nodejs','python','dotnet','go'],
+            language: ['nodejs', 'python', 'dotnet', 'go'],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -326,22 +369,22 @@ export class BuildSdkJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }
 }
 
 export class PrerequisitesJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
+    'runs-on' = 'ubuntu-latest';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -350,7 +393,7 @@ export class PrerequisitesJob extends job.Job {
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -370,23 +413,23 @@ export class PrerequisitesJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }
 }
 
 export class TestsJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'build_sdk'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'build_sdk';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -394,9 +437,9 @@ export class TestsJob extends job.Job {
             dotnetversion: [dotnetVersion],
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
-            language: ['nodejs','python','dotnet','go'],
+            language: ['nodejs', 'python', 'dotnet', 'go'],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -427,23 +470,23 @@ export class TestsJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }
 }
 
 export class PublishPrereleaseJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'test'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'test';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -452,7 +495,7 @@ export class PublishPrereleaseJob extends job.Job {
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutTagsStep(),
@@ -467,13 +510,13 @@ export class PublishPrereleaseJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 }
 
 export class PublishJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'test'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'test';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -482,7 +525,7 @@ export class PublishJob extends job.Job {
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutTagsStep(),
@@ -497,13 +540,13 @@ export class PublishJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 }
 
 export class DocsBuildJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'publish_sdk'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'publish_sdk';
     steps = [
         new steps.InstallPulumiCtl(),
         new steps.DispatchDocsBuildEvent(),
@@ -512,13 +555,13 @@ export class DocsBuildJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 }
 
 export class PublishSDKJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'publish'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'publish';
     strategy = {
         'fail-fast': true,
         matrix: {
@@ -527,7 +570,7 @@ export class PublishSDKJob extends job.Job {
             pythonversion: [pythonVersion],
             nodeversion: [nodeVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -552,19 +595,19 @@ export class PublishSDKJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 }
 
 export class LintProviderJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    container = 'golangci/golangci-lint:latest'
+    'runs-on' = 'ubuntu-latest';
+    container = 'golangci/golangci-lint:latest';
     strategy = {
         'fail-fast': true,
         matrix: {
             goversion: [goVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -574,35 +617,35 @@ export class LintProviderJob extends job.Job {
         new steps.InstallPulumiCli(),
         new steps.RunCommand('make lint_provider'),
         new steps.NotifySlack('Failure in linting provider'),
-    ]
+    ];
 
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }
 }
 
 export class LintSDKJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    needs = 'build_sdk'
-    container = 'golangci/golangci-lint:latest'
+    'runs-on' = 'ubuntu-latest';
+    needs = 'build_sdk';
+    container = 'golangci/golangci-lint:latest';
     strategy = {
         'fail-fast': true,
         matrix: {
             goversion: [goVersion],
         },
-    }
+    };
     steps = [
         new steps.CheckoutRepoStep(),
         new steps.CheckoutScriptsRepoStep(),
@@ -617,33 +660,33 @@ export class LintSDKJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }
 }
 
 export class GenerateCoverageDataJob extends job.Job {
-    'runs-on' = 'ubuntu-latest'
-    'continue-on-error' = true
-    needs = 'prerequisites'
+    'runs-on' = 'ubuntu-latest';
+    'continue-on-error' = true;
+    needs = 'prerequisites';
     env = {
         COVERAGE_OUTPUT_DIR: '${{ secrets.COVERAGE_OUTPUT_DIR }}'
-    }
+    };
     strategy = {
         'fail-fast': true,
         matrix: {
             goversion: [goVersion],
         },
-    }
+    };
     steps = [
         // Setting up prerequisites needed to run the coverage tracker
         new steps.CheckoutRepoStep(),
@@ -659,7 +702,7 @@ export class GenerateCoverageDataJob extends job.Job {
         new steps.EchoCoverageOutputDirStep(),
         new steps.GenerateCoverageDataStep(),
         new steps.PrintCoverageDataStep(),
-        
+
         // Uploading coverage data
         new steps.UploadCoverageDataStep(),
     ] as any;
@@ -667,15 +710,15 @@ export class GenerateCoverageDataJob extends job.Job {
     constructor(name: string) {
         super();
         this.name = name;
-        Object.assign(this, {name})
+        Object.assign(this, { name });
     }
 
     addDispatchConditional(isWorkflowDispatch) {
         if (isWorkflowDispatch) {
-            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+            this.if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
             this.steps = this.steps.filter(step => step.name !== 'Checkout Repo') as any;
-            this.steps.unshift(new steps.CheckoutRepoStepAtPR())
+            this.steps.unshift(new steps.CheckoutRepoStepAtPR());
         }
         return this;
     }

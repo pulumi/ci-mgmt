@@ -48,6 +48,18 @@ Before generating any workflow files, run the following commands:
 
     This will generate the module into `provider-ci/lib`
 
+To generate code for a single provider, e.g.:
+
+```bash
+make aws
+```
+
+To generate code for all providers:
+
+```bash
+make providers
+```
+
 ## Adding a New Provider
 
 To add a new provider:
@@ -87,4 +99,13 @@ To add a new provider:
 
 ## Updating All Providers
 
-If the underlying code generation has changed and we need to generate and deploy the workflows to all the providers, run the "Update All Providers" GitHub Actions workflow manually in the GitHub UI.  This will generate a PR to all providers whose files have changed.
+If the underlying code generation has changed and we need to deploy the workflows to all the providers:
+
+1. Compile the TypeScript to JavaScript, and generate the files:
+
+    ```bash
+    make dist providers
+    ```
+
+1. Commit the code, submit a PR, and merge.
+1. Run the "Update All Providers" GitHub Actions workflow manually in the GitHub UI.  This will generate a PR to any providers whose files have changed.
