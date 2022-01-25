@@ -132,7 +132,7 @@ export class RunAcceptanceTestsWorkflow extends g.GithubWorkflow {
             pull_request: {
                 branches: ["master", "main"],
                 'paths-ignore': [
-                    "*.md"
+                    "CHANGELOG.md"
                 ]
             },
         }, {
@@ -173,11 +173,24 @@ export class PullRequestWorkflow extends g.GithubWorkflow {
 export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
     constructor(name, jobs) {
         super(name, jobs, {
-            repository_dispatch: {
-                types: ["update-bridge"],
-            },
+            workflow_dispatch: {
+                inputs: {
+                    bridge_version: {
+                        required: true,
+                        description: "The version of pulumi/pulumi-terraform-bridge to update to. Do not include the 'v' prefix. Must be major version 3.",
+                        type: "string",
+                    },
+                    sdk_version: {
+                        required: true,
+                        description: "The version of pulumi/pulumi/sdk to update to. Do not include the 'v' prefix. Must be major version 3.",
+                        type: "string"
+                    },
+                }
+            }
         }, {
-            env,
+            env: {
+                GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
+            }
         });
         this.jobs = {
             'update_bridge': new EmptyJob('update-bridge')
@@ -191,7 +204,6 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                 },
             })
                 .addStep(new steps.CheckoutRepoStep())
-                .addStep(new steps.CheckoutScriptsRepoStep())
                 .addStep(new steps.CheckoutTagsStep())
                 .addStep(new steps.InstallGo())
                 .addStep(new steps.InstallPulumiCtl())
@@ -199,12 +211,36 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                 .addStep(new steps.InstallDotNet())
                 .addStep(new steps.InstallNodeJS())
                 .addStep(new steps.InstallPython())
-                .addStep(new steps.RunCommand('sudo npm install -g chg'))
-                .addStep(new steps.UpdatePulumiTerraformBridgeDependency())
+                .addStep({
+                name: "Update pulumi-terraform-bridge",
+                run: "cd provider && go mod edit -require github.com/pulumi/pulumi-terraform-bridge/v3@v${{ github.event.inputs.bridge_version }} && go mod tidy",
+            })
+                .addStep({
+                name: "Update Pulumi SDK (provider/go.mod)",
+                run: "cd provider && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{ github.event.inputs.sdk_version }} && go mod tidy",
+            })
+                .addStep({
+                name: "Update Pulumi SDK (sdk/go.mod)",
+                run: "cd sdk && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{ github.event.inputs.sdk_version }} && go mod tidy",
+            })
+                .addStep(new steps.RunCommand('make tfgen'))
                 .addStep(new steps.RunCommand('make build_sdks'))
-                .addStep(new steps.RunCommand('chg add "Upgrading pulumi-terraform-bridge to ${{ github.event.client_payload.ref }}'))
-                .addStep(new steps.CommitChanges('update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}'))
-                .addStep(new steps.PullRequest('update-bridge/${{ github.event.client_payload.ref }}-${{ github.run_id }}', 'Upgrade to ${{ github.event.client_payload.ref }} of pulumi-terraform-bridge', 'stack72'))
+                .addStep({
+                name: "Create PR",
+                uses: "peter-evans/create-pull-request@v3.12.0",
+                with: {
+                    "commit-message": "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
+                    committer: "pulumi-bot <bot@pulumi.com>",
+                    author: "pulumi-bot <bot@pulumi.com>",
+                    branch: "pulumi-bot/bridge-v${{ github.event.inputs.bridge_version }}-${{ github.run_id}}",
+                    base: "master",
+                    labels: "impact/no-changelog-required",
+                    title: "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
+                    body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
+                    reviewers: "pulumi/platform-integrations",
+                    token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                }
+            })
         };
     }
 }

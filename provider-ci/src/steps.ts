@@ -7,7 +7,7 @@ export class CheckoutRepoStep extends step.Step {
         return {
             name: "Checkout Repo",
             uses: action.checkout,
-        }
+        };
     }
 }
 
@@ -20,7 +20,7 @@ export class CheckoutRepoStepAtPR extends step.Step {
             with: {
                 ref: '${{ env.PR_COMMIT_SHA }}'
             }
-        }
+        };
     }
 }
 
@@ -34,7 +34,7 @@ export class CheckoutScriptsRepoStep extends step.Step {
                 path: 'ci-scripts',
                 repository: 'pulumi/scripts',
             },
-        }
+        };
     }
 }
 
@@ -44,7 +44,7 @@ export class CheckoutTagsStep extends step.Step {
         return {
             name: 'Unshallow clone for tags',
             run: 'git fetch --prune --unshallow --tags',
-        }
+        };
     }
 }
 
@@ -62,7 +62,7 @@ export class ConfigureGcpCredentials extends step.Step {
                     'service_account_key': '${{ secrets.GCP_SA_KEY }}',
                     'export_default_credentials': true,
                 }
-            }
+            };
         }
     }
 }
@@ -82,7 +82,7 @@ export class ConfigureAwsCredentialsForTests extends step.Step {
                     'role-session-name': '${{ env.PROVIDER }}@githubActions',
                     'role-to-assume': '${{ secrets.AWS_CI_ROLE_ARN }}'
                 }
-            }
+            };
         }
     }
 }
@@ -102,7 +102,7 @@ export class ConfigureAwsCredentialsForPublish extends step.Step {
                 'role-external-id': 'upload-pulumi-release',
                 'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}'
             }
-        }
+        };
     }
 }
 
@@ -117,7 +117,7 @@ export class ConfigureAwsCredentialsForCoverageDataUpload extends step.Step {
                 'aws-region': 'us-west-2',
                 'aws-secret-access-key': '${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}'
             }
-        }
+        };
     }
 }
 
@@ -130,7 +130,7 @@ export class InstallGo extends step.Step {
             with: {
                 'go-version': version || '${{matrix.goversion}}',
             },
-        }
+        };
     }
 }
 
@@ -144,7 +144,7 @@ export class InstallNodeJS extends step.Step {
                 'node-version': version || '${{matrix.nodeversion}}',
                 'registry-url': 'https://registry.npmjs.org',
             },
-        }
+        };
     }
 }
 
@@ -157,7 +157,7 @@ export class InstallDotNet extends step.Step {
             with: {
                 'dotnet-version': version || '${{matrix.dotnetversion}}'
             },
-        }
+        };
     }
 }
 
@@ -170,7 +170,7 @@ export class InstallPython extends step.Step {
             with: {
                 'python-version': version || '${{matrix.pythonversion}}'
             },
-        }
+        };
     }
 }
 
@@ -180,7 +180,7 @@ export class InstallPlugins extends step.Step {
         return {
             name: 'Install plugins',
             run: 'make install_plugins',
-        }
+        };
     }
 }
 
@@ -191,7 +191,7 @@ export class InstallPythonDeps extends step.Step {
             name: 'Install Python deps',
             run: 'pip3 install virtualenv==20.0.23\n' +
                 'pip3 install pipenv',
-        }
+        };
     }
 }
 
@@ -201,7 +201,7 @@ export class InstallSDKDeps extends step.Step {
         return {
             name: 'Install dependencies',
             run: 'make install_${{ matrix.language}}_sdk',
-        }
+        };
     }
 }
 
@@ -214,7 +214,7 @@ export class InstallPulumiCtl extends step.Step {
             with: {
                 repo: 'pulumi/pulumictl',
             },
-        }
+        };
     }
 }
 
@@ -228,7 +228,7 @@ export class InstallSchemaChecker extends step.Step {
             with: {
                 repo: 'mikhailshilkov/schema-tools',
             },
-        }
+        };
     }
 }
 
@@ -241,7 +241,7 @@ export class DispatchDocsBuildEvent extends step.Step {
             env: {
                 GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
             }
-        }
+        };
     }
 
 }
@@ -252,7 +252,7 @@ export class InstallPulumiCli extends step.Step {
         return {
             name: 'Install Pulumi CLI',
             uses: action.installPulumiCli,
-        }
+        };
     }
 }
 
@@ -263,7 +263,7 @@ export class RunDockerComposeStep extends step.Step {
             return {
                 name: 'Run docker-compose',
                 run: 'docker-compose -f testing/docker-compose.yml up --build -d'
-            }
+            };
         }
     }
 }
@@ -275,9 +275,9 @@ export class RunSetUpScriptStep extends step.Step {
             return {
                 name: 'Run setup script',
                 run: `${setupScript}`,
-            }
+            };
         }
-        return
+        return;
     }
 }
 
@@ -287,7 +287,7 @@ export class BuildBinariesStep extends step.Step {
         return {
             name: 'Build tfgen & provider binaries',
             run: 'make provider'
-        }
+        };
     }
 }
 
@@ -297,7 +297,7 @@ export class BuildSdksStep extends step.Step {
         return {
             name: 'Build SDK',
             run: 'make build_${{ matrix.language }}'
-        }
+        };
     }
 }
 
@@ -311,7 +311,7 @@ export class UploadProviderBinariesStep extends step.Step {
                 name: '${{ env.PROVIDER }}-provider.tar.gz',
                 path: '${{ github.workspace }}/bin/provider.tar.gz',
             }
-        }
+        };
     }
 }
 
@@ -325,7 +325,7 @@ export class UploadSdkStep extends step.Step {
                 name: '${{ matrix.language  }}-sdk.tar.gz',
                 path: '${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz',
             }
-        }
+        };
     }
 }
 
@@ -339,7 +339,7 @@ export class DownloadProviderStep extends step.Step {
                 name: '${{ env.PROVIDER }}-provider.tar.gz',
                 path: '${{ github.workspace }}/bin',
             }
-        }
+        };
     }
 }
 
@@ -353,7 +353,7 @@ export class DownloadSDKsStep extends step.Step {
                 name: '${{ matrix.language }}-sdk.tar.gz',
                 path: '${{ github.workspace}}/sdk/',
             }
-        }
+        };
     }
 }
 
@@ -367,7 +367,7 @@ export class DownloadSpecificSDKStep extends step.Step {
                 name: `${name}-sdk.tar.gz`,
                 path: '${{ github.workspace}}/sdk/',
             }
-        }
+        };
     }
 }
 
@@ -378,7 +378,7 @@ export class UnzipProviderBinariesStep extends step.Step {
             name: 'Untar provider binaries',
             run: 'tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin\n' +
                 'find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \\;',
-        }
+        };
     }
 }
 
@@ -388,7 +388,7 @@ export class UnzipSDKsStep extends step.Step {
         return {
             name: 'Uncompress SDK folder',
             run: 'tar -zxf ${{ github.workspace }}/sdk/${{ matrix.language }}.tar.gz -C ${{ github.workspace }}/sdk/${{ matrix.language }}',
-        }
+        };
     }
 }
 
@@ -398,7 +398,7 @@ export class UnzipSpecificSDKStep extends step.Step {
         return {
             name: `Uncompress ${name} SDK`,
             run: `tar -zxf \${{github.workspace}}/sdk/${name}.tar.gz -C \${{github.workspace}}/sdk/${name}`,
-        }
+        };
     }
 }
 
@@ -408,7 +408,7 @@ export class ZipProviderBinariesStep extends step.Step {
         return {
             name: 'Tar provider binaries',
             run: 'tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-tfgen-${{ env.PROVIDER }}'
-        }
+        };
     }
 }
 
@@ -418,7 +418,7 @@ export class ZipSDKsStep extends step.Step {
         return {
             name: 'Compress SDK folder',
             run: 'tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .'
-        }
+        };
     }
 }
 
@@ -434,7 +434,7 @@ export class NotifySlack extends step.Step {
                 fields: 'repo,commit,author,action',
                 status: '${{ job.status }}'
             }
-        }
+        };
     }
 }
 
@@ -444,7 +444,7 @@ export class CheckCleanWorkTreeStep extends step.Step {
         return {
             name: 'Check worktree clean',
             run: './ci-scripts/ci/check-worktree-is-clean'
-        }
+        };
     }
 }
 
@@ -453,7 +453,7 @@ export class SetNugetSource extends step.Step {
         super();
         return {
             run: 'dotnet nuget add source ${{ github.workspace }}/nuget'
-        }
+        };
     }
 }
 
@@ -463,7 +463,7 @@ export class SetProvidersToPATH extends step.Step {
         return {
             name: 'Update path',
             run: 'echo "${{ github.workspace }}/bin" >> $GITHUB_PATH'
-        }
+        };
     }
 }
 
@@ -473,7 +473,7 @@ export class RunTests extends step.Step {
         return {
             name: 'Run tests',
             run: 'cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt'
-        }
+        };
     }
 }
 
@@ -483,7 +483,7 @@ export class SetPreReleaseVersion extends step.Step {
         return {
             name: 'Set PreRelease Version',
             run: 'echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV'
-        }
+        };
     }
 }
 
@@ -497,7 +497,7 @@ export class RunGoReleaserWithArgs extends step.Step {
                 args: `${args}`,
                 version: 'latest'
             }
-        }
+        };
     }
 }
 
@@ -506,7 +506,7 @@ export class RunCommand extends step.Step {
         super();
         return {
             run: `${command}`,
-        }
+        };
     }
 }
 
@@ -519,7 +519,7 @@ export class RunPublishSDK extends step.Step {
             env: {
                 'NODE_AUTH_TOKEN': '${{ secrets.NPM_TOKEN }}'
             }
-        }
+        };
     }
 }
 
@@ -529,7 +529,7 @@ export class UpdatePulumiTerraformBridgeDependency extends step.Step {
         return {
             name: 'Update Pulumi Terraform Bridge Dependency',
             run: 'cd provider && go mod edit -require github.com/pulumi/pulumi-terraform-bridge/v3@${{ github.event.client_payload.ref }} && go mod tidy && cd ../',
-        }
+        };
     }
 }
 
@@ -544,7 +544,7 @@ export class CommitChanges extends step.Step {
                 author_name: "pulumi-bot",
                 ref: `${refName}`
             }
-        }
+        };
     }
 }
 
@@ -569,7 +569,7 @@ export class PullRequest extends step.Step {
             env: {
                 GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
             }
-        }
+        };
     }
 }
 
@@ -582,7 +582,7 @@ export class CheckSchemaChanges extends step.Step {
             run: "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
                 "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
                 "echo 'EOF' >> $GITHUB_ENV",
-        }
+        };
     }
 }
 
@@ -598,7 +598,7 @@ export class CommentSchemaChangesOnPR extends step.Step {
                     "${{ env.SCHEMA_CHANGES }}\n",
                 GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
-        }
+        };
     }
 }
 
@@ -615,7 +615,7 @@ export class CommandDispatchStep extends step.Step {
                 'issue-type': 'pull-request',
                 'repository': `pulumi/pulumi-${providerName}`,
             }
-        }
+        };
     }
 }
 
@@ -631,7 +631,7 @@ export class UpdatePRWithResultsStep extends step.Step {
                 'issue-number': '${{ github.event.client_payload.github.payload.issue.number }}',
                 body: 'Please view the PR build - ${{ steps.vars.outputs.run-url }}',
             }
-        }
+        };
     }
 }
 
@@ -646,7 +646,7 @@ export class CommentPRWithSlashCommandStep extends step.Step {
                     "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
                 GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
-        }
+        };
     }
 }
 
@@ -657,7 +657,7 @@ export class CreateCommentsUrlStep extends step.Step {
             name: 'Create URL to the run output',
             id: 'var',
             run: 'echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID',
-        }
+        };
     }
 }
 
@@ -667,7 +667,7 @@ export class EchoCoverageOutputDirStep extends step.Step {
         return {
             name: 'Echo Coverage Output Dir',
             run: 'echo "Coverage output directory: ${{ env.COVERAGE_OUTPUT_DIR }}"',
-        }
+        };
     }
 }
 
@@ -677,7 +677,7 @@ export class GenerateCoverageDataStep extends step.Step {
         return {
             name: 'Generate Coverage Data',
             run: 'make tfgen',
-        }
+        };
     }
 }
 
@@ -687,7 +687,7 @@ export class PrintCoverageDataStep extends step.Step {
         return {
             name: 'Summarize Provider Coverage Results',
             run: 'cat ${{ env.COVERAGE_OUTPUT_DIR }}/shortSummary.txt',
-        }
+        };
     }
 }
 
@@ -699,7 +699,7 @@ export class UploadCoverageDataStep extends step.Step {
             run: `summaryName="\${PROVIDER}_summary_\`date +"%Y-%m-%d_%H-%M-%S"\`.json"
 s3FullURI="s3://\${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/\${summaryName}"
 aws s3 cp \${{ env.COVERAGE_OUTPUT_DIR }}/summary.json \${s3FullURI} --acl bucket-owner-full-control`,
-        }
+        };
     }
 }
 
@@ -712,6 +712,6 @@ export class SetupGotestfmt extends step.Step {
             with: {
                 repo: 'haveyoudebuggedit/gotestfmt',
             },
-        }
+        };
     }
 }
