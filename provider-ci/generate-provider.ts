@@ -6,6 +6,18 @@ import * as param from '@jkcfg/std/param';
 
 const provider = param.String('provider');
 
+const getRequiredStringParam = (path) => {
+  const value = param.String(path);
+  if (!value) {
+    throw new Error(`Config value "${path}" is required.`);
+  }
+
+  return value;
+};
+
+const upstreamProviderRepo = getRequiredStringParam('upstream-provider-repo');
+const upstreamProviderOrg = getRequiredStringParam('upstream-provider-org');
+
 // NOTE: The following code works against the JS in lib/ generated from the TS
 // in src/. In order to have changes in e.g. workflows.ts be reflected in this
 // code, run `make dist`.
@@ -22,6 +34,7 @@ const cron = () => new wf.NightlyCronWorkflow('cron');
 const preRelease = () => new wf.PrereleaseWorkflow('prerelease');
 const release = () => new wf.ReleaseWorkflow('release');
 const updatePulumiTerraformBridge = () => new wf.UpdatePulumiTerraformBridgeWorkflow();
+const updateUpstreamProvider = () => new wf.UpdateUpstreamProviderWorkflow(upstreamProviderOrg, upstreamProviderRepo);
 const commandDispatch = () => new wf.CommandDispatchWorkflow();
 const pre = () => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = () => new goreleaser.PulumiGoreleaserConfig(provider);
@@ -41,6 +54,7 @@ export default [
   { value: cleanup(), file: `providers/${provider}/repo/.github/workflows/artifact-cleanup.yml` },
   { value: commandDispatch(), file: `providers/${provider}/repo/.github/workflows/command-dispatch.yml` },
   { value: updatePulumiTerraformBridge(), file: `providers/${provider}/repo/.github/workflows/update-bridge.yml` },
+  { value: updateUpstreamProvider(), file: `providers/${provider}/repo/.github/workflows/update-upstream-provider.yml` },
   { value: pre(), file: `providers/${provider}/repo/.goreleaser.prerelease.yml` },
   { value: r(), file: `providers/${provider}/repo/.goreleaser.yml` },
   { value: lintConfig(), file: `providers/${provider}/repo/.golangci.yml` },
