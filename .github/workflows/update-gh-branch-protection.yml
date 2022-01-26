@@ -1,4 +1,4 @@
-name: IAM Roles project preview on Pulumi Dev AWS Accounts
+name: Update Provider GH Branch Protection Settings
 on:
   workflow_dispatch: {}
   pull_request:
