@@ -2,8 +2,6 @@ import * as g from '@jaxxstorm/gh-actions';
 import * as job from '@jaxxstorm/gh-actions/lib/job';
 import * as param from '@jkcfg/std/param';
 import * as steps from './steps';
-import * as step from '@jaxxstorm/gh-actions/lib/step';
-import { ConfigureAwsCredentialsForCoverageDataUpload, SetProvidersToPATH } from "./steps";
 
 const pythonVersion = "3.7";
 const goVersion = "1.17.x";
