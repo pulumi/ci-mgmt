@@ -1,3 +1,4 @@
 provider: cloudinit
 major-version: 1
 lint: false
+upstream-provider-org: hashicorp

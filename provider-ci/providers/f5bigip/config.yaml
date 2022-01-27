@@ -6,3 +6,5 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_SDK_LOAD_CONFIG: true
+upstream-provider-org: F5Networks
+upstream-provider-repo: terraform-provider-bigip

@@ -6,4 +6,4 @@ golangci-timeout: 20m
 env:
   RANCHER_INSECURE: "true"
   RANCHER_URL: https://localhost # docker
-
+upstream-provider-org: pulumi

@@ -1,2 +1,3 @@
 provider: signalfx
 major-version: 5
+upstream-provider-org: pulumi

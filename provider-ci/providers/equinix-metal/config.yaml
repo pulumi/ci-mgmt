@@ -3,3 +3,5 @@ major-version: 3
 lint: false
 env:
   PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}
+upstream-provider-org: equinix
+upstream-provider-repo: terraform-provider-metal

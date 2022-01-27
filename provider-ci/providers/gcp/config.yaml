@@ -8,4 +8,5 @@ env:
   GOOGLE_PROJECT: "pulumi-ci-gcp-provider"
   GOOGLE_REGION: "us-central1"
   GOOGLE_ZONE: "us-central1-a"
-
+upstream-provider-org: pulumi
+upstream-provider-repo: terraform-provider-google-beta

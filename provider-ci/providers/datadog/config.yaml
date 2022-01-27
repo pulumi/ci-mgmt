@@ -1,3 +1,4 @@
 provider: datadog
 major-version: 4
 lint: false
+upstream-provider-org: pulumi

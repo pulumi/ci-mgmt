@@ -4,7 +4,6 @@ import * as goreleaser from './lib/goreleaser';
 import * as lint from './lib/golangci';
 import * as param from '@jkcfg/std/param';
 
-const provider = param.String('provider');
 
 const getRequiredStringParam = (path) => {
   const value = param.String(path);
@@ -15,8 +14,9 @@ const getRequiredStringParam = (path) => {
   return value;
 };
 
-const upstreamProviderRepo = getRequiredStringParam('upstream-provider-repo');
+const provider = getRequiredStringParam('provider');
 const upstreamProviderOrg = getRequiredStringParam('upstream-provider-org');
+const upstreamProviderRepo = param.String('upstream-provider-repo', `terraform-provider-${provider}`);
 
 // NOTE: The following code works against the JS in lib/ generated from the TS
 // in src/. In order to have changes in e.g. workflows.ts be reflected in this

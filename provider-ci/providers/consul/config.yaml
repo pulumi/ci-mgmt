@@ -1,3 +1,4 @@
 provider: consul
 major-version: 3
 docker: true
+upstream-provider-org: hashicorp

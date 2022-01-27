@@ -9,3 +9,4 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   AZURE_LOCATION: westus
   PULUMI_GO_DEP_ROOT: /home/runner/work/pulumi-docker
+upstream-provider-org: kreuzwerker

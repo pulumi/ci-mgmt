@@ -6,4 +6,4 @@ env:
   SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
   SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
   SNOWFLAKE_REGION: ${{ secrets.SNOWFLAKE_REGION }}
-
+upstream-provider-org: pulumi

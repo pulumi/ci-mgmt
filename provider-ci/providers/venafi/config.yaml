@@ -4,3 +4,4 @@ env:
   VENAFI_TOKEN: ${{ secrets.VENAFI_TOKEN }}
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
+upstream-provider-org: pulumi
