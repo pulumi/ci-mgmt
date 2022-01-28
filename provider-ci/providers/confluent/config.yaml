@@ -3,3 +3,4 @@ major-version: 1
 env:
   CONFLUENT_CLOUD_USERNAME: ${{ secrets.CONFLUENT_CLOUD_USERNAME }}
   CONFLUENT_CLOUD_PASSWORD: ${{ secrets.CONFLUENT_CLOUD_PASSWORD }}
+upstream-provider-org: Mongey

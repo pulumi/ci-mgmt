@@ -3,3 +3,4 @@ major-version: 1
 lint: true
 env:
   EC_API_KEY: ${{ secrets.EC_API_KEY }}
+upstream-provider-org: elastic

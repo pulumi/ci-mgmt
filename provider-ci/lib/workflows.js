@@ -237,9 +237,93 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                     labels: "impact/no-changelog-required",
                     title: "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
                     body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
-                    reviewers: "pulumi/platform-integrations",
+                    "team-reviewers": "platform-integrations",
                     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
                 }
+            })
+        };
+    }
+}
+export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
+    constructor(upstreamProviderOrg, upstreamProviderRepo, jobs) {
+        super('Update upstream provider', jobs, {
+            workflow_dispatch: {
+                inputs: {
+                    version: {
+                        required: true,
+                        description: "The new version of the upstream provider. Do not include the 'v' prefix.",
+                        type: "string",
+                    },
+                    linked_issue_number: {
+                        required: false,
+                        description: "The issue number of a PR in this repository to which the generated pull request should be linked.",
+                        type: "string"
+                    },
+                }
+            }
+        }, {
+            env: Object.assign(Object.assign({}, env), { PULUMI_PROVIDER_MAP_ERROR: true, UPSTREAM_PROVIDER_ORG: upstreamProviderOrg, UPSTREAM_PROVIDER_REPO: upstreamProviderRepo })
+        });
+        const prStepOptions = {
+            "commit-message": "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",
+            committer: "pulumi-bot <bot@pulumi.com>",
+            author: "pulumi-bot <bot@pulumi.com>",
+            branch: "pulumi-bot/v${{ github.event.inputs.version }}-${{ github.run_id}}",
+            base: "master",
+            // TODO: Add auto-merge.
+            labels: "impact/no-changelog-required",
+            title: "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",
+            body: "This pull request was generated automatically by the update-upstream-provider workflow in this repository.",
+            "team-reviewers": "platform-integrations",
+            token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+        };
+        this.jobs = {
+            'update_upstream_provider': new EmptyJob('update-upstream_provider')
+                .addStrategy({
+                'fail-fast': true,
+                matrix: {
+                    goversion: [goVersion],
+                    dotnetversion: [dotnetVersion],
+                    pythonversion: [pythonVersion],
+                    nodeversion: [nodeVersion],
+                },
+            })
+                .addStep(new steps.CheckoutRepoStep())
+                .addStep(new steps.CheckoutTagsStep())
+                .addStep(new steps.InstallGo())
+                .addStep(new steps.InstallPulumiCtl())
+                .addStep(new steps.InstallPulumiCli())
+                .addStep(new steps.InstallDotNet())
+                .addStep(new steps.InstallNodeJS())
+                .addStep(new steps.InstallPython())
+                .addStep({
+                name: "Get upstream provider sha",
+                run: "echo \"UPSTREAM_PROVIDER_SHA=$(curl https://api.github.com/repos/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}/git/ref/tags/v${{ github.event.inputs.version }} | jq .object.sha -r)\" >> $GITHUB_ENV",
+            })
+                .addStep({
+                name: "Update shim/go.mod",
+                if: "${{ hashFiles('provider/shim/go.mod') != '' }}",
+                run: "cd provider/shim && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy"
+            })
+                .addStep({
+                name: "Update go.mod",
+                run: "cd provider && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy",
+            })
+                .addStep(new steps.RunCommand('make tfgen'))
+                .addStep(new steps.RunCommand('make build_sdks'))
+                .addStep({
+                name: "Create PR (no linked issue)",
+                uses: "peter-evans/create-pull-request@v3.12.0",
+                if: "${{ !github.event.inputs.linked_issue_number }}",
+                with: Object.assign(Object.assign({}, prStepOptions), { body: "This pull request was generated automatically by the update-upstream-provider workflow in this repository." })
+            })
+                // Identical to the previous step, except that it links to the
+                // issue if one is suppled:
+                .addStep({
+                name: "Create PR (with linked issue)",
+                uses: "peter-evans/create-pull-request@v3.12.0",
+                if: "${{ github.event.inputs.linked_issue_number }}",
+                with: Object.assign(Object.assign({}, prStepOptions), { body: "Fixes #${{ github.event.inputs.linked_issue_number }}\n\nThis pull request was generated automatically by the update-upstream-provider workflow in this repository." })
             })
         };
     }
@@ -640,3 +724,5 @@ export class GenerateCoverageDataJob extends job.Job {
         return this;
     }
 }
+;
+;

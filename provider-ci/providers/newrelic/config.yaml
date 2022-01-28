@@ -3,3 +3,4 @@ major-version: 4
 env:
   NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
   NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+upstream-provider-org: pulumi

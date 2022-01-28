@@ -2,3 +2,4 @@ provider: hcloud
 major-version: 1
 env:
   HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+upstream-provider-org: hetznercloud

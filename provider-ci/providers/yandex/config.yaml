@@ -1,5 +1,7 @@
 provider: yandex
 major-version: 1
+upstream-provider-org: yandex-cloud
+upstream-provider-repo: terraform-provider-yandex
 env:
   YC_SERVICE_ACCOUNT_KEY_FILE: ${{ secrets.YC_SERVICE_ACCOUNT_KEY_FILE }}
   YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}

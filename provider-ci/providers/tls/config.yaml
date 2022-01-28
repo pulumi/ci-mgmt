@@ -1,2 +1,3 @@
 provider: tls
 major-version: 4
+upstream-provider-org: terraform-providers

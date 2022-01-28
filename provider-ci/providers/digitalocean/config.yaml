@@ -2,3 +2,4 @@ provider: digitalocean
 major-version: 4
 env:
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+upstream-provider-org: pulumi

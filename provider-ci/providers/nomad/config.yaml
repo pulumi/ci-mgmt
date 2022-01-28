@@ -1,5 +1,6 @@
 provider: nomad
 major-version: 1
-setup-script: 'testing/setup.sh'
+setup-script: "testing/setup.sh"
 env:
   VAULT_ADDR: "http://127.0.0.1:4646"
+upstream-provider-org: hashicorp
