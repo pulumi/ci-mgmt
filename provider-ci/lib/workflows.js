@@ -529,6 +529,7 @@ export class PublishPrereleaseJob extends job.Job {
             new steps.ConfigureAwsCredentialsForPublish(),
             new steps.SetPreReleaseVersion(),
             new steps.RunGoReleaserWithArgs(`-p ${parallelism} -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout ${goReleaserTimeout}m0s`),
+            new steps.NotifySlack('Failure in publishing binaries'),
         ];
         this.name = name;
         Object.assign(this, { name });
@@ -557,6 +558,7 @@ export class PublishJob extends job.Job {
             new steps.ConfigureAwsCredentialsForPublish(),
             new steps.SetPreReleaseVersion(),
             new steps.RunGoReleaserWithArgs(`-p ${parallelism} release --rm-dist --timeout ${goReleaserTimeout}m0s`),
+            new steps.NotifySlack('Failure in publishing binaries'),
         ];
         this.name = name;
         Object.assign(this, { name });

@@ -29,6 +29,9 @@ changelog:
     exclude:
     - Merge branch
     - Merge pull request
+    - '[internal]'
+    - '[ci]'
+    - '[chore]'
   sort: asc
   use: git
 release:
