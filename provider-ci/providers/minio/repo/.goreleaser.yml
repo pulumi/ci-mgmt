@@ -24,6 +24,9 @@ builds:
   - darwin
   - windows
   - linux
+  ignore:
+  - goarch: arm64
+    goos: windows
   ldflags:
   - -X github.com/pulumi/pulumi-minio/provider/pkg/version.Version={{.Tag}}
   main: ./cmd/pulumi-resource-minio/
@@ -32,6 +35,9 @@ changelog:
     exclude:
     - Merge branch
     - Merge pull request
+    - '[internal]'
+    - '[ci]'
+    - '[chore]'
   sort: asc
   use: git
 release:
