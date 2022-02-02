@@ -1,3 +1,0 @@
-name: ci-mgmt-actions
-runtime: nodejs
-description: Updates all repositories with ci config
