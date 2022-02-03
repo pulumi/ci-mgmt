@@ -224,11 +224,8 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                 // If there are missing or extra mappings, they can not have been
                 // introduced by updating the bridge, so for this workflow we'll
                 // ignore mapping errors.
-                //
-                // At the time of writing, the bridge checks for _any_ value
-                // assigned to the following env var, so we cannot be as
-                // explicit as we might like in the workflow:
-                // PULUMI_PROVIDER_MAP_ERROR: false,
+                PULUMI_EXTRA_MAPPING_ERROR: false,
+                PULUMI_MISSING_MAPPING_ERROR: false,
             }
         });
         this.jobs = {
@@ -284,10 +281,17 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
     }
 }
 
+class UpdateUpstreamProviderArgs {
+    upstreamProviderOrg: string;
+    upstreamProviderRepo: string;
+    failOnExtraMapping: boolean;
+    failOnMissingMapping: boolean;
+}
+
 export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
     jobs: { [k: string]: job.Job; };
 
-    constructor(upstreamProviderOrg: string, upstreamProviderRepo: string, jobs: { [k: string]: job.Job; }) {
+    constructor(args: UpdateUpstreamProviderArgs, jobs: { [k: string]: job.Job; }) {
         super('Update upstream provider', jobs, {
             workflow_dispatch: {
                 inputs: {
@@ -306,9 +310,10 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
         }, {
             env: {
                 ...env,
-                PULUMI_PROVIDER_MAP_ERROR: true,
-                UPSTREAM_PROVIDER_ORG: upstreamProviderOrg,
-                UPSTREAM_PROVIDER_REPO: upstreamProviderRepo,
+                PULUMI_EXTRA_MAPPING_ERROR: args.failOnExtraMapping,
+                PULUMI_MISSING_MAPPING_ERROR: args.failOnMissingMapping,
+                UPSTREAM_PROVIDER_ORG: args.upstreamProviderOrg,
+                UPSTREAM_PROVIDER_REPO: args.upstreamProviderRepo,
             }
         });
 

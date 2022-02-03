@@ -244,8 +244,10 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
         };
     }
 }
+class UpdateUpstreamProviderArgs {
+}
 export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
-    constructor(upstreamProviderOrg, upstreamProviderRepo, jobs) {
+    constructor(args, jobs) {
         super('Update upstream provider', jobs, {
             workflow_dispatch: {
                 inputs: {
@@ -262,7 +264,7 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 }
             }
         }, {
-            env: Object.assign(Object.assign({}, env), { PULUMI_PROVIDER_MAP_ERROR: true, UPSTREAM_PROVIDER_ORG: upstreamProviderOrg, UPSTREAM_PROVIDER_REPO: upstreamProviderRepo })
+            env: Object.assign(Object.assign({}, env), { PULUMI_EXTRA_MAPPING_ERROR: args.failOnExtraMapping, PULUMI_MISSING_MAPPING_ERROR: args.failOnMissingMapping, UPSTREAM_PROVIDER_ORG: args.upstreamProviderOrg, UPSTREAM_PROVIDER_REPO: args.upstreamProviderRepo })
         });
         const prStepOptions = {
             "commit-message": "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",
