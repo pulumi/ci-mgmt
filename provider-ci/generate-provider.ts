@@ -17,6 +17,8 @@ const getRequiredStringParam = (path) => {
 const provider = getRequiredStringParam('provider');
 const upstreamProviderOrg = getRequiredStringParam('upstream-provider-org');
 const upstreamProviderRepo = param.String('upstream-provider-repo', `terraform-provider-${provider}`);
+const failOnExtraMapping = param.Boolean('fail-on-extra-mapping', true);
+const failOnMissingMapping = param.Boolean('fail-on-missing-mapping', true);
 
 // NOTE: The following code works against the JS in lib/ generated from the TS
 // in src/. In order to have changes in e.g. workflows.ts be reflected in this
@@ -24,6 +26,8 @@ const upstreamProviderRepo = param.String('upstream-provider-repo', `terraform-p
 //
 // This design inconsistency should be fixed in the future, but cannot be at the
 // time of writing due to schedule constraints.
+//
+// Per the original author, jkcfg cannot work directly against TypeScript.
 
 // eslint-disable-next-line no-template-curly-in-string
 const runAcceptanceTests = () => new wf.RunAcceptanceTestsWorkflow('run-acceptance-tests');
@@ -34,7 +38,12 @@ const cron = () => new wf.NightlyCronWorkflow('cron');
 const preRelease = () => new wf.PrereleaseWorkflow('prerelease');
 const release = () => new wf.ReleaseWorkflow('release');
 const updatePulumiTerraformBridge = () => new wf.UpdatePulumiTerraformBridgeWorkflow();
-const updateUpstreamProvider = () => new wf.UpdateUpstreamProviderWorkflow(upstreamProviderOrg, upstreamProviderRepo);
+const updateUpstreamProvider = () => new wf.UpdateUpstreamProviderWorkflow({
+  upstreamProviderOrg: upstreamProviderOrg,
+  upstreamProviderRepo: upstreamProviderRepo,
+  failOnExtraMapping: failOnExtraMapping,
+  failOnMissingMapping: failOnMissingMapping,
+});
 const commandDispatch = () => new wf.CommandDispatchWorkflow();
 const pre = () => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = () => new goreleaser.PulumiGoreleaserConfig(provider);
