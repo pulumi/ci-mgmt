@@ -190,6 +190,11 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
         }, {
             env: {
                 GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}',
+                // If there are missing or extra mappings, they can not have been
+                // introduced by updating the bridge, so for this workflow we'll
+                // ignore mapping errors.
+                PULUMI_EXTRA_MAPPING_ERROR: false,
+                PULUMI_MISSING_MAPPING_ERROR: false,
             }
         });
         this.jobs = {
@@ -264,7 +269,7 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 }
             }
         }, {
-            env: Object.assign(Object.assign({}, env), { PULUMI_EXTRA_MAPPING_ERROR: args.failOnExtraMapping, PULUMI_MISSING_MAPPING_ERROR: args.failOnMissingMapping, UPSTREAM_PROVIDER_ORG: args.upstreamProviderOrg, UPSTREAM_PROVIDER_REPO: args.upstreamProviderRepo })
+            env: Object.assign(Object.assign({}, env), { PULUMI_EXTRA_MAPPING_ERROR: args.failOnExtraMapping, PULUMI_MISSING_MAPPING_ERROR: args.failOnMissingMapping, UPSTREAM_PROVIDER_ORG: args.upstreamProviderOrg, UPSTREAM_PROVIDER_REPO: args.upstreamProviderRepo, UPSTREAM_PROVIDER_MAJOR_VERSION: args.upstreamProviderMajorVersion })
         });
         const prStepOptions = {
             "commit-message": "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",
@@ -305,11 +310,11 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 .addStep({
                 name: "Update shim/go.mod",
                 if: "${{ hashFiles('provider/shim/go.mod') != '' }}",
-                run: "cd provider/shim && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy"
+                run: "cd provider/shim && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}${{ env.UPSTREAM_PROVIDER_MAJOR_VERSION }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy"
             })
                 .addStep({
                 name: "Update go.mod",
-                run: "cd provider && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy",
+                run: "cd provider && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}${{ env.UPSTREAM_PROVIDER_MAJOR_VERSION }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy",
             })
                 .addStep(new steps.RunCommand('make tfgen'))
                 .addStep(new steps.RunCommand('make build_sdks'))

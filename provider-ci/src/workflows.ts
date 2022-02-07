@@ -286,6 +286,7 @@ class UpdateUpstreamProviderArgs {
     upstreamProviderRepo: string;
     failOnExtraMapping: boolean;
     failOnMissingMapping: boolean;
+    upstreamProviderMajorVersion: string;
 }
 
 export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
@@ -314,6 +315,7 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 PULUMI_MISSING_MAPPING_ERROR: args.failOnMissingMapping,
                 UPSTREAM_PROVIDER_ORG: args.upstreamProviderOrg,
                 UPSTREAM_PROVIDER_REPO: args.upstreamProviderRepo,
+                UPSTREAM_PROVIDER_MAJOR_VERSION: args.upstreamProviderMajorVersion,
             }
         });
 
@@ -357,11 +359,11 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 .addStep({
                     name: "Update shim/go.mod",
                     if: "${{ hashFiles('provider/shim/go.mod') != '' }}",
-                    run: "cd provider/shim && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy"
+                    run: "cd provider/shim && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}${{ env.UPSTREAM_PROVIDER_MAJOR_VERSION }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy"
                 })
                 .addStep({
                     name: "Update go.mod",
-                    run: "cd provider && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy",
+                    run: "cd provider && go mod edit -require github.com/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}${{ env.UPSTREAM_PROVIDER_MAJOR_VERSION }}@${{ env.UPSTREAM_PROVIDER_SHA }} && go mod tidy",
                 })
                 .addStep(new steps.RunCommand('make tfgen'))
                 .addStep(new steps.RunCommand('make build_sdks'))
