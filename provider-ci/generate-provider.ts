@@ -19,6 +19,7 @@ const upstreamProviderOrg = getRequiredStringParam('upstream-provider-org');
 const upstreamProviderRepo = param.String('upstream-provider-repo', `terraform-provider-${provider}`);
 const failOnExtraMapping = param.Boolean('fail-on-extra-mapping', true);
 const failOnMissingMapping = param.Boolean('fail-on-missing-mapping', true);
+const upstreamProviderMajorVersion = param.String('upstream-provider-major-version', "");
 
 // NOTE: The following code works against the JS in lib/ generated from the TS
 // in src/. In order to have changes in e.g. workflows.ts be reflected in this
@@ -43,6 +44,7 @@ const updateUpstreamProvider = () => new wf.UpdateUpstreamProviderWorkflow({
   upstreamProviderRepo: upstreamProviderRepo,
   failOnExtraMapping: failOnExtraMapping,
   failOnMissingMapping: failOnMissingMapping,
+  upstreamProviderMajorVersion: upstreamProviderMajorVersion,
 });
 const commandDispatch = () => new wf.CommandDispatchWorkflow();
 const pre = () => new goreleaser.PulumiGoreleaserPreConfig(provider);
