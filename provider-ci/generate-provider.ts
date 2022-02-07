@@ -20,6 +20,7 @@ const upstreamProviderRepo = param.String('upstream-provider-repo', `terraform-p
 const failOnExtraMapping = param.Boolean('fail-on-extra-mapping', true);
 const failOnMissingMapping = param.Boolean('fail-on-missing-mapping', true);
 const upstreamProviderMajorVersion = param.String('upstream-provider-major-version', "");
+const providerDefaultBranch = param.String('provider-default-branch', "master");
 
 // NOTE: The following code works against the JS in lib/ generated from the TS
 // in src/. In order to have changes in e.g. workflows.ts be reflected in this
@@ -38,13 +39,16 @@ const main = () => new wf.DefaultBranchWorkflow('main');
 const cron = () => new wf.NightlyCronWorkflow('cron');
 const preRelease = () => new wf.PrereleaseWorkflow('prerelease');
 const release = () => new wf.ReleaseWorkflow('release');
-const updatePulumiTerraformBridge = () => new wf.UpdatePulumiTerraformBridgeWorkflow();
+const updatePulumiTerraformBridge = () => new wf.UpdatePulumiTerraformBridgeWorkflow({
+  providerDefaultBranch: providerDefaultBranch,
+});
 const updateUpstreamProvider = () => new wf.UpdateUpstreamProviderWorkflow({
   upstreamProviderOrg: upstreamProviderOrg,
   upstreamProviderRepo: upstreamProviderRepo,
   failOnExtraMapping: failOnExtraMapping,
   failOnMissingMapping: failOnMissingMapping,
   upstreamProviderMajorVersion: upstreamProviderMajorVersion,
+  providerDefaultBranch: providerDefaultBranch,
 });
 const commandDispatch = () => new wf.CommandDispatchWorkflow();
 const pre = () => new goreleaser.PulumiGoreleaserPreConfig(provider);

@@ -170,9 +170,11 @@ export class PullRequestWorkflow extends g.GithubWorkflow {
         };
     }
 }
+class UpdatePulumiTerraformBridgeWorkflowArgs {
+}
 export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
-    constructor(name, jobs) {
-        super(name, jobs, {
+    constructor(args, jobs) {
+        super('Update pulumi-terraform-bridge', jobs, {
             workflow_dispatch: {
                 inputs: {
                     bridge_version: {
@@ -238,7 +240,7 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                     committer: "pulumi-bot <bot@pulumi.com>",
                     author: "pulumi-bot <bot@pulumi.com>",
                     branch: "pulumi-bot/bridge-v${{ github.event.inputs.bridge_version }}-${{ github.run_id}}",
-                    base: "master",
+                    base: args.providerDefaultBranch,
                     labels: "impact/no-changelog-required",
                     title: "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
                     body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
@@ -276,7 +278,7 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
             committer: "pulumi-bot <bot@pulumi.com>",
             author: "pulumi-bot <bot@pulumi.com>",
             branch: "pulumi-bot/v${{ github.event.inputs.version }}-${{ github.run_id}}",
-            base: "master",
+            base: args.providerDefaultBranch,
             // TODO: Add auto-merge.
             labels: "impact/no-changelog-required",
             title: "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",

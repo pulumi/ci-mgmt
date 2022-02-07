@@ -5,3 +5,4 @@ env:
   ARTIFACTORY_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN}}
 upstream-provider-org: jfrog
 upstream-provider-major-version: /v2
+provider-default-branch: main
