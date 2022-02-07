@@ -199,11 +199,15 @@ export class PullRequestWorkflow extends g.GithubWorkflow {
     }
 }
 
+class UpdatePulumiTerraformBridgeWorkflowArgs {
+    providerDefaultBranch: string;
+}
+
 export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
     jobs: { [k: string]: job.Job; };
 
-    constructor(name: string, jobs: { [k: string]: job.Job; }) {
-        super(name, jobs, {
+    constructor(args: UpdatePulumiTerraformBridgeWorkflowArgs, jobs: { [k: string]: job.Job; }) {
+        super('Update pulumi-terraform-bridge', jobs, {
             workflow_dispatch: {
                 inputs: {
                     bridge_version: {
@@ -269,7 +273,7 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                         committer: "pulumi-bot <bot@pulumi.com>",
                         author: "pulumi-bot <bot@pulumi.com>",
                         branch: "pulumi-bot/bridge-v${{ github.event.inputs.bridge_version }}-${{ github.run_id}}",
-                        base: "master",
+                        base: args.providerDefaultBranch,
                         labels: "impact/no-changelog-required",
                         title: "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
                         body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
@@ -287,6 +291,7 @@ class UpdateUpstreamProviderArgs {
     failOnExtraMapping: boolean;
     failOnMissingMapping: boolean;
     upstreamProviderMajorVersion: string;
+    providerDefaultBranch: string;
 }
 
 export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
@@ -324,7 +329,7 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
             committer: "pulumi-bot <bot@pulumi.com>",
             author: "pulumi-bot <bot@pulumi.com>",
             branch: "pulumi-bot/v${{ github.event.inputs.version }}-${{ github.run_id}}",
-            base: "master",
+            base: args.providerDefaultBranch,
             // TODO: Add auto-merge.
             labels: "impact/no-changelog-required",
             title: "Update ${{ env.UPSTREAM_PROVIDER_REPO }} to v${{ github.event.inputs.version }}",
