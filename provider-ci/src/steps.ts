@@ -97,7 +97,7 @@ export class ConfigureAwsCredentialsForPublish extends step.Step {
                 'aws-access-key-id': '${{ secrets.AWS_ACCESS_KEY_ID }}',
                 'aws-region': 'us-east-2',
                 'aws-secret-access-key': '${{ secrets.AWS_SECRET_ACCESS_KEY }}',
-                'role-duration-seconds': 3600,
+                'role-duration-seconds': 7200,
                 'role-session-name': '${{ env.PROVIDER }}@githubActions',
                 'role-external-id': 'upload-pulumi-release',
                 'role-to-assume': '${{ secrets.AWS_UPLOAD_ROLE_ARN }}'
