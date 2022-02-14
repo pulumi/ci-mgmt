@@ -6,10 +6,9 @@ This repository contains code to manage CI/CD for the many Pulumi providers in a
 
 Pulumi providers use [GitHub Actions](https://docs.github.com/en/actions) for CI/CD. Because we maintain a long list of providers, we use this repository to:
 
-* Generate GitHub Actions Workflow files for any provider. These can be manually copied to new providers. We look forward to automating this step in the future.
+* Generate GitHub Actions Workflow files for any provider. These can be deployed to all providers or a single provider respectively by the GitHub Actions workflows in this repository.
 * Keep an [inventory of existing Pulumi providers](./provider-ci/providers).
 * Maintain logic for branch protection across provider repositories.
-* Bulk update all Pulumi Corp provider workflows when necessary.
 
 ## Usage
 
@@ -19,7 +18,7 @@ This repository has the following components:
 * The `infra/providers/` directory contains a Pulumi program which uses the [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
 
   For an overview of how Pulumi programs work, see [the Pulumi docs](https://www.pulumi.com/docs/).
-* A GitHub action to deploy updates to all providers.
+* GitHub Actions workflows to automate common operations across all providers or a single provider.
 
 ## Prerequisites
 
