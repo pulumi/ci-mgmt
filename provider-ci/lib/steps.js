@@ -569,6 +569,16 @@ export class CommandDispatchStep extends step.Step {
         };
     }
 }
+export class CreateCommentsUrlStep extends step.Step {
+    constructor() {
+        super();
+        return {
+            name: 'Create URL to the run output',
+            id: 'run-url',
+            run: 'echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID',
+        };
+    }
+}
 export class UpdatePRWithResultsStep extends step.Step {
     constructor() {
         super();
@@ -579,7 +589,7 @@ export class UpdatePRWithResultsStep extends step.Step {
                 token: '${{ secrets.PULUMI_BOT_TOKEN }}',
                 repository: '${{ github.event.client_payload.github.payload.repository.full_name }}',
                 'issue-number': '${{ github.event.client_payload.github.payload.issue.number }}',
-                body: 'Please view the PR build - ${{ steps.vars.outputs.run-url }}',
+                body: 'Please view the PR build: ${{ steps.run-url.outputs.run-url }}',
             }
         };
     }
@@ -595,16 +605,6 @@ export class CommentPRWithSlashCommandStep extends step.Step {
                     "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
                 GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
             }
-        };
-    }
-}
-export class CreateCommentsUrlStep extends step.Step {
-    constructor() {
-        super();
-        return {
-            name: 'Create URL to the run output',
-            id: 'var',
-            run: 'echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID',
         };
     }
 }
