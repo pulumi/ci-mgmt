@@ -297,6 +297,11 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                     nodeversion: [nodeVersion],
                 },
             })
+                .addStep({
+                id: "run-url",
+                name: "Create URL to the run output",
+                run: "echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            })
                 .addStep(new steps.CheckoutRepoStep())
                 .addStep(new steps.CheckoutTagsStep())
                 .addStep(new steps.InstallGo())
@@ -333,6 +338,17 @@ export class UpdateUpstreamProviderWorkflow extends g.GithubWorkflow {
                 uses: "peter-evans/create-pull-request@v3.12.0",
                 if: "${{ github.event.inputs.linked_issue_number }}",
                 with: Object.assign(Object.assign({}, prStepOptions), { body: "Fixes #${{ github.event.inputs.linked_issue_number }}\n\nThis pull request was generated automatically by the update-upstream-provider workflow in this repository." })
+            })
+                .addStep({
+                name: "Comment on failed attempt",
+                if: "${{ failure() && github.event.inputs.linked_issue_number }}",
+                uses: "jungwinter/comment@v1",
+                with: {
+                    type: "create",
+                    issue_number: "${{ github.event.inputs.linked_issue_number }}",
+                    token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                    body: "Failed to automatically update upstream provider (probably beacuse of new resources or data sources, which must be mapped manually).\n\nFor more details, see: \$\{\{ steps.run-url.outputs.run-url \}\}",
+                }
             })
         };
     }
