@@ -36,7 +36,7 @@ export class DefaultBranchWorkflow extends g.GithubWorkflow {
                 branches: [name],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
-                    "*.md"
+                    '*.md'
                 ]
             },
         }, {
