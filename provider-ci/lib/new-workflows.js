@@ -34,7 +34,7 @@ export class MasterWorkflow extends g.GithubWorkflow {
                 branches: ["master"],
                 'tags-ignore': ['v*', 'sdk/*', '**'],
                 'paths-ignore': [
-                    '*.md'
+                    "*.md"
                 ]
             },
         }, {
