@@ -299,6 +299,10 @@ jobs:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
         status: ${{ job.status }}
+    - if: success() && github.event_name == 'push'
+      name: Add SDK version tag
+      run: tag=`git tag | grep -E '^v[0-9]' | sort -V | tail -1` && git tag sdk/${tag}
+        && git push origin sdk/${tag}
     strategy:
       fail-fast: true
       matrix:
