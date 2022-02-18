@@ -635,6 +635,7 @@ export class PublishSDKJob extends job.Job {
             new steps.RunCommand('python -m pip install pip twine'),
             new steps.RunPublishSDK(),
             new steps.NotifySlack('Failure in publishing SDK'),
+            new steps.TagSDKTag(),
         ];
         this.name = name;
         Object.assign(this, { name });
