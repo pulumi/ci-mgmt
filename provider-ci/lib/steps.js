@@ -485,7 +485,7 @@ export class TagSDKTag extends step.Step {
         return {
             if: 'success() && github.event_name == \'push\'',
             name: 'Add SDK version tag',
-            run: 'git tag sdk/${{ github.ref_name }} && git push origin sdk/${github.ref_name}',
+            run: 'git tag sdk/${{ github.ref_name }} && git push origin sdk/${{ github.ref_name }}',
         };
     }
 }
