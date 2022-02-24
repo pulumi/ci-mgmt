@@ -102,6 +102,7 @@ export class ReleaseWorkflow extends g.GithubWorkflow {
             'test': new TestsJob('test'),
             'publish': new PublishJob('publish'),
             'publish_sdk': new PublishSDKJob('publish_sdk'),
+            'tag_sdk': new TagSDKJob('tag_sdk'),
             'create_docs_build': new DocsBuildJob('create_docs_build'),
         };
 
@@ -674,10 +675,26 @@ export class PublishJob extends job.Job {
 
 export class DocsBuildJob extends job.Job {
     'runs-on' = 'ubuntu-latest';
-    needs = 'publish_sdk';
+    needs = 'tag_sdk';
     steps = [
         new steps.InstallPulumiCtl(),
         new steps.DispatchDocsBuildEvent(),
+    ] as any;
+
+    constructor(name: string) {
+        super();
+        this.name = name;
+        Object.assign(this, { name });
+    }
+}
+
+export class TagSDKJob extends job.Job {
+    'runs-on' = 'ubuntu-latest';
+    needs = 'publish_sdk';
+    steps = [
+        new steps.CheckoutRepoStep(),
+        new steps.InstallPulumiCtl(),
+        new steps.TagSDKTag(),
     ] as any;
 
     constructor(name: string) {
@@ -718,7 +735,6 @@ export class PublishSDKJob extends job.Job {
         new steps.RunCommand('python -m pip install pip twine'),
         new steps.RunPublishSDK(),
         new steps.NotifySlack('Failure in publishing SDK'),
-        new steps.TagSDKTag(),
     ] as any;
 
     constructor(name: string) {
