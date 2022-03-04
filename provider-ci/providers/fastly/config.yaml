@@ -1,5 +1,5 @@
 provider: fastly
-major-version: 3
+major-version: 4
 env:
   FASTLY_API_KEY: ${{ secrets.FASTLY_API_KEY }}
 upstream-provider-org: pulumi
