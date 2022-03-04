@@ -484,7 +484,7 @@ export class TagSDKTag extends step.Step {
         super();
         return {
             name: 'Add SDK version tag',
-            run: 'git tag sdk/$(pulumictl get version --language generic) && git push origin sdk/$(pulumictl get version --language generic)',
+            run: 'git tag sdk/v$(pulumictl get version --language generic) && git push origin sdk/v$(pulumictl get version --language generic)',
         };
     }
 }
