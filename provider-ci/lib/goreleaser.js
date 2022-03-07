@@ -87,9 +87,9 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
                 exclude: [
                     "Merge branch",
                     "Merge pull request",
-                    "[internal]",
-                    "[ci]",
-                    "[chore]",
+                    "\\Winternal\\W",
+                    "\\Wci\\W",
+                    "\\Wchore\\W",
                 ],
             },
         };
