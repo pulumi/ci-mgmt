@@ -7,4 +7,5 @@ timeout: 90
 customLdFlag: "-X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion={{.Tag}}"
 env:
   AWS_REGION: us-west-2
+  PULUMI_MISSING_DOCS_ERROR: true
 upstream-provider-org: pulumi
