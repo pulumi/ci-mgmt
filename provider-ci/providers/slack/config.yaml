@@ -1,0 +1,6 @@
+provider: slack
+major-version: 1
+env: 
+  SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+lint: true 
+upstream-provider-org: pulumi
