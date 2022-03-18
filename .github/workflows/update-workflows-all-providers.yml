@@ -61,6 +61,7 @@ jobs:
         with:
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
           pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          repository: pulumi-${{ matrix.provider }}
           merge-method: squash
         # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
