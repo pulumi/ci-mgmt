@@ -43,6 +43,7 @@ jobs:
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ matrix.provider }}/repo/. pulumi-${{ matrix.provider }}/.
       - name: Create PR
+        id: create-pr
         uses: peter-evans/create-pull-request@v3
         with:
           author: Pulumi Bot <bot@pulumi.com>
@@ -50,10 +51,17 @@ jobs:
           branch: "update-github-actions-workflows-${{ github.run_number }}"
           committer: Pulumi Bot <bot@pulumi.com>
           commit-message: "[internal] Update GitHub Actions workflow files"
-          labels: "impact/no-changelog-required, automation/merge"
+          labels: "impact/no-changelog-required"
           title: "Update GitHub Actions workflows."
           path: pulumi-${{ matrix.provider }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
-      # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      - name: Set PR to auto-merge
+        if: steps.create-pr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v1
+        with:
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash
+        # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
