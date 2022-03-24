@@ -4,7 +4,6 @@ env:
   PULUMI_MISSING_MAPPING_ERROR: false
 jobs:
   update_bridge:
-    if: steps.create-pr.outputs.pull-request-operation == 'created'
     name: update-bridge
     runs-on: ubuntu-latest
     steps:
@@ -63,7 +62,8 @@ jobs:
         title: Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version
           }}
         token: ${{ secrets.PULUMI_BOT_TOKEN }}
-    - name: Set Automerge
+    - if: steps.create-pr.outputs.pull-request-operation == 'created'
+      name: Set Automerge
       uses: peter-evans/enable-pull-request-automerge@v1
       with:
         github_token: ${{ secrets.PULUMI_BOT_TOKEN }}

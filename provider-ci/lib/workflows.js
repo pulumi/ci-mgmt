@@ -252,6 +252,7 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
             })
                 .addStep({
                 name: "Set Automerge",
+                if: "steps.create-pr.outputs.pull-request-operation == 'created'",
                 uses: "peter-evans/enable-pull-request-automerge@v1",
                 with: {
                     github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
@@ -260,7 +261,6 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                     merge_method: "squash"
                 },
             })
-                .addConditional("steps.create-pr.outputs.pull-request-operation == 'created'")
         };
     }
 }
