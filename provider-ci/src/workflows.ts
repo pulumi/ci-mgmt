@@ -268,6 +268,7 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                 .addStep(new steps.RunCommand('make build_sdks'))
                 .addStep({
                     name: "Create PR",
+                    id: "create-pr",
                     uses: "peter-evans/create-pull-request@v3.12.0",
                     with: {
                         "commit-message": "Update pulumi-terraform-bridge to v${{ github.event.inputs.bridge_version }}",
@@ -282,6 +283,17 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                         token: "${{ secrets.PULUMI_BOT_TOKEN }}",
                     }
                 })
+                .addStep({
+                    name: "Set Automerge",
+                    uses: "peter-evans/enable-pull-request-automerge@v1",
+                    with: {
+                        github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                        pull_request_number: "${{ steps.create-pr.outputs.pull-request-number }}",
+                        repository: "${{ github.repository }}",
+                        merge_method: "squash"
+                    },
+                })
+                    .addConditional("steps.create-pr.outputs.pull-request-operation == 'created'")
         };
     }
 }

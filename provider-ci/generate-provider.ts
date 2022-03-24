@@ -55,7 +55,6 @@ const pre = () => new goreleaser.PulumiGoreleaserPreConfig(provider);
 const r = () => new goreleaser.PulumiGoreleaserConfig(provider);
 const lintConfig = () => new lint.PulumiGolangCIConfig();
 const cleanup = () => new shared.ArtifactCleanupWorkflow();
-const automation = () => new shared.AutoMergeWorkflow();
 
 export default [
   { value: runAcceptanceTests(), file: `providers/${provider}/repo/.github/workflows/run-acceptance-tests.yml` },
@@ -65,7 +64,6 @@ export default [
   { value: preRelease(), file: `providers/${provider}/repo/.github/workflows/prerelease.yml` },
   { value: release(), file: `providers/${provider}/repo/.github/workflows/release.yml` },
   { value: cron(), file: `providers/${provider}/repo/.github/workflows/nightly-test.yml` },
-  { value: automation(), file: `providers/${provider}/repo/.github/workflows/pr-automation.yml` },
   { value: cleanup(), file: `providers/${provider}/repo/.github/workflows/artifact-cleanup.yml` },
   { value: commandDispatch(), file: `providers/${provider}/repo/.github/workflows/command-dispatch.yml` },
   { value: updatePulumiTerraformBridge(), file: `providers/${provider}/repo/.github/workflows/update-bridge.yml` },
