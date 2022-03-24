@@ -570,11 +570,29 @@ export class PullRequest extends step.Step {
                 pr_allow_empty: "true",
                 pr_assignee: `${user}`,
                 pr_body: '*Automated PR*',
-                pr_label: "automation/merge",
                 pr_reviewer: `${user}`,
                 pr_title: `${prTitle}`,
                 author_name: "pulumi-bot",
                 source_branch: `${refName}`
+            },
+            env: {
+                GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
+            }
+        };
+    }
+}
+
+export class SetAutoMerge extends step.Step {
+    constructor(repo: string, prNumber: number) {
+        super();
+        return {
+            name: 'set-automerge',
+            uses: action.setAutoMerge,
+            with: {
+                github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+                pull_request_number: `${prNumber}`,
+                repository: `${repo}`,
+                merge_method: "squash"
             },
             env: {
                 GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
