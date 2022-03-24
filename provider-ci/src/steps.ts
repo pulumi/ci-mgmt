@@ -582,25 +582,6 @@ export class PullRequest extends step.Step {
     }
 }
 
-export class SetAutoMerge extends step.Step {
-    constructor(repo: string, prNumber: number) {
-        super();
-        return {
-            name: 'set-automerge',
-            uses: action.setAutoMerge,
-            with: {
-                github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-                pull_request_number: `${prNumber}`,
-                repository: `${repo}`,
-                merge_method: "squash"
-            },
-            env: {
-                GITHUB_TOKEN: '${{ secrets.PULUMI_BOT_TOKEN }}'
-            }
-        };
-    }
-}
-
 export class CheckSchemaChanges extends step.Step {
     constructor() {
         super();

@@ -523,7 +523,6 @@ export class PullRequest extends step.Step {
                 pr_allow_empty: "true",
                 pr_assignee: `${user}`,
                 pr_body: '*Automated PR*',
-                pr_label: "automation/merge",
                 pr_reviewer: `${user}`,
                 pr_title: `${prTitle}`,
                 author_name: "pulumi-bot",
