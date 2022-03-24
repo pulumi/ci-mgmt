@@ -18,6 +18,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jest": "^22.4.1",
+    "quicktype": "^15.0.260",
     "typescript": "^3.4.3"
   },
   "homepage": "https://github.com/pulumi/ci-mgmt#readme",
@@ -35,6 +36,7 @@
     "url": "git+https://github.com/pulumi/ci-mgmt.git"
   },
   "scripts": {
+    "gen": "quicktype --src-lang schema -o src/github-workflow.ts --just-types https://json.schemastore.org/github-workflow.json",
     "build": "tsc",
     "lint": "eslint {src,tests}/**/*.ts"
   },
