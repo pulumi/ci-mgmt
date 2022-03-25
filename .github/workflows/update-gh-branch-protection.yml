@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'infra/providers/**'
+      - '.github/workflows/update-gh-branch-protection.yml'
 env:
   GITHUB_OWNER: pulumi
 jobs:
