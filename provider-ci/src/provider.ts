@@ -88,12 +88,9 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     },
     {
       path: path.join(githubWorkflowsDir, "update-bridge.yml"),
-      data: wf.UpdatePulumiTerraformBridgeWorkflow(
-        {
-          providerDefaultBranch: config["provider-default-branch"],
-        },
-        config
-      ),
+      data: wf.UpdatePulumiTerraformBridgeWorkflow({
+        providerDefaultBranch: config["provider-default-branch"],
+      }),
     },
     {
       path: path.join(githubWorkflowsDir, "update-upstream-provider.yml"),

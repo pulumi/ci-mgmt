@@ -225,8 +225,7 @@ interface UpdatePulumiTerraformBridgeWorkflowArgs {
 }
 
 export function UpdatePulumiTerraformBridgeWorkflow(
-  args: UpdatePulumiTerraformBridgeWorkflowArgs,
-  opts: WorkflowOpts
+  args: UpdatePulumiTerraformBridgeWorkflowArgs
 ): GithubWorkflow {
   return {
     name: "Update pulumi-terraform-bridge",
@@ -473,7 +472,7 @@ export function CommandDispatchWorkflow(
 export class EmptyJob implements NormalJob {
   steps: Step[];
   "runs-on" = "ubuntu-latest";
-  strategy: any;
+  strategy: NormalJob["strategy"];
   name: string;
   if?: string;
 
@@ -488,7 +487,7 @@ export class EmptyJob implements NormalJob {
     return this;
   }
 
-  addStrategy(strategy: any) {
+  addStrategy(strategy: NormalJob["strategy"]) {
     this.strategy = strategy;
     return this;
   }
@@ -611,7 +610,7 @@ export class TestsJob implements NormalJob {
       language: ["nodejs", "python", "dotnet", "go"],
     },
   };
-  steps: any;
+  steps: NormalJob["steps"];
   name: string;
   if: string;
 
@@ -670,7 +669,7 @@ export class PublishPrereleaseJob implements NormalJob {
       nodeversion: [nodeVersion],
     },
   };
-  steps: any;
+  steps: NormalJob["steps"];
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
@@ -704,7 +703,7 @@ export class PublishJob implements NormalJob {
     },
   };
   name: string;
-  steps: any;
+  steps: NormalJob["steps"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
@@ -844,7 +843,7 @@ export class LintSDKJob implements NormalJob {
       goversion: [goVersion],
     },
   };
-  steps: any;
+  steps: NormalJob["steps"];
   name: string;
   if: string;
 

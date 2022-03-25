@@ -100,13 +100,13 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
     super();
 
     let ldflags: string[];
-    let ignores: Ignores[] = [];
+    const ignores: Ignores[] = [];
 
     if (opts.skipWindowsArmBuild) {
       ignores.push({ goos: "windows", goarch: "arm64" });
     }
 
-    if (opts["major-version"]! > 1) {
+    if (opts["major-version"] > 1) {
       ldflags = [
         `-X github.com/pulumi/pulumi-${name}/provider/v${opts["major-version"]}/pkg/version.Version={{.Tag}}`,
       ];

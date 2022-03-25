@@ -143,7 +143,7 @@ export function InstallPython(version?: string): Step {
   };
 }
 
-export function InstallPlugins(version?: string): Step {
+export function InstallPlugins(): Step {
   return {
     name: "Install plugins",
     run: "make install_plugins",
