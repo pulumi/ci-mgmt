@@ -66,18 +66,15 @@ export interface Blob {
   ids?: string[];
 }
 
-export class GoreleaserConfig {
-  name: string;
+export interface GoreleaserConfig {
+  name?: string;
   builds: Build[];
   archives: Archive[];
-  before: Before;
+  before?: Before;
   snapshot: Snapshot;
   changelog: Changelog;
   release: Release;
   blobs: Blob[];
-  constructor(params?: Partial<GoreleaserConfig>) {
-    Object.assign(this, params);
-  }
 }
 
 interface GoReleaserOpts {
@@ -87,8 +84,9 @@ interface GoReleaserOpts {
   skipTfGen: boolean;
 }
 
-export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
-  before: Before;
+export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
+  name?: string;
+  before?: Before;
   builds: Build[];
   archives: Archive[];
   snapshot: Snapshot;
@@ -97,8 +95,6 @@ export class PulumiGoreleaserPreConfig extends GoreleaserConfig {
   blobs: Blob[];
 
   constructor(name: string, opts: GoReleaserOpts) {
-    super();
-
     let ldflags: string[];
     const ignores: Ignores[] = [];
 

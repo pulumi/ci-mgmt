@@ -532,7 +532,7 @@ export class BuildSdkJob implements NormalJob {
     steps.NotifySlack("Failure in building ${{ matrix.language }} sdk"),
   ];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string) {
     this.name = name;
@@ -578,7 +578,7 @@ export class PrerequisitesJob implements NormalJob {
     steps.NotifySlack("Failure in building provider prerequisites"),
   ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string) {
     this.name = name;
@@ -612,7 +612,7 @@ export class TestsJob implements NormalJob {
   };
   steps: NormalJob["steps"];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
@@ -812,7 +812,7 @@ export class LintProviderJob implements NormalJob {
     steps.NotifySlack("Failure in linting provider"),
   ];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string) {
     this.name = name;
@@ -845,7 +845,7 @@ export class LintSDKJob implements NormalJob {
   };
   steps: NormalJob["steps"];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
@@ -909,7 +909,7 @@ export class GenerateCoverageDataJob implements NormalJob {
     steps.UploadCoverageDataStep(),
   ];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string) {
     this.name = name;

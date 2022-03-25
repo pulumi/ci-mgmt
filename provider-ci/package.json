@@ -30,7 +30,7 @@
   ],
   "license": "Apache-2.0",
   "module": "workflow.ts",
-  "name": "@jaxxstorm/pulumi-action-config",
+  "name": "@pulumi/ci-mgmt",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pulumi/ci-mgmt.git"

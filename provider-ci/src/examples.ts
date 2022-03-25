@@ -65,7 +65,7 @@ export class Linting implements NormalJob {
     },
   ];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string, params?: Partial<Linting>) {
     this.name = name;
@@ -234,7 +234,7 @@ export abstract class EnvironmentSetup implements NormalJob {
     },
   ];
   name: string;
-  if: string;
+  if: NormalJob["if"];
 
   constructor(name: string, params?: Partial<EnvironmentSetup>) {
     this.name = name;
@@ -647,7 +647,7 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
 export class UnitTestingJob implements NormalJob {
   "runs-on" = "${{ matrix.platform }}";
   name = "Running ${{ matrix.source-dir }} test";
-  if: string;
+  if: NormalJob["if"];
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
