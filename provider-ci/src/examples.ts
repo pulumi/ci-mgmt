@@ -1,36 +1,30 @@
-import * as g from "@jaxxstorm/gh-actions";
-import * as job from "@jaxxstorm/gh-actions/lib/job";
-import * as param from "@jkcfg/std/param";
+import { GithubWorkflow, NormalJob } from "./github-workflow";
+import { Step } from "./steps";
 
-const extraEnv = param.Object("env");
+const env = () => ({
+  PULUMI_TEST_OWNER: "moolumi",
+  PULUMI_ACCESS_TOKEN: "${{ secrets.PULUMI_ACCESS_TOKEN }}",
+  PULUMI_API: "https://api.pulumi-staging.io",
+  SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
+  AWS_ACCESS_KEY_ID: " ${{ secrets.AWS_ACCESS_KEY_ID }}",
+  AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+  AWS_REGION: "us-west-2",
+  ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}",
+  ARM_CLIENT_SECRET: "${{ secrets.ARM_CLIENT_SECRET }}",
+  ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}",
+  ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}",
+  ARM_ENVIRONMENT: "public",
+  ARM_LOCATION: "westus",
+  DIGITALOCEAN_TOKEN: "${{ secrets.DIGITALOCEAN_TOKEN }}",
+  CLOUDSDK_CORE_DISABLE_PROMPTS: 1,
+  GOOGLE_CREDENTIALS: "${{ secrets.GCP_CREDENTIALS }}",
+  GOOGLE_PROJECT: "${{ secrets.GCP_PROJECT_ID }}",
+  GOOGLE_REGION: "us-central1",
+  GOOGLE_ZONE: "us-central1-a",
+  PACKET_AUTH_TOKEN: "${{ secrets.PACKET_AUTH_TOKEN }}",
+});
 
-const env = Object.assign(
-  {
-    PULUMI_TEST_OWNER: "moolumi",
-    PULUMI_ACCESS_TOKEN: "${{ secrets.PULUMI_ACCESS_TOKEN }}",
-    PULUMI_API: "https://api.pulumi-staging.io",
-    SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
-    AWS_ACCESS_KEY_ID: " ${{ secrets.AWS_ACCESS_KEY_ID }}",
-    AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
-    AWS_REGION: "us-west-2",
-    ARM_CLIENT_ID: "${{ secrets.ARM_CLIENT_ID }}",
-    ARM_CLIENT_SECRET: "${{ secrets.ARM_CLIENT_SECRET }}",
-    ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}",
-    ARM_TENANT_ID: "${{ secrets.ARM_TENANT_ID }}",
-    ARM_ENVIRONMENT: "public",
-    ARM_LOCATION: "westus",
-    DIGITALOCEAN_TOKEN: "${{ secrets.DIGITALOCEAN_TOKEN }}",
-    CLOUDSDK_CORE_DISABLE_PROMPTS: 1,
-    GOOGLE_CREDENTIALS: "${{ secrets.GCP_CREDENTIALS }}",
-    GOOGLE_PROJECT: "${{ secrets.GCP_PROJECT_ID }}",
-    GOOGLE_REGION: "us-central1",
-    GOOGLE_ZONE: "us-central1-a",
-    PACKET_AUTH_TOKEN: "${{ secrets.PACKET_AUTH_TOKEN }}",
-  },
-  extraEnv
-);
-
-export class Linting extends job.Job {
+export class Linting implements NormalJob {
   strategy = {
     "fail-fast": false,
     matrix: {
@@ -69,15 +63,16 @@ export class Linting extends job.Job {
       name: "Lint typescript files",
       run: "make lint",
     },
-  ] as any;
+  ];
+  name: string;
+  if: string;
 
   constructor(name: string, params?: Partial<Linting>) {
-    super();
     this.name = name;
     Object.assign(this, { name }, params);
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -86,7 +81,7 @@ export class Linting extends job.Job {
   }
 }
 
-export class CommentOnPrJob extends job.Job {
+export class CommentOnPrJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   if = "github.event.pull_request.head.repo.full_name != github.repository";
   steps = [
@@ -103,16 +98,16 @@ export class CommentOnPrJob extends job.Job {
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
       },
     },
-  ] as any;
+  ];
+  name: string;
 
   constructor(name: string, params?: Partial<Linting>) {
-    super();
     this.name = name;
     Object.assign(this, { name }, params);
   }
 }
 
-export class ResultsCommentJob extends job.Job {
+export class ResultsCommentJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   if = "github.event_name == 'repository_dispatch'";
   steps = [
@@ -135,17 +130,18 @@ export class ResultsCommentJob extends job.Job {
           "[1]: ${{ steps.vars.outputs.run-url }}",
       },
     },
-  ] as any;
+  ];
+  name: string;
 
   constructor(name: string, params?: Partial<ResultsCommentJob>) {
-    super();
     this.name = name;
     Object.assign(this, { name }, params);
   }
 }
 
-export class EnvironmentSetup extends job.Job {
-  steps = [
+export abstract class EnvironmentSetup implements NormalJob {
+  "runs-on": NormalJob["runs-on"];
+  steps: NormalJob["steps"] = [
     {
       name: "Install DotNet ${{ matrix.dotnet-version }}",
       uses: "actions/setup-dotnet@v1",
@@ -236,24 +232,21 @@ export class EnvironmentSetup extends job.Job {
         repository: "pulumi/scripts",
       },
     },
-  ] as any;
+  ];
+  name: string;
+  if: string;
 
-  constructor(
-    name: string,
-    params?: Partial<EnvironmentSetup>,
-    isCommandDispatch?: boolean
-  ) {
-    super();
+  constructor(name: string, params?: Partial<EnvironmentSetup>) {
     this.name = name;
     Object.assign(this, { name }, params);
   }
 
-  addStep(step) {
-    this.steps.push(step);
+  addStep(step: Step) {
+    this.steps?.push(step);
     return this;
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -274,7 +267,7 @@ export class TestInfraSetup extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -301,7 +294,7 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -329,7 +322,7 @@ export class TestInfraDestroy extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "kubernetes";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -357,7 +350,7 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -395,7 +388,7 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Specific Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -450,7 +443,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       if: "matrix.examples-test-matrix == 'no-latest-cli'",
       run: "echo 'running combination of stable pulumi cli + dev providers'",
@@ -512,7 +505,7 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -553,7 +546,7 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Specific Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -588,7 +581,7 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Specific Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -629,7 +622,7 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
-  steps = this.steps.concat([
+  steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Specific Pulumi CLI",
       uses: "pulumi/action-install-pulumi-cli@v1.0.1",
@@ -651,15 +644,12 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
   ]);
 }
 
-export class UnitTestingJob extends job.Job {
+export class UnitTestingJob implements NormalJob {
   "runs-on" = "${{ matrix.platform }}";
   name = "Running ${{ matrix.source-dir }} test";
+  if: string;
 
-  constructor(isCommandDispatch?: boolean) {
-    super();
-  }
-
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -820,31 +810,24 @@ export class UnitTestGoJob extends UnitTestingJob {
   ];
 }
 
-export class CronWorkflow extends g.GithubWorkflow {
-  jobs: { [k: string]: job.Job };
-
-  constructor(name: string, jobs: { [k: string]: job.Job }) {
-    super(
-      name,
-      jobs,
-      {
-        schedule: [
-          {
-            cron: "0 9 * * *",
-          },
-        ],
-        repository_dispatch: {
-          types: ["trigger-cron"],
+export function CronWorkflow(name: string): GithubWorkflow {
+  return {
+    name: name,
+    on: {
+      schedule: [
+        {
+          cron: "0 9 * * *",
         },
+      ],
+      repository_dispatch: {
+        types: ["trigger-cron"],
       },
-      {
-        env: {
-          ...env,
-          PULUMI_ENABLE_RESOURCE_REFERENCES: "1",
-        },
-      }
-    );
-    this.jobs = {
+    },
+    env: {
+      ...env(),
+      PULUMI_ENABLE_RESOURCE_REFERENCES: "1",
+    },
+    jobs: {
       providers: new CronProviderTestJob("providers", {}),
       linting: new Linting("lint"),
       "test-infra-setup": new TestInfraSetup("test-infra-setup"),
@@ -854,30 +837,23 @@ export class CronWorkflow extends g.GithubWorkflow {
       "ts-unit-testing": new UnitTestNodeJSJob(),
       "go-unit-testing": new UnitTestGoJob(),
       "python-unit-testing": new UnitTestPythonJob(),
-    };
-  }
+    },
+  };
 }
 
-export class SmokeTestCliWorkflow extends g.GithubWorkflow {
-  jobs: { [k: string]: job.Job };
-
-  constructor(name: string, jobs: { [k: string]: job.Job }) {
-    super(
-      name,
-      jobs,
-      {
-        repository_dispatch: {
-          types: ["smoke-test-cli"],
-        },
+export function SmokeTestCliWorkflow(name: string): GithubWorkflow {
+  return {
+    name,
+    on: {
+      repository_dispatch: {
+        types: ["smoke-test-cli"],
       },
-      {
-        env: {
-          ...env,
-          PULUMI_VERSION: "${{ github.event.client_payload.ref }}",
-        },
-      }
-    );
-    this.jobs = {
+    },
+    env: {
+      ...env(),
+      PULUMI_VERSION: "${{ github.event.client_payload.ref }}",
+    },
+    jobs: {
       providers: new SmokeTestCliForProvidersJob(
         "smoke-test-cli-on-providers",
         {}
@@ -891,30 +867,24 @@ export class SmokeTestCliWorkflow extends g.GithubWorkflow {
       "ts-unit-testing": new UnitTestNodeJSJob(),
       "go-unit-testing": new UnitTestGoJob(),
       "python-unit-testing": new UnitTestPythonJob(),
-    };
-  }
+    },
+  };
 }
 
-export class SmokeTestProvidersWorkflow extends g.GithubWorkflow {
-  jobs: { [k: string]: job.Job };
-
-  constructor(name: string, jobs: { [k: string]: job.Job }) {
-    super(
-      name,
-      jobs,
-      {
-        repository_dispatch: {
-          types: ["smoke-test-provider"],
-        },
+export function SmokeTestProvidersWorkflow(name: string): GithubWorkflow {
+  return {
+    name,
+    on: {
+      repository_dispatch: {
+        types: ["smoke-test-provider"],
       },
-      {
-        env: {
-          ...env,
-          PROVIDER_TESTS_TAG: "${{ github.event.client_payload.ref }}",
-        },
-      }
-    );
-    this.jobs = {
+    },
+
+    env: {
+      ...env(),
+      PROVIDER_TESTS_TAG: "${{ github.event.client_payload.ref }}",
+    },
+    jobs: {
       providers: new SmokeTestProvidersJob("smoke-test-providers"),
       "test-infra-setup": new TestInfraSetup("test-infra-setup"),
       "test-infra-destroy": new TestInfraDestroy("test-infra-destroy"),
@@ -925,24 +895,23 @@ export class SmokeTestProvidersWorkflow extends g.GithubWorkflow {
       "ts-unit-testing": new UnitTestNodeJSJob(),
       "go-unit-testing": new UnitTestGoJob(),
       "python-unit-testing": new UnitTestPythonJob(),
-    };
-  }
+    },
+  };
 }
 
-export class PrWorkFlow extends g.GithubWorkflow {
-  jobs: { [k: string]: job.Job };
-
-  constructor(name: string, jobs: { [k: string]: job.Job }) {
-    super(name, jobs, {
+export function PrWorkFlow(name: string): GithubWorkflow {
+  return {
+    name,
+    on: {
       pull_request_target: {},
-    });
-    this.jobs = {
+    },
+    jobs: {
       "comment-on-pr": new CommentOnPrJob("comment-on-pr", {}),
-    };
-  }
+    },
+  };
 }
 
-export class CommandDispatchWorkflow {
+export class CommandDispatchWorkflow implements GithubWorkflow {
   name = "Command Dispatch for testing";
   on = {
     issue_comment: {
@@ -973,30 +942,24 @@ export class CommandDispatchWorkflow {
   };
 }
 
-export class RunTestsCommandWorkflow extends g.GithubWorkflow {
-  jobs: { [k: string]: job.Job };
-
-  constructor(name: string, jobs: { [k: string]: job.Job }) {
-    super(
-      name,
-      jobs,
-      {
-        repository_dispatch: {
-          types: ["run-example-tests-command"],
-        },
-        pull_request: {
-          branches: ["master"],
-        },
+export function RunTestsCommandWorkflow(name: string): GithubWorkflow {
+  return {
+    name,
+    on: {
+      repository_dispatch: {
+        types: ["run-example-tests-command"],
       },
-      {
-        env: {
-          ...env,
-          PR_COMMIT_SHA:
-            "${{ github.event.client_payload.pull_request.head.sha }}",
-        },
-      }
-    );
-    this.jobs = {
+      pull_request: {
+        branches: ["master"],
+      },
+    },
+
+    env: {
+      ...env(),
+      PR_COMMIT_SHA: "${{ github.event.client_payload.pull_request.head.sha }}",
+    },
+
+    jobs: {
       "comment-notification": new ResultsCommentJob("comment-notification"),
       "test-infra-setup": new TestInfraSetup(
         "test-infra-setup"
@@ -1019,6 +982,6 @@ export class RunTestsCommandWorkflow extends g.GithubWorkflow {
       "python-unit-testing": new UnitTestPythonJob().addDispatchConditional(
         true
       ),
-    };
-  }
+    },
+  };
 }

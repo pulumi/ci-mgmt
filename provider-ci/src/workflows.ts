@@ -492,7 +492,7 @@ export class EmptyJob implements NormalJob {
     return this;
   }
 
-  addConditional(conditional) {
+  addConditional(conditional: string) {
     this.if = conditional;
     return this;
   }
@@ -539,7 +539,7 @@ export class BuildSdkJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -585,7 +585,7 @@ export class PrerequisitesJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -645,7 +645,7 @@ export class TestsJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -819,7 +819,7 @@ export class LintProviderJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -864,7 +864,7 @@ export class LintSDKJob implements NormalJob {
     ];
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
@@ -916,7 +916,7 @@ export class GenerateCoverageDataJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch) {
+  addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";

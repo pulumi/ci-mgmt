@@ -6,7 +6,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
     "outDir": "lib",
     "pretty": true,
@@ -15,6 +15,12 @@
     "stripInternal": true,
     "target": "ES6"
   },
-  "exclude": ["node_modules", "example"],
-  "include": ["src", "cmd"]
+  "exclude": [
+    "node_modules",
+    "example"
+  ],
+  "include": [
+    "src",
+    "cmd"
+  ]
 }

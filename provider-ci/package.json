@@ -38,6 +38,7 @@
   "scripts": {
     "discovery": "wget https://json.schemastore.org/github-workflow.json -O github-workflow.json && json2ts -i github-workflow.json -o src/github-workflow.d.ts --unreachableDefinitions --ignoreMinAndMaxItems",
     "gen-providers": "ts-node cmd/generate-providers.ts",
+    "gen-examples": "ts-node cmd/generate-examples.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts && tsc --noEmit",
     "format": "prettier --write src"
