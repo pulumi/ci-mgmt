@@ -55,7 +55,10 @@ const writeProviderFiles = (provider: Provider) => {
   const providerRepoPath = path.join(providersDir, provider.name, "repo");
   for (const file of provider.files) {
     const filePath = path.join(providerRepoPath, file.path);
-    const yamlContent = yaml.stringify(file.data, { sortMapEntries: true });
+    const yamlContent = yaml.stringify(file.data, {
+      sortMapEntries: true,
+      indentSeq: false,
+    });
     debug("Writing", filePath);
     fs.writeFileSync(filePath, yamlContent, { encoding: "utf-8" });
   }
