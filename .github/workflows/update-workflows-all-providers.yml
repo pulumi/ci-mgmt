@@ -39,6 +39,8 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ matrix.provider }}
           path: pulumi-${{ matrix.provider }}
+      - name: Delete old automerge
+        run: rm pulumi-${{ matrix.provider }}/.github/workflows/pr-automation.yml
       - name: Copy files from ci-mgmt to pulumi-${{ matrix.provider }}
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ matrix.provider }}/repo/. pulumi-${{ matrix.provider }}/.
