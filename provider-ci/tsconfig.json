@@ -13,14 +13,8 @@
     "sourceMap": false,
     "strictNullChecks": true,
     "stripInternal": true,
-    "target": "ES6",
+    "target": "ES6"
   },
-  "exclude": [
-    "node_modules",
-    "example"
-  ],
-  "include": [
-    "src",
-    "cmd"
-  ]
+  "exclude": ["node_modules", "example"],
+  "include": ["src", "cmd"]
 }

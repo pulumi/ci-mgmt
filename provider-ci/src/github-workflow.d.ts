@@ -50,7 +50,9 @@ export type Event =
  * This interface was referenced by `GithubWorkflow`'s JSON-Schema
  * via the `definition` "shell".
  */
-export type Shell = string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell");
+export type Shell =
+  | string
+  | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell");
 /**
  * Using the working-directory keyword, you can specify the working directory of where to run the command.
  *
