@@ -13,7 +13,7 @@ jobs:
         repository: pulumi/examples
         token: ${{ secrets.EVENT_PAT }}
 name: Command Dispatch for testing
-"on":
+on:
   issue_comment:
     types:
     - created

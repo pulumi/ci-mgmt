@@ -5,7 +5,7 @@ env:
   ARM_LOCATION: westus
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  AWS_ACCESS_KEY_ID: ' ${{ secrets.AWS_ACCESS_KEY_ID }}'
+  AWS_ACCESS_KEY_ID: " ${{ secrets.AWS_ACCESS_KEY_ID }}"
   AWS_REGION: us-west-2
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   CLOUDSDK_CORE_DISABLE_PROMPTS: 1
@@ -28,7 +28,8 @@ jobs:
     steps:
     - id: vars
       name: Create URL to the run output
-      run: echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+      run: echo ::set-output
+        name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
     - name: Update with Result
       uses: peter-evans/create-or-update-comment@v1
       with:
@@ -36,14 +37,12 @@ jobs:
           Please view the results of the PR Build [Here][1]
 
           [1]: ${{ steps.vars.outputs.run-url }}
-        issue-number: ${{ github.event.client_payload.github.payload.issue.number
-          }}
-        repository: ${{ github.event.client_payload.github.payload.repository.full_name
-          }}
+        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         token: ${{ secrets.GITHUB_TOKEN }}
   dotnet-unit-testing:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
@@ -69,8 +68,8 @@ jobs:
         - testing-unit-cs-mocks
         - testing-unit-fs-mocks
   go-unit-testing:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
@@ -94,8 +93,8 @@ jobs:
         source-dir:
         - testing-unit-go
   kubernetes:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: kubernetes
     needs: test-infra-setup
     runs-on: ${{ matrix.platform }}
@@ -121,19 +120,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -165,8 +175,9 @@ jobs:
     - name: Install Go Dependencies
       run: make ensure
     - name: Setup Config
-      run: |-
+      run: >-
         mkdir -p "$HOME/.kube/"
+
         pulumi stack -s "${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config
     - name: Run ${{ matrix.tests-set }} Tests
       run: make specific_test_set TestSet=Kubernetes
@@ -184,8 +195,8 @@ jobs:
         python-version:
         - "3.7"
   linting:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: lint
     runs-on: ${{ matrix.platform }}
     steps:
@@ -195,8 +206,8 @@ jobs:
       with:
         node-version: ${{matrix.node-version}}
     - name: Install Yarn
-      run: curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version ${{ matrix.yarn-version
-        }}
+      run: curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version ${{
+        matrix.yarn-version }}
     - name: Update PATH for Yarn
       run: |-
         echo "$HOME/.yarn/bin" >> $GITHUB_PATH
@@ -215,8 +226,8 @@ jobs:
         yarn-version:
         - 1.13.0
   providers:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: run-provider-tests
     runs-on: ${{ matrix.platform }}
     steps:
@@ -241,19 +252,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -285,8 +307,7 @@ jobs:
     - name: Install Testing Dependencies
       run: make ensure
     - name: Running ${{ matrix.clouds }}${{ matrix.languages }} Tests
-      run: make specific_test_set TestSet=${{ matrix.clouds }}${{ matrix.languages
-        }}
+      run: make specific_test_set TestSet=${{ matrix.clouds }}${{ matrix.languages }}
     strategy:
       fail-fast: false
       matrix:
@@ -315,8 +336,8 @@ jobs:
         python-version:
         - "3.7"
   python-unit-testing:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
@@ -348,8 +369,8 @@ jobs:
         source-dir:
         - testing-unit-py
   test-infra-destroy:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: test-infra-destroy
     needs: kubernetes
     runs-on: ${{ matrix.platform }}
@@ -375,19 +396,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -417,8 +449,8 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Destroy test infra
-      run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
-        }}-${{ github.run_number }}"
+      run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
+        github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
@@ -433,8 +465,8 @@ jobs:
         python-version:
         - "3.7"
   test-infra-setup:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: test-infra-setup
     runs-on: ${{ matrix.platform }}
     steps:
@@ -459,19 +491,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -501,8 +544,8 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Create Test Infrastructure
-      run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
-        }}-${{ github.run_number }}"
+      run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
+        github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
@@ -517,8 +560,8 @@ jobs:
         python-version:
         - "3.7"
   ts-unit-testing:
-    if: github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name
-      == github.repository
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
@@ -546,7 +589,7 @@ jobs:
         source-dir:
         - testing-unit-ts
 name: Run Examples Tests From PR
-"on":
+on:
   pull_request:
     branches:
     - master
