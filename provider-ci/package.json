@@ -4,13 +4,15 @@
     "url": "https://github.com/pulumi/ci-mgmt/issues"
   },
   "dependencies": {
-    "@jaxxstorm/gh-actions": "git+ssh://git@github.com/jaxxstorm/gh-actions.git#develop"
+    "zod": "^3.14.2"
   },
   "description": "Generate Pulumi github actions with Typescript",
   "devDependencies": {
     "@babel/preset-env": "^7.4.5",
     "@jkcfg/std": "^0.2.7",
     "@types/jest": "^24.0.15",
+    "@types/node": "^17.0.23",
+    "@types/yargs": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.10.2",
     "babel-jest": "^24.8.0",
@@ -19,7 +21,10 @@
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jest": "^22.4.1",
     "quicktype": "^15.0.260",
-    "typescript": "^3.4.3"
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.0",
+    "yaml": "^1.10.2",
+    "yargs": "^17.4.0"
   },
   "homepage": "https://github.com/pulumi/ci-mgmt#readme",
   "keywords": [
@@ -36,7 +41,8 @@
     "url": "git+https://github.com/pulumi/ci-mgmt.git"
   },
   "scripts": {
-    "gen": "quicktype --src-lang schema -o src/github-workflow.ts --just-types https://json.schemastore.org/github-workflow.json",
+    "gen-schema": "quicktype --src-lang schema -o src/github-workflow.ts --just-types https://json.schemastore.org/github-workflow.json",
+    "gen-providers": "ts-node cmd/generate-providers.ts",
     "build": "tsc",
     "lint": "eslint {src,tests}/**/*.ts"
   },
