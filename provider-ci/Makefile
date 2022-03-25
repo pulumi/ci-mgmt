@@ -1,13 +1,11 @@
 .PHONY: dist clean gen test
 
-all: dist
-
-dist:
-	npx tsc
+all: clean
+	npm run gen-providers
 
 %: 
 	rm -rvf providers/$@/repo
-	jk generate generate-provider.ts -f providers/$@/config.yaml
+	npm run gen-providers -n $@
 
 providers := $(shell ls providers)
 
@@ -31,4 +29,4 @@ clean:
 # It will generate the files to a platform directory and then examples directory
 examples: dist
 	rm -rvf platform/examples/repo
-	jk generate generate-examples.ts
+	npm run gen-examples

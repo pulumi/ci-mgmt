@@ -60,6 +60,10 @@ const writeProviderFiles = (provider: Provider) => {
       indentSeq: false,
     });
     debug("Writing", filePath);
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     fs.writeFileSync(filePath, yamlContent, { encoding: "utf-8" });
   }
 };
