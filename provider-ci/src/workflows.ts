@@ -650,8 +650,8 @@ export class TestsJob implements NormalJob {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
-      this.steps.unshift(steps.CheckoutRepoStepAtPR());
+      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
+      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
@@ -869,8 +869,8 @@ export class LintSDKJob implements NormalJob {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
-      this.steps.unshift(steps.CheckoutRepoStepAtPR());
+      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
+      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
