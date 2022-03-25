@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { Job } from "./github/job";
-import { Step } from "./github/step";
-import { GithubWorkflow } from "./github/workflow";
+import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
+import { Step } from "./steps";
 
 const pythonVersion = "3.7";
 const goVersion = "1.17.x";
@@ -173,7 +172,7 @@ export function RunAcceptanceTestsWorkflow(
       pull_request: {
         branches: ["master", "main"],
         "paths-ignore": ["CHANGELOG.md"],
-      } as any,
+      },
     },
     env: {
       ...env(opts),
@@ -208,7 +207,7 @@ export function PullRequestWorkflow(
     name: name,
     on: {
       pull_request_target: {},
-    } as any,
+    },
     env: env(opts),
     jobs: {
       "comment-on-pr": new EmptyJob("comment-on-pr")
@@ -248,7 +247,7 @@ export function UpdatePulumiTerraformBridgeWorkflow(
           },
         },
       },
-    } as any,
+    },
     env: {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
       // If there are missing or extra mappings, they can not have been
@@ -362,7 +361,7 @@ export function UpdateUpstreamProviderWorkflow(
           },
         },
       },
-    } as any,
+    },
 
     env: {
       ...env(opts),
@@ -471,19 +470,20 @@ export function CommandDispatchWorkflow(
   };
 }
 
-export class EmptyJob implements Job {
-  steps: Step[] = [];
+export class EmptyJob implements NormalJob {
+  steps: Step[];
   "runs-on" = "ubuntu-latest";
   strategy: any;
   name: string;
   if?: string;
 
-  constructor(name: string, params?: Partial<Job>) {
+  constructor(name: string, params?: Partial<NormalJob>) {
     this.name = name;
+    this.steps = [];
     Object.assign(this, { name }, params);
   }
 
-  addStep(step) {
+  addStep(step: Step) {
     this.steps.push(step);
     return this;
   }
@@ -499,7 +499,7 @@ export class EmptyJob implements Job {
   }
 }
 
-export class BuildSdkJob implements Job {
+export class BuildSdkJob implements NormalJob {
   needs = "prerequisites";
   "runs-on" = "ubuntu-latest";
   strategy = {
@@ -531,7 +531,7 @@ export class BuildSdkJob implements Job {
     steps.ZipSDKsStep(),
     steps.UploadSdkStep(),
     steps.NotifySlack("Failure in building ${{ matrix.language }} sdk"),
-  ] as any;
+  ];
   name: string;
   if: string;
 
@@ -545,16 +545,14 @@ export class BuildSdkJob implements Job {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter(
-        (step) => step.name !== "Checkout Repo"
-      ) as any;
+      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
 }
 
-export class PrerequisitesJob implements Job {
+export class PrerequisitesJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   strategy = {
     "fail-fast": true,
@@ -579,9 +577,7 @@ export class PrerequisitesJob implements Job {
     steps.ZipProviderBinariesStep(),
     steps.UploadProviderBinariesStep(),
     steps.NotifySlack("Failure in building provider prerequisites"),
-  ].filter(
-    (step: Step) => step.uses !== undefined || step.run !== undefined
-  ) as any;
+  ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
   name: string;
   if: string;
 
@@ -595,16 +591,14 @@ export class PrerequisitesJob implements Job {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter(
-        (step) => step.name !== "Checkout Repo"
-      ) as any;
+      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
 }
 
-export class TestsJob implements Job {
+export class TestsJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "build_sdk";
   strategy = {
@@ -657,16 +651,14 @@ export class TestsJob implements Job {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter(
-        (step) => step.name !== "Checkout Repo"
-      ) as any;
+      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
 }
 
-export class PublishPrereleaseJob implements Job {
+export class PublishPrereleaseJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
   strategy = {
@@ -694,12 +686,12 @@ export class PublishPrereleaseJob implements Job {
         `-p ${opts.parallel} -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
-    ] as any;
+    ];
     Object.assign(this, { name });
   }
 }
 
-export class PublishJob implements Job {
+export class PublishJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
   strategy = {
@@ -729,14 +721,14 @@ export class PublishJob implements Job {
         `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
-    ] as any;
+    ];
   }
 }
 
-export class DocsBuildJob implements Job {
+export class DocsBuildJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "tag_sdk";
-  steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()] as any;
+  steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()];
   name: string;
 
   constructor(name: string) {
@@ -745,14 +737,14 @@ export class DocsBuildJob implements Job {
   }
 }
 
-export class TagSDKJob implements Job {
+export class TagSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish_sdk";
   steps = [
     steps.CheckoutRepoStep(),
     steps.InstallPulumiCtl(),
     steps.TagSDKTag(),
-  ] as any;
+  ];
   name: string;
 
   constructor(name: string) {
@@ -761,7 +753,7 @@ export class TagSDKJob implements Job {
   }
 }
 
-export class PublishSDKJob implements Job {
+export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
   strategy = {
@@ -792,7 +784,7 @@ export class PublishSDKJob implements Job {
     steps.RunCommand("python -m pip install pip twine"),
     steps.RunPublishSDK(),
     steps.NotifySlack("Failure in publishing SDK"),
-  ] as any;
+  ];
   name: string;
 
   constructor(name: string) {
@@ -801,7 +793,7 @@ export class PublishSDKJob implements Job {
   }
 }
 
-export class LintProviderJob implements Job {
+export class LintProviderJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   container = "golangci/golangci-lint:latest";
   strategy = {
@@ -835,14 +827,14 @@ export class LintProviderJob implements Job {
 
       this.steps = this.steps.filter(
         (step: Step) => step.name !== "Checkout Repo"
-      ) as any;
+      );
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
 }
 
-export class LintSDKJob implements Job {
+export class LintSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "build_sdk";
   container = "golangci/golangci-lint:latest";
@@ -870,7 +862,7 @@ export class LintSDKJob implements Job {
         `cd sdk/go/${opts.provider} && golangci-lint run -c ../../../.golangci.yml`
       ),
       steps.NotifySlack("Failure in linting go sdk"),
-    ] as any;
+    ];
   }
 
   addDispatchConditional(isWorkflowDispatch) {
@@ -878,16 +870,14 @@ export class LintSDKJob implements Job {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter(
-        (step) => step.name !== "Checkout Repo"
-      ) as any;
+      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
   }
 }
 
-export class GenerateCoverageDataJob implements Job {
+export class GenerateCoverageDataJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   "continue-on-error" = true;
   needs = "prerequisites";
@@ -918,7 +908,7 @@ export class GenerateCoverageDataJob implements Job {
 
     // Uploading coverage data
     steps.UploadCoverageDataStep(),
-  ] as any;
+  ];
   name: string;
   if: string;
 
@@ -932,9 +922,7 @@ export class GenerateCoverageDataJob implements Job {
       this.if =
         "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
 
-      this.steps = this.steps.filter(
-        (step) => step.name !== "Checkout Repo"
-      ) as any;
+      this.steps = this.steps.filter((step) => step.name !== "Checkout Repo");
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;

@@ -13,7 +13,7 @@
     "sourceMap": false,
     "strictNullChecks": true,
     "stripInternal": true,
-    "target": "es2017",
+    "target": "ES6",
   },
   "exclude": [
     "node_modules",

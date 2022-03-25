@@ -20,7 +20,7 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jest": "^22.4.1",
-    "quicktype": "^15.0.260",
+    "json-schema-to-typescript": "^10.1.5",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.0",
     "yaml": "^1.10.2",
@@ -41,7 +41,7 @@
     "url": "git+https://github.com/pulumi/ci-mgmt.git"
   },
   "scripts": {
-    "gen-schema": "quicktype --src-lang schema -o src/github-workflow.ts --just-types https://json.schemastore.org/github-workflow.json",
+    "discovery": "wget https://json.schemastore.org/github-workflow.json -O github-workflow.json && json2ts -i github-workflow.json -o src/github-workflow.d.ts --unreachableDefinitions --ignoreMinAndMaxItems",
     "gen-providers": "ts-node cmd/generate-providers.ts",
     "build": "tsc",
     "lint": "eslint {src,tests}/**/*.ts"

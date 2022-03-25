@@ -1,5 +1,7 @@
 import * as action from "./action-versions";
-import { Step } from "./github/step";
+import { NormalJob } from "./github-workflow";
+
+export type Step = Required<NormalJob>["steps"][0];
 
 export function CheckoutRepoStep(): Step {
   return {
