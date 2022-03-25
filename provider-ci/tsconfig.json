@@ -3,7 +3,7 @@
     "allowJs": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "es6",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": false,
@@ -13,13 +13,14 @@
     "sourceMap": false,
     "strictNullChecks": true,
     "stripInternal": true,
-    "target": "es2017"
+    "target": "es2017",
   },
   "exclude": [
     "node_modules",
     "example"
   ],
   "include": [
-    "src"
+    "src",
+    "cmd"
   ]
 }
