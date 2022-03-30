@@ -27,5 +27,5 @@ jobs:
   update-bridge:
     runs-on: ubuntu-latest
     steps:
-      - name: pulumi-${{ matrix.provider }}
+      - name: Trigger workflow on pulumi-${{ github.event.inputs.provider_name }}
         run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ github.event.inputs.provider_name }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }}
