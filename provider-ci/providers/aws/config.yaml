@@ -1,6 +1,6 @@
 provider: aws
 lint: false
-major-version: 4
+major-version: 5
 aws: true
 parallel: 1
 timeout: 90

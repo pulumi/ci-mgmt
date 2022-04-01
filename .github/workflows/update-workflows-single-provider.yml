@@ -25,6 +25,8 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ github.event.inputs.provider_name }}
           path: pulumi-${{ github.event.inputs.provider_name }}
+      - name: Delete existing workflows
+        run: rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/*.yml
       - name: Copy files from ci-mgmt to pulumi-${{ github.event.inputs.provider_name }}
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ github.event.inputs.provider_name }}/repo/. pulumi-${{ github.event.inputs.provider_name }}/.
