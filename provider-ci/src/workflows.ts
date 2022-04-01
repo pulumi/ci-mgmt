@@ -288,10 +288,10 @@ export class UpdatePulumiTerraformBridgeWorkflow extends g.GithubWorkflow {
                     if: "steps.create-pr.outputs.pull-request-operation == 'created'",
                     uses: "peter-evans/enable-pull-request-automerge@v1",
                     with: {
-                        token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-                        pull_request_number: "${{ steps.create-pr.outputs.pull-request-number }}",
-                        repository: "${{ github.repository }}",
-                        merge_method: "squash"
+                        "token": "${{ secrets.PULUMI_BOT_TOKEN }}",
+                        "pull-request-number": "${{ steps.create-pr.outputs.pull-request-number }}",
+                        "repository": "${{ github.repository }}",
+                        "merge-method": "squash"
                     },
                 })
         };
