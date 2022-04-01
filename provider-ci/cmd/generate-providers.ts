@@ -53,6 +53,10 @@ interface Provider {
 
 const writeProviderFiles = (provider: Provider) => {
   const providerRepoPath = path.join(providersDir, provider.name, "repo");
+  if (fs.existsSync(providerRepoPath)) {
+    fs.rmSync(providerRepoPath, { recursive: true });
+  }
+  fs.mkdirSync(providerRepoPath, { recursive: true });
   for (const file of provider.files) {
     const filePath = path.join(providerRepoPath, file.path);
     const yamlContent = yaml.stringify(file.data, {

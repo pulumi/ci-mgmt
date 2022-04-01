@@ -57,6 +57,10 @@ const writeProviderFiles = (files: ProviderFile[]) => {
     ".github",
     "workflows"
   );
+  if (fs.existsSync(examplesWorkflowsPath)) {
+    fs.rmSync(examplesWorkflowsPath, { recursive: true });
+  }
+  fs.mkdirSync(examplesWorkflowsPath, { recursive: true });
   for (const file of files) {
     const filePath = path.join(examplesWorkflowsPath, file.path);
     const yamlContent = yaml.stringify(file.data, {
