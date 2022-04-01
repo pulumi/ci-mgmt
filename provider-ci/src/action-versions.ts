@@ -16,6 +16,5 @@ export const uploadArtifact = "actions/upload-artifact@v2";
 export const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
 export const notifySlack = "8398a7/action-slack@v3";
 export const goReleaser = "goreleaser/goreleaser-action@v2";
-export const automerge = "pascalgn/automerge-action@v0.14.3";
 export const addAndCommit = "EndBug/add-and-commit@v7";
 export const pullRequest = "repo-sync/pull-request@v2";

@@ -290,6 +290,7 @@ export function UpdatePulumiTerraformBridgeWorkflow(
         .addStep(steps.RunCommand("make build_sdks"))
         .addStep({
           name: "Create PR",
+          id: "create-pr",
           uses: "peter-evans/create-pull-request@v3.12.0",
           with: {
             "commit-message":
@@ -305,6 +306,18 @@ export function UpdatePulumiTerraformBridgeWorkflow(
             body: "This pull request was generated automatically by the update-bridge workflow in this repository.",
             "team-reviewers": "platform-integrations",
             token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+          },
+        })
+        .addStep({
+          name: "Set Automerge",
+          if: "steps.create-pr.outputs.pull-request-operation == 'created'",
+          uses: "peter-evans/enable-pull-request-automerge@v1",
+          with: {
+            token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+            "pull-request-number":
+              "${{ steps.create-pr.outputs.pull-request-number }}",
+            repository: "${{ github.repository }}",
+            "merge-method": "squash",
           },
         }),
     },

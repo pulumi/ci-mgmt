@@ -75,10 +75,6 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: wf.NightlyCronWorkflow("cron", config),
     },
     {
-      path: path.join(githubWorkflowsDir, "pr-automation.yml"),
-      data: new shared.AutoMergeWorkflow(),
-    },
-    {
       path: path.join(githubWorkflowsDir, "artifact-cleanup.yml"),
       data: new shared.ArtifactCleanupWorkflow(),
     },
