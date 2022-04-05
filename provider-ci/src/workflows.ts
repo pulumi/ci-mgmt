@@ -940,3 +940,39 @@ export class GenerateCoverageDataJob implements NormalJob {
     return this;
   }
 }
+
+export class WarnCodegenJob implements NormalJob {
+  'runs-on' = 'ubuntu-latest';
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.SchemaFileChanged(),
+    steps.SdkFilesChanged(),
+    steps.SendCodegenWarnCommentPr(),
+  ];
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
+  }
+}
+
+export function ModerationWorkflow(
+    name: string,
+    opts: WorkflowOpts
+): GithubWorkflow {
+  const workflow: GithubWorkflow = {
+    name,
+    on: {
+      pull_request_target: {
+        branches: ["main", "master"],
+      },
+    },
+    env: env(opts),
+    jobs: {
+      warn_codegen: new WarnCodegenJob("warn_codegen"),
+
+    },
+  };
+  return workflow;
+}
