@@ -39,16 +39,11 @@ cd provider-ci && make
 Common commands:
 
 - `make providers`: Generate code for all providers
+- `make provider NAME=aws`: Generate code for single provider with debug information
 - `make examples`: Generate examples code
 - `make check`: Check for correctness
 - `make format`: Auto-format all code
 - `make discovery`: Check for GitHub workflow schema updates
-
-Generate code for a single provider and include debug information:
-
-```bash
-npm run gen-examples -- --name [provider] --debug
-```
 
 ## Adding a New Provider
 
