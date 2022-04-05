@@ -9,7 +9,8 @@ export const setupDotNet = "actions/setup-dotnet@v1";
 export const setupPython = "actions/setup-python@v2";
 export const setupGcloud = "google-github-actions/setup-gcloud@v0";
 export const checkout = "actions/checkout@v2";
-export const configureAwsCredentials = "aws-actions/configure-aws-credentials@v1";
+export const configureAwsCredentials =
+  "aws-actions/configure-aws-credentials@v1";
 export const downloadArtifact = "actions/download-artifact@v2";
 export const uploadArtifact = "actions/upload-artifact@v2";
 export const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";

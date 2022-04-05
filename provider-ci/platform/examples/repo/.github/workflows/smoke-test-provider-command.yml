@@ -5,7 +5,7 @@ env:
   ARM_LOCATION: westus
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  AWS_ACCESS_KEY_ID: ' ${{ secrets.AWS_ACCESS_KEY_ID }}'
+  AWS_ACCESS_KEY_ID: " ${{ secrets.AWS_ACCESS_KEY_ID }}"
   AWS_REGION: us-west-2
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   CLOUDSDK_CORE_DISABLE_PROMPTS: 1
@@ -95,19 +95,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -141,8 +152,9 @@ jobs:
     - name: Install Go Dependencies
       run: make ensure
     - name: Setup Config
-      run: |-
+      run: >-
         mkdir -p "$HOME/.kube/"
+
         pulumi stack -s "${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}" -C misc/scripts/testinfra/ output --show-secrets kubeconfig >~/.kube/config
     - name: Run Kubernetes Smoke Tests
       run: make specific_tag_set TagSet=Kubernetes
@@ -184,19 +196,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -230,8 +253,8 @@ jobs:
     - name: Install Testing Dependencies
       run: make ensure
     - name: Running ${{ env.PROVIDER_TESTS_TAG }}${{ matrix.languages }} Smoke Tests
-      run: make specific_tag_set TestSet=${{ matrix.languages }} TagSet=${{ env.PROVIDER_TESTS_TAG
-        }}
+      run: make specific_tag_set TestSet=${{ matrix.languages }} TagSet=${{
+        env.PROVIDER_TESTS_TAG }}
     strategy:
       fail-fast: false
       matrix:
@@ -308,19 +331,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -350,8 +384,8 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Destroy test infra
-      run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
-        }}-${{ github.run_number }}"
+      run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
+        github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
@@ -390,19 +424,30 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install aws-iam-authenticator
-      run: |-
-        curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+      run: >-
+        curl -o aws-iam-authenticator
+        https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+
         chmod +x ./aws-iam-authenticator
+
         sudo mv aws-iam-authenticator /usr/local/bin
     - name: Install Kubectl
-      run: |-
-        curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+      run: >-
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
         chmod +x ./kubectl
+
         sudo mv kubectl /usr/local/bin
     - name: Install + Configure Helm
-      run: |-
-        curl -o- -L https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+      run: >-
+        curl -o- -L
+        https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get |
+        bash
+
         helm init -c
+
         helm repo add bitnami https://charts.bitnami.com/bitnami
     - name: Configure GCP credentials
       uses: google-github-actions/setup-gcloud@v0
@@ -432,8 +477,8 @@ jobs:
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Create Test Infrastructure
-      run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha
-        }}-${{ github.run_number }}"
+      run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
+        github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
@@ -475,7 +520,7 @@ jobs:
         source-dir:
         - testing-unit-ts
 name: Smoke Test Latest Provider Release
-"on":
+on:
   repository_dispatch:
     types:
     - smoke-test-provider

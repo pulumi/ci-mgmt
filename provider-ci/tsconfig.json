@@ -1,25 +1,14 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "es6",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
-    "noImplicitReturns": true,
-    "outDir": "lib",
+    "noEmit": true,
     "pretty": true,
     "sourceMap": false,
-    "strictNullChecks": true,
+    "strict": true,
     "stripInternal": true,
-    "target": "es2017"
-  },
-  "exclude": [
-    "node_modules",
-    "example"
-  ],
-  "include": [
-    "src"
-  ]
+    "target": "ES6",
+  }
 }
