@@ -1,6 +1,6 @@
 provider: azure
 lint: false
-major-version: 4
+major-version: 5
 parallel: 2
 customLdFlag: "-X github.com/hashicorp/terraform-provider-azurerm/version.ProviderVersion={{.Tag}}"
 env:
