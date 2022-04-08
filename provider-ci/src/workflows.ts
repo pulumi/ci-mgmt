@@ -942,6 +942,7 @@ export class GenerateCoverageDataJob implements NormalJob {
 }
 
 
+
 export class WarnCodegenJob implements NormalJob {
   'runs-on' = 'ubuntu-latest';
   steps = [
@@ -969,7 +970,10 @@ export function ModerationWorkflow(
         branches: ["main", "master"],
       },
     },
-    env: env(opts),
+    env: {
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+    },
+
     jobs: {
       warn_codegen: new WarnCodegenJob("warn_codegen"),
 
