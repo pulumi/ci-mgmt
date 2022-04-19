@@ -968,6 +968,7 @@ export function ModerationWorkflow(
     on: {
       pull_request_target: {
         branches: ["main", "master"],
+        types: ["opened"]
       },
     },
     env: {
