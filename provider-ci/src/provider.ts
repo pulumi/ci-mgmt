@@ -93,6 +93,10 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: wf.UpdateUpstreamProviderWorkflow(config, config),
     },
     {
+      path: path.join(githubWorkflowsDir, "community-moderation.yml"),
+      data: wf.ModerationWorkflow("warn-codegen", config),
+    },
+    {
       path: ".goreleaser.prerelease.yml",
       data: new goreleaser.PulumiGoreleaserPreConfig(provider, config),
     },
