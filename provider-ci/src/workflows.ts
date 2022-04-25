@@ -941,10 +941,8 @@ export class GenerateCoverageDataJob implements NormalJob {
   }
 }
 
-
-
 export class WarnCodegenJob implements NormalJob {
-  'runs-on' = 'ubuntu-latest';
+  "runs-on" = "ubuntu-latest";
   steps = [
     steps.CheckoutRepoStep(),
     steps.SchemaFileChanged(),
@@ -960,15 +958,15 @@ export class WarnCodegenJob implements NormalJob {
 }
 
 export function ModerationWorkflow(
-    name: string,
-    opts: WorkflowOpts
+  name: string,
+  opts: WorkflowOpts
 ): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name,
     on: {
       pull_request_target: {
         branches: ["main", "master"],
-        types: ["opened"]
+        types: ["opened"],
       },
     },
     env: {
@@ -977,7 +975,6 @@ export function ModerationWorkflow(
 
     jobs: {
       warn_codegen: new WarnCodegenJob("warn_codegen"),
-
     },
   };
   return workflow;

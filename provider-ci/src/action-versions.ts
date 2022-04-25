@@ -19,4 +19,3 @@ export const goReleaser = "goreleaser/goreleaser-action@v2";
 export const addAndCommit = "EndBug/add-and-commit@v7";
 export const pullRequest = "repo-sync/pull-request@v2";
 export const pathsFilter = "dorny/paths-filter@v2";
-
