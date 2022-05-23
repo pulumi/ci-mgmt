@@ -2,6 +2,7 @@ provider: azure
 lint: false
 major-version: 5
 parallel: 2
+timeout: 90
 customLdFlag: "-X github.com/hashicorp/terraform-provider-azurerm/version.ProviderVersion={{.Tag}}"
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
