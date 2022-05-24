@@ -1,0 +1,46 @@
+{
+  "author": "Lee Briggs",
+  "bugs": {
+    "url": "https://github.com/pulumi/ci-mgmt/issues"
+  },
+  "dependencies": {
+    "yaml": "^1.10.2",
+    "yargs": "^17.4.0",
+    "zod": "^3.14.2"
+  },
+  "description": "Generate Pulumi github actions with Typescript",
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@types/node": "^17.0.23",
+    "@types/yargs": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
+    "json-schema-to-typescript": "^10.1.5",
+    "prettier": "^2.6.1",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.0"
+  },
+  "homepage": "https://github.com/pulumi/ci-mgmt#readme",
+  "keywords": [
+    "configuration",
+    "code",
+    "generation",
+    "pulumi"
+  ],
+  "license": "Apache-2.0",
+  "module": "workflow.ts",
+  "name": "@pulumi/ci-mgmt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pulumi/ci-mgmt.git"
+  },
+  "scripts": {
+    "discovery": "wget https://json.schemastore.org/github-workflow.json -O github-workflow.json && json2ts -i github-workflow.json -o src/github-workflow.d.ts --unreachableDefinitions --ignoreMinAndMaxItems",
+    "gen-providers": "ts-node cmd/generate-providers.ts",
+    "gen-examples": "ts-node cmd/generate-examples.ts",
+    "lint": "eslint src/**/*.ts && tsc --noEmit",
+    "format": "prettier --write src"
+  },
+  "version": "0.1.0"
+}

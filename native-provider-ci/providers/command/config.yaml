@@ -1,0 +1,3 @@
+provider: command
+lint: false
+upstream-provider-org: pulumi

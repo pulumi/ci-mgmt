@@ -1,0 +1,3 @@
+provider: aws-native
+lint: false
+upstream-provider-org: pulumi
