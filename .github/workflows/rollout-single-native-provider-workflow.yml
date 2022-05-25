@@ -2,7 +2,7 @@
 # Pulumi provider. Note that this workflow does not generate any files -
 # workflows must already be generated and committed to this repo when this
 # workflow is run.
-name: Update GH workflows, single provider
+name: Update GH workflows, single native provider
 "on":
   workflow_dispatch:
     inputs:
