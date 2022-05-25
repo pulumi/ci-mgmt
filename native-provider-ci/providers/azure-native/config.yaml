@@ -1,0 +1,2 @@
+provider: azure-native
+lint: false

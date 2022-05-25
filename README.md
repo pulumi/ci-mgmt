@@ -45,7 +45,7 @@ Common commands:
 - `make format`: Auto-format all code
 - `make discovery`: Check for GitHub workflow schema updates
 
-## Adding a New Provider
+## Adding a New Bridged Provider
 
 To add a new provider:
 

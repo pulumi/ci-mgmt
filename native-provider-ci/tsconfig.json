@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "pretty": true,
+    "sourceMap": false,
+    "strict": true,
+    "stripInternal": true,
+    "target": "ES6",
+  }
+}
