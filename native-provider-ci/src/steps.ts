@@ -409,13 +409,6 @@ export function TagSDKTag(): Step {
   };
 }
 
-export function UpdatePulumiTerraformBridgeDependency(): Step {
-  return {
-    name: "Update Pulumi Terraform Bridge Dependency",
-    run: "cd provider && go mod edit -require github.com/pulumi/pulumi-terraform-bridge/v3@${{ github.event.client_payload.ref }} && go mod tidy && cd ../",
-  };
-}
-
 export function CommitChanges(refName: string): Step {
   return {
     name: "commit changes",

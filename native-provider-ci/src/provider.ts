@@ -50,5 +50,9 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       path: path.join(githubWorkflowsDir, "artifact-cleanup.yml"),
       data: new shared.ArtifactCleanupWorkflow(),
     },
+    {
+      path: path.join(githubWorkflowsDir, "command-dispatch.yml"),
+      data: wf.CommandDispatchWorkflow("command-dispatch", config),
+    },
   ];
 };

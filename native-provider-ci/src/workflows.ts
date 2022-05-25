@@ -33,9 +33,7 @@ const env = (opts: WorkflowOpts) =>
       NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
       NUGET_PUBLISH_KEY: "${{ secrets.NUGET_PUBLISH_KEY }}",
       PYPI_PASSWORD: "${{ secrets.PYPI_PASSWORD }}",
-      TRAVIS_OS_NAME: "linux",
       SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
-      PULUMI_GO_DEP_ROOT: "${{ github.workspace }}/..",
     },
     opts.env
   );
@@ -476,6 +474,7 @@ export function CommandDispatchWorkflow(
       "command-dispatch-for-testing": new EmptyJob(
         "command-dispatch-for-testing"
       )
+        .addConditional("${{ github.event.issue.pull_request }}")
         .addStep(steps.CheckoutRepoStep())
         .addStep(steps.CommandDispatchStep(`${opts.provider}`)),
     },
