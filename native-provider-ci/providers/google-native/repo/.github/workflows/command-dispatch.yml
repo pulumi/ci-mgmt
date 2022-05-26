@@ -6,7 +6,7 @@ on:
     - edited
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PROVIDER: command
+  PROVIDER: google-native
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -16,7 +16,9 @@ env:
   TRAVIS_OS_NAME: linux
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  AWS_REGION: us-west-2
+  GOOGLE_PROJECT: pulumi-ci-gcp-provider
+  GOOGLE_REGION: us-central1
+  GOOGLE_ZONE: us-central1-a
   PULUMI_API: https://api.pulumi-staging.io
 jobs:
   command-dispatch-for-testing:
@@ -34,5 +36,5 @@ jobs:
         commands: run-acceptance-tests
         permission: write
         issue-type: pull-request
-        repository: pulumi/pulumi-command
+        repository: pulumi/pulumi-google-native
     if: ${{ github.event.issue.pull_request }}

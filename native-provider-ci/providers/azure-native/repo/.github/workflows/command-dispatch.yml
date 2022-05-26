@@ -6,7 +6,7 @@ on:
     - edited
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PROVIDER: command
+  PROVIDER: azure-native
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -16,7 +16,13 @@ env:
   TRAVIS_OS_NAME: linux
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  AWS_REGION: us-west-2
+  ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_ENVIRONMENT: public
+  ARM_LOCATION: westus2
+  ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
+  ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
+  GO111MODULE: on
   PULUMI_API: https://api.pulumi-staging.io
 jobs:
   command-dispatch-for-testing:
@@ -34,5 +40,5 @@ jobs:
         commands: run-acceptance-tests
         permission: write
         issue-type: pull-request
-        repository: pulumi/pulumi-command
+        repository: pulumi/pulumi-azure-native
     if: ${{ github.event.issue.pull_request }}

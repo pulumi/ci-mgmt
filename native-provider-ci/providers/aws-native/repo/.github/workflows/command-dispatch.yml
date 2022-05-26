@@ -6,7 +6,7 @@ on:
     - edited
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PROVIDER: command
+  PROVIDER: aws-native
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -34,5 +34,5 @@ jobs:
         commands: run-acceptance-tests
         permission: write
         issue-type: pull-request
-        repository: pulumi/pulumi-command
+        repository: pulumi/pulumi-aws-native
     if: ${{ github.event.issue.pull_request }}

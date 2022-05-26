@@ -60,7 +60,7 @@ const writeProviderFiles = (provider: Provider) => {
   for (const file of provider.files) {
     const filePath = path.join(providerRepoPath, file.path);
     const yamlContent = yaml.stringify(file.data, {
-      sortMapEntries: true,
+      sortMapEntries: false,
       indentSeq: false,
     });
     debug("Writing", filePath);
