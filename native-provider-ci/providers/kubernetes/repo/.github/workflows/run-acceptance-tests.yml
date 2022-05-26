@@ -202,7 +202,13 @@ jobs:
       run: find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print
         -exec chmod +x {} \;
     - name: Generate SDK
+<<<<<<< HEAD
       run: make ${{ matrix.language }}_sdk
+=======
+      run: make generate_${{ matrix.language }}
+    - name: Build SDK
+      run: make build_${{ matrix.language }}
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     - name: Check worktree clean
       run: ./ci-scripts/ci/check-worktree-is-clean
     - name: Tar SDK folder
@@ -326,6 +332,7 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
     - name: Install Kubectl
+<<<<<<< HEAD
       run: >
         curl -LO
         https://storage.googleapis.com/kubernetes-release/release/$(curl -s
@@ -341,6 +348,17 @@ jobs:
         sudo mv linux-amd64/helm /usr/local/bin
         helm repo add stable https://charts.helm.sh/stable
         helm repo update
+=======
+      run: curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl
+        -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectlchmod
+        +x ./kubectlsudo mv kubectl /usr/local/bin
+    - name: Install and configure Helm
+      run: curl -LO  https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gztar -xvf
+        helm-v3.8.0-linux-amd64.tar.gzsudo mv linux-amd64/helm
+        /usr/local/binhelm repo add stable https://charts.helm.sh/stablehelm
+        repo update
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     - name: Install gotestfmt
       uses: jaxxstorm/action-install-gh-release@v1.5.0
       with:
@@ -352,7 +370,11 @@ jobs:
         cd tests/sdk/${{ matrix.language }} && go test -v -json -count=1 -cover -timeout 2h -parallel 4 ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
+<<<<<<< HEAD
   build-test-cluster:
+=======
+  build_test_cluster:
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -365,9 +387,20 @@ jobs:
         - "3.7"
         nodeversion:
         - 14.x
+<<<<<<< HEAD
     name: build-test-cluster
     outputs:
       stack-name: ${{ steps.stackname.outputs.stack-name }}
+=======
+        language:
+        - nodejs
+        - python
+        - dotnet
+        - go
+    name: build-test-cluster
+    outputs:
+      stack-name: ${{ steps.vars.outputs.stack-name }}
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
@@ -405,6 +438,7 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
     - name: Install Kubectl
+<<<<<<< HEAD
       run: >
         curl -LO
         https://storage.googleapis.com/kubernetes-release/release/$(curl -s
@@ -413,6 +447,12 @@ jobs:
         chmod +x ./kubectl
 
         sudo mv kubectl /usr/local/bin
+=======
+      run: curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl
+        -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectlchmod
+        +x ./kubectlsudo mv kubectl /usr/local/bin
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     - name: Set stack name in output
@@ -428,7 +468,11 @@ jobs:
         path: ~/.kube/config
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
+<<<<<<< HEAD
   destroy-test-cluster:
+=======
+  destroy_test_cluster:
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -441,6 +485,14 @@ jobs:
         - "3.7"
         nodeversion:
         - 14.x
+<<<<<<< HEAD
+=======
+        language:
+        - nodejs
+        - python
+        - dotnet
+        - go
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     name: teardown-test-cluster
     needs:
     - build-test-cluster
@@ -482,6 +534,7 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
     - name: Install Kubectl
+<<<<<<< HEAD
       run: >
         curl -LO
         https://storage.googleapis.com/kubernetes-release/release/$(curl -s
@@ -496,6 +549,18 @@ jobs:
       run: ./scripts/ci-cluster-destroy.sh ${{
         needs.build-test-cluster.outputs.stack-name }}
     - uses: geekyeggo/delete-artifact@v1
+=======
+      run: curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl
+        -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectlchmod
+        +x ./kubectlsudo mv kubectl /usr/local/bin
+    - name: Login to Google Cloud Registry
+      run: gcloud --quiet auth configure-docker
+    - name: Destroy test infra
+      run: ./scripts/ci-cluster-destroy.sh
+        ${{needs.build-test-cluster.outputs.stack-name}}
+      uses: geekyeggo/delete-artifact@v1
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
       with:
         name: config
     if: github.event_name == 'repository_dispatch' ||

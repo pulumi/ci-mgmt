@@ -1,3 +1,4 @@
+import { stripVTControlCharacters } from "util";
 import * as action from "./action-versions";
 import { NormalJob } from "./github-workflow";
 

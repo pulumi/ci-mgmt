@@ -120,21 +120,35 @@ export function RunAcceptanceTestsWorkflow(
         "prerequisites",
         opts
       ).addDispatchConditional(true),
+<<<<<<< HEAD
       build_sdks: new BuildSdkJob("build_sdks", opts)
         .addDispatchConditional(true)
         .addRunsOn(opts.provider),
+=======
+      build_sdks: new BuildSdkJob("build_sdks", opts).addDispatchConditional(
+        true
+      ),
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
       test: new TestsJob("test", opts).addDispatchConditional(true),
     },
   };
   if (opts.provider === "kubernetes") {
     workflow.jobs = Object.assign(workflow.jobs, {
+<<<<<<< HEAD
       "build-test-cluster": new BuildTestClusterJob(
+=======
+      build_test_cluster: new BuildTestClusterJob(
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
         "build-test-cluster",
         opts
       ).addDispatchConditional(true),
     });
     workflow.jobs = Object.assign(workflow.jobs, {
+<<<<<<< HEAD
       "destroy-test-cluster": new TeardownTestClusterJob(
+=======
+      destroy_test_cluster: new TeardownTestClusterJob(
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
         "teardown-test-cluster",
         opts
       ).addDispatchConditional(true),
@@ -177,10 +191,16 @@ export class BuildSdkJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+<<<<<<< HEAD
       steps.DownloadProviderBinaries(opts.provider, name),
       steps.UnTarProviderBinaries(opts.provider, name),
       steps.RestoreBinaryPerms(opts.provider, name),
       steps.CodegenDuringSDKBuild(opts.provider),
+=======
+      steps.DownloadProviderBinaries(),
+      steps.UnTarProviderBinaries(),
+      steps.RestoreBinaryPerms(),
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
       steps.InitializeSubModules(opts.submodules),
       steps.GenerateSDKs(opts.provider),
       steps.BuildSDKs(opts.provider),
@@ -201,6 +221,7 @@ export class BuildSdkJob implements NormalJob {
     }
     return this;
   }
+<<<<<<< HEAD
 
   addRunsOn(provider: string) {
     if (provider === "azure-native") {
@@ -209,6 +230,8 @@ export class BuildSdkJob implements NormalJob {
     }
     return this;
   }
+=======
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
 }
 
 export class PrerequisitesJob implements NormalJob {
@@ -298,9 +321,15 @@ export class TestsJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+<<<<<<< HEAD
       steps.DownloadProviderBinaries(opts.provider, name),
       steps.UnTarProviderBinaries(opts.provider, name),
       steps.RestoreBinaryPerms(opts.provider, name),
+=======
+      steps.DownloadProviderBinaries(),
+      steps.UnTarProviderBinaries(),
+      steps.RestoreBinaryPerms(),
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
       steps.DownloadSDKs(),
       steps.UnzipSDKs(),
       steps.UpdatePath(),
@@ -341,6 +370,10 @@ export class BuildTestClusterJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
+<<<<<<< HEAD
+=======
+      language: ["nodejs", "python", "dotnet", "go"],
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     },
   };
   steps: NormalJob["steps"];
@@ -350,9 +383,13 @@ export class BuildTestClusterJob implements NormalJob {
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
+<<<<<<< HEAD
     this.outputs = {
       "stack-name": "${{ steps.stackname.outputs.stack-name }}",
     };
+=======
+    this.outputs = { "stack-name": "${{ steps.vars.outputs.stack-name }}" };
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
@@ -392,6 +429,10 @@ export class TeardownTestClusterJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
+<<<<<<< HEAD
+=======
+      language: ["nodejs", "python", "dotnet", "go"],
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     },
   };
   steps: NormalJob["steps"];
@@ -414,7 +455,10 @@ export class TeardownTestClusterJob implements NormalJob {
       steps.InstallKubectl(opts.provider),
       steps.LoginGoogleCloudRegistry(opts.provider),
       steps.DestroyTestCluster(opts.provider),
+<<<<<<< HEAD
       steps.DeleteArtifact(opts.provider),
+=======
+>>>>>>> 3c548907 (Add pull request/comment on PR workflow)
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
