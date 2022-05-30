@@ -7,6 +7,7 @@ import * as goreleaser from "./goreleaser";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import { providersDir } from "../cmd/generate-providers";
+import { buildMakefile } from "./makefiles";
 
 const Config = z.object({
   provider: z.string(),
@@ -21,6 +22,7 @@ const Config = z.object({
   skipTfGen: z.boolean().default(false),
   customLdFlag: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
+  makeTemplate: z.literal("bridged").optional(),
 });
 
 const getProviderConfig = (provider: string) => {
@@ -45,7 +47,7 @@ export interface ProviderFile {
 export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const config = getProviderConfig(provider);
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
-  return [
+  const files: ProviderFile[] = [
     {
       path: path.join(githubWorkflowsDir, "run-acceptance-tests.yml"),
       data: wf.RunAcceptanceTestsWorkflow("run-acceptance-tests", config),
@@ -109,4 +111,12 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: new lint.PulumiGolangCIConfig(config["golangci-timeout"]),
     },
   ];
+  const makeTemplate = config.makeTemplate;
+  if (makeTemplate) {
+    files.push({
+      path: "Makefile",
+      data: buildMakefile({ ...config, makeTemplate }),
+    });
+  }
+  return files;
 };
