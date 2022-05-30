@@ -1,5 +1,4 @@
 import { Makefile, Target } from "./make";
-import { goBuild, genSchema, yarnInstall, cwd } from "./make-targets";
 
 type BridgedProviderConfig = {
   provider: string;
@@ -15,7 +14,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
   const PROVIDER_PATH = `provider/v5`;
   const SDK_PATH = `sdk/v5`;
   const VERSION_PATH = `${PROVIDER_PATH}/pkg/version.Version`;
-  const TF_GEN = `pulumi-tfgen-${PACK}`;
+  const TFGEN = `pulumi-tfgen-${PACK}`;
   const PROVIDER = `pulumi-resource-${PACK}`;
   const VERSION = "$(shell pulumictl get version)";
   const TESTPARALLELISM = "10";
@@ -30,7 +29,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     PROVIDER_PATH,
     SDK_PATH,
     VERSION_PATH,
-    TF_GEN,
+    TFGEN,
     PROVIDER,
     VERSION,
     TESTPARALLELISM,
@@ -51,12 +50,39 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     name: "development",
     dependencies: [install_plugins],
   };
-  const tfgen: Target = { name: "tfgen", dependencies: [install_plugins] };
+  const tfgen: Target = {
+    name: "tfgen",
+    dependencies: [install_plugins],
+    commands: [
+      '(cd provider && go build -o $(WORKING_DIR)/bin/${TFGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${TFGEN})',
+      `$(WORKING_DIR)/bin/${TFGEN} schema --out provider/cmd/${PROVIDER}`,
+      `(cd provider && VERSION=$(VERSION) go generate cmd/${PROVIDER}/main.go)`,
+    ],
+  };
   const provider: Target = {
     name: "provider",
     dependencies: [tfgen, install_plugins],
+    commands: [
+      '(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION} -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${PROVIDER})',
+    ],
   };
-  const build_nodejs: Target = { name: "build_nodejs" };
+  const build_nodejs: Target = {
+    name: "build_nodejs",
+    variables: {
+      VERSION: "$(shell pulumictl get version --language javascript)",
+    },
+    commands: [
+      "$(WORKING_DIR)/bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
+      [
+        "cd sdk/nodejs/",
+        'echo "module fake_nodejs_module // Exclude this directory from Go tools\\n\\ngo 1.16" > go.mod',
+        "yarn install",
+        "yarn run tsc",
+        "cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/",
+        'sed -i.bak -e "s/$${VERSION}/$(VERSION)/g" ./bin/package.json',
+      ],
+    ],
+  };
   const build_python: Target = { name: "build_python" };
   const build_go: Target = { name: "build_go" };
   const build_dotnet: Target = { name: "build_dotnet" };
