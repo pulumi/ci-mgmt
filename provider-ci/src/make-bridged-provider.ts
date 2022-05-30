@@ -47,11 +47,6 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
       "pulumi plugin install resource random 4.4.1",
     ],
   };
-  const development: Target = {
-    name: "development",
-    phony: true,
-    dependencies: [install_plugins],
-  };
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
@@ -185,6 +180,11 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     name: "install_sdks",
     phony: true,
     dependencies: [install_dotnet_sdk, install_python_sdk, install_nodejs_sdk],
+  };
+  const development: Target = {
+    name: "development",
+    phony: true,
+    dependencies: [install_plugins, provider, build_sdks, install_sdks],
   };
   const build: Target = {
     name: "build",

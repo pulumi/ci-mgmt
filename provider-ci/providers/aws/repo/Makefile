@@ -12,7 +12,7 @@ VERSION := $(shell pulumictl get version)
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
 
-development:: install_plugins
+development:: install_plugins provider build_sdks install_sdks
 
 build:: install_plugins provider build_sdks install_sdks
 
