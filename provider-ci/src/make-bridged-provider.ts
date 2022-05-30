@@ -38,6 +38,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
 
   const install_plugins: Target = {
     name: "install_plugins",
+    phony: true,
     commands: [
       "[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh",
       "pulumi plugin install resource tls 4.1.0",
@@ -48,10 +49,12 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
   };
   const development: Target = {
     name: "development",
+    phony: true,
     dependencies: [install_plugins],
   };
   const tfgen: Target = {
     name: "tfgen",
+    phony: true,
     dependencies: [install_plugins],
     commands: [
       '(cd provider && go build -o $(WORKING_DIR)/bin/${TFGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${TFGEN})',
@@ -61,6 +64,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
   };
   const provider: Target = {
     name: "provider",
+    phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
       '(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION} -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${PROVIDER})',
@@ -68,6 +72,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
   };
   const build_nodejs: Target = {
     name: "build_nodejs",
+    phony: true,
     variables: {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
@@ -79,38 +84,121 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
         "yarn install",
         "yarn run tsc",
         "cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/",
-        'sed -i.bak -e "s/$${VERSION}/$(VERSION)/g" ./bin/package.json',
+        'sed -i.bak -e "s/\\$${VERSION}/$(VERSION)/g" ./bin/package.json',
       ],
     ],
   };
-  const build_python: Target = { name: "build_python" };
-  const build_go: Target = { name: "build_go" };
-  const build_dotnet: Target = { name: "build_dotnet" };
+  const build_python: Target = {
+    name: "build_python",
+    phony: true,
+    variables: {
+      PYPI_VERSION: "$(shell pulumictl get version --language python)",
+    },
+    commands: [
+      "$(WORKING_DIR)/bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
+      [
+        "cd sdk/python/",
+        'echo "module fake_python_module // Exclude this directory from Go tools\\n\\ngo 1.16" > go.mod',
+        "cp ../../README.md .",
+        "python3 setup.py clean --all 2>/dev/null",
+        "rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin",
+        `sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py`,
+        "rm ./bin/setup.py.bak && rm ./bin/go.mod",
+        "cd ./bin && python3 setup.py build sdist",
+      ],
+    ],
+  };
+  const build_go: Target = {
+    name: "build_go",
+    phony: true,
+    commands: [
+      "$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/",
+    ],
+  };
+  const build_dotnet: Target = {
+    name: "build_dotnet",
+    phony: true,
+    variables: {
+      DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
+    },
+    commands: [
+      "pulumictl get version --language dotnet",
+      "$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
+      [
+        "cd sdk/dotnet/",
+        'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.16" > go.mod',
+        'echo "${DOTNET_VERSION}" >version.txt',
+        "dotnet build /p:Version=${DOTNET_VERSION}",
+      ],
+    ],
+  };
   const build_sdks: Target = {
     name: "build_sdks",
+    phony: true,
     dependencies: [build_nodejs, build_python, build_go, build_dotnet],
   };
   const lint_provider: Target = {
     name: "lint_provider",
+    phony: true,
     dependencies: [provider],
+    commands: ["cd provider && golangci-lint run -c ../.golangci.yml"],
   };
-  const cleanup: Target = { name: "cleanup" };
-  const help: Target = { name: "help" };
-  const clean: Target = { name: "clean" };
-  const install_dotnet_sdk: Target = { name: "install_dotnet_sdk" };
-  const install_python_sdk: Target = { name: "install_python_sdk" };
-  const install_go_sdk: Target = { name: "install_go_sdk" };
-  const install_nodejs_sdk: Target = { name: "install_nodejs_sdk" };
+  const cleanup: Target = {
+    name: "cleanup",
+    phony: true,
+    commands: [
+      "rm -r $(WORKING_DIR)/bin",
+      `rm -f provider/cmd/${PROVIDER}/schema.go`,
+    ],
+  };
+  const help: Target = {
+    name: "help",
+    commands: [
+      '@grep \'^[^.#]\\+:\\s\\+.*#\' Makefile | sed "s/\\(.\\+\\):\\s*\\(.*\\) #\\s*\\(.*\\)/`printf "\\033[93m"`\\1`printf "\\033[0m"`	\\3 [\\2]/" | expand -t20',
+    ],
+    phony: true,
+  };
+  const clean: Target = {
+    name: "clean",
+    phony: true,
+    commands: ["rm -rf sdk/{dotnet,nodejs,go,python}"],
+  };
+  const install_dotnet_sdk: Target = {
+    name: "install_dotnet_sdk",
+    phony: true,
+    commands: [
+      "mkdir -p $(WORKING_DIR)/nuget",
+      "find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \\;",
+    ],
+  };
+  const install_python_sdk: Target = {
+    name: "install_python_sdk",
+    phony: true,
+  };
+  const install_go_sdk: Target = { name: "install_go_sdk", phony: true };
+  const install_nodejs_sdk: Target = {
+    name: "install_nodejs_sdk",
+    phony: true,
+    commands: ["yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin"],
+  };
   const install_sdks: Target = {
     name: "install_sdks",
+    phony: true,
     dependencies: [install_dotnet_sdk, install_python_sdk, install_nodejs_sdk],
   };
   const build: Target = {
     name: "build",
+    phony: true,
     dependencies: [install_plugins, provider, build_sdks, install_sdks],
   };
   const only_build: Target = { name: "only_build", dependencies: [build] };
-  const test: Target = { name: "test" };
+  const test: Target = {
+    name: "test",
+    phony: true,
+    commands: [
+      "cd examples && go test -v -tags=all -parallel ${TESTPARALLELISM} -timeout 2h",
+    ],
+  };
   return {
     variables,
     targets: [
