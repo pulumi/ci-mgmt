@@ -5,7 +5,7 @@ import z from "zod";
 import * as wf from "./workflows";
 import { providersDir } from "../cmd/generate-providers";
 
-export const Config = z.object({
+const Config = z.object({
   provider: z.string(),
   "upstream-provider-org": z.string(),
   "upstream-provider-repo": z.string().optional(),
@@ -19,9 +19,10 @@ export const Config = z.object({
   customLdFlag: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
   makeTemplate: z.literal("bridged").optional(),
+  plugins: z
+    .array(z.object({ name: z.string(), version: z.string() }))
+    .optional(),
 });
-
-export type Config = z.TypeOf<typeof Config>;
 
 export const getProviderConfig = (provider: string) => {
   const configPath = path.join(providersDir, provider, "config.yaml");
@@ -36,3 +37,5 @@ export const getProviderConfig = (provider: string) => {
     "upstream-provider-repo": upstreamProviderRepo,
   };
 };
+
+export type Config = ReturnType<typeof getProviderConfig>;

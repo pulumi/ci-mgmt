@@ -1,13 +1,11 @@
+import { Config } from "./config";
 import { Makefile, Target } from "./make";
 
-type BridgedProviderConfig = {
-  provider: string;
-  org: string;
-};
+type BridgedProviderConfig = Pick<Config, "provider" | "plugins">;
 
 export function bridgedProvider(config: BridgedProviderConfig): Makefile {
   const PACK = config.provider;
-  const ORG = config.org;
+  const ORG = "pulumi";
   const PROJECT = `github.com/${ORG}/pulumi-${PACK}`;
   const NODE_MODULE_NAME = `@pulumi/${PACK}`;
   const TF_NAME = PACK;
@@ -41,10 +39,9 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     phony: true,
     commands: [
       "[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh",
-      "pulumi plugin install resource tls 4.1.0",
-      "pulumi plugin install resource github 4.10.0",
-      "pulumi plugin install resource kubernetes 3.17.0",
-      "pulumi plugin install resource random 4.4.1",
+      ...(config.plugins?.map(
+        (p) => `pulumi plugin install resource ${p.name} ${p.version}`
+      ) ?? []),
     ],
   };
   const tfgen: Target = {

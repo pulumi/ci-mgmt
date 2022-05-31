@@ -19,7 +19,7 @@ export const WorkflowOpts = z.object({
   parallel: z.number().default(3),
   timeout: z.number().default(60),
 });
-type WorkflowOpts = z.infer<typeof WorkflowOpts>;
+export type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 
 const env = (opts: WorkflowOpts) =>
   Object.assign(

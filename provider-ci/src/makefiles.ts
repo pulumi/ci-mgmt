@@ -1,13 +1,13 @@
+import { Config } from "./config";
 import { render } from "./make";
 import { bridgedProvider } from "./make-bridged-provider";
 
-export function buildMakefile(config: {
-  provider: string;
-  makeTemplate: string;
-}): string {
+type MakefileConfig = Pick<Config, "makeTemplate" | "provider" | "plugins">;
+
+export function buildMakefile(config: MakefileConfig): string {
   switch (config.makeTemplate) {
     case "bridged":
-      return render(bridgedProvider({ ...config, org: "pulumi" }));
+      return render(bridgedProvider(config));
     default:
       throw new Error(`Unknown makefile template: ${config.makeTemplate}`);
   }
