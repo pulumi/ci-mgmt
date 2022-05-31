@@ -4,14 +4,14 @@ import { Makefile, Target } from "./make";
 export function bridgedProvider(config: Config): Makefile {
   const PACK = config.provider;
   const ORG = "pulumi";
-  const PROJECT = `github.com/${ORG}/pulumi-${PACK}`;
-  const NODE_MODULE_NAME = `@pulumi/${PACK}`;
-  const TF_NAME = PACK;
-  const PROVIDER_PATH = `provider/v5`;
-  const SDK_PATH = `sdk/v5`;
-  const VERSION_PATH = `${PROVIDER_PATH}/pkg/version.Version`;
-  const TFGEN = `pulumi-tfgen-${PACK}`;
-  const PROVIDER = `pulumi-resource-${PACK}`;
+  const PROJECT = `github.com/$(ORG)/pulumi-$(PACK)`;
+  const PROVIDER_PATH =
+    config["major-version"] > 1
+      ? `provider/v${config["major-version"]}`
+      : `provider`;
+  const VERSION_PATH = `$(PROVIDER_PATH)/pkg/version.Version`;
+  const TFGEN = `pulumi-tfgen-$(PACK)`;
+  const PROVIDER = `pulumi-resource-$(PACK)`;
   const VERSION = "$(shell pulumictl get version)";
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
@@ -20,10 +20,7 @@ export function bridgedProvider(config: Config): Makefile {
     PACK,
     ORG,
     PROJECT,
-    NODE_MODULE_NAME,
-    TF_NAME,
     PROVIDER_PATH,
-    SDK_PATH,
     VERSION_PATH,
     TFGEN,
     PROVIDER,
