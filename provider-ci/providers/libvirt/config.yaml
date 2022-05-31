@@ -4,3 +4,4 @@ major-version: 1
 env:
   LIBVIRT_DEFAULT_URI: "lxc://"
 upstream-provider-org: dmacvicar
+makeTemplate: bridged

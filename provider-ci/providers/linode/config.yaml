@@ -3,3 +3,4 @@ major-version: 3
 env:
   LINODE_TOKEN: ${{ secrets.LINODE_API_TOKEN }}
 upstream-provider-org: pulumi
+makeTemplate: bridged

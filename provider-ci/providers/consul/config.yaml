@@ -2,3 +2,9 @@ provider: consul
 major-version: 3
 docker: true
 upstream-provider-org: hashicorp
+makeTemplate: bridged
+plugins:
+  - name: aws 
+    version: "4.0.0"
+  - name: vault 
+    version: "4.0.0"

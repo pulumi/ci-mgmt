@@ -10,3 +10,4 @@ env:
   AZURE_LOCATION: westus
   PULUMI_GO_DEP_ROOT: /home/runner/work/pulumi-docker
 upstream-provider-org: kreuzwerker
+makeTemplate: bridged

@@ -5,3 +5,4 @@ env:
   AIVEN_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
   AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
 upstream-provider-org: pulumi
+makeTemplate: bridged

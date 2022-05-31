@@ -2,3 +2,4 @@ provider: rabbitmq
 docker: true
 major-version: 3
 upstream-provider-org: cyrilgdn
+makeTemplate: bridged

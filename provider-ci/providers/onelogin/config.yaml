@@ -1,3 +1,7 @@
 provider: onelogin
 major-version: 1
 upstream-provider-org: onelogin
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "2.2.0"

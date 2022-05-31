@@ -5,3 +5,7 @@ env:
 lint: true
 upstream-provider-org: pulumi
 provider-default-branch: main
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"

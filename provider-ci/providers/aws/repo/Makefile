@@ -2,14 +2,11 @@
 
 PACK := aws
 ORG := pulumi
-PROJECT := github.com/pulumi/pulumi-aws
-NODE_MODULE_NAME := @pulumi/aws
-TF_NAME := aws
+PROJECT := github.com/$(ORG)/pulumi-$(PACK)
 PROVIDER_PATH := provider/v5
-SDK_PATH := sdk/v5
-VERSION_PATH := provider/v5/pkg/version.Version
-TFGEN := pulumi-tfgen-aws
-PROVIDER := pulumi-resource-aws
+VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
+TFGEN := pulumi-tfgen-$(PACK)
+PROVIDER := pulumi-resource-$(PACK)
 VERSION := $(shell pulumictl get version)
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)

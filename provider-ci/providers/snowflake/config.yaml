@@ -7,3 +7,13 @@ env:
   SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
   SNOWFLAKE_REGION: ${{ secrets.SNOWFLAKE_REGION }}
 upstream-provider-org: chanzuckerberg
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.2.0"
+  - name: aws 
+    version: "4.10.0"
+  - name: gcp 
+    version: "5.10.0"
+  - name: azure 
+    version: "4.7.0"

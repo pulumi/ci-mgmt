@@ -7,3 +7,7 @@ env:
 upstream-provider-org: jfrog
 upstream-provider-major-version: /v2
 provider-default-branch: main
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"

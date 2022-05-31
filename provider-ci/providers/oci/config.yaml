@@ -9,3 +9,13 @@ env:
   TF_VAR_private_key: ${{ secrets.TF_VAR_private_key }}
   TF_VAR_region: ${{ secrets.TF_VAR_region }}
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: tls 
+    version: "4.1.0"
+  - name: github 
+    version: "4.10.0"
+  - name: kubernetes 
+    version: "3.17.0"
+  - name: random 
+    version: "4.4.1"

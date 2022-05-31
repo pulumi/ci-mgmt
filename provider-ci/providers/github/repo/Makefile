@@ -2,14 +2,11 @@
 
 PACK := github
 ORG := pulumi
-PROJECT := github.com/pulumi/pulumi-github
-NODE_MODULE_NAME := @pulumi/github
-TF_NAME := github
-PROVIDER_PATH := provider/v5
-SDK_PATH := sdk/v5
-VERSION_PATH := provider/v5/pkg/version.Version
-TFGEN := pulumi-tfgen-github
-PROVIDER := pulumi-resource-github
+PROJECT := github.com/$(ORG)/pulumi-$(PACK)
+PROVIDER_PATH := provider/v4
+VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
+TFGEN := pulumi-tfgen-$(PACK)
+PROVIDER := pulumi-resource-$(PACK)
 VERSION := $(shell pulumictl get version)
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)

@@ -4,3 +4,4 @@ aws: true
 env:
   AWS_REGION: us-west-2
 upstream-provider-org: pulumi
+makeTemplate: bridged

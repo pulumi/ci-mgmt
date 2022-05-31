@@ -7,3 +7,9 @@ env:
   DATABRICKS_HOST: https://accounts.cloud.databricks.com
 upstream-provider-org: databrickslabs
 provider-default-branch: main
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"
+  - name: aws 
+    version: "5.1.0"
