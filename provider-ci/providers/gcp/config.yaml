@@ -11,3 +11,11 @@ env:
   PULUMI_MISSING_DOCS_ERROR: true
 upstream-provider-org: pulumi
 upstream-provider-repo: terraform-provider-google-beta
+makeTemplate: bridged
+plugins:
+  - name: random
+    version: "4.0.0"
+  - name: kubernetes
+    version: "3.12.0"
+  - name: tls
+    version: "4.0.0"

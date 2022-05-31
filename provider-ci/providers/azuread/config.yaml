@@ -7,3 +7,4 @@ env:
   ARM_TENANT_ID: "706143bc-e1d4-4593-aee2-c9dc60ab9be7"
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
 upstream-provider-org: hashicorp
+makeTemplate: bridged

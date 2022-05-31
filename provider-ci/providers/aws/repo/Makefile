@@ -21,12 +21,12 @@ build:: install_plugins provider build_sdks install_sdks
 only_build:: build
 
 tfgen:: install_plugins
-	(cd provider && go build -o $(WORKING_DIR)/bin/${TFGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${TFGEN})
-	$(WORKING_DIR)/bin/pulumi-tfgen-aws schema --out provider/cmd/pulumi-resource-aws
-	(cd provider && VERSION=$(VERSION) go generate cmd/pulumi-resource-aws/main.go)
+	(cd provider && go build -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
+	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
+	(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)
 
 provider:: tfgen install_plugins
-	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION} -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${PROVIDER})
+	(cd provider && go build -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
 build_sdks:: build_nodejs build_python build_go build_dotnet
 
@@ -61,18 +61,20 @@ build_dotnet::
 	$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
 	cd sdk/dotnet/ && \
 		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.16" > go.mod && \
-		echo "${DOTNET_VERSION}" >version.txt && \
-		dotnet build /p:Version=${DOTNET_VERSION}
+		echo "$(DOTNET_VERSION)" >version.txt && \
+		dotnet build /p:Version=$(DOTNET_VERSION)
 
 lint_provider:: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 cleanup:: 
 	rm -r $(WORKING_DIR)/bin
-	rm -f provider/cmd/pulumi-resource-aws/schema.go
+	rm -f provider/cmd/$(PROVIDER)/schema.go
 
 help:: 
-	@grep '^[^.#]\+:\s\+.*#' Makefile | sed "s/\(.\+\):\s*\(.*\) #\s*\(.*\)/`printf "\033[93m"`\1`printf "\033[0m"`	\3 [\2]/" | expand -t20
+	@grep '^[^.#]\+:\s\+.*#' Makefile | \
+	sed "s/\(.\+\):\s*\(.*\) #\s*\(.*\)/`printf "\033[93m"`\1`printf "\033[0m"`	\3 [\2]/" | \
+	expand -t20
 
 clean:: 
 	rm -rf sdk/{dotnet,nodejs,go,python}
@@ -86,7 +88,7 @@ install_plugins::
 
 install_dotnet_sdk:: 
 	mkdir -p $(WORKING_DIR)/nuget
-	find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \;
+	find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \;
 
 install_python_sdk:: 
 
@@ -98,6 +100,6 @@ install_nodejs_sdk::
 install_sdks:: install_dotnet_sdk install_python_sdk install_nodejs_sdk
 
 test:: 
-	cd examples && go test -v -tags=all -parallel ${TESTPARALLELISM} -timeout 2h
+	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
 .PHONY:: development build tfgen provider build_sdks build_nodejs build_python build_go build_dotnet lint_provider cleanup help clean install_plugins install_dotnet_sdk install_python_sdk install_go_sdk install_nodejs_sdk install_sdks test

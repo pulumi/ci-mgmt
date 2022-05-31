@@ -149,7 +149,9 @@ export function bridgedProvider(config: Config): Makefile {
   const help: Target = {
     name: "help",
     commands: [
-      '@grep \'^[^.#]\\+:\\s\\+.*#\' Makefile | sed "s/\\(.\\+\\):\\s*\\(.*\\) #\\s*\\(.*\\)/`printf "\\033[93m"`\\1`printf "\\033[0m"`	\\3 [\\2]/" | expand -t20',
+      "@grep '^[^.#]\\+:\\s\\+.*#' Makefile | \\",
+      'sed "s/\\(.\\+\\):\\s*\\(.*\\) #\\s*\\(.*\\)/`printf "\\033[93m"`\\1`printf "\\033[0m"`	\\3 [\\2]/" | \\',
+      "expand -t20",
     ],
     phony: true,
   };
