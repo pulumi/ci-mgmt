@@ -80,7 +80,7 @@ export interface GoreleaserConfig {
 interface GoReleaserOpts {
   skipWindowsArmBuild: boolean;
   "major-version": number;
-  customLdFlag: string;
+  providerVersion: string;
   skipTfGen: boolean;
 }
 
@@ -112,8 +112,8 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
       ];
     }
 
-    if (opts.customLdFlag != "") {
-      ldflags.push(opts.customLdFlag);
+    if (opts.providerVersion != "") {
+      ldflags.push(`-X ${opts.providerVersion}={{.Tag}}`);
     }
 
     if (!opts.skipTfGen) {

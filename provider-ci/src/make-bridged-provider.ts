@@ -52,12 +52,17 @@ export function bridgedProvider(config: Config): Makefile {
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
   };
+  const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
+  if (config.providerVersion) {
+    ldFlagStatements.push(`-X ${config.providerVersion}=$(VERSION)`);
+  }
+  const ldflags = ldFlagStatements.join(" ");
   const provider: Target = {
     name: "provider",
     phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
-      `(cd provider && go build -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/${config["upstream-provider-org"]}/${config["upstream-provider-repo"]}/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
+      `(cd provider && go build -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
   };
   const build_nodejs: Target = {

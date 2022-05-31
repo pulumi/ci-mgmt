@@ -16,7 +16,7 @@ const Config = z.object({
   "golangci-timeout": z.string().default("20m"),
   "major-version": z.number().default(2),
   skipTfGen: z.boolean().default(false),
-  customLdFlag: z.string().default(""),
+  providerVersion: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
   makeTemplate: z.literal("bridged").optional(),
   plugins: z
