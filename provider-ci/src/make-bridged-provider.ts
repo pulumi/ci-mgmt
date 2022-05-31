@@ -1,9 +1,7 @@
 import { Config } from "./config";
 import { Makefile, Target } from "./make";
 
-type BridgedProviderConfig = Pick<Config, "provider" | "plugins">;
-
-export function bridgedProvider(config: BridgedProviderConfig): Makefile {
+export function bridgedProvider(config: Config): Makefile {
   const PACK = config.provider;
   const ORG = "pulumi";
   const PROJECT = `github.com/${ORG}/pulumi-${PACK}`;
@@ -49,9 +47,9 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     phony: true,
     dependencies: [install_plugins],
     commands: [
-      '(cd provider && go build -o $(WORKING_DIR)/bin/${TFGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${TFGEN})',
-      `$(WORKING_DIR)/bin/${TFGEN} schema --out provider/cmd/${PROVIDER}`,
-      `(cd provider && VERSION=$(VERSION) go generate cmd/${PROVIDER}/main.go)`,
+      '(cd provider && go build -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
+      "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
+      "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
   };
   const provider: Target = {
@@ -59,7 +57,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
-      '(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION} -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${PROVIDER})',
+      `(cd provider && go build -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/${config["upstream-provider-org"]}/${config["upstream-provider-repo"]}/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
   };
   const build_nodejs: Target = {
@@ -119,8 +117,8 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
       [
         "cd sdk/dotnet/",
         'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.16" > go.mod',
-        'echo "${DOTNET_VERSION}" >version.txt',
-        "dotnet build /p:Version=${DOTNET_VERSION}",
+        'echo "$(DOTNET_VERSION)" >version.txt',
+        "dotnet build /p:Version=$(DOTNET_VERSION)",
       ],
     ],
   };
@@ -140,7 +138,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     phony: true,
     commands: [
       "rm -r $(WORKING_DIR)/bin",
-      `rm -f provider/cmd/${PROVIDER}/schema.go`,
+      "rm -f provider/cmd/$(PROVIDER)/schema.go",
     ],
   };
   const help: Target = {
@@ -160,7 +158,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     phony: true,
     commands: [
       "mkdir -p $(WORKING_DIR)/nuget",
-      "find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \\;",
+      "find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \\;",
     ],
   };
   const install_python_sdk: Target = {
@@ -193,7 +191,7 @@ export function bridgedProvider(config: BridgedProviderConfig): Makefile {
     name: "test",
     phony: true,
     commands: [
-      "cd examples && go test -v -tags=all -parallel ${TESTPARALLELISM} -timeout 2h",
+      "cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h",
     ],
   };
   return {
