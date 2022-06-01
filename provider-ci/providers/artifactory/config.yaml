@@ -1,5 +1,5 @@
 provider: artifactory
-major-version: 1
+major-version: 2
 env:
   ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
   ARTIFACTORY_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN}}
