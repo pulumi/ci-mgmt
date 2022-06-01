@@ -4,7 +4,13 @@
 # workflow is run.
 name: Update GH workflows, bridged providers
 on:
-  - workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      automerge:
+        description: Mark created PRs for auto-merging?
+        required: true
+        type: boolean
+        default: true
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
@@ -58,7 +64,7 @@ jobs:
           path: pulumi-${{ matrix.provider }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
       - name: Set PR to auto-merge
-        if: steps.create-pr.outputs.pull-request-operation == 'created'
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge
         uses: peter-evans/enable-pull-request-automerge@v1
         with:
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
