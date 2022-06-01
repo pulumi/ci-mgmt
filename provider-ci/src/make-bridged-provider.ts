@@ -44,7 +44,7 @@ export function bridgedProvider(config: Config): Makefile {
     phony: true,
     dependencies: [install_plugins],
     commands: [
-      '(cd provider && go build -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
+      '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
@@ -59,7 +59,7 @@ export function bridgedProvider(config: Config): Makefile {
     phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
-      `(cd provider && go build -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
+      `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
   };
   const build_nodejs: Target = {
