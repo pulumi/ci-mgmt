@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { Config } from "./config";
 import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
@@ -8,20 +8,7 @@ const goVersion = "1.18.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
 
-export const WorkflowOpts = z.object({
-  provider: z.string(),
-  env: z.record(z.any()).optional(),
-  docker: z.boolean().default(false),
-  aws: z.boolean().default(false),
-  gcp: z.boolean().default(false),
-  lint: z.boolean().default(true),
-  "setup-script": z.string().optional(),
-  parallel: z.number().default(3),
-  timeout: z.number().default(60),
-});
-export type WorkflowOpts = z.infer<typeof WorkflowOpts>;
-
-const env = (opts: WorkflowOpts) =>
+const env = (opts: Config) =>
   Object.assign(
     {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
@@ -42,7 +29,7 @@ const env = (opts: WorkflowOpts) =>
 
 export function DefaultBranchWorkflow(
   name: string,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name,
@@ -77,7 +64,7 @@ export function DefaultBranchWorkflow(
 
 export function NightlyCronWorkflow(
   name: string,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   return {
     name: name,
@@ -97,10 +84,7 @@ export function NightlyCronWorkflow(
   };
 }
 
-export function ReleaseWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
+export function ReleaseWorkflow(name: string, opts: Config): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
     on: {
@@ -129,10 +113,7 @@ export function ReleaseWorkflow(
   return workflow;
 }
 
-export function PrereleaseWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
+export function PrereleaseWorkflow(name: string, opts: Config): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
     on: {
@@ -161,7 +142,7 @@ export function PrereleaseWorkflow(
 
 export function RunAcceptanceTestsWorkflow(
   name: string,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
@@ -201,7 +182,7 @@ export function RunAcceptanceTestsWorkflow(
 
 export function PullRequestWorkflow(
   name: string,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   return {
     name: name,
@@ -335,7 +316,7 @@ export interface UpdateUpstreamProviderArgs {
 
 export function UpdateUpstreamProviderWorkflow(
   args: UpdateUpstreamProviderArgs,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   const prStepOptions = {
     "commit-message":
@@ -460,7 +441,7 @@ export function UpdateUpstreamProviderWorkflow(
 
 export function CommandDispatchWorkflow(
   name: string,
-  opts: WorkflowOpts
+  opts: Config
 ): GithubWorkflow {
   return {
     name: name,
@@ -627,7 +608,7 @@ export class TestsJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string, opts: Config) {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -684,7 +665,7 @@ export class PublishPrereleaseJob implements NormalJob {
   };
   steps: NormalJob["steps"];
   name: string;
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string, opts: Config) {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -718,7 +699,7 @@ export class PublishJob implements NormalJob {
   name: string;
   steps: NormalJob["steps"];
 
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string, opts: Config) {
     this.name = name;
     Object.assign(this, { name });
     this.steps = [
@@ -860,7 +841,7 @@ export class LintSDKJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string, opts: Config) {
     this.name = name;
     Object.assign(this, { name });
     this.steps = [
@@ -957,10 +938,7 @@ export class WarnCodegenJob implements NormalJob {
   }
 }
 
-export function ModerationWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
+export function ModerationWorkflow(name: string, opts: Config): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name,
     on: {

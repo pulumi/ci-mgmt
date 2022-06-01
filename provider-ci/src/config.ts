@@ -2,11 +2,20 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
 import { z } from "zod";
-import * as wf from "./workflows";
 import { providersDir } from "../cmd/generate-providers";
 
 const Config = z.object({
   provider: z.string(),
+  // Workflow options
+  env: z.record(z.any()).optional(),
+  docker: z.boolean().default(false),
+  aws: z.boolean().default(false),
+  gcp: z.boolean().default(false),
+  lint: z.boolean().default(true),
+  "setup-script": z.string().optional(),
+  parallel: z.number().default(3),
+  timeout: z.number().default(60),
+  // Provider options
   "upstream-provider-org": z.string(),
   "upstream-provider-repo": z.string().optional(),
   "fail-on-extra-mapping": z.boolean().default(true),
@@ -18,6 +27,7 @@ const Config = z.object({
   skipTfGen: z.boolean().default(false),
   providerVersion: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
+  // Makefile options
   makeTemplate: z.literal("bridged").optional(),
   plugins: z
     .array(z.object({ name: z.string(), version: z.string() }))
@@ -25,9 +35,7 @@ const Config = z.object({
 });
 
 const parseConfig = (provider: string, content: string) => {
-  const parsed = z
-    .intersection(Config, wf.WorkflowOpts)
-    .parse(yaml.parse(content));
+  const parsed = Config.parse(yaml.parse(content));
   const upstreamProviderRepo =
     parsed["upstream-provider-repo"] ?? `terraform-provider-${provider}`;
   return {
