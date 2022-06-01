@@ -1,3 +1,7 @@
 provider: tls
 major-version: 4
 upstream-provider-org: terraform-providers
+makeTemplate: bridged
+plugins:
+  - name: aws
+    version: "4.26.0"

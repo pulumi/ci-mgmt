@@ -4,3 +4,7 @@ setup-script: "testing/setup.sh"
 env:
   VAULT_ADDR: "http://127.0.0.1:4646"
 upstream-provider-org: hashicorp
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.2.0"

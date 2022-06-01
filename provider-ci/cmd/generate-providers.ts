@@ -59,16 +59,19 @@ const writeProviderFiles = (provider: Provider) => {
   fs.mkdirSync(providerRepoPath, { recursive: true });
   for (const file of provider.files) {
     const filePath = path.join(providerRepoPath, file.path);
-    const yamlContent = yaml.stringify(file.data, {
-      sortMapEntries: true,
-      indentSeq: false,
-    });
+    const data =
+      typeof file.data === "string"
+        ? file.data
+        : yaml.stringify(file.data, {
+            sortMapEntries: true,
+            indentSeq: false,
+          });
     debug("Writing", filePath);
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(filePath, yamlContent, { encoding: "utf-8" });
+    fs.writeFileSync(filePath, data, { encoding: "utf-8" });
   }
 };
 

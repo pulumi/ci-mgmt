@@ -5,3 +5,4 @@ env:
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
 upstream-provider-org: pulumi
+makeTemplate: bridged

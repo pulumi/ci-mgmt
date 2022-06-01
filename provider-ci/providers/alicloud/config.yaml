@@ -13,3 +13,7 @@ upstream-provider-org: aliyun
 # mappings until we are able to explicitly able to tell tfgen that a mapping is
 # intentionally ignored.
 fail-on-missing-mapping: false
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"

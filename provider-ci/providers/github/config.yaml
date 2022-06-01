@@ -5,3 +5,4 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TESTING_TOKEN: ${{ secrets.GH_TESTING_TOKEN }}
 upstream-provider-org: pulumi
+makeTemplate: bridged

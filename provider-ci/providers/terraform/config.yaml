@@ -10,3 +10,4 @@ env:
 # pulumi-terraform is not a typical bridged provider, so the upgrade process may not work, but since these values are required to generate the workflows anyway,
 upstream-provider-org: hashicorp
 upstream-provider-repo: terraform
+makeTemplate: bridged

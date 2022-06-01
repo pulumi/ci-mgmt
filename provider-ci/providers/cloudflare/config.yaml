@@ -1,3 +1,9 @@
 provider: cloudflare
 major-version: 4
 upstream-provider-org: cloudflare
+makeTemplate: bridged
+plugins:
+  - name: gcp 
+    version: "5.0.0"
+  - name: tls 
+    version: "4.0.0"

@@ -4,3 +4,7 @@ lint: true
 env:
   EC_API_KEY: ${{ secrets.EC_API_KEY }}
 upstream-provider-org: elastic
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"

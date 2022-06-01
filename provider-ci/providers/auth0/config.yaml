@@ -4,3 +4,4 @@ env:
   AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
   AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
 upstream-provider-org: auth0
+makeTemplate: bridged

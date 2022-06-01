@@ -6,3 +6,11 @@ env:
   SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
   AWS_REGION: "us-west-2"
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: aws 
+    version: "4.1.0"
+  - name: azure 
+    version: "4.1.0"
+  - name: random 
+    version: "4.0.0"

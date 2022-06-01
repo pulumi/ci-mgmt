@@ -2,3 +2,7 @@ provider: vault
 docker: true
 major-version: 5
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: gcp 
+    version: "5.26.0"

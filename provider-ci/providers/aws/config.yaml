@@ -4,8 +4,18 @@ major-version: 5
 aws: true
 parallel: 1
 timeout: 90
-customLdFlag: "-X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion={{.Tag}}"
+providerVersion: "github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion"
 env:
   AWS_REGION: us-west-2
   PULUMI_MISSING_DOCS_ERROR: true
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: tls
+    version: "4.1.0"
+  - name: github
+    version: "4.10.0"
+  - name: kubernetes
+    version: "3.17.0"
+  - name: random
+    version: "4.4.1"

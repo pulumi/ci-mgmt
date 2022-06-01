@@ -5,3 +5,11 @@ env:
   MONGODB_ATLAS_PRIVATE_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_KEY }}
   MONGODB_ATLAS_PUBLIC_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_KEY }}
 upstream-provider-org: mongodb
+makeTemplate: bridged
+plugins:
+  - name: aws 
+    version: "4.0.0"
+  - name: azure 
+    version: "4.0.0"
+  - name: gcp 
+    version: "5.0.0"

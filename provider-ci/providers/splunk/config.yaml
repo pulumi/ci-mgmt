@@ -6,3 +6,4 @@ env:
   SPLUNK_USERNAME: admin
   SPLUNK_PASSWORD: password
 upstream-provider-org: splunk
+makeTemplate: bridged

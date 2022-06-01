@@ -4,3 +4,7 @@ env:
   TAILSCALE_API_KEY: ${{ secrets.TAILSCALE_API_KEY }}
   TAILSCALE_TAILNET: ${{ secrets.TAILSCALE_TAILNET }}
 upstream-provider-org: davidsbond
+makeTemplate: bridged
+plugins:
+  - name: random 
+    version: "4.3.1"

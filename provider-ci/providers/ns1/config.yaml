@@ -2,3 +2,4 @@ provider: ns1
 env:
   NS1_APIKEY: ${{ secrets.NS1_APIKEY }}
 upstream-provider-org: pulumi
+makeTemplate: bridged

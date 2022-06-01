@@ -8,3 +8,7 @@ env:
   MINIO_ENABLE_HTTPS: false
 upstream-provider-org: pulumi
 skipWindowsArmBuild: true
+makeTemplate: bridged
+plugins:
+  - name: aws 
+    version: "4.10.0"

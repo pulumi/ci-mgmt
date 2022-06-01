@@ -3,3 +3,7 @@ major-version: 4
 env:
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: kubernetes 
+    version: "3.10.0"

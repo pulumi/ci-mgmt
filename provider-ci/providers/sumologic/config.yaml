@@ -5,3 +5,9 @@ env:
   SUMOLOGIC_ACCESSKEY: ${{ secrets.SUMOLOGIC_ACCESSKEY }}
   SUMOLOGIC_ENVIRONMENT: ${{ secrets.SUMOLOGIC_ENVIRONMENT }}
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: aws 
+    version: "4.0.0"
+  - name: gcp 
+    version: "5.0.0"

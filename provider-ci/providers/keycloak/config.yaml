@@ -9,3 +9,7 @@ env: # these are in plaintext in the setup script
   KEYCLOAK_URL: "http://localhost:8080"
   KEYCLOAK_USER: "keycloak"
 upstream-provider-org: pulumi
+makeTemplate: bridged
+plugins:
+  - name: aws
+    version: "4.2.0"

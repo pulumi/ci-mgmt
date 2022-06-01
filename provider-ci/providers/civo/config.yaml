@@ -2,3 +2,4 @@ provider: civo
 env:
   CIVO_TOKEN: ${{ secrets.CIVO_TOKEN }}
 upstream-provider-org: pulumi
+makeTemplate: bridged
