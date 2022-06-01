@@ -24,9 +24,7 @@ const Config = z.object({
     .optional(),
 });
 
-export const getProviderConfig = (provider: string) => {
-  const configPath = path.join(providersDir, provider, "config.yaml");
-  const content = fs.readFileSync(configPath, { encoding: "utf-8" });
+const parseConfig = (provider: string, content: string) => {
   const parsed = z
     .intersection(Config, wf.WorkflowOpts)
     .parse(yaml.parse(content));
@@ -38,4 +36,10 @@ export const getProviderConfig = (provider: string) => {
   };
 };
 
-export type Config = ReturnType<typeof getProviderConfig>;
+export type Config = Readonly<ReturnType<typeof parseConfig>>;
+
+export const getConfig = (provider: string): Config => {
+  const configPath = path.join(providersDir, provider, "config.yaml");
+  const content = fs.readFileSync(configPath, { encoding: "utf-8" });
+  return parseConfig(provider, content);
+};

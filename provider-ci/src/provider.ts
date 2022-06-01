@@ -4,7 +4,7 @@ import * as goreleaser from "./goreleaser";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import { buildMakefile } from "./makefiles";
-import { getProviderConfig } from "./config";
+import { getConfig } from "./config";
 
 export interface ProviderFile {
   path: string;
@@ -12,7 +12,7 @@ export interface ProviderFile {
 }
 
 export const buildProviderFiles = (provider: string): ProviderFile[] => {
-  const config = getProviderConfig(provider);
+  const config = getConfig(provider);
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
   const files: ProviderFile[] = [
     {
