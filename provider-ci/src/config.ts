@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
-import z from "zod";
+import { z } from "zod";
 import * as wf from "./workflows";
 import { providersDir } from "../cmd/generate-providers";
 

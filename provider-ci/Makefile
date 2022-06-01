@@ -5,32 +5,32 @@ NAME ?= all
 all: ensure clean test format providers examples
 
 ensure:
-	npm i
+	yarn install
 
 clean:
 	rm -rf providers/*/repo
 	rm -rf platform/examples/repo
 
 test:	
-	npm run lint
+	yarn run lint
 
 format:
-	npm run format
+	yarn run format
 
 ifneq ($(NAME),all)
 provider:
 	echo $(NAME)
-	npm run gen-providers -- --name $(NAME) --debug
+	yarn run gen-providers -- --name $(NAME) --debug
 else 
 providers:
-	npm run gen-providers
+	yarn run gen-providers
 endif
 
 # Generate the GitHub Actions for the examples repo
 # It will generate the files to a platform directory and then examples directory
 examples:
-	npm run gen-examples
+	yarn run gen-examples
 
 discovery:
-	npm run discovery
-	npm run format
+	yarn run discovery
+	yarn run format
