@@ -594,7 +594,7 @@ export function SdkFilesChanged(): Step {
 export function SendCodegenWarnCommentPr(): Step {
   return {
     name: "Send codegen warning as comment on PR",
-    if: "steps.sdk_changed.outputs.changed == 'true'",
+    if: "steps.sdk_changed.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name != github.repository",
     uses: action.prComment,
     with: {
       message:
