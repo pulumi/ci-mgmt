@@ -1413,6 +1413,11 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
+zod-to-json-schema@^3.17.0:
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/zod-to-json-schema/-/zod-to-json-schema-3.17.0.tgz#dbfb61b10342c4d02fb2cacfa60d54d564e03458"
+  integrity sha512-Ioxmh41HTo4xAip7DPy79ysvGibPnDxzGoPNcNT+1dxwLjeXf/BruRnj7sRJAe2p4z8vTx6d62CXigEPTz6DqQ==
+
 zod@^3.14.2:
   version "3.17.3"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.17.3.tgz#86abbc670ff0063a4588d85a4dcc917d6e4af2ba"

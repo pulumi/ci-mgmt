@@ -3,9 +3,8 @@ import * as path from "path";
 import * as yaml from "yaml";
 import * as yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import { providersDir } from "../src/config";
 import { buildProviderFiles, ProviderFile } from "../src/provider";
-
-export const providersDir = "providers";
 
 const args = yargs(hideBin(process.argv))
   .command("generate-providers", "generate the providers")

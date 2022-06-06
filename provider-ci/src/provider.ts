@@ -78,11 +78,13 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: new lint.PulumiGolangCIConfig(config["golangci-timeout"]),
     },
   ];
+
   if (config.makeTemplate) {
     files.push({
       path: "Makefile",
       data: buildMakefile(config),
     });
   }
+
   return files;
 };

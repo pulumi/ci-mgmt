@@ -2,9 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
 import { z } from "zod";
-import { providersDir } from "../cmd/generate-providers";
 
-const Config = z.object({
+export const providersDir = "providers";
+
+export const Config = z.object({
   provider: z.string(),
   // Workflow options
   env: z.record(z.any()).optional(),

@@ -6,7 +6,8 @@
   "dependencies": {
     "yaml": "^1.10.2",
     "yargs": "^17.4.0",
-    "zod": "^3.14.2"
+    "zod": "^3.14.2",
+    "zod-to-json-schema": "^3.17.0"
   },
   "description": "Generate Pulumi github actions with Typescript",
   "devDependencies": {
@@ -39,6 +40,7 @@
     "discovery": "wget https://json.schemastore.org/github-workflow.json -O github-workflow.json && json2ts -i github-workflow.json -o src/github-workflow.d.ts --unreachableDefinitions --ignoreMinAndMaxItems",
     "gen-providers": "ts-node cmd/generate-providers.ts",
     "gen-examples": "ts-node cmd/generate-examples.ts",
+    "gen-config-schema": "ts-node cmd/generate-config-schema.ts",
     "lint": "eslint src/**/*.ts && tsc --noEmit",
     "format": "prettier --write src"
   },
