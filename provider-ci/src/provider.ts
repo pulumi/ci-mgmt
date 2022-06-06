@@ -4,7 +4,7 @@ import * as goreleaser from "./goreleaser";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import { buildMakefile } from "./makefiles";
-import { getConfig } from "./config";
+import { BridgedConfig, getConfig } from "./config";
 
 export interface ProviderFile {
   path: string;
@@ -13,6 +13,15 @@ export interface ProviderFile {
 
 export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const config = getConfig(provider);
+  if (config.template !== "bridged") {
+    throw new Error(
+      `Expected bridged template config, found "${config.template}"`
+    );
+  }
+  return generateProviderFiles(config);
+};
+
+export function generateProviderFiles(config: BridgedConfig) {
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
   const files: ProviderFile[] = [
     {
@@ -59,7 +68,7 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     },
     {
       path: path.join(githubWorkflowsDir, "update-upstream-provider.yml"),
-      data: wf.UpdateUpstreamProviderWorkflow(config, config),
+      data: wf.UpdateUpstreamProviderWorkflow(config),
     },
     {
       path: path.join(githubWorkflowsDir, "community-moderation.yml"),
@@ -67,11 +76,11 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     },
     {
       path: ".goreleaser.prerelease.yml",
-      data: new goreleaser.PulumiGoreleaserPreConfig(provider, config),
+      data: new goreleaser.PulumiGoreleaserPreConfig(config),
     },
     {
       path: ".goreleaser.yml",
-      data: new goreleaser.PulumiGoreleaserConfig(provider, config),
+      data: new goreleaser.PulumiGoreleaserConfig(config),
     },
     {
       path: ".golangci.yml",
@@ -87,4 +96,4 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   }
 
   return files;
-};
+}

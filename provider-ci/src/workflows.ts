@@ -1,4 +1,4 @@
-import { Config } from "./config";
+import { BridgedConfig } from "./config";
 import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
@@ -8,7 +8,7 @@ const goVersion = "1.18.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
 
-const env = (opts: Config) =>
+const env = (opts: BridgedConfig) =>
   Object.assign(
     {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
@@ -29,7 +29,7 @@ const env = (opts: Config) =>
 
 export function DefaultBranchWorkflow(
   name: string,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name,
@@ -64,7 +64,7 @@ export function DefaultBranchWorkflow(
 
 export function NightlyCronWorkflow(
   name: string,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   return {
     name: name,
@@ -84,7 +84,10 @@ export function NightlyCronWorkflow(
   };
 }
 
-export function ReleaseWorkflow(name: string, opts: Config): GithubWorkflow {
+export function ReleaseWorkflow(
+  name: string,
+  opts: BridgedConfig
+): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
     on: {
@@ -113,7 +116,10 @@ export function ReleaseWorkflow(name: string, opts: Config): GithubWorkflow {
   return workflow;
 }
 
-export function PrereleaseWorkflow(name: string, opts: Config): GithubWorkflow {
+export function PrereleaseWorkflow(
+  name: string,
+  opts: BridgedConfig
+): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
     on: {
@@ -142,7 +148,7 @@ export function PrereleaseWorkflow(name: string, opts: Config): GithubWorkflow {
 
 export function RunAcceptanceTestsWorkflow(
   name: string,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name: name,
@@ -182,7 +188,7 @@ export function RunAcceptanceTestsWorkflow(
 
 export function PullRequestWorkflow(
   name: string,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   return {
     name: name,
@@ -305,18 +311,8 @@ export function UpdatePulumiTerraformBridgeWorkflow(
   };
 }
 
-export interface UpdateUpstreamProviderArgs {
-  "upstream-provider-repo": string;
-  "upstream-provider-org": string;
-  "fail-on-extra-mapping": boolean;
-  "fail-on-missing-mapping": boolean;
-  "upstream-provider-major-version": string;
-  "provider-default-branch": string;
-}
-
 export function UpdateUpstreamProviderWorkflow(
-  args: UpdateUpstreamProviderArgs,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   const prStepOptions = {
     "commit-message":
@@ -325,7 +321,7 @@ export function UpdateUpstreamProviderWorkflow(
     author: "pulumi-bot <bot@pulumi.com>",
     branch:
       "pulumi-bot/v${{ github.event.inputs.version }}-${{ github.run_id}}",
-    base: args["provider-default-branch"],
+    base: opts["provider-default-branch"],
     // TODO: Add auto-merge.
     labels: "impact/no-changelog-required",
     title:
@@ -358,11 +354,11 @@ export function UpdateUpstreamProviderWorkflow(
 
     env: {
       ...env(opts),
-      PULUMI_EXTRA_MAPPING_ERROR: args["fail-on-extra-mapping"],
-      PULUMI_MISSING_MAPPING_ERROR: args["fail-on-missing-mapping"],
-      UPSTREAM_PROVIDER_ORG: args["upstream-provider-org"],
-      UPSTREAM_PROVIDER_REPO: args["upstream-provider-repo"],
-      UPSTREAM_PROVIDER_MAJOR_VERSION: args["upstream-provider-major-version"],
+      PULUMI_EXTRA_MAPPING_ERROR: opts["fail-on-extra-mapping"],
+      PULUMI_MISSING_MAPPING_ERROR: opts["fail-on-missing-mapping"],
+      UPSTREAM_PROVIDER_ORG: opts["upstream-provider-org"],
+      UPSTREAM_PROVIDER_REPO: opts["upstream-provider-repo"],
+      UPSTREAM_PROVIDER_MAJOR_VERSION: opts["upstream-provider-major-version"],
     },
 
     jobs: {
@@ -441,7 +437,7 @@ export function UpdateUpstreamProviderWorkflow(
 
 export function CommandDispatchWorkflow(
   name: string,
-  opts: Config
+  opts: BridgedConfig
 ): GithubWorkflow {
   return {
     name: name,
@@ -608,7 +604,7 @@ export class TestsJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: Config) {
+  constructor(name: string, opts: BridgedConfig) {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -665,7 +661,7 @@ export class PublishPrereleaseJob implements NormalJob {
   };
   steps: NormalJob["steps"];
   name: string;
-  constructor(name: string, opts: Config) {
+  constructor(name: string, opts: BridgedConfig) {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -699,7 +695,7 @@ export class PublishJob implements NormalJob {
   name: string;
   steps: NormalJob["steps"];
 
-  constructor(name: string, opts: Config) {
+  constructor(name: string, opts: BridgedConfig) {
     this.name = name;
     Object.assign(this, { name });
     this.steps = [
@@ -841,7 +837,7 @@ export class LintSDKJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: Config) {
+  constructor(name: string, opts: BridgedConfig) {
     this.name = name;
     Object.assign(this, { name });
     this.steps = [
@@ -938,7 +934,10 @@ export class WarnCodegenJob implements NormalJob {
   }
 }
 
-export function ModerationWorkflow(name: string, opts: Config): GithubWorkflow {
+export function ModerationWorkflow(
+  name: string,
+  opts: BridgedConfig
+): GithubWorkflow {
   const workflow: GithubWorkflow = {
     name,
     on: {
