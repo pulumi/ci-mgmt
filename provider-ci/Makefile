@@ -8,7 +8,12 @@ node_modules:: package.json yarn.lock
 	yarn install
 	@touch node_modules
 
-ensure:: node_modules
+config-schema.json:: node_modules cmd/generate-config-schema.ts src/*.ts
+	yarn gen-config-schema
+
+schema:: config-schema.json
+
+ensure:: node_modules config-schema.json
 
 clean:
 	rm -rf providers/*/repo

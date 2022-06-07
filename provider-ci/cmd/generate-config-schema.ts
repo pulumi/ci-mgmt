@@ -4,4 +4,4 @@ import { Config } from "../src/config";
 
 const schema = zodToJsonSchema(Config, "ci-config");
 
-fs.writeFileSync("ci-config-schema.json", JSON.stringify(schema, null, 2));
+fs.writeFileSync("config-schema.json", JSON.stringify(schema, null, 2));

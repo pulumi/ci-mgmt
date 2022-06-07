@@ -7,8 +7,7 @@ const providerNames = fs
   .filter((dir) => dir.isDirectory)
   .map((dir) => dir.name);
 
-const schemaConfig =
-  "# yaml-language-server: $schema=../ci-config-schema.json\n";
+const schemaConfig = "# yaml-language-server: $schema=../config-schema.json\n";
 
 providerNames.forEach((provider) => {
   const configYaml = fs.readFileSync(
@@ -16,5 +15,6 @@ providerNames.forEach((provider) => {
     "utf-8"
   );
   const configWithSchema = schemaConfig + configYaml;
-  fs.writeFileSync(path.join("config", `${provider}.yaml`), configWithSchema);
+  const outputPath = path.join("config", `${provider}.yaml`);
+  fs.writeFileSync(outputPath, configWithSchema);
 });
