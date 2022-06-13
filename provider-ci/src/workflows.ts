@@ -974,7 +974,7 @@ export function ModerationWorkflow(
     },
 
     jobs: {
-      warn_codegen: new WarnCodegenJob("warn_codegen"),
+      warn_codegen: new WarnCodegenJob("warn_codegen")
     },
   };
   return workflow;
