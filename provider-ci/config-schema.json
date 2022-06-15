@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/ci-config",
+  "definitions": {
+    "ci-config": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "template": {
+              "type": "string",
+              "const": "bridged",
+              "default": "bridged"
+            },
+            "provider": {
+              "type": "string"
+            },
+            "env": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "docker": {
+              "type": "boolean",
+              "default": false
+            },
+            "aws": {
+              "type": "boolean",
+              "default": false
+            },
+            "gcp": {
+              "type": "boolean",
+              "default": false
+            },
+            "lint": {
+              "type": "boolean",
+              "default": true
+            },
+            "setup-script": {
+              "type": "string"
+            },
+            "parallel": {
+              "type": "number",
+              "default": 3
+            },
+            "timeout": {
+              "type": "number",
+              "default": 60
+            },
+            "upstream-provider-org": {
+              "type": "string"
+            },
+            "upstream-provider-repo": {
+              "type": "string",
+              "default": ""
+            },
+            "fail-on-extra-mapping": {
+              "type": "boolean",
+              "default": true
+            },
+            "fail-on-missing-mapping": {
+              "type": "boolean",
+              "default": true
+            },
+            "upstream-provider-major-version": {
+              "type": "string",
+              "default": ""
+            },
+            "provider-default-branch": {
+              "type": "string",
+              "default": "master"
+            },
+            "golangci-timeout": {
+              "type": "string",
+              "default": "20m"
+            },
+            "major-version": {
+              "type": "number",
+              "default": 2
+            },
+            "skipTfGen": {
+              "type": "boolean",
+              "default": false
+            },
+            "providerVersion": {
+              "type": "string",
+              "default": ""
+            },
+            "skipWindowsArmBuild": {
+              "type": "boolean",
+              "default": false
+            },
+            "makeTemplate": {
+              "type": "string",
+              "const": "bridged"
+            },
+            "plugins": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "provider",
+            "upstream-provider-org"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "template": {
+              "type": "string",
+              "const": "examples"
+            }
+          },
+          "required": [
+            "template"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

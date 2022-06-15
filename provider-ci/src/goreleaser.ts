@@ -78,6 +78,7 @@ export interface GoreleaserConfig {
 }
 
 interface GoReleaserOpts {
+  provider: string;
   skipWindowsArmBuild: boolean;
   "major-version": number;
   providerVersion: string;
@@ -94,7 +95,7 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
   release: Release;
   blobs: Blob[];
 
-  constructor(name: string, opts: GoReleaserOpts) {
+  constructor(opts: GoReleaserOpts) {
     let ldflags: string[];
     const ignores: Ignores[] = [];
 
@@ -104,11 +105,11 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
 
     if (opts["major-version"] > 1) {
       ldflags = [
-        `-X github.com/pulumi/pulumi-${name}/provider/v${opts["major-version"]}/pkg/version.Version={{.Tag}}`,
+        `-X github.com/pulumi/pulumi-${opts.provider}/provider/v${opts["major-version"]}/pkg/version.Version={{.Tag}}`,
       ];
     } else {
       ldflags = [
-        `-X github.com/pulumi/pulumi-${name}/provider/pkg/version.Version={{.Tag}}`,
+        `-X github.com/pulumi/pulumi-${opts.provider}/provider/pkg/version.Version={{.Tag}}`,
       ];
     }
 
@@ -128,9 +129,9 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
         goos: ["darwin", "windows", "linux"],
         goarch: ["amd64", "arm64"],
         ignore: ignores,
-        main: `./cmd/pulumi-resource-${name}/`,
+        main: `./cmd/pulumi-resource-${opts.provider}/`,
         ldflags: ldflags,
-        binary: `pulumi-resource-${name}`,
+        binary: `pulumi-resource-${opts.provider}`,
       },
     ];
     this.archives = [
@@ -161,8 +162,8 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
 }
 
 export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
-  constructor(name: string, opts: GoReleaserOpts) {
-    super(name, opts);
+  constructor(opts: GoReleaserOpts) {
+    super(opts);
     this.release = {
       disable: false,
     };

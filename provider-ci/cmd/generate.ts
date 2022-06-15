@@ -3,13 +3,13 @@ import * as path from "path";
 import * as yaml from "yaml";
 import * as yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { providersDir } from "../src/config";
-import { buildProviderFiles, ProviderFile } from "../src/provider";
+import { parseConfig } from "../src/config";
+import { generate, RepositoryFiles } from "../src/generate";
 
 const args = yargs(hideBin(process.argv))
   .command("generate-providers", "generate the providers")
   .option("name", {
-    description: "Provider name to generate",
+    description: "Project name to generate",
     type: "string",
     array: true,
     alias: "n",
@@ -26,32 +26,26 @@ const debug = (message?: any, ...optionalParams: any[]) => {
   }
 };
 
-const getProviders = (names: string[] | undefined) => {
-  const providers = fs
-    .readdirSync(providersDir, { withFileTypes: true })
-    .filter((dir) => dir.isDirectory)
-    .map((dir) => dir.name);
-
-  const providerSet = new Set(providers);
-  const unknown = names?.filter((n) => !providerSet.has(n)) ?? [];
-  if (unknown?.length > 0) {
-    throw new Error(`Unknown providers ${unknown?.join(", ")}`);
-  }
-
-  const nameSet = new Set(names);
-  if (names !== undefined) {
-    return providers.filter((n) => nameSet.has(n));
-  }
-  return providers;
-};
-
-interface Provider {
-  name: string;
-  files: ProviderFile[];
+function getConfigs() {
+  const includeAll = args.name === undefined || args.name.length === 0;
+  const nameSet = new Set(args.name);
+  const configNames = fs
+    .readdirSync("config", { withFileTypes: true })
+    .filter((d) => d.isFile() && d.name.endsWith(".yaml"))
+    .map((d) => d.name.substring(0, d.name.length - 5));
+  return configNames
+    .filter((name) => includeAll || nameSet.has(name))
+    .map((name) => {
+      const configContent = fs.readFileSync(
+        path.join("config", `${name}.yaml`),
+        "utf-8"
+      );
+      return { name, config: parseConfig(configContent) };
+    });
 }
 
-const writeProviderFiles = (provider: Provider) => {
-  const providerRepoPath = path.join(providersDir, provider.name, "repo");
+const writeProviderFiles = (provider: RepositoryFiles) => {
+  const providerRepoPath = path.join("repos", provider.repository);
   if (fs.existsSync(providerRepoPath)) {
     fs.rmSync(providerRepoPath, { recursive: true });
   }
@@ -74,11 +68,11 @@ const writeProviderFiles = (provider: Provider) => {
   }
 };
 
-const providerNames = getProviders(args.name);
-debug("providers to generate", providerNames);
+const configs = getConfigs();
+debug(
+  "providers to generate",
+  configs.map((c) => c.name)
+);
 
-const providerFiles = providerNames.map((providerName) => ({
-  name: providerName,
-  files: buildProviderFiles(providerName),
-}));
+const providerFiles = configs.map((config) => generate(config.config));
 providerFiles.forEach(writeProviderFiles);

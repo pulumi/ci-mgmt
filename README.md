@@ -38,6 +38,7 @@ cd provider-ci && make
 
 Common commands:
 
+- `make gen`: Generate all code
 - `make providers`: Generate code for all providers
 - `make provider NAME=aws`: Generate code for single provider with debug information
 - `make examples`: Generate examples code

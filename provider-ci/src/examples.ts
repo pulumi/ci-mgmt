@@ -1,4 +1,5 @@
 import { GithubWorkflow, NormalJob } from "./github-workflow";
+import { ProviderFile } from "./provider";
 import { Step } from "./steps";
 
 const env = () => ({
@@ -985,3 +986,32 @@ export function RunTestsCommandWorkflow(name: string): GithubWorkflow {
     },
   };
 }
+
+export const generateExamplesFiles = (): ProviderFile[] => {
+  return [
+    {
+      path: "cron.yml",
+      data: CronWorkflow("Run Examples Cron Job"),
+    },
+    {
+      path: "command_dispatch.yml",
+      data: new CommandDispatchWorkflow(),
+    },
+    {
+      path: "pr.yml",
+      data: PrWorkFlow("New Pull request Open"),
+    },
+    {
+      path: "run-tests-command.yml",
+      data: RunTestsCommandWorkflow("Run Examples Tests From PR"),
+    },
+    {
+      path: "smoke-test-cli-command.yml",
+      data: SmokeTestCliWorkflow("Smoke Test Specific Version of CLI"),
+    },
+    {
+      path: "smoke-test-provider-command.yml",
+      data: SmokeTestProvidersWorkflow("Smoke Test Latest Provider Release"),
+    },
+  ];
+};

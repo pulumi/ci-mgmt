@@ -1,7 +1,7 @@
-import { Config } from "./config";
+import { BridgedConfig } from "./config";
 import { Makefile, Target } from "./make";
 
-export function bridgedProvider(config: Config): Makefile {
+export function bridgedProvider(config: BridgedConfig): Makefile {
   const PACK = config.provider;
   const ORG = "pulumi";
   const PROJECT = `github.com/$(ORG)/pulumi-$(PACK)`;
