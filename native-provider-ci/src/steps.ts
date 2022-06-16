@@ -1,4 +1,3 @@
-import { stripVTControlCharacters } from "util";
 import * as action from "./action-versions";
 import { NormalJob } from "./github-workflow";
 
@@ -793,4 +792,79 @@ export function CodegenDuringSDKBuild(provider: string) {
     };
   }
   return {};
+export function UpdatePulumi(): Step {
+  return {
+    name: "Update Pulumi/Pulumi",
+    id: "gomod",
+    run:
+      "git config --local user.email 'bot@pulumi.com'\n" +
+      "git config --local user.name 'pulumi-bot'\n" +
+      "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
+      "cd provider\n" +
+      "go get github.com/pulumi/pulumi/pkg/v3\n" +
+      "go get github.com/pulumi/pulumi/sdk/v3\n" +
+      "go mod download\n" +
+      "go mod tidy\n" +
+      "cd ../sdk\n" +
+      "go get github.com/pulumi/pulumi/sdk/v3\n" +
+      "go mod download\n" +
+      "go mod tidy\n" +
+      "cd ..\n" +
+      "git update-index -q --refresh\n" +
+      "if ! git diff-files --quiet; then echo ::set-output name=changes::1 fi",
+  };
+}
+
+export function ProviderWithPulumiUpgrade(provider: string): Step {
+  let buildProvider = "make codegen && make local_generate\n";
+  if (provider === "command" || provider == "kubernetes") {
+    buildProvider = "make build\n";
+  }
+  return {
+    name: "Provider with Pulumi Upgrade",
+    if: "steps.gomod.outputs.changes != 0",
+    run:
+      buildProvider +
+      "git add sdk/nodejs\n" +
+      'git commit -m "Regenerating Node.js SDK based on updated modules" || echo "ignore commit failure, may be empty"\n' +
+      "git add sdk/python\n" +
+      'git commit -m "Regenerating Python SDK based on updated modules" || echo "ignore commit failure, may be empty"\n' +
+      "git add sdk/dotnet\n" +
+      'git commit -m "Regenerating .NET SDK based on updated modules" || echo "ignore commit failure, may be empty"\n' +
+      "git add sdk/go*\n" +
+      'git commit -m "Regenerating Go SDK based on updated modules" || echo "ignore commit failure, may be empty"\n' +
+      "git add .\n" +
+      'git commit -m "Updated modules"\n' +
+      "git push origin update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
+  };
+}
+
+export function CreateUpdatePulumiPR(): Step {
+  return {
+    name: "Create PR",
+    id: "create-pr",
+    if: "steps.gomod.output.changes != 0",
+    uses: action.pullRequest,
+    with: {
+      source_branch:
+        "update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
+      destination_branch: "master",
+      pr_title: "Automated pulumi/pulumi upgrade",
+      github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+    },
+  };
+}
+
+export function UpdatePulumiPRAutoMerge(): Step {
+  return {
+    name: "Set AutoMerge",
+    if: "steps.create-pr.outputs.has_changed_files",
+    uses: action.autoMerge,
+    with: {
+      token: "{{ secrets.PULUMI_BOT_TOKEN }}",
+      "pull-request-number": "${{steps.create-pr.outputs.pr_number",
+      repository: "${{ github.repository }}",
+      "merge-method": "squash",
+    },
+  };
 }
