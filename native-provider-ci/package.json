@@ -1,8 +1,4 @@
 {
-  "author": "Lee Briggs",
-  "bugs": {
-    "url": "https://github.com/pulumi/ci-mgmt/issues"
-  },
   "dependencies": {
     "yaml": "^1.10.2",
     "yargs": "^17.4.0",

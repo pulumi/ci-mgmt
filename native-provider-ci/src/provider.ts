@@ -10,7 +10,7 @@ const Config = z.object({
   provider: z.string(),
   "provider-default-branch": z.string().default("master"),
   "golangci-timeout": z.string().default("20m"),
-  "major-version": z.number().default(2),
+  "major-version": z.number().default(0),
   customLdFlag: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
 });
@@ -42,6 +42,14 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     {
       path: path.join(githubWorkflowsDir, "command-dispatch.yml"),
       data: wf.CommandDispatchWorkflow("command-dispatch", config),
+    },
+    {
+      path: path.join(githubWorkflowsDir, "pull-request.yml"),
+      data: wf.PullRequestWorkflow("pull-request", config),
+    },
+    {
+      path: path.join(githubWorkflowsDir, "run-acceptance-tests.yml"),
+      data: wf.RunAcceptanceTestsWorkflow("run-acceptance-tests", config),
     },
   ];
 };
