@@ -792,6 +792,8 @@ export function CodegenDuringSDKBuild(provider: string) {
     };
   }
   return {};
+}
+
 export function UpdatePulumi(): Step {
   return {
     name: "Update Pulumi/Pulumi",

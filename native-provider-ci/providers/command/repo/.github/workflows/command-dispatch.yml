@@ -16,11 +16,8 @@ env:
   TRAVIS_OS_NAME: linux
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-<<<<<<< HEAD
   AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
-=======
->>>>>>> 3c548907 (Add pull request/comment on PR workflow)
 jobs:
   command-dispatch-for-testing:
     runs-on: ubuntu-latest

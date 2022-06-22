@@ -8,10 +8,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PROVIDER: aws-native
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-<<<<<<< HEAD
-=======
-  PULUMI_API: https://api.pulumi-staging.io
->>>>>>> 3c548907 (Add pull request/comment on PR workflow)
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

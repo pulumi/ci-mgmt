@@ -16,10 +16,7 @@ env:
   GOOGLE_PROJECT: pulumi-ci-gcp-provider
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
-<<<<<<< HEAD
   PULUMI_API: https://api.pulumi-staging.io
-=======
->>>>>>> 3c548907 (Add pull request/comment on PR workflow)
 jobs:
   comment-on-pr:
     runs-on: ubuntu-latest
