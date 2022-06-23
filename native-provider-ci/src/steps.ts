@@ -629,7 +629,7 @@ export function SetStackName(provider: string): Step {
     return {
       name: "Set stack name in output",
       id: "stackname",
-      run: "echo '::set-output name=stack-name::${{ secrets.PULUMI_TEST_OWNER }}/${{ github.sha }}-$(date +%s)'",
+      run: "echo '::set-output name=stack-name::${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}'",
     };
   }
   return {};
