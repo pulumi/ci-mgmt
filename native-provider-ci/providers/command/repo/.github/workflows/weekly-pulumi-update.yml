@@ -82,7 +82,9 @@ jobs:
 
         git update-index -q --refresh
 
-        if ! git diff-files --quiet; then echo ::set-output name=changes::1 fi
+        if ! git diff-files --quiet; then 
+        	echo ::set-output name=changes::1 
+        fi
     - name: Provider with Pulumi Upgrade
       if: steps.gomod.outputs.changes != 0
       run: >-
@@ -123,7 +125,7 @@ jobs:
       uses: peter-evans/enable-pull-request-automerge@v1
       with:
         token: "{{ secrets.PULUMI_BOT_TOKEN }}"
-        pull-request-number: ${{steps.create-pr.outputs.pr_number
+        pull-request-number: ${{ steps.create-pr.outputs.pr_number }}
         repository: ${{ github.repository }}
         merge-method: squash
     strategy:

@@ -813,7 +813,7 @@ export function UpdatePulumi(): Step {
       "go mod tidy\n" +
       "cd ..\n" +
       "git update-index -q --refresh\n" +
-      "if ! git diff-files --quiet; then echo ::set-output name=changes::1 fi",
+      "if ! git diff-files --quiet; then \n\techo ::set-output name=changes::1 \nfi",
   };
 }
 
@@ -864,7 +864,7 @@ export function UpdatePulumiPRAutoMerge(): Step {
     uses: action.autoMerge,
     with: {
       token: "{{ secrets.PULUMI_BOT_TOKEN }}",
-      "pull-request-number": "${{steps.create-pr.outputs.pr_number",
+      "pull-request-number": "${{ steps.create-pr.outputs.pr_number }}",
       repository: "${{ github.repository }}",
       "merge-method": "squash",
     },
