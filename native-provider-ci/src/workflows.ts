@@ -4,7 +4,7 @@ import * as steps from "./steps";
 import { Step } from "./steps";
 
 const pythonVersion = "3.7";
-const goVersion = "1.17.x";
+const goVersion = "1.18.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
 
@@ -144,6 +144,48 @@ export function RunAcceptanceTestsWorkflow(
     });
   }
   return workflow;
+}
+
+export function weeklyPulumiUpdate(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  return {
+    name: name,
+    on: {
+      schedule: [
+        {
+          cron: "35 12 * * 4",
+        },
+      ],
+      workflow_dispatch: {},
+    },
+    env: env(opts),
+    jobs: {
+      update_pulumi: new EmptyJob("update-pulumi")
+        .addStrategy({
+          "fail-fast": true,
+          matrix: {
+            goversion: [goVersion],
+            dotnetversion: [dotnetVersion],
+            pythonversion: [pythonVersion],
+            nodeversion: [nodeVersion],
+          },
+        })
+        .addStep(steps.CheckoutRepoStep())
+        .addStep(steps.CheckoutTagsStep())
+        .addStep(steps.InstallGo())
+        .addStep(steps.InstallPulumiCtl())
+        .addStep(steps.InstallPulumiCli())
+        .addStep(steps.InstallDotNet())
+        .addStep(steps.InstallNodeJS())
+        .addStep(steps.InstallPython())
+        .addStep(steps.UpdatePulumi())
+        .addStep(steps.ProviderWithPulumiUpgrade(opts.provider))
+        .addStep(steps.CreateUpdatePulumiPR())
+        .addStep(steps.UpdatePulumiPRAutoMerge()),
+    },
+  };
 }
 
 // This section represents sub-jobs that may be used in more than one workflow

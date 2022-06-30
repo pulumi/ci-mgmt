@@ -6,6 +6,8 @@ export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const createOrUpdateComment = "peter-evans/create-or-update-comment@v1";
 export const uploadArtifact = "actions/upload-artifact@v2";
 export const deleteArtifact = "geekyeggo/delete-artifact@v1";
+export const pullRequest = "repo-sync/pull-request@v2";
+export const autoMerge = "peter-evans/enable-pull-request-automerge@v1";
 
 export const installPulumiCli = "pulumi/action-install-pulumi-cli@v2";
 export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.5.0";
@@ -23,7 +25,6 @@ export const downloadArtifact = "actions/download-artifact@v2";
 export const notifySlack = "8398a7/action-slack@v3";
 export const goReleaser = "goreleaser/goreleaser-action@v2";
 export const addAndCommit = "EndBug/add-and-commit@v7";
-export const pullRequest = "repo-sync/pull-request@v2";
-export const pathsFilter = "dorny/paths-filter@v2";
 
+export const pathsFilter = "dorny/paths-filter@v2";
 export const goLint = "golangci/golangci-lint-action@v3";

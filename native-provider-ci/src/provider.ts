@@ -51,5 +51,9 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       path: path.join(githubWorkflowsDir, "run-acceptance-tests.yml"),
       data: wf.RunAcceptanceTestsWorkflow("run-acceptance-tests", config),
     },
+    {
+      path: path.join(githubWorkflowsDir, "weekly-pulumi-update.yml"),
+      data: wf.weeklyPulumiUpdate("weekly-pulumi-update", config),
+    },
   ];
 };
