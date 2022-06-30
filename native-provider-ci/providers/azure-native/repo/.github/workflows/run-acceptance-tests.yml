@@ -9,6 +9,7 @@ on:
     - main
     paths-ignore:
     - CHANGELOG.md
+  workflow_dispatch: {}
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PROVIDER: azure-native
