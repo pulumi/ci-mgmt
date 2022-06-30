@@ -7,6 +7,7 @@ const pythonVersion = "3.7";
 const goVersion = "1.18.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
+const javaVersion = "11";
 
 const env = (opts: BridgedConfig) =>
   Object.assign(
@@ -23,6 +24,12 @@ const env = (opts: BridgedConfig) =>
       TRAVIS_OS_NAME: "linux",
       SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
       PULUMI_GO_DEP_ROOT: "${{ github.workspace }}/..",
+      PUBLISH_REPO_URL: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/",
+      PUBLISH_REPO_USERNAME: "${{ secrets.OSSRH_USERNAME }}",
+      PUBLISH_REPO_PASSWORD: "${{ secrets.OSSRH_PASSWORD }}",
+      SIGNING_KEY_ID: "${{ secrets.JAVA_SIGNING_KEY_ID }}",
+      SIGNING_KEY: "${{ secrets.JAVA_SIGNING_KEY }}",
+      SIGNING_PASSWORD: "${{ secrets.JAVA_SIGNING_PASSWORD }}",
     },
     opts.env
   );
@@ -498,7 +505,8 @@ export class BuildSdkJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      language: ["nodejs", "python", "dotnet", "go"],
+      javaversion: [javaVersion],
+      language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
   steps = [
@@ -511,10 +519,12 @@ export class BuildSdkJob implements NormalJob {
     steps.InstallNodeJS(),
     steps.InstallDotNet(),
     steps.InstallPython(),
+    steps.InstallJava(),
     steps.DownloadProviderStep(),
     steps.UnzipProviderBinariesStep(),
     steps.InstallPlugins(),
     steps.SetProvidersToPATH(),
+    steps.SetPackageVersionToEnv(),
     steps.BuildSdksStep(),
     steps.CheckCleanWorkTreeStep(),
     steps.ZipSDKsStep(),
@@ -597,7 +607,8 @@ export class TestsJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      language: ["nodejs", "python", "dotnet", "go"],
+      javaversion: [javaVersion],
+      language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
   steps: NormalJob["steps"];
@@ -616,6 +627,7 @@ export class TestsJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+      steps.InstallJava(),
       steps.DownloadProviderStep(),
       steps.UnzipProviderBinariesStep(),
       steps.SetNugetSource(),
@@ -752,6 +764,7 @@ export class PublishSDKJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
+      javaversion: [javaVersion],
     },
   };
   steps = [
@@ -764,14 +777,19 @@ export class PublishSDKJob implements NormalJob {
     steps.InstallNodeJS(),
     steps.InstallDotNet(),
     steps.InstallPython(),
+    steps.InstallJava(),
     steps.DownloadSpecificSDKStep("python"),
     steps.UnzipSpecificSDKStep("python"),
     steps.DownloadSpecificSDKStep("dotnet"),
     steps.UnzipSpecificSDKStep("dotnet"),
     steps.DownloadSpecificSDKStep("nodejs"),
     steps.UnzipSpecificSDKStep("nodejs"),
+    steps.DownloadSpecificSDKStep("java"),
+    steps.UnzipSpecificSDKStep("java"),
     steps.RunCommand("python -m pip install pip twine"),
     steps.RunPublishSDK(),
+    steps.SetPackageVersionToEnv(),
+    steps.RunPublishJavaSDK(),
     steps.NotifySlack("Failure in publishing SDK"),
   ];
   name: string;
