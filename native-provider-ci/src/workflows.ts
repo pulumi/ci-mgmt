@@ -105,6 +105,7 @@ export function RunAcceptanceTestsWorkflow(
         branches: ["master", "main"],
         "paths-ignore": ["CHANGELOG.md"],
       },
+      workflow_dispatch: {},
     },
     env: {
       ...env(opts),
