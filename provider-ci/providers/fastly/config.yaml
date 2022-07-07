@@ -1,11 +1,11 @@
 provider: fastly
-major-version: 4
+major-version: 5
 env:
   FASTLY_API_KEY: ${{ secrets.FASTLY_API_KEY }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
   - name: aws 
-    version: "4.0.0"
+    version: "5.0.0"
   - name: tls 
     version: "4.0.0"

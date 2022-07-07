@@ -3,7 +3,7 @@
 PACK := fastly
 ORG := pulumi
 PROJECT := github.com/$(ORG)/pulumi-$(PACK)
-PROVIDER_PATH := provider/v4
+PROVIDER_PATH := provider/v5
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
@@ -90,7 +90,7 @@ clean::
 
 install_plugins:: 
 	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
-	pulumi plugin install resource aws 4.0.0
+	pulumi plugin install resource aws 5.0.0
 	pulumi plugin install resource tls 4.0.0
 
 install_dotnet_sdk:: 
