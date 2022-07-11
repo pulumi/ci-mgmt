@@ -146,7 +146,47 @@ export function RunAcceptanceTestsWorkflow(
   return workflow;
 }
 
-export function weeklyPulumiUpdate(
+export function BuildWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  const workflow: GithubWorkflow = {
+    name: name,
+    on: {
+      push: {
+        branches: ["master", "main", "feature-**"],
+        "paths-ignore": ["CHANGELOG.md"],
+        "tags-ignore": ["v*", "sdk/*", "**"],
+      },
+      workflow_dispatch: {},
+    },
+    env: env(opts),
+    jobs: {
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts).addRunsOn(opts.provider),
+      test: new TestsJob("test", opts),
+      publish: new PublishPrereleaseJob("publish", opts),
+      publish_sdk: new PublishSDKsJob("publish_sdk", opts),
+    },
+  };
+  if (opts.provider === "kubernetes") {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "destroy-test-cluster": new TeardownTestClusterJob(
+        "teardown-test-cluster",
+        opts
+      ),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      lint: new LintKubernetesJob("lint").addDispatchConditional(true),
+    });
+  }
+  return workflow;
+}
+
+export function WeeklyPulumiUpdate(
   name: string,
   opts: WorkflowOpts
 ): GithubWorkflow {
@@ -227,6 +267,7 @@ export class BuildSdkJob implements NormalJob {
       steps.GenerateSDKs(opts.provider),
       steps.BuildSDKs(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.Porcelain(),
       steps.ZipSDKsStep(),
       steps.UploadSDKs(),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
@@ -289,9 +330,11 @@ export class PrerequisitesJob implements NormalJob {
       steps.LabelIfNoBreakingChanges(opts.provider),
       steps.BuildProvider(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.Porcelain(),
       steps.TarProviderBinaries(),
       steps.UploadProviderBinaries(),
       steps.TestProviderLibrary(),
+      steps.NotifySlack("Failure in building provider prerequisites"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
@@ -428,7 +471,7 @@ export class BuildTestClusterJob implements NormalJob {
 export class TeardownTestClusterJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   strategy = {
-    "fail-fast": true,
+    "fail-fast": false,
     matrix: {
       goversion: [goVersion],
       dotnetversion: [dotnetVersion],
@@ -444,6 +487,8 @@ export class TeardownTestClusterJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     this.needs = ["build-test-cluster", "test"];
+    this.if =
+      "${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
@@ -463,9 +508,6 @@ export class TeardownTestClusterJob implements NormalJob {
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
     if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
       this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
       this.steps?.unshift(steps.CheckoutRepoStepAtPR());
     }
@@ -501,6 +543,109 @@ export class LintKubernetesJob implements NormalJob {
       this.steps.unshift(steps.CheckoutRepoStepAtPR());
     }
     return this;
+  }
+}
+
+export class PublishPrereleaseJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  needs = "test";
+  strategy = {
+    matrix: {
+      goversion: [goVersion],
+    },
+  };
+  steps: NormalJob["steps"];
+  name: string;
+  constructor(name: string, opts: WorkflowOpts) {
+    this.name = name;
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.ConfigureAwsCredentialsForPublish(),
+      steps.SetPreReleaseVersion(),
+      steps.RunGoReleaserWithArgs(
+        `-p ${opts.parallel} -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout ${opts.timeout}m0s`
+      ),
+      steps.NotifySlack("Failure in publishing binaries"),
+    ];
+    Object.assign(this, { name });
+  }
+}
+
+export class PublishSDKsJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  needs = "publish";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
+    },
+  };
+  name: string;
+  steps: NormalJob["steps"];
+
+  constructor(name: string, opts: WorkflowOpts) {
+    this.name = name;
+    Object.assign(this, { name });
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.ConfigureAwsCredentialsForPublish(),
+      steps.SetPreReleaseVersion(),
+      steps.RunGoReleaserWithArgs(
+        `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
+      ),
+      steps.NotifySlack("Failure in publishing binaries"),
+    ];
+  }
+}
+
+export class PublishSDKJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  needs = "publish";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
+    },
+  };
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.CheckoutScriptsRepoStep(),
+    steps.CheckoutTagsStep(),
+    steps.InstallGo(),
+    steps.InstallPulumiCtl(),
+    steps.InstallPulumiCli(),
+    steps.InstallNodeJS(),
+    steps.InstallDotNet(),
+    steps.InstallPython(),
+    steps.DownloadSpecificSDKStep("python"),
+    steps.UnzipSpecificSDKStep("python"),
+    steps.DownloadSpecificSDKStep("dotnet"),
+    steps.UnzipSpecificSDKStep("dotnet"),
+    steps.DownloadSpecificSDKStep("nodejs"),
+    steps.UnzipSpecificSDKStep("nodejs"),
+    steps.InstallTwine(),
+    steps.RunPublishSDK(),
+    steps.NotifySlack("Failure in publishing SDK"),
+  ];
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
   }
 }
 
