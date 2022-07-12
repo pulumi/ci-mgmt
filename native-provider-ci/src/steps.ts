@@ -870,3 +870,75 @@ export function UpdatePulumiPRAutoMerge(): Step {
     },
   };
 }
+
+export function SetPreReleaseVersion(): Step {
+  return {
+    name: "Set PreRelease Version",
+    run: `echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV`,
+  };
+}
+
+export function RunGoReleaserWithArgs(args?: string): Step {
+  return {
+    name: "Run GoReleaser",
+    uses: action.goReleaser,
+    with: {
+      args: `${args}`,
+      version: "latest",
+    },
+  };
+}
+
+export function NotifySlack(name: string): Step {
+  return {
+    if: "failure() && github.event_name == 'push'",
+    name: "Notify Slack",
+    uses: action.notifySlack,
+    with: {
+      author_name: `${name}`,
+      fields: "repo,commit,author,action",
+      status: "${{ job.status }}",
+    },
+  };
+}
+
+export function DownloadSpecificSDKStep(name: string): Step {
+  return {
+    name: `Download ${name} SDK`,
+    uses: action.downloadArtifact,
+    with: {
+      name: `${name}-sdk.tar.gz`,
+      path: "${{ github.workspace}}/sdk/",
+    },
+  };
+}
+
+export function UnzipSpecificSDKStep(name: string): Step {
+  return {
+    name: `Uncompress ${name} SDK`,
+    run: `tar -zxf \${{github.workspace}}/sdk/${name}.tar.gz -C \${{github.workspace}}/sdk/${name}`,
+  };
+}
+
+export function InstallTwine(): Step {
+  return {
+    name: "Install Twine",
+    run: "python -m pip install pip twine",
+  };
+}
+
+export function RunPublishSDK(): Step {
+  return {
+    name: "Publish SDKs",
+    run: "./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
+    env: {
+      NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
+    },
+  };
+}
+
+export function Porcelain(): Step {
+  return {
+    run: "git status --porcelain",
+  };
+}
