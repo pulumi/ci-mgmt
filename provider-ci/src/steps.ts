@@ -377,7 +377,7 @@ export function SetPackageVersionToEnv(): Step {
   return {
     // This is required for the Java Provider Build + Publish Steps
     name: "Set PACKAGE_VERSION to Env",
-    run: 'echo "PACKAGE_VERSION=v$(pulumictl get version --language generic)" >> $GITHUB_ENV',
+    run: 'echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >> $GITHUB_ENV',
   };
 }
 
