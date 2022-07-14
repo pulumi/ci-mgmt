@@ -845,7 +845,7 @@ export function CreateUpdatePulumiPR(): Step {
   return {
     name: "Create PR",
     id: "create-pr",
-    if: "steps.gomod.output.changes != 0",
+    if: "steps.gomod.outputs.changes != 0",
     uses: action.pullRequest,
     with: {
       source_branch:
