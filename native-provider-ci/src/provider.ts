@@ -2,8 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
 import z from "zod";
-import * as shared from "./shared-workflows";
+import * as shared from "../../provider-ci/src/shared-workflows";
 import * as wf from "./workflows";
+import * as goreleaser from "./goreleaser";
 import { providersDir } from "../cmd/generate-providers";
 
 const Config = z.object({
@@ -58,6 +59,22 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     {
       path: path.join(githubWorkflowsDir, "build.yml"),
       data: wf.BuildWorkflow("build", config),
+    },
+    {
+      path: path.join(githubWorkflowsDir, "prerelease.yml"),
+      data: wf.PrereleaseWorkflow("prerelease", config),
+    },
+    {
+      path: path.join(githubWorkflowsDir, "release.yml"),
+      data: wf.ReleaseWorkflow("release", config),
+    },
+    {
+      path: ".goreleaser.prerelease.yml",
+      data: new goreleaser.PulumiGoreleaserPreConfig(config),
+    },
+    {
+      path: ".goreleaser.yml",
+      data: new goreleaser.PulumiGoreleaserConfig(config),
     },
   ];
 };

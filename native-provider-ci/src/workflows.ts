@@ -19,6 +19,9 @@ export const WorkflowOpts = z.object({
   "setup-script": z.string().optional(),
   parallel: z.number().default(3),
   timeout: z.number().default(60),
+  providerVersion: z.string().default(""),
+  skipCodegen: z.boolean().default(false),
+  skipWindowsArmBuild: z.boolean().default(false),
 });
 type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 
@@ -166,7 +169,7 @@ export function BuildWorkflow(
       build_sdks: new BuildSdkJob("build_sdks", opts).addRunsOn(opts.provider),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKsJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -181,6 +184,76 @@ export function BuildWorkflow(
     });
     workflow.jobs = Object.assign(workflow.jobs, {
       lint: new LintKubernetesJob("lint").addDispatchConditional(true),
+    });
+  }
+  return workflow;
+}
+
+export function PrereleaseWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  const workflow: GithubWorkflow = {
+    name: name,
+    on: {
+      push: {
+        tags: ["v*.*.*-**"],
+      },
+    },
+    env: env(opts),
+    jobs: {
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
+      build_sdk: new BuildSdkJob("build_sdk", opts),
+      test: new TestsJob("test", opts),
+      publish: new PublishPrereleaseJob("publish", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
+    },
+  };
+  if (opts.provider === "kubernetes") {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "destroy-test-cluster": new TeardownTestClusterJob(
+        "teardown-test-cluster",
+        opts
+      ),
+    });
+  }
+  return workflow;
+}
+
+export function ReleaseWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  const workflow: GithubWorkflow = {
+    name: name,
+    on: {
+      push: {
+        tags: ["v*.*.*", "!v*.*.*-**"],
+      },
+    },
+    env: env(opts),
+    jobs: {
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
+      build_sdk: new BuildSdkJob("build_sdk", opts),
+      test: new TestsJob("test", opts),
+      publish: new PublishPrereleaseJob("publish", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
+      tag_sdk: new TagSDKJob("tag_sdk"),
+      dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
+    },
+  };
+  if (opts.provider === "kubernetes") {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "destroy-test-cluster": new TeardownTestClusterJob(
+        "teardown-test-cluster",
+        opts
+      ),
     });
   }
   return workflow;
@@ -557,6 +630,9 @@ export class PublishPrereleaseJob implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
+    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
+      this["runs-on"] = "macos-latest";
+    }
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -575,7 +651,7 @@ export class PublishPrereleaseJob implements NormalJob {
   }
 }
 
-export class PublishSDKsJob implements NormalJob {
+export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
   strategy = {
@@ -595,52 +671,47 @@ export class PublishSDKsJob implements NormalJob {
     Object.assign(this, { name });
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.CheckoutScriptsRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
-      steps.ConfigureAwsCredentialsForPublish(),
-      steps.SetPreReleaseVersion(),
-      steps.RunGoReleaserWithArgs(
-        `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
-      ),
-      steps.NotifySlack("Failure in publishing binaries"),
+      steps.InstallNodeJS(),
+      steps.InstallDotNet(),
+      steps.InstallPython(),
+      steps.DownloadSpecificSDKStep("python"),
+      steps.UnzipSpecificSDKStep("python"),
+      steps.DownloadSpecificSDKStep("dotnet"),
+      steps.UnzipSpecificSDKStep("dotnet"),
+      steps.DownloadSpecificSDKStep("nodejs"),
+      steps.UnzipSpecificSDKStep("nodejs"),
+      steps.InstallTwine(),
+      steps.RunPublishSDK(),
+      steps.NotifySlack("Failure in publishing SDK"),
     ];
   }
 }
 
-export class PublishSDKJob implements NormalJob {
+export class TagSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  needs = "publish";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
+  needs = "publish_sdk";
   steps = [
     steps.CheckoutRepoStep(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
     steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallNodeJS(),
-    steps.InstallDotNet(),
-    steps.InstallPython(),
-    steps.DownloadSpecificSDKStep("python"),
-    steps.UnzipSpecificSDKStep("python"),
-    steps.DownloadSpecificSDKStep("dotnet"),
-    steps.UnzipSpecificSDKStep("dotnet"),
-    steps.DownloadSpecificSDKStep("nodejs"),
-    steps.UnzipSpecificSDKStep("nodejs"),
-    steps.InstallTwine(),
-    steps.RunPublishSDK(),
-    steps.NotifySlack("Failure in publishing SDK"),
+    steps.TagSDKTag(),
   ];
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
+  }
+}
+
+export class DocsBuildDispatchJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  needs = "tag_sdk";
+  steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()];
   name: string;
 
   constructor(name: string) {

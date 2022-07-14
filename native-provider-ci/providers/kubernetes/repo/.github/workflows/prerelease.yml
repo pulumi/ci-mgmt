@@ -1,17 +1,8 @@
-name: build
+name: prerelease
 on:
   push:
-    branches:
-    - master
-    - main
-    - feature-**
-    paths-ignore:
-    - CHANGELOG.md
-    tags-ignore:
-    - v*
-    - sdk/*
-    - "**"
-  workflow_dispatch: {}
+    tags:
+    - v*.*.*-**
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PROVIDER: kubernetes
@@ -124,7 +115,7 @@ jobs:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
         status: ${{ job.status }}
-  build_sdks:
+  build_sdk:
     needs: prerequisites
     runs-on: ubuntu-latest
     strategy:
@@ -143,7 +134,7 @@ jobs:
         - python
         - dotnet
         - go
-    name: build_sdks
+    name: build_sdk
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
@@ -619,29 +610,3 @@ jobs:
     - uses: geekyeggo/delete-artifact@v1
       with:
         name: config
-  lint:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        goversion:
-        - 1.18.x
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v2
-      with:
-        lfs: true
-        ref: ${{ env.PR_COMMIT_SHA }}
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{matrix.goversion}}
-    - name: golangci-lint provider pkg
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: ${{ env.GOLANGCI_LINT_VERSION }}
-        args: -c ../../.golangci.yml --timeout ${{ env.GOLANGCI_LINT_TIMEOUT }}
-        working-directory: provider/pkg
-    name: lint
-    if: github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository

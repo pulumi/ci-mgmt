@@ -889,6 +889,13 @@ export function RunGoReleaserWithArgs(args?: string): Step {
   };
 }
 
+export function TagSDKTag(): Step {
+  return {
+    name: "Add SDK version tag",
+    run: "git tag sdk/v$(pulumictl get version --language generic) && git push origin sdk/v$(pulumictl get version --language generic)",
+  };
+}
+
 export function NotifySlack(name: string): Step {
   return {
     if: "failure() && github.event_name == 'push'",
