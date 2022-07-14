@@ -209,6 +209,17 @@ export function PrereleaseWorkflow(
       publish_sdk: new PublishSDKsJob("publish_sdk", opts),
     },
   };
+  if (opts.provider === "kubernetes") {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "destroy-test-cluster": new TeardownTestClusterJob(
+        "teardown-test-cluster",
+        opts
+      ),
+    });
+  }
   return workflow;
 }
 
@@ -234,6 +245,17 @@ export function ReleaseWorkflow(
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
   };
+  if (opts.provider === "kubernetes") {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
+    });
+    workflow.jobs = Object.assign(workflow.jobs, {
+      "destroy-test-cluster": new TeardownTestClusterJob(
+        "teardown-test-cluster",
+        opts
+      ),
+    });
+  }
   return workflow;
 }
 

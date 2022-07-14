@@ -467,3 +467,147 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
     name: dispatch_docs_build
+  build-test-cluster:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        goversion:
+        - 1.18.x
+        dotnetversion:
+        - 3.1.301
+        pythonversion:
+        - "3.7"
+        nodeversion:
+        - 14.x
+    name: build-test-cluster
+    outputs:
+      stack-name: ${{ steps.stackname.outputs.stack-name }}
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup DotNet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
+      run: |-
+        pip3 install virtualenv==20.0.23
+        pip3 install pipenv
+    - name: Configure GCP credentials
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ env.GOOGLE_PROJECT }}
+        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    - name: Install Kubectl
+      run: >
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+        chmod +x ./kubectl
+
+        sudo mv kubectl /usr/local/bin
+    - name: Login to Google Cloud Registry
+      run: gcloud --quiet auth configure-docker
+    - name: Set stack name in output
+      id: stackname
+      run: echo '::set-output name=stack-name::${{ env.PULUMI_TEST_OWNER }}/${{
+        github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}'
+    - name: Create test infrastructure
+      run: ./scripts/ci-cluster-create.sh ${{ steps.stackname.outputs.stack-name }}
+    - name: Upload Kubernetes Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: config
+        path: ~/.kube/config
+  destroy-test-cluster:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        goversion:
+        - 1.18.x
+        dotnetversion:
+        - 3.1.301
+        pythonversion:
+        - "3.7"
+        nodeversion:
+        - 14.x
+    name: teardown-test-cluster
+    needs:
+    - build-test-cluster
+    - test
+    if: ${{ always() }} && github.event.pull_request.head.repo.full_name ==
+      github.repository
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup DotNet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
+      run: |-
+        pip3 install virtualenv==20.0.23
+        pip3 install pipenv
+    - name: Configure GCP credentials
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ env.GOOGLE_PROJECT }}
+        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    - name: Install Kubectl
+      run: >
+        curl -LO
+        https://storage.googleapis.com/kubernetes-release/release/$(curl -s
+        https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+        chmod +x ./kubectl
+
+        sudo mv kubectl /usr/local/bin
+    - name: Login to Google Cloud Registry
+      run: gcloud --quiet auth configure-docker
+    - name: Destroy test infra
+      run: ./scripts/ci-cluster-destroy.sh ${{
+        needs.build-test-cluster.outputs.stack-name }}
+    - uses: geekyeggo/delete-artifact@v1
+      with:
+        name: config
