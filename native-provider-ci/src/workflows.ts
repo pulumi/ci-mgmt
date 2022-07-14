@@ -169,7 +169,7 @@ export function BuildWorkflow(
       build_sdks: new BuildSdkJob("build_sdks", opts).addRunsOn(opts.provider),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk"),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -203,10 +203,10 @@ export function PrereleaseWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdk: new BuildSdkJob("build_sdk", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk"),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -237,10 +237,10 @@ export function ReleaseWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdk: new BuildSdkJob("build_sdk", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts),
       test: new TestsJob("test", opts),
-      publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKJob("publish_sdk", opts),
+      publish: new PublishJob("publish", opts),
+      publish_sdk: new PublishSDKJob("publish_sdks"),
       tag_sdk: new TagSDKJob("tag_sdk"),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
@@ -321,6 +321,10 @@ export class BuildSdkJob implements NormalJob {
   if: NormalJob["if"];
 
   constructor(name: string, opts: WorkflowOpts) {
+    if (opts.provider === "azure-native") {
+      this["runs-on"] =
+        "${{ matrix.language }} == 'dotnet' && 'macos-latest' || 'ubuntu-latest'";
+    }
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -343,6 +347,7 @@ export class BuildSdkJob implements NormalJob {
       steps.Porcelain(),
       steps.ZipSDKsStep(),
       steps.UploadSDKs(),
+      steps.NotifySlack("Failure while building SDKs"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
@@ -474,6 +479,7 @@ export class TestsJob implements NormalJob {
       steps.InstallandConfigureHelm(opts.provider),
       steps.SetupGotestfmt(),
       steps.RunTests(opts.provider),
+      steps.NotifySlack("Failure in SDK tests"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
@@ -651,6 +657,43 @@ export class PublishPrereleaseJob implements NormalJob {
   }
 }
 
+export class PublishJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  needs = "test";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
+    },
+  };
+  name: string;
+  steps: NormalJob["steps"];
+
+  constructor(name: string, opts: WorkflowOpts) {
+    this.name = name;
+    Object.assign(this, { name });
+    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
+      this["runs-on"] = "macos-latest";
+    }
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.ConfigureAwsCredentialsForPublish(),
+      steps.SetPreReleaseVersion(),
+      steps.RunGoReleaserWithArgs(
+        `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
+      ),
+      steps.NotifySlack("Failure in publishing binaries"),
+    ];
+  }
+}
+
 export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
@@ -666,7 +709,7 @@ export class PublishSDKJob implements NormalJob {
   name: string;
   steps: NormalJob["steps"];
 
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string) {
     this.name = name;
     Object.assign(this, { name });
     this.steps = [
