@@ -169,7 +169,7 @@ export function BuildWorkflow(
       build_sdks: new BuildSdkJob("build_sdks", opts).addRunsOn(opts.provider),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKsJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -206,7 +206,7 @@ export function PrereleaseWorkflow(
       build_sdk: new BuildSdkJob("build_sdk", opts),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKsJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -240,7 +240,7 @@ export function ReleaseWorkflow(
       build_sdk: new BuildSdkJob("build_sdk", opts),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
-      publish_sdk: new PublishSDKsJob("publish_sdk", opts),
+      publish_sdk: new PublishSDKJob("publish_sdk", opts),
       tag_sdk: new TagSDKJob("tag_sdk"),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
@@ -651,7 +651,7 @@ export class PublishPrereleaseJob implements NormalJob {
   }
 }
 
-export class PublishSDKsJob implements NormalJob {
+export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
   strategy = {
@@ -674,16 +674,23 @@ export class PublishSDKsJob implements NormalJob {
     }
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.CheckoutScriptsRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
-      steps.ConfigureAwsCredentialsForPublish(),
-      steps.SetPreReleaseVersion(),
-      steps.RunGoReleaserWithArgs(
-        `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
-      ),
-      steps.NotifySlack("Failure in publishing binaries"),
+      steps.InstallNodeJS(),
+      steps.InstallDotNet(),
+      steps.InstallPython(),
+      steps.DownloadSpecificSDKStep("python"),
+      steps.UnzipSpecificSDKStep("python"),
+      steps.DownloadSpecificSDKStep("dotnet"),
+      steps.UnzipSpecificSDKStep("dotnet"),
+      steps.DownloadSpecificSDKStep("nodejs"),
+      steps.UnzipSpecificSDKStep("nodejs"),
+      steps.InstallTwine(),
+      steps.RunPublishSDK(),
+      steps.NotifySlack("Failure in publishing SDK"),
     ];
   }
 }

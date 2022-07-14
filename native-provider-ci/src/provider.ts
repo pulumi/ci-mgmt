@@ -60,10 +60,10 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       path: path.join(githubWorkflowsDir, "build.yml"),
       data: wf.BuildWorkflow("build", config),
     },
-    // {
-    //   path: path.join(githubWorkflowsDir, "prerelease.yml"),
-    //   data: wf.PrereleaseWorkflow("prerelease", config),
-    // },
+    {
+      path: path.join(githubWorkflowsDir, "prerelease.yml"),
+      data: wf.PrereleaseWorkflow("prerelease", config),
+    },
     {
       path: path.join(githubWorkflowsDir, "release.yml"),
       data: wf.ReleaseWorkflow("release", config),
