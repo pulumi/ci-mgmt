@@ -669,9 +669,6 @@ export class PublishSDKJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     Object.assign(this, { name });
-    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
-      this["runs-on"] = "macos-latest";
-    }
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.CheckoutScriptsRepoStep(),
