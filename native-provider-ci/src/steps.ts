@@ -866,7 +866,7 @@ export function UpdatePulumiPRAutoMerge(): Step {
     if: "steps.create-pr.outputs.has_changed_files",
     uses: action.autoMerge,
     with: {
-      token: "{{ secrets.PULUMI_BOT_TOKEN }}",
+      token: "${{ secrets.PULUMI_BOT_TOKEN }}",
       "pull-request-number": "${{ steps.create-pr.outputs.pr_number }}",
       repository: "${{ github.repository }}",
       "merge-method": "squash",
