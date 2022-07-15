@@ -28,7 +28,7 @@ type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 const env = (opts: WorkflowOpts) =>
   Object.assign(
     {
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
       PROVIDER: opts.provider,
       PULUMI_ACCESS_TOKEN: "${{ secrets.PULUMI_ACCESS_TOKEN }}",
       PULUMI_LOCAL_NUGET: "${{ github.workspace }}/nuget",
