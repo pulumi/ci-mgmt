@@ -845,14 +845,17 @@ export function CreateUpdatePulumiPR(): Step {
   return {
     name: "Create PR",
     id: "create-pr",
-    if: "steps.gomod.output.changes != 0",
+    if: "steps.gomod.outputs.changes != 0",
     uses: action.pullRequest,
     with: {
       source_branch:
         "update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
       destination_branch: "master",
-      pr_title: "Automated pulumi/pulumi upgrade",
+      pr_title: "Automated Pulumi/Pulumi upgrade",
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+    },
+    env: {
+      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
   };
 }

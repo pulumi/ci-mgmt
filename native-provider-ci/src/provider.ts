@@ -54,7 +54,7 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     },
     {
       path: path.join(githubWorkflowsDir, "weekly-pulumi-update.yml"),
-      data: wf.WeeklyPulumiUpdate("weekly-pulumi-update", config),
+      data: wf.WeeklyPulumiUpdateWorkflow("weekly-pulumi-update", config),
     },
     {
       path: path.join(githubWorkflowsDir, "build.yml"),

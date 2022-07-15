@@ -28,7 +28,7 @@ type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 const env = (opts: WorkflowOpts) =>
   Object.assign(
     {
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
       PROVIDER: opts.provider,
       PULUMI_ACCESS_TOKEN: "${{ secrets.PULUMI_ACCESS_TOKEN }}",
       PULUMI_LOCAL_NUGET: "${{ github.workspace }}/nuget",
@@ -149,6 +149,7 @@ export function RunAcceptanceTestsWorkflow(
   return workflow;
 }
 
+// Creates build.yml
 export function BuildWorkflow(
   name: string,
   opts: WorkflowOpts
@@ -189,6 +190,7 @@ export function BuildWorkflow(
   return workflow;
 }
 
+// Creates prerelease.yml
 export function PrereleaseWorkflow(
   name: string,
   opts: WorkflowOpts
@@ -223,6 +225,7 @@ export function PrereleaseWorkflow(
   return workflow;
 }
 
+// Creates release.yml
 export function ReleaseWorkflow(
   name: string,
   opts: WorkflowOpts
@@ -259,11 +262,12 @@ export function ReleaseWorkflow(
   return workflow;
 }
 
-export function WeeklyPulumiUpdate(
+// Creates weekly-pulumi-update.yml
+export function WeeklyPulumiUpdateWorkflow(
   name: string,
   opts: WorkflowOpts
 ): GithubWorkflow {
-  return {
+  const workflow: GithubWorkflow = {
     name: name,
     on: {
       schedule: [
@@ -275,30 +279,13 @@ export function WeeklyPulumiUpdate(
     },
     env: env(opts),
     jobs: {
-      update_pulumi: new EmptyJob("update-pulumi")
-        .addStrategy({
-          "fail-fast": true,
-          matrix: {
-            goversion: [goVersion],
-            dotnetversion: [dotnetVersion],
-            pythonversion: [pythonVersion],
-            nodeversion: [nodeVersion],
-          },
-        })
-        .addStep(steps.CheckoutRepoStep())
-        .addStep(steps.CheckoutTagsStep())
-        .addStep(steps.InstallGo())
-        .addStep(steps.InstallPulumiCtl())
-        .addStep(steps.InstallPulumiCli())
-        .addStep(steps.InstallDotNet())
-        .addStep(steps.InstallNodeJS())
-        .addStep(steps.InstallPython())
-        .addStep(steps.UpdatePulumi())
-        .addStep(steps.ProviderWithPulumiUpgrade(opts.provider))
-        .addStep(steps.CreateUpdatePulumiPR())
-        .addStep(steps.UpdatePulumiPRAutoMerge()),
+      "weekly-pulumi-update": new WeeklyPulumiUpdate(
+        "weekly-pulumi-update",
+        opts
+      ),
     },
   };
+  return workflow;
 }
 
 // This section represents sub-jobs that may be used in more than one workflow
@@ -759,6 +746,40 @@ export class DocsBuildDispatchJob implements NormalJob {
 
   constructor(name: string) {
     this.name = name;
+    Object.assign(this, { name });
+  }
+}
+
+export class WeeklyPulumiUpdate implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
+      language: ["nodejs", "python", "dotnet", "go"],
+    },
+  };
+  steps: NormalJob["steps"];
+  if: NormalJob["if"];
+  constructor(name: string, opts: WorkflowOpts) {
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.InstallDotNet(),
+      steps.InstallNodeJS(),
+      steps.InstallPython(),
+      steps.UpdatePulumi(),
+      steps.InitializeSubModules(opts.submodules),
+      steps.ProviderWithPulumiUpgrade(opts.provider),
+      steps.CreateUpdatePulumiPR(),
+      steps.UpdatePulumiPRAutoMerge(),
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
 }
