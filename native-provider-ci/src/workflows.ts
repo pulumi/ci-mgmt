@@ -759,7 +759,6 @@ export class WeeklyPulumiUpdate implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      language: ["nodejs", "python", "dotnet", "go"],
     },
   };
   steps: NormalJob["steps"];
