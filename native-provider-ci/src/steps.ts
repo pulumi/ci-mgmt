@@ -851,8 +851,11 @@ export function CreateUpdatePulumiPR(): Step {
       source_branch:
         "update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
       destination_branch: "master",
-      pr_title: "Automated pulumi/pulumi upgrade",
+      pr_title: "Automated Pulumi/Pulumi upgrade",
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+    },
+    env: {
+      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
   };
 }
