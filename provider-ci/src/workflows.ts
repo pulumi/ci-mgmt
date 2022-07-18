@@ -24,7 +24,6 @@ const env = (opts: BridgedConfig) =>
       TRAVIS_OS_NAME: "linux",
       SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
       PULUMI_GO_DEP_ROOT: "${{ github.workspace }}/..",
-      PUBLISH_REPO_URL: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/",
       PUBLISH_REPO_USERNAME: "${{ secrets.OSSRH_USERNAME }}",
       PUBLISH_REPO_PASSWORD: "${{ secrets.OSSRH_PASSWORD }}",
       SIGNING_KEY_ID: "${{ secrets.JAVA_SIGNING_KEY_ID }}",
