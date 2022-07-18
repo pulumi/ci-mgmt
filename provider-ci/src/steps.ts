@@ -427,7 +427,7 @@ export function RunPublishJavaSDK(): Step {
     name: "Publish Java SDK",
     uses: action.gradleBuildAction,
     with: {
-      arguments: "publish",
+      arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
       "build-root-directory": "./sdk/java",
       "gradle-version": '7.4.1',
     },
