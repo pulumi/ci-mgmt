@@ -35,7 +35,7 @@ export interface ProviderFile {
 export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const config = getProviderConfig(provider);
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
-  return [
+  const files = [
     {
       path: path.join(githubWorkflowsDir, "artifact-cleanup.yml"),
       data: new shared.ArtifactCleanupWorkflow(),
@@ -77,4 +77,11 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: new goreleaser.PulumiGoreleaserConfig(config),
     },
   ];
+  if (config.provider === "aws-native") {
+    files.push({
+      path: path.join(githubWorkflowsDir, "cf2pulumi-release.yml"),
+      data: wf.Cf2PulumiReleaseWorkflow("CF2Pulumi Release", config),
+    });
+  }
+  return files;
 };

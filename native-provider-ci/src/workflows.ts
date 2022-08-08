@@ -288,6 +288,27 @@ export function WeeklyPulumiUpdateWorkflow(
   return workflow;
 }
 
+// creates cf2pulumi-release.yml
+export function Cf2PulumiReleaseWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  return {
+    name: name,
+    on: {
+      push: {
+        tags: ["v*.*.*", "!v*.*.*-**"],
+      },
+    },
+    env: env(opts),
+    jobs: {
+      release: new Cf2PulumiRelease("release"),
+    },
+  };
+}
+// creates arm2pulumi-coverage-report.yml
+// creates arm2pulumi-release.yml
+
 // This section represents sub-jobs that may be used in more than one workflow
 
 export class BuildSdkJob implements NormalJob {
@@ -742,6 +763,26 @@ export class DocsBuildDispatchJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "tag_sdk";
   steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()];
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
+  }
+}
+
+export class Cf2PulumiRelease implements NormalJob {
+  "runs-on" = "macos-latest";
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.CheckoutTagsStep(),
+    steps.InstallPulumiCtl(),
+    steps.InstallGo(goVersion),
+    steps.RunGoReleaserWithArgs(
+      "-p 1 -f .goreleaser.cf2pulumi.yml release --rm-dist --timeout 60m0s"
+    ),
+    steps.ChocolateyPackageDeployment(),
+  ];
   name: string;
 
   constructor(name: string) {

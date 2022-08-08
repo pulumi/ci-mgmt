@@ -952,3 +952,12 @@ export function Porcelain(): Step {
     run: "git status --porcelain",
   };
 }
+
+export function ChocolateyPackageDeployment(): Step {
+  return {
+    name: "Chocolatey Package Deployment",
+    run:
+      "CURRENT_TAG=v$(pulumictl get version --language generic -o)\n" +
+      "pulumictl create choco-deploy -a cf2pulumi ${CURRENT_TAG}",
+  };
+}
