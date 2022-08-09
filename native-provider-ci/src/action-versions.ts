@@ -6,7 +6,7 @@ export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const createOrUpdateComment = "peter-evans/create-or-update-comment@v1";
 export const uploadArtifact = "actions/upload-artifact@v2";
 export const deleteArtifact = "geekyeggo/delete-artifact@v1";
-export const pullRequest = "repo-sync/pull-request@v2";
+export const pullRequest = "repo-sync/pull-request@v2.6.2";
 export const autoMerge = "peter-evans/enable-pull-request-automerge@v1";
 
 export const installPulumiCli = "pulumi/action-install-pulumi-cli@v2";

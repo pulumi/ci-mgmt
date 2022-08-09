@@ -48,6 +48,34 @@ export function CreateCommentsUrlStep(): Step {
   };
 }
 
+export function SetGitSubmoduleCommitHash(provider: string): Step {
+  let dir = "api-specs";
+  if (provider === "azure-native") {
+    dir = "azure-rest-api-specs";
+  }
+  return {
+    name: "Git submodule commit hash",
+    id: "vars",
+    run: "echo ::set-output name=commit-hash::$(git rev-parse HEAD)",
+    "working-directory": dir,
+  };
+}
+
+export function CommitAzureSDKUpdates(provider: string): Step {
+  if (provider !== "azure-native") {
+    return {};
+  }
+  return {
+    name: "Commit changes",
+    run:
+      "git add sdk\n" +
+      'git commit -m "Regenerating SDKs based on azure-rest-api-specs @ ${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"\n' +
+      "git add .\n" +
+      'git commit -m "Regenerating based on azure-rest-api-specs @ ${{ steps.vars.outputs.commit-hash }}"\n' +
+      "git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
+  };
+}
+
 export function UpdatePRWithResultsStep(): Step {
   return {
     name: "Update with Result",
@@ -384,39 +412,32 @@ export function RunTests(provider: string): Step {
   };
 }
 
-export function CommitChanges(refName: string): Step {
-  return {
-    name: "commit changes",
-    uses: action.addAndCommit,
-    with: {
-      author_email: "bot@pulumi.com",
-      author_name: "pulumi-bot",
-      ref: `${refName}`,
-    },
-  };
-}
+// export function CommitChanges(refName: string): Step {
+//   return {
+//     name: "commit changes",
+//     uses: action.addAndCommit,
+//     with: {
+//       author_email: "bot@pulumi.com",
+//       author_name: "pulumi-bot",
+//       ref: `${refName}`,
+//     },
+//   };
+// }
 
-export function PullRequest(
-  refName: string,
-  prTitle: string,
-  user: string
-): Step {
+export function PullRequestSdkGeneration(): Step {
   return {
-    name: "pull-request",
+    name: "Create PR",
+    id: "create-pr",
     uses: action.pullRequest,
     with: {
       destination_branch: "master",
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-      pr_allow_empty: "true",
-      pr_assignee: `${user}`,
       pr_body: "*Automated PR*",
-      pr_reviewer: `${user}`,
-      pr_title: `${prTitle}`,
+      pr_title:
+        "Automated SDK generation @ azure-rest-api-specs ${{ steps.vars.outputs.commit-hash }}",
       author_name: "pulumi-bot",
-      source_branch: `${refName}`,
-    },
-    env: {
-      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+      source_branch:
+        "generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
     },
   };
 }
@@ -847,7 +868,7 @@ export function CreateUpdatePulumiPR(): Step {
   };
 }
 
-export function UpdatePulumiPRAutoMerge(): Step {
+export function SetPRAutoMerge(): Step {
   return {
     name: "Set AutoMerge",
     if: "steps.create-pr.outputs.has_changed_files",
@@ -1013,5 +1034,36 @@ export function UploadArmCoverageToS3(): Step {
   return {
     name: "Upload results to S3",
     run: "cd provider/pkg/arm2pulumi/internal/test && bash s3-upload-script.sh",
+  };
+}
+
+export function PrepareGitBranchForSdkGeneration(): Step {
+  return {
+    name: "Preparing Git Branch and initial commit",
+    run:
+      'git config --local user.email "bot@pulumi.com"\n' +
+      'git config --local user.name "pulumi-bot"\n' +
+      "git checkout -b generate-sdk/${{ github.run_id }}-${{ github.run_number }}\n" +
+      'git add . && git commit -m "Preparing the SDK folder for regeneration"',
+  };
+}
+
+export function UpdateSubmodules(provider: string): Step {
+  if (provider !== "azure-native") {
+    return {};
+  }
+  return {
+    name: "Update Submodules",
+    run: "make update_submodules",
+  };
+}
+
+export function GenerateAzureNativeSchemaAndSdks(provider: string): Step {
+  if (provider !== "azure-native") {
+    return {};
+  }
+  return {
+    name: "Generate Schema + SDKs",
+    run: "make versions local_generate",
   };
 }

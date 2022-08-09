@@ -288,6 +288,28 @@ export function WeeklyPulumiUpdateWorkflow(
   return workflow;
 }
 
+// creates nightly-sdk-generation.yml
+export function NightlySdkGenerationWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  return {
+    name: name,
+    on: {
+      schedule: [
+        {
+          cron: "35 4 * * *",
+        },
+      ],
+      workflow_dispatch: {},
+    },
+    env: env(opts),
+    jobs: {
+      "generate-sdk": new NightlySdkGeneration("generate-sdk", opts),
+    },
+  };
+}
+
 // creates cf2pulumi-release.yml
 export function Cf2PulumiReleaseWorkflow(
   name: string,
@@ -913,7 +935,36 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
       steps.CreateUpdatePulumiPR(),
-      steps.UpdatePulumiPRAutoMerge(),
+      steps.SetPRAutoMerge(),
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
+    Object.assign(this, { name });
+  }
+}
+
+export class NightlySdkGeneration implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  steps: NormalJob["steps"];
+  name: string;
+  if: NormalJob["if"];
+
+  constructor(name: string, opts: WorkflowOpts) {
+    this.name = name;
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.InstallGo(goVersion),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.AzureLogin(),
+      steps.MakeClean(),
+      steps.PrepareGitBranchForSdkGeneration(),
+      steps.UpdateSubmodules(opts.provider),
+      steps.BuildCodegenBinaries(opts.provider),
+      steps.GenerateAzureNativeSchemaAndSdks(opts.provider),
+      steps.SetGitSubmoduleCommitHash(opts.provider),
+      steps.CommitAzureSDKUpdates(opts.provider),
+      steps.PullRequestSdkGeneration(),
+      steps.SetPRAutoMerge(),
+      steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }

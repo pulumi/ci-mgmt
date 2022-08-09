@@ -93,6 +93,10 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       {
         path: path.join(githubWorkflowsDir, "arm2pulumi-coverage-report.yml"),
         data: wf.Arm2PulumiCoverageReportWorkflow("generate-coverage", config),
+      },
+      {
+        path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
+        data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
       }
     );
   }
