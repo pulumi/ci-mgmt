@@ -82,7 +82,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
 name: Update pulumi-terraform-bridge
 on:
   workflow_dispatch:

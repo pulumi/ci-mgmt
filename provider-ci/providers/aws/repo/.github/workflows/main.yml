@@ -116,7 +116,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   generate_coverage_data:
     continue-on-error: true
     env:
@@ -246,7 +246,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   publish:
     name: publish
     needs: test
@@ -302,7 +302,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -411,7 +411,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   test:
     name: test
     needs: build_sdk
@@ -524,7 +524,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
 name: main
 on:
   push:
