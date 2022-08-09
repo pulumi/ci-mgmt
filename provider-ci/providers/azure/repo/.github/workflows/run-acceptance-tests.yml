@@ -124,7 +124,7 @@ jobs:
         - go
         - java
         nodeversion:
-        - 14.x
+        - 16.x
         pythonversion:
         - "3.7"
   comment-notification:
@@ -218,7 +218,7 @@ jobs:
         goversion:
         - 1.19.x
         nodeversion:
-        - 14.x
+        - 16.x
         pythonversion:
         - "3.7"
   test:
@@ -326,7 +326,7 @@ jobs:
         - go
         - java
         nodeversion:
-        - 14.x
+        - 16.x
         pythonversion:
         - "3.7"
 name: run-acceptance-tests
