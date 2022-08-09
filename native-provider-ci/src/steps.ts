@@ -142,19 +142,6 @@ export function ConfigureAwsCredentialsForPublish(): Step {
   };
 }
 
-export function ConfigureAwsCredentialsForCoverageDataUpload(): Step {
-  return {
-    name: "Configure AWS Credentials",
-    uses: action.configureAwsCredentials,
-    with: {
-      "aws-access-key-id": "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
-      "aws-region": "us-west-2",
-      "aws-secret-access-key":
-        "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
-    },
-  };
-}
-
 export function InstallGo(version?: string): Step {
   return {
     name: "Install Go",
@@ -881,6 +868,14 @@ export function SetPreReleaseVersion(): Step {
   };
 }
 
+export function SetVersionIfAvailable(): Step {
+  return {
+    name: "Set Version if Parameter available",
+    if: "github.event.inputs.version != ''",
+    run: `echo "GORELEASER_CURRENT_TAG=v\${{ github.event.inputs.message }}" >> $GITHUB_ENV`,
+  };
+}
+
 export function RunGoReleaserWithArgs(args?: string): Step {
   return {
     name: "Run GoReleaser",
@@ -950,5 +945,73 @@ export function RunPublishSDK(): Step {
 export function Porcelain(): Step {
   return {
     run: "git status --porcelain",
+  };
+}
+
+export function ChocolateyPackageDeployment(): Step {
+  return {
+    name: "Chocolatey Package Deployment",
+    run:
+      "CURRENT_TAG=v$(pulumictl get version --language generic -o)\n" +
+      "pulumictl create choco-deploy -a cf2pulumi ${CURRENT_TAG}",
+  };
+}
+
+export function AzureLogin(): Step {
+  return {
+    uses: action.azureLogin,
+    with: {
+      creds: "${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}",
+    },
+  };
+}
+
+export function AwsCredentialsForArmCoverageReport(): Step {
+  return {
+    name: "Configure AWS Credentials",
+    uses: action.configureAwsCredentials,
+    with: {
+      "aws-access-key-id": "${{ secrets.AWS_ACCESS_KEY_ID }}",
+      "aws-region": "us-west-2",
+      "aws-secret-access-key": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+      "role-duration-seconds": 3600,
+      "role-session-name": "arm2pulumiCvg@githubActions",
+      "role-to-assume": "${{ secrets.AWS_CI_ROLE_ARN }}",
+    },
+  };
+}
+
+export function MakeClean(): Step {
+  return {
+    name: "Cleanup SDK Folder",
+    run: "make clean",
+  };
+}
+
+export function MakeLocalGenerate(): Step {
+  return {
+    name: "Build Schema + SDKs",
+    run: "make local_generate",
+  };
+}
+
+export function GenerateCoverageReport(): Step {
+  return {
+    name: "Generate coverage report",
+    run: "make arm2pulumi_coverage_report",
+  };
+}
+
+export function TestResultsJSON(): Step {
+  return {
+    name: "Test usage of results.json",
+    run: "cat provider/pkg/arm2pulumi/internal/test/results.json",
+  };
+}
+
+export function UploadArmCoverageToS3(): Step {
+  return {
+    name: "Upload results to S3",
+    run: "cd provider/pkg/arm2pulumi/internal/test && bash s3-upload-script.sh",
   };
 }

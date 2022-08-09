@@ -20,6 +20,7 @@ export const setupPython = "actions/setup-python@v2";
 export const setupGcloud = "google-github-actions/setup-gcloud@v0";
 export const configureAwsCredentials =
   "aws-actions/configure-aws-credentials@v1";
+export const azureLogin = "azure/login@v1";
 export const downloadArtifact = "actions/download-artifact@v2";
 
 export const notifySlack = "8398a7/action-slack@v3";
