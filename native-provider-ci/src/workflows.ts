@@ -841,7 +841,7 @@ export class Cf2PulumiRelease implements NormalJob {
 }
 
 export class Arm2PulumiRelease implements NormalJob {
-  "runs-on" = "ubuntu-latest";
+  "runs-on" = "macos-latest";
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutTagsStep(),
