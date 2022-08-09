@@ -137,7 +137,7 @@ jobs:
         goversion:
         - 1.19.x
         nodeversion:
-        - 14.x
+        - 16.x
         pythonversion:
         - "3.7"
 name: Update upstream provider

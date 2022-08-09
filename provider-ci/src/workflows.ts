@@ -5,7 +5,7 @@ import { Step } from "./steps";
 
 const pythonVersion = "3.7";
 const goVersion = "1.19.x";
-const nodeVersion = "14.x";
+const nodeVersion = "16.x";
 const dotnetVersion = "3.1.301";
 const javaVersion = "11";
 
