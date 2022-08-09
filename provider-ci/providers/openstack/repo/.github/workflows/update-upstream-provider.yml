@@ -144,7 +144,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
 name: Update upstream provider
 on:
   workflow_dispatch:

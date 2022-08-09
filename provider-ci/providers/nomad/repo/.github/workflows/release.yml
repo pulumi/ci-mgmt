@@ -115,7 +115,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   create_docs_build:
     name: create_docs_build
     needs: tag_sdk
@@ -278,7 +278,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   publish:
     name: publish
     needs: test
@@ -333,7 +333,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -442,7 +442,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
   tag_sdk:
     name: tag_sdk
     needs: publish_sdk
@@ -562,7 +562,7 @@ jobs:
         nodeversion:
         - 16.x
         pythonversion:
-        - "3.7"
+        - "3.9"
 name: release
 on:
   push:
