@@ -298,7 +298,7 @@ export function NightlySdkGenerationWorkflow(
     on: {
       schedule: [
         {
-          cron: "35 4 * * *",
+          cron: "35 4 * * 1-5",
         },
       ],
       workflow_dispatch: {},
@@ -889,7 +889,7 @@ export class Arm2PulumiCoverageReport implements NormalJob {
     steps.InstallGo(goVersion),
     steps.InstallPulumiCtl(),
     steps.InstallPulumiCli(),
-    steps.AzureLogin(),
+    steps.AzureLogin("azure-native"),
     steps.MakeClean(),
     steps.InitializeSubModules(true),
     steps.BuildCodegenBinaries("azure-native"),
@@ -951,18 +951,22 @@ export class NightlySdkGeneration implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
+      // Pass the provider here as an option so that it can be skipped if not needed
+      steps.CheckoutTagsStep(opts.provider),
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
-      steps.AzureLogin(),
+      steps.AzureLogin(opts.provider),
       steps.MakeClean(),
       steps.PrepareGitBranchForSdkGeneration(),
+      steps.CommitEmptySDK(),
       steps.UpdateSubmodules(opts.provider),
+      steps.MakeDiscovery(opts.provider),
       steps.BuildCodegenBinaries(opts.provider),
-      steps.GenerateAzureNativeSchemaAndSdks(opts.provider),
+      steps.MakeLocalGenerate(),
       steps.SetGitSubmoduleCommitHash(opts.provider),
-      steps.CommitAzureSDKUpdates(opts.provider),
-      steps.PullRequestSdkGeneration(),
+      steps.CommitAutomatedSDKUpdates(opts.provider),
+      steps.PullRequestSdkGeneration(opts.provider),
       steps.SetPRAutoMerge(),
       steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
