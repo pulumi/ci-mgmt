@@ -1,7 +1,7 @@
 import { BridgedConfig } from "./config";
 import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
-import { Step } from "./steps";
+import {Step} from "./steps";
 
 const pythonVersion = "3.9";
 const goVersion = "1.19.x";
@@ -181,6 +181,10 @@ export function RunAcceptanceTestsWorkflow(
       ).addDispatchConditional(true),
       build_sdk: new BuildSdkJob("build_sdk").addDispatchConditional(true),
       test: new TestsJob("test", opts).addDispatchConditional(true),
+      sentinel: new EmptyJob("sentinel")
+          .addConditional("github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository")
+          .addStep(steps.EchoSuccessStep())
+          .addNeeds(calculateSentinelNeeds(opts.lint)),
     },
   };
   if (opts.lint) {
@@ -190,6 +194,16 @@ export function RunAcceptanceTestsWorkflow(
     });
   }
   return workflow;
+}
+
+function calculateSentinelNeeds(requiresLint: boolean): string[] {
+  const needs: string[] = ["tests"];
+
+  if (requiresLint) {
+    needs.push("lint", "lint-sdk")
+  }
+
+  return needs
 }
 
 export function PullRequestWorkflow(
@@ -471,6 +485,7 @@ export class EmptyJob implements NormalJob {
   strategy: NormalJob["strategy"];
   name: string;
   if?: string;
+  needs?: string[];
 
   constructor(name: string, params?: Partial<NormalJob>) {
     this.name = name;
@@ -490,6 +505,11 @@ export class EmptyJob implements NormalJob {
 
   addConditional(conditional: string) {
     this.if = conditional;
+    return this;
+  }
+
+  addNeeds(name: string[]) {
+    this.needs = name;
     return this;
   }
 }
