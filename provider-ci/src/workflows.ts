@@ -190,7 +190,7 @@ export function RunAcceptanceTestsWorkflow(
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
       lint: new LintProviderJob("lint").addDispatchConditional(true),
-      lint_sdk: new LintSDKJob("lint-sdk", opts).addDispatchConditional(true),
+      lint_sdk: new LintSDKJob("lint_sdk", opts).addDispatchConditional(true),
     });
   }
   return workflow;
