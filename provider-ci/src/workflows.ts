@@ -197,7 +197,7 @@ export function RunAcceptanceTestsWorkflow(
 }
 
 function calculateSentinelNeeds(requiresLint: boolean): string[] {
-  const needs: string[] = ["tests"];
+  const needs: string[] = ["test"];
 
   if (requiresLint) {
     needs.push("lint", "lint-sdk")
