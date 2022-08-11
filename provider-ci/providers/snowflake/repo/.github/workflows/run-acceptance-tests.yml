@@ -186,7 +186,7 @@ jobs:
     container: golangci/golangci-lint:latest
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
-    name: lint_sdk
+    name: lint-sdk
     needs: build_sdk
     runs-on: ubuntu-latest
     steps:
@@ -309,7 +309,7 @@ jobs:
     needs:
     - test
     - lint
-    - lint-sdk
+    - lint_sdk
     runs-on: ubuntu-latest
     steps:
     - name: Is workflow a success
