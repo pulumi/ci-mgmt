@@ -7,6 +7,7 @@ const pythonVersion = "3.7";
 const goVersion = "1.19.x";
 const nodeVersion = "14.x";
 const dotnetVersion = "3.1.301";
+const javaVersion = "11";
 
 export const WorkflowOpts = z.object({
   provider: z.string(),
@@ -39,6 +40,11 @@ const env = (opts: WorkflowOpts) =>
       TRAVIS_OS_NAME: "linux",
       SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}",
       PULUMI_GO_DEP_ROOT: "${{ github.workspace }}/..",
+      PUBLISH_REPO_USERNAME: "${{ secrets.OSSRH_USERNAME }}",
+      PUBLISH_REPO_PASSWORD: "${{ secrets.OSSRH_PASSWORD }}",
+      SIGNING_KEY_ID: "${{ secrets.JAVA_SIGNING_KEY_ID }}",
+      SIGNING_KEY: "${{ secrets.JAVA_SIGNING_KEY }}",
+      SIGNING_PASSWORD: "${{ secrets.JAVA_SIGNING_PASSWORD }}",
     },
     opts.env
   );
@@ -127,6 +133,10 @@ export function RunAcceptanceTestsWorkflow(
         .addDispatchConditional(true)
         .addRunsOn(opts.provider),
       test: new TestsJob("test", opts).addDispatchConditional(true),
+      sentinel: new EmptyJob("sentinel")
+          .addConditional("github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository")
+          .addStep(steps.EchoSuccessStep())
+          .addNeeds(calculateSentinelNeeds(opts.lint)),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -147,6 +157,16 @@ export function RunAcceptanceTestsWorkflow(
     });
   }
   return workflow;
+}
+
+function calculateSentinelNeeds(requiresLint: boolean): string[] {
+  const needs: string[] = ["test"];
+
+  if (requiresLint) {
+    needs.push("lint", "lint_sdk")
+  }
+
+  return needs
 }
 
 // Creates build.yml
@@ -392,7 +412,8 @@ export class BuildSdkJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      language: ["nodejs", "python", "dotnet", "go"],
+      javaversion: [javaVersion],
+      language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
   steps: NormalJob["steps"];
@@ -415,6 +436,7 @@ export class BuildSdkJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+      steps.InstallJava(),
       steps.DownloadProviderBinaries(opts.provider, name),
       steps.UnTarProviderBinaries(opts.provider, name),
       steps.RestoreBinaryPerms(opts.provider, name),
@@ -518,7 +540,8 @@ export class TestsJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      language: ["nodejs", "python", "dotnet", "go"],
+      javaversion: [javaVersion],
+      language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
   steps: NormalJob["steps"];
@@ -540,6 +563,7 @@ export class TestsJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+      steps.InstallJava(),
       steps.DownloadProviderBinaries(opts.provider, name),
       steps.UnTarProviderBinaries(opts.provider, name),
       steps.RestoreBinaryPerms(opts.provider, name),
@@ -783,6 +807,7 @@ export class PublishSDKJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
+      javaversion: [javaVersion],
     },
   };
   name: string;
@@ -801,14 +826,19 @@ export class PublishSDKJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
+      steps.InstallJava(),
       steps.DownloadSpecificSDKStep("python"),
       steps.UnzipSpecificSDKStep("python"),
       steps.DownloadSpecificSDKStep("dotnet"),
       steps.UnzipSpecificSDKStep("dotnet"),
       steps.DownloadSpecificSDKStep("nodejs"),
       steps.UnzipSpecificSDKStep("nodejs"),
+      steps.DownloadSpecificSDKStep("java"),
+      steps.UnzipSpecificSDKStep("java"),
       steps.InstallTwine(),
       steps.RunPublishSDK(),
+      steps.SetPackageVersionToEnv(),
+      steps.RunPublishJavaSDK(),
       steps.NotifySlack("Failure in publishing SDK"),
     ];
   }
@@ -980,6 +1010,7 @@ export class EmptyJob implements NormalJob {
   strategy: NormalJob["strategy"];
   name: string;
   if?: string;
+  needs?: string[];
 
   constructor(name: string, params?: Partial<NormalJob>) {
     this.name = name;
@@ -999,6 +1030,11 @@ export class EmptyJob implements NormalJob {
 
   addConditional(conditional: string) {
     this.if = conditional;
+    return this;
+  }
+
+  addNeeds(name: string[]) {
+    this.needs = name;
     return this;
   }
 }

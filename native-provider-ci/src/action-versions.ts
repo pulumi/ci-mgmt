@@ -16,6 +16,7 @@ export const setupGo = "actions/setup-go@v2";
 export const setupNode = "actions/setup-node@v2";
 export const setupDotNet = "actions/setup-dotnet@v1";
 export const setupPython = "actions/setup-python@v2";
+export const setupJava = "actions/setup-java@v3";
 
 export const setupGcloud = "google-github-actions/setup-gcloud@v0";
 export const configureAwsCredentials =
@@ -29,3 +30,4 @@ export const addAndCommit = "EndBug/add-and-commit@v7";
 
 export const pathsFilter = "dorny/paths-filter@v2";
 export const goLint = "golangci/golangci-lint-action@v3";
+export const gradleBuildAction = "gradle/gradle-build-action@9b814496b50909128c6a52622b416c5ffa04db49";
