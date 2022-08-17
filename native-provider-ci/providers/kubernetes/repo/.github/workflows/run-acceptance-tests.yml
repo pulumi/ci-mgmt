@@ -22,6 +22,11 @@ env:
   TRAVIS_OS_NAME: linux
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
+  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
+  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi
   GOLANGCI_LINT_VERSION: v1.46.2
@@ -156,11 +161,14 @@ jobs:
         - "3.7"
         nodeversion:
         - 14.x
+        javaversion:
+        - "11"
         language:
         - nodejs
         - python
         - dotnet
         - go
+        - java
     name: build_sdks
     steps:
     - name: Checkout Repo
@@ -198,6 +206,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{matrix.javaversion}}
+        distribution: temurin
+        cache: gradle
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v2
       with:
@@ -246,11 +260,14 @@ jobs:
         - "3.7"
         nodeversion:
         - 14.x
+        javaversion:
+        - "11"
         language:
         - nodejs
         - python
         - dotnet
         - go
+        - java
     name: test
     steps:
     - name: Checkout Repo
@@ -288,6 +305,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{matrix.javaversion}}
+        distribution: temurin
+        cache: gradle
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v2
       with:

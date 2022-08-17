@@ -226,6 +226,18 @@ export function InstallDotNet(version?: string): Step {
   };
 }
 
+export function InstallJava(version?: string): Step {
+  return {
+    name: "Setup Java",
+    uses: action.setupJava,
+    with: {
+      "java-version": version || "${{matrix.javaversion}}",
+      distribution: "temurin",
+      cache: "gradle",
+    },
+  };
+}
+
 export function InstallPython(version?: string): Step {
   return {
     name: "Setup Python",
@@ -417,6 +429,14 @@ export function CheckCleanWorkTree(): Step {
 export function SetNugetSource(): Step {
   return {
     run: "dotnet nuget add source ${{ github.workspace }}/nuget",
+  };
+}
+
+export function SetPackageVersionToEnv(): Step {
+  return {
+    // This is required for the Java Provider Build + Publish Steps
+    name: "Set PACKAGE_VERSION to Env",
+    run: 'echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >> $GITHUB_ENV',
   };
 }
 
@@ -991,6 +1011,18 @@ export function RunPublishSDK(): Step {
     run: "./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
     env: {
       NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
+    },
+  };
+}
+
+export function RunPublishJavaSDK(): Step {
+  return {
+    name: "Publish Java SDK",
+    uses: action.gradleBuildAction,
+    with: {
+      arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
+      "build-root-directory": "./sdk/java",
+      "gradle-version": '7.4.1',
     },
   };
 }
