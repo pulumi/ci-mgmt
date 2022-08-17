@@ -97,6 +97,13 @@ export function CommitAutomatedSDKUpdates(provider: string): Step {
   };
 }
 
+export function EchoSuccessStep(): Step {
+  return {
+    name: "Is workflow a success",
+    run: "echo yes"
+  }
+}
+
 export function UpdatePRWithResultsStep(): Step {
   return {
     name: "Update with Result",
