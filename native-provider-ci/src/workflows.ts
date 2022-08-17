@@ -134,9 +134,11 @@ export function RunAcceptanceTestsWorkflow(
         .addRunsOn(opts.provider),
       test: new TestsJob("test", opts).addDispatchConditional(true),
       sentinel: new EmptyJob("sentinel")
-          .addConditional("github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository")
-          .addStep(steps.EchoSuccessStep())
-          .addNeeds(calculateSentinelNeeds(opts.lint)),
+        .addConditional(
+          "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
+        )
+        .addStep(steps.EchoSuccessStep())
+        .addNeeds(calculateSentinelNeeds(opts.lint)),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -163,10 +165,10 @@ function calculateSentinelNeeds(requiresLint: boolean): string[] {
   const needs: string[] = ["test"];
 
   if (requiresLint) {
-    needs.push("lint", "lint_sdk")
+    needs.push("lint", "lint_sdk");
   }
 
-  return needs
+  return needs;
 }
 
 // Creates build.yml

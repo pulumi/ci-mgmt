@@ -131,8 +131,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const bin_pulumi_java_gen: Target = {
     name: "bin/pulumi-java-gen",
     commands: [
-        "$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)"
-    ]
+      "$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)",
+    ],
   };
   const build_java: Target = {
     name: "build_java",
@@ -142,18 +142,24 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       PACKAGE_VERSION: "$(shell pulumictl get version --language generic)",
     },
     commands: [
-        "$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
+      "$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
       [
         "cd sdk/java/",
         'echo "module fake_java_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
         "gradle --console=plain build",
       ],
-    ]
+    ],
   };
   const build_sdks: Target = {
     name: "build_sdks",
     phony: true,
-    dependencies: [build_nodejs, build_python, build_go, build_dotnet, build_java],
+    dependencies: [
+      build_nodejs,
+      build_python,
+      build_go,
+      build_dotnet,
+      build_java,
+    ],
   };
   const lint_provider: Target = {
     name: "lint_provider",
@@ -208,7 +214,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const install_sdks: Target = {
     name: "install_sdks",
     phony: true,
-    dependencies: [install_dotnet_sdk, install_python_sdk, install_nodejs_sdk, install_java_sdk],
+    dependencies: [
+      install_dotnet_sdk,
+      install_python_sdk,
+      install_nodejs_sdk,
+      install_java_sdk,
+    ],
   };
   const development: Target = {
     name: "development",

@@ -429,7 +429,7 @@ export function RunPublishJavaSDK(): Step {
     with: {
       arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
       "build-root-directory": "./sdk/java",
-      "gradle-version": '7.4.1',
+      "gradle-version": "7.4.1",
     },
   };
 }
@@ -535,8 +535,8 @@ export function CreateCommentsUrlStep(): Step {
 export function EchoSuccessStep(): Step {
   return {
     name: "Is workflow a success",
-    run: "echo yes"
-  }
+    run: "echo yes",
+  };
 }
 
 export function UpdatePRWithResultsStep(): Step {
