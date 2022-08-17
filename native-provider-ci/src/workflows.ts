@@ -402,7 +402,7 @@ export class BuildSdkJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language }} == 'dotnet' && 'macos-latest' || 'ubuntu-latest'";
+        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
     }
     this.name = name;
     this.steps = [
