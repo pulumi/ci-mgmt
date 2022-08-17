@@ -288,6 +288,28 @@ export function WeeklyPulumiUpdateWorkflow(
   return workflow;
 }
 
+// creates nightly-sdk-generation.yml
+export function NightlySdkGenerationWorkflow(
+  name: string,
+  opts: WorkflowOpts
+): GithubWorkflow {
+  return {
+    name: name,
+    on: {
+      schedule: [
+        {
+          cron: "35 4 * * 1-5",
+        },
+      ],
+      workflow_dispatch: {},
+    },
+    env: env(opts),
+    jobs: {
+      "generate-sdk": new NightlySdkGeneration("generate-sdk", opts),
+    },
+  };
+}
+
 // creates cf2pulumi-release.yml
 export function Cf2PulumiReleaseWorkflow(
   name: string,
@@ -380,7 +402,7 @@ export class BuildSdkJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language }} == 'dotnet' && 'macos-latest' || 'ubuntu-latest'";
+        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
     }
     this.name = name;
     this.steps = [
@@ -867,7 +889,7 @@ export class Arm2PulumiCoverageReport implements NormalJob {
     steps.InstallGo(goVersion),
     steps.InstallPulumiCtl(),
     steps.InstallPulumiCli(),
-    steps.AzureLogin(),
+    steps.AzureLogin("azure-native"),
     steps.MakeClean(),
     steps.InitializeSubModules(true),
     steps.BuildCodegenBinaries("azure-native"),
@@ -913,7 +935,40 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
       steps.CreateUpdatePulumiPR(),
-      steps.UpdatePulumiPRAutoMerge(),
+      steps.SetPRAutoMerge(),
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
+    Object.assign(this, { name });
+  }
+}
+
+export class NightlySdkGeneration implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  steps: NormalJob["steps"];
+  name: string;
+  if: NormalJob["if"];
+
+  constructor(name: string, opts: WorkflowOpts) {
+    this.name = name;
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      // Pass the provider here as an option so that it can be skipped if not needed
+      steps.CheckoutTagsStep(opts.provider),
+      steps.InstallGo(goVersion),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.AzureLogin(opts.provider),
+      steps.MakeClean(),
+      steps.PrepareGitBranchForSdkGeneration(),
+      steps.CommitEmptySDK(),
+      steps.UpdateSubmodules(opts.provider),
+      steps.MakeDiscovery(opts.provider),
+      steps.BuildCodegenBinaries(opts.provider),
+      steps.MakeLocalGenerate(),
+      steps.SetGitSubmoduleCommitHash(opts.provider),
+      steps.CommitAutomatedSDKUpdates(opts.provider),
+      steps.PullRequestSdkGeneration(opts.provider),
+      steps.SetPRAutoMerge(),
+      steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }

@@ -79,10 +79,16 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   ];
   // Add files that are unique to providers
   if (config.provider === "aws-native") {
-    files.push({
-      path: path.join(githubWorkflowsDir, "cf2pulumi-release.yml"),
-      data: wf.Cf2PulumiReleaseWorkflow("cf2pulumi-release", config),
-    });
+    files.push(
+      {
+        path: path.join(githubWorkflowsDir, "cf2pulumi-release.yml"),
+        data: wf.Cf2PulumiReleaseWorkflow("cf2pulumi-release", config),
+      }
+      // {
+      //   path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
+      //   data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
+      // }
+    );
   }
   if (config.provider === "azure-native") {
     files.push(
@@ -93,8 +99,18 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       {
         path: path.join(githubWorkflowsDir, "arm2pulumi-coverage-report.yml"),
         data: wf.Arm2PulumiCoverageReportWorkflow("generate-coverage", config),
+      },
+      {
+        path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
+        data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
       }
     );
+  }
+  if (config.provider === "google-native") {
+    files.push({
+      path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
+      data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
+    });
   }
   return files;
 };

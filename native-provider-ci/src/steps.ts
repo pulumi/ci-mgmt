@@ -48,6 +48,55 @@ export function CreateCommentsUrlStep(): Step {
   };
 }
 
+export function SetGitSubmoduleCommitHash(provider: string): Step {
+  let dir;
+  if (provider === "azure-native") {
+    dir = "azure-rest-api-specs";
+  }
+  if (provider === "aws-native") {
+    dir = "aws-cloudformation-user-guide";
+  }
+  if (provider === "google-native") {
+    return {};
+  }
+  return {
+    name: "Git submodule commit hash",
+    id: "vars",
+    run: "echo ::set-output name=commit-hash::$(git rev-parse HEAD)",
+    "working-directory": dir,
+  };
+}
+
+export function CommitAutomatedSDKUpdates(provider: string): Step {
+  let dir;
+  if (provider === "azure-native") {
+    dir = "azure-rest-api-specs";
+  }
+  if (provider === "aws-native") {
+    dir = "aws-cloudformation-user-guide";
+  }
+  if (provider === "google-native") {
+    return {
+      name: "Commit changes",
+      run:
+        "git add discovery\n" +
+        `git commit -m "Discovery documents"\n` +
+        "git add .\n" +
+        `git commit -m "Regenerating based on discovery"\n` +
+        "git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
+    };
+  }
+  return {
+    name: "Commit changes",
+    run:
+      "git add sdk\n" +
+      `git commit -m "Regenerating SDKs based on ${dir} @ \${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"\n` +
+      "git add .\n" +
+      `git commit -m "Regenerating based on ${dir} @ \${{ steps.vars.outputs.commit-hash }}"\n` +
+      "git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
+  };
+}
+
 export function UpdatePRWithResultsStep(): Step {
   return {
     name: "Update with Result",
@@ -85,7 +134,11 @@ export function CheckoutScriptsRepoStep(): Step {
   };
 }
 
-export function CheckoutTagsStep(): Step {
+export function CheckoutTagsStep(skipProvider?: string): Step {
+  // If a provider is not passed at all then this step will not be skipped.
+  if (skipProvider === "azure-native") {
+    return {};
+  }
   return {
     name: "Unshallow clone for tags",
     run: "git fetch --prune --unshallow --tags",
@@ -384,41 +437,41 @@ export function RunTests(provider: string): Step {
   };
 }
 
-export function CommitChanges(refName: string): Step {
+export function CommitEmptySDK(): Step {
   return {
-    name: "commit changes",
-    uses: action.addAndCommit,
-    with: {
-      author_email: "bot@pulumi.com",
-      author_name: "pulumi-bot",
-      ref: `${refName}`,
-    },
+    name: "Commit Empty SDK",
+    run:
+      "git add . \n" +
+      'git commit -m "Preparing the SDK folder for regeneration"',
   };
 }
 
-export function PullRequest(
-  refName: string,
-  prTitle: string,
-  user: string
-): Step {
-  return {
-    name: "pull-request",
+export function PullRequestSdkGeneration(provider: string): Step {
+  let dir;
+  if (provider === "azure-native") {
+    dir = "azure-rest-api-specs";
+  }
+  if (provider === "aws-native") {
+    dir = "aws-cloudformation-user-guide";
+  }
+  const result = {
+    name: "Create PR",
+    id: "create-pr",
     uses: action.pullRequest,
     with: {
       destination_branch: "master",
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-      pr_allow_empty: "true",
-      pr_assignee: `${user}`,
       pr_body: "*Automated PR*",
-      pr_reviewer: `${user}`,
-      pr_title: `${prTitle}`,
+      pr_title: `Automated SDK generation @ ${dir} \${{ steps.vars.outputs.commit-hash }}`,
       author_name: "pulumi-bot",
-      source_branch: `${refName}`,
-    },
-    env: {
-      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+      source_branch:
+        "generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
     },
   };
+  if (provider === "google-native") {
+    result.with.pr_title = "Automated SDK generation";
+  }
+  return result;
 }
 
 export function CheckSchemaChanges(provider: string): Step {
@@ -847,7 +900,7 @@ export function CreateUpdatePulumiPR(): Step {
   };
 }
 
-export function UpdatePulumiPRAutoMerge(): Step {
+export function SetPRAutoMerge(): Step {
   return {
     name: "Set AutoMerge",
     if: "steps.create-pr.outputs.has_changed_files",
@@ -957,13 +1010,16 @@ export function ChocolateyPackageDeployment(): Step {
   };
 }
 
-export function AzureLogin(): Step {
-  return {
-    uses: action.azureLogin,
-    with: {
-      creds: "${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}",
-    },
-  };
+export function AzureLogin(provider: string): Step {
+  if (provider === "azure-native") {
+    return {
+      uses: action.azureLogin,
+      with: {
+        creds: "${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}",
+      },
+    };
+  }
+  return {};
 }
 
 export function AwsCredentialsForArmCoverageReport(): Step {
@@ -1014,4 +1070,41 @@ export function UploadArmCoverageToS3(): Step {
     name: "Upload results to S3",
     run: "cd provider/pkg/arm2pulumi/internal/test && bash s3-upload-script.sh",
   };
+}
+
+export function PrepareGitBranchForSdkGeneration(): Step {
+  return {
+    name: "Preparing Git Branch",
+    run:
+      'git config --local user.email "bot@pulumi.com"\n' +
+      'git config --local user.name "pulumi-bot"\n' +
+      "git checkout -b generate-sdk/${{ github.run_id }}-${{ github.run_number }}\n",
+  };
+}
+
+export function UpdateSubmodules(provider: string): Step {
+  if (provider !== "azure-native") {
+    return {};
+  }
+  return {
+    name: "Update Submodules",
+    run: "make update_submodules",
+  };
+}
+
+export function MakeDiscovery(provider: string): Step {
+  if (provider === "aws-native") {
+    return {
+      name: "Discovery",
+      run: "make discovery",
+    };
+  }
+  if (provider === "google-native") {
+    return {
+      name: "Discovery",
+      id: "discovery",
+      run: "make discovery\n" + "git update-index -q --refresh",
+    };
+  }
+  return {};
 }
