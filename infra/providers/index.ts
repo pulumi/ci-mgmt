@@ -3,8 +3,11 @@ import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
 
-// grab all the providers from the directory listing
-const providers = fs.readdirSync('../../provider-ci/providers/');
+// grab all the providers from their directory listing
+const tfProviders = fs.readdirSync('../../provider-ci/providers/');
+const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
+
+const providers = [...tfProviders, ...nativeProviders];
 
 for (let provider of providers) {
     const contexts: string[] = [
