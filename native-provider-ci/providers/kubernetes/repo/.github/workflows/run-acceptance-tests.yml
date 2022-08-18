@@ -409,7 +409,6 @@ jobs:
     needs:
     - test
     - lint
-    - lint_sdk
   build-test-cluster:
     runs-on: ubuntu-latest
     strategy:

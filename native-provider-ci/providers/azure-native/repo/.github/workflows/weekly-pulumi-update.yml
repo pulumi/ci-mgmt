@@ -129,6 +129,10 @@ jobs:
 
         git commit -m "Regenerating Go SDK based on updated modules" || echo "ignore commit failure, may be empty"
 
+        git add sdk/java*
+
+        git commit -m "Regenerating Java SDK based on updated modules" || echo "ignore commit failure, may be empty"
+
         git add .
 
         git commit -m "Updated modules"
