@@ -1,4 +1,4 @@
-import * as action from "./action-versions";
+import * as action from "../../provider-ci/src/action-versions";
 import { NormalJob } from "./github-workflow";
 
 export type Step = Required<NormalJob>["steps"][0];
@@ -100,8 +100,8 @@ export function CommitAutomatedSDKUpdates(provider: string): Step {
 export function EchoSuccessStep(): Step {
   return {
     name: "Is workflow a success",
-    run: "echo yes"
-  }
+    run: "echo yes",
+  };
 }
 
 export function UpdatePRWithResultsStep(): Step {
@@ -1029,7 +1029,7 @@ export function RunPublishJavaSDK(): Step {
     with: {
       arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
       "build-root-directory": "./sdk/java",
-      "gradle-version": '7.4.1',
+      "gradle-version": "7.4.1",
     },
   };
 }
