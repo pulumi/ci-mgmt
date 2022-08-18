@@ -165,7 +165,7 @@ function calculateSentinelNeeds(requiresLint: boolean): string[] {
   const needs: string[] = ["test"];
 
   if (requiresLint) {
-    needs.push("lint", "lint_sdk");
+    needs.push("lint");
   }
 
   return needs;
