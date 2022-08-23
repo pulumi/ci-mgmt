@@ -9,7 +9,7 @@ TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 VERSION := $(shell pulumictl get version)
 JAVA_GEN := pulumi-java-gen
-JAVA_GEN_VERSION := v0.5.0
+JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
 
@@ -90,9 +90,9 @@ clean::
 
 install_plugins:: 
 	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
-	pulumi plugin install resource random 4.0.0
-	pulumi plugin install resource kubernetes 3.12.0
-	pulumi plugin install resource tls 4.0.0
+	pulumi plugin install resource random 4.8.2
+	pulumi plugin install resource kubernetes 3.20.0
+	pulumi plugin install resource tls 4.6.0
 
 install_dotnet_sdk:: 
 	mkdir -p $(WORKING_DIR)/nuget
