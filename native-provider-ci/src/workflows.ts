@@ -988,6 +988,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
+      steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.AzureLogin(opts.provider),
       steps.MakeClean(),
       steps.PrepareGitBranchForSdkGeneration(),
