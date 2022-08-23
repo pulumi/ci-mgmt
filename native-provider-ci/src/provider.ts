@@ -83,11 +83,11 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       {
         path: path.join(githubWorkflowsDir, "cf2pulumi-release.yml"),
         data: wf.Cf2PulumiReleaseWorkflow("cf2pulumi-release", config),
+      },
+      {
+        path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
+        data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
       }
-      // {
-      //   path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
-      //   data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
-      // }
     );
   }
   if (config.provider === "azure-native") {
