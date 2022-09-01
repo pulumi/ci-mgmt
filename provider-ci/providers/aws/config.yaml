@@ -3,7 +3,7 @@ lint: false
 major-version: 5
 aws: true
 parallel: 1
-timeout: 90
+timeout: 120
 providerVersion: "github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion"
 env:
   AWS_REGION: us-west-2
