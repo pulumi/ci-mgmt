@@ -158,6 +158,7 @@ export function ConfigureGcpCredentials(requiresGcp?: boolean): Step {
       name: "Configure GCP credentials",
       uses: action.setupGcloud,
       with: {
+        install_components: "gke-gcloud-auth-plugin",
         project_id: "${{ env.GOOGLE_PROJECT }}",
         service_account_email: "${{ secrets.GCP_SA_EMAIL }}",
         service_account_key: "${{ secrets.GCP_SA_KEY }}",
