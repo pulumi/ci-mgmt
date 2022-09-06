@@ -7,6 +7,9 @@ export function CheckoutRepoStep(): Step {
   return {
     name: "Checkout Repo",
     uses: action.checkout,
+    with: {
+      lfs: true,
+    },
   };
 }
 
