@@ -1,5 +1,5 @@
 provider: newrelic
-major-version: 4
+major-version: 5
 env:
   NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
   NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
