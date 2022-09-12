@@ -31,8 +31,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-      with:
-        lfs: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
@@ -130,8 +128,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-      with:
-        lfs: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
@@ -207,8 +203,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-      with:
-        lfs: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v2
       with:
