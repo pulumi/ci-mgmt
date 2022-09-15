@@ -56,12 +56,17 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       ) ?? []),
     ],
   };
+  const bin_tfgen: Target = {
+    name: "bin/$(TFGEN)",
+    commands: [
+      'cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)',
+    ],
+  };
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins],
+    dependencies: [install_plugins, bin_tfgen],
     commands: [
-      '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
@@ -251,6 +256,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       development,
       build,
       only_build,
+      bin_tfgen,
       tfgen,
       provider,
       build_sdks,
