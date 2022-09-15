@@ -620,12 +620,12 @@ export function SchemaFileChanged(): Step {
 
 export function SdkFilesChanged(): Step {
   return {
-    name: "Check for diff in sdk/*",
+    name: "Check for diff in sdk/**",
     id: "sdk_changed",
     if: "steps.schema_changed.outputs.changed == 'false'",
     uses: action.pathsFilter,
     with: {
-      filters: `changed: 'sdk/*'`,
+      filters: `changed: 'sdk/**'`,
     },
   };
 }
