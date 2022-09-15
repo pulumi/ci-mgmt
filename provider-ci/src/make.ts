@@ -67,7 +67,7 @@ function renderTarget(target: Target): string {
   const dependencyNames = dependencies.map((d) =>
     typeof d === "string" ? d : d.name
   );
-  const declaration = `${target.name}:: ${dependencyNames.join(" ")}`;
+  const declaration = `${target.name}: ${dependencyNames.join(" ")}`;
   const commands = renderCommands(target.commands);
   const suffixCommands =
     target.autoTouch ?? false ? renderCommands(["@touch $@"]) : [];
