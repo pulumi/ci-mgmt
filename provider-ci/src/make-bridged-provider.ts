@@ -1,5 +1,5 @@
 import { BridgedConfig } from "./config";
-import { Makefile, Target } from "./make";
+import { Makefile, Target, Variables } from "./make";
 
 export function bridgedProvider(config: BridgedConfig): Makefile {
   const PACK = config.provider;
@@ -13,11 +13,10 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const TFGEN = `pulumi-tfgen-$(PACK)`;
   const JAVA_GEN_VERSION = "v0.5.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
-  const VERSION = "$(shell pulumictl get version)";
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
-  const variables = {
+  const variables: Variables = {
     PACK,
     ORG,
     PROJECT,
@@ -25,10 +24,26 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     VERSION_PATH,
     TFGEN,
     PROVIDER,
-    VERSION,
     JAVA_GEN_VERSION,
     TESTPARALLELISM,
     WORKING_DIR,
+    // Recursive variables are also lazy and cached - so only calculated once, if accessed
+    VERSION: {
+      value: "$(shell pulumictl get version --language generic)",
+      type: "recursive",
+    },
+    VERSION_DOTNET: {
+      value: "$(shell pulumictl get version --language dotnet)",
+      type: "recursive",
+    },
+    VERSION_JAVASCRIPT: {
+      value: "$(shell pulumictl get version --language javascript)",
+      type: "recursive",
+    },
+    VERSION_PYTHON: {
+      value: "$(shell pulumictl get version --language python)",
+      type: "recursive",
+    },
   } as const;
 
   const install_plugins: Target = {
@@ -67,9 +82,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_nodejs: Target = {
     name: "build_nodejs",
     phony: true,
-    variables: {
-      VERSION: "$(shell pulumictl get version --language javascript)",
-    },
     commands: [
       "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
       [
@@ -78,16 +90,13 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         "yarn install",
         "yarn run tsc",
         "cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/",
-        'sed -i.bak -e "s/\\$${VERSION}/$(VERSION)/g" ./bin/package.json',
+        'sed -i.bak -e "s/\\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json',
       ],
     ],
   };
   const build_python: Target = {
     name: "build_python",
     phony: true,
-    variables: {
-      PYPI_VERSION: "$(shell pulumictl get version --language python)",
-    },
     commands: [
       "bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
       [
@@ -96,7 +105,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         "cp ../../README.md .",
         "python3 setup.py clean --all 2>/dev/null",
         "rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin",
-        `sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py`,
+        `sed -i.bak -e 's/^VERSION = .*/VERSION = "$(VERSION_PYTHON)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION_PYTHON)"/g' ./bin/setup.py`,
         "rm ./bin/setup.py.bak && rm ./bin/go.mod",
         "cd ./bin && python3 setup.py build sdist",
       ],
@@ -110,9 +119,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_dotnet: Target = {
     name: "build_dotnet",
     phony: true,
-    variables: {
-      DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
-    },
     commands: [
       "pulumictl get version --language dotnet",
       "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
@@ -120,7 +126,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         "cd sdk/dotnet/",
         'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
         'echo "$(DOTNET_VERSION)" >version.txt',
-        "dotnet build /p:Version=$(DOTNET_VERSION)",
+        "dotnet build /p:Version=$(VERSION_DOTNET)",
       ],
     ],
   };

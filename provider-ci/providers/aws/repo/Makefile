@@ -7,10 +7,13 @@ PROVIDER_PATH := provider/v5
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
-VERSION := $(shell pulumictl get version)
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
+VERSION = $(shell pulumictl get version --language generic)
+VERSION_DOTNET = $(shell pulumictl get version --language dotnet)
+VERSION_JAVASCRIPT = $(shell pulumictl get version --language javascript)
+VERSION_PYTHON = $(shell pulumictl get version --language python)
 
 development: install_plugins provider build_sdks install_sdks
 
@@ -28,7 +31,6 @@ provider: tfgen install_plugins
 
 build_sdks: build_nodejs build_python build_go build_dotnet build_java
 
-build_nodejs: VERSION := $(shell pulumictl get version --language javascript)
 build_nodejs: 
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	cd sdk/nodejs/ && \
@@ -36,9 +38,8 @@ build_nodejs:
 		yarn install && \
 		yarn run tsc && \
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
-		sed -i.bak -e "s/\$${VERSION}/$(VERSION)/g" ./bin/package.json
+		sed -i.bak -e "s/\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json
 
-build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
 build_python: 
 	bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
 	cd sdk/python/ && \
@@ -46,21 +47,20 @@ build_python:
 		cp ../../README.md . && \
 		python3 setup.py clean --all 2>/dev/null && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
+		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(VERSION_PYTHON)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION_PYTHON)"/g' ./bin/setup.py && \
 		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
 		cd ./bin && python3 setup.py build sdist
 
 build_go: 
 	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 
-build_dotnet: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 build_dotnet: 
 	pulumictl get version --language dotnet
 	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
 	cd sdk/dotnet/ && \
 		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		echo "$(DOTNET_VERSION)" >version.txt && \
-		dotnet build /p:Version=$(DOTNET_VERSION)
+		dotnet build /p:Version=$(VERSION_DOTNET)
 
 sdk/java/.gen.sentinel: bin/pulumi-java-gen
 	bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
