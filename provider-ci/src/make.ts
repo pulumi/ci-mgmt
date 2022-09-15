@@ -63,7 +63,7 @@ function renderTarget(target: Target): string {
   const commands = target.commands?.map(renderCommand) ?? [];
   const variables = Object.entries(target.variables ?? {})
     .map(renderVariable)
-    .map((v) => target.name + ":: " + v);
+    .map((v) => target.name + ": " + v);
   return [...variables, declaration, ...commands].join("\n");
 }
 

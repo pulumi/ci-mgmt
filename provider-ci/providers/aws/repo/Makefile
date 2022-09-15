@@ -29,7 +29,7 @@ provider:: tfgen install_plugins
 
 build_sdks:: build_nodejs build_python build_go build_dotnet build_java
 
-build_nodejs:: VERSION := $(shell pulumictl get version --language javascript)
+build_nodejs: VERSION := $(shell pulumictl get version --language javascript)
 build_nodejs:: 
 	$(WORKING_DIR)/bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	cd sdk/nodejs/ && \
@@ -39,7 +39,7 @@ build_nodejs::
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION)/g" ./bin/package.json
 
-build_python:: PYPI_VERSION := $(shell pulumictl get version --language python)
+build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
 build_python:: 
 	$(WORKING_DIR)/bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
 	cd sdk/python/ && \
@@ -54,7 +54,7 @@ build_python::
 build_go:: 
 	$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 
-build_dotnet:: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
+build_dotnet: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 build_dotnet:: 
 	pulumictl get version --language dotnet
 	$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
@@ -63,7 +63,7 @@ build_dotnet::
 		echo "$(DOTNET_VERSION)" >version.txt && \
 		dotnet build /p:Version=$(DOTNET_VERSION)
 
-build_java:: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
+build_java: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
 build_java:: bin/pulumi-java-gen
 	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
 	cd sdk/java/ && \
