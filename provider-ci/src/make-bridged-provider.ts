@@ -11,7 +11,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       : `provider`;
   const VERSION_PATH = `$(PROVIDER_PATH)/pkg/version.Version`;
   const TFGEN = `pulumi-tfgen-$(PACK)`;
-  const JAVA_GEN = `pulumi-java-gen`;
   const JAVA_GEN_VERSION = "v0.5.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
   const VERSION = "$(shell pulumictl get version)";
@@ -27,7 +26,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     TFGEN,
     PROVIDER,
     VERSION,
-    JAVA_GEN,
     JAVA_GEN_VERSION,
     TESTPARALLELISM,
     WORKING_DIR,
@@ -142,9 +140,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       PACKAGE_VERSION: "$(shell pulumictl get version --language generic)",
     },
     commands: [
-      "$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
+      "bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
       [
-        "cd sdk/java/",
+        "cd sdk/java",
         'echo "module fake_java_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
         "gradle --console=plain build",
       ],
