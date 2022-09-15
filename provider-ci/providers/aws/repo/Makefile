@@ -8,7 +8,6 @@ VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 VERSION := $(shell pulumictl get version)
-JAVA_GEN := pulumi-java-gen
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
@@ -63,12 +62,18 @@ build_dotnet::
 		echo "$(DOTNET_VERSION)" >version.txt && \
 		dotnet build /p:Version=$(DOTNET_VERSION)
 
-build_java: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
-build_java:: bin/pulumi-java-gen
-	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
-	cd sdk/java/ && \
-		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+sdk/java/.gen.sentinel:: bin/pulumi-java-gen
+	bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+	cd sdk/java && \
+		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod
+	@touch $@
+
+sdk/java/.build.sentinel:: sdk/java/.gen.sentinel
+	cd sdk/java && \
 		gradle --console=plain build
+	@touch $@
+
+build_java:: sdk/java/.build.sentinel
 
 bin/pulumi-java-gen:: 
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
