@@ -27,6 +27,8 @@ export type Target = {
   commands?: (string | string[])[];
   /** Auto-emit .PHONY target */
   phony?: boolean;
+  /** Auto-touch file on completion */
+  autoTouch?: boolean;
 };
 
 export type Makefile = {
@@ -54,17 +56,25 @@ function renderCommand(cmd: string | string[]) {
   return indent + cmd;
 }
 
+function renderCommands(
+  commands?: (string | string[])[] | undefined
+): string[] {
+  return commands?.map(renderCommand) ?? [];
+}
+
 function renderTarget(target: Target): string {
   const dependencies = target.dependencies ?? [];
   const dependencyNames = dependencies.map((d) =>
     typeof d === "string" ? d : d.name
   );
   const declaration = `${target.name}:: ${dependencyNames.join(" ")}`;
-  const commands = target.commands?.map(renderCommand) ?? [];
+  const commands = renderCommands(target.commands);
+  const suffixCommands =
+    target.autoTouch ?? false ? renderCommands(["@touch $@"]) : [];
   const variables = Object.entries(target.variables ?? {})
     .map(renderVariable)
     .map((v) => target.name + ": " + v);
-  return [...variables, declaration, ...commands].join("\n");
+  return [...variables, declaration, ...commands, ...suffixCommands].join("\n");
 }
 
 function renderVariable([name, assignment]: [string, Assignment]): string {
