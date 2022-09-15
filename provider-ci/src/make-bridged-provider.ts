@@ -47,7 +47,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     dependencies: [install_plugins],
     commands: [
       '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
-      "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
+      "bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
   };
@@ -71,7 +71,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
+      "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
       [
         "cd sdk/nodejs/",
         'echo "module fake_nodejs_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -89,7 +89,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       PYPI_VERSION: "$(shell pulumictl get version --language python)",
     },
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
+      "bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
       [
         "cd sdk/python/",
         'echo "module fake_python_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -105,9 +105,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_go: Target = {
     name: "build_go",
     phony: true,
-    commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/",
-    ],
+    commands: ["bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/"],
   };
   const build_dotnet: Target = {
     name: "build_dotnet",
@@ -117,7 +115,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     },
     commands: [
       "pulumictl get version --language dotnet",
-      "$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
+      "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
       [
         "cd sdk/dotnet/",
         'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -175,10 +173,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const cleanup: Target = {
     name: "cleanup",
     phony: true,
-    commands: [
-      "rm -r $(WORKING_DIR)/bin",
-      "rm -f provider/cmd/$(PROVIDER)/schema.go",
-    ],
+    commands: ["rm -r bin", "rm -f provider/cmd/$(PROVIDER)/schema.go"],
   };
   const help: Target = {
     name: "help",
@@ -198,8 +193,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "install_dotnet_sdk",
     phony: true,
     commands: [
-      "mkdir -p $(WORKING_DIR)/nuget",
-      "find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \\;",
+      "mkdir -p nuget",
+      "find sdk/dotnet -name '*.nupkg' -print -exec cp -p {} nuget \\;",
     ],
   };
   const install_python_sdk: Target = {
@@ -214,7 +209,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const install_nodejs_sdk: Target = {
     name: "install_nodejs_sdk",
     phony: true,
-    commands: ["yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin"],
+    commands: ["yarn link --cwd sdk/nodejs/bin"],
   };
   const install_sdks: Target = {
     name: "install_sdks",
