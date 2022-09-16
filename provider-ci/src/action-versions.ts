@@ -11,6 +11,7 @@ export const azureLogin = "azure/login@v1";
 export const configureAwsCredentials =
   "aws-actions/configure-aws-credentials@v1";
 export const setupGcloud = "google-github-actions/setup-gcloud@v0";
+export const googleAuth = "google-github-actions/auth@v0";
 
 // Tools
 export const goReleaser = "goreleaser/goreleaser-action@v2";

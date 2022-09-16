@@ -546,6 +546,7 @@ export class TestsJob implements NormalJob {
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
+  permissions: NormalJob["permissions"];
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
@@ -555,6 +556,10 @@ export class TestsJob implements NormalJob {
       this.needs = ["build_sdks", "build-test-cluster"];
     }
     this.name = name;
+    this.permissions = {
+      contents: "read",
+      "id-token": "write",
+    };
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.CheckoutScriptsRepoStep(),
@@ -579,7 +584,8 @@ export class TestsJob implements NormalJob {
       steps.MakeKubeDir(opts.provider),
       steps.DownloadKubeconfig(opts.provider),
       steps.ConfigureAwsCredentialsForTests(opts.aws),
-      steps.ConfigureGcpCredentials(opts.gcp),
+      steps.GoogleAuth(opts.gcp),
+      steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
       steps.InstallandConfigureHelm(opts.provider),
       steps.SetupGotestfmt(),
@@ -616,21 +622,24 @@ export class BuildTestClusterJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
   outputs: NormalJob["outputs"];
+  permissions: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     this.outputs = {
       "stack-name": "${{ steps.stackname.outputs.stack-name }}",
     };
+    this.permissions = {
+      contents: "read",
+      "id-token": "write",
+    };
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
       steps.InstallPulumiCli(),
       steps.InstallNodeJS(),
-      steps.InstallDotNet(),
-      steps.InstallPython(),
-      steps.InstallPythonDeps(),
-      steps.ConfigureGcpCredentials(opts.gcp),
+      steps.GoogleAuth(opts.gcp),
+      steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
       steps.LoginGoogleCloudRegistry(opts.provider),
       steps.SetStackName(opts.provider),
@@ -667,21 +676,24 @@ export class TeardownTestClusterJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
   needs: NormalJob["needs"];
+  permissions: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     this.needs = ["build-test-cluster", "test"];
     this.if =
       "${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
+    this.permissions = {
+      contents: "read",
+      "id-token": "write",
+    };
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
       steps.InstallPulumiCli(),
       steps.InstallNodeJS(),
-      steps.InstallDotNet(),
-      steps.InstallPython(),
-      steps.InstallPythonDeps(),
-      steps.ConfigureGcpCredentials(opts.gcp),
+      steps.GoogleAuth(opts.gcp),
+      steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
       steps.LoginGoogleCloudRegistry(opts.provider),
       steps.DestroyTestCluster(opts.provider),

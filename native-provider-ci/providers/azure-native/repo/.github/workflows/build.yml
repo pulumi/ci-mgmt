@@ -261,6 +261,9 @@ jobs:
         - go
         - java
     name: test
+    permissions:
+      contents: read
+      id-token: write
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3

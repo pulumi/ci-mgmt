@@ -1,6 +1,7 @@
 import { GithubWorkflow, NormalJob } from "./github-workflow";
 import { ProviderFile } from "./provider";
 import { Step } from "./steps";
+import * as action from "./action-versions";
 
 const env = () => ({
   PULUMI_TEST_OWNER: "moolumi",
@@ -37,7 +38,7 @@ export class Linting implements NormalJob {
   "runs-on" = "${{ matrix.platform }}";
   steps = [
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       name: "Install Node.js ${{ matrix.node-version }}",
@@ -87,7 +88,7 @@ export class CommentOnPrJob implements NormalJob {
   if = "github.event.pull_request.head.repo.full_name != github.repository";
   steps = [
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       name: "Comment PR",
@@ -223,11 +224,11 @@ export abstract class EnvironmentSetup implements NormalJob {
       },
     },
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       name: "Checkout Scripts Repo",
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
       with: {
         path: "ci-scripts",
         repository: "pulumi/scripts",
@@ -688,7 +689,7 @@ export class UnitTestDotNetJob extends UnitTestingJob {
       run: 'echo "Currently Pulumi $(pulumi version) is installed"',
     },
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       run: "dotnet test",
@@ -726,7 +727,7 @@ export class UnitTestPythonJob extends UnitTestingJob {
       run: 'echo "Currently Pulumi $(pulumi version) is installed"',
     },
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       run:
@@ -764,7 +765,7 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
       run: 'echo "Currently Pulumi $(pulumi version) is installed"',
     },
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       run:
@@ -802,7 +803,7 @@ export class UnitTestGoJob extends UnitTestingJob {
       run: 'echo "Currently Pulumi $(pulumi version) is installed"',
     },
     {
-      uses: "actions/checkout@v2",
+      uses: action.checkout,
     },
     {
       run: "go test",
@@ -924,7 +925,7 @@ export class CommandDispatchWorkflow implements GithubWorkflow {
       "runs-on": "ubuntu-latest",
       steps: [
         {
-          uses: "actions/checkout@v2",
+          uses: action.checkout,
         },
         {
           name: "Run Build",

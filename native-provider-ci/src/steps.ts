@@ -152,17 +152,28 @@ export function CheckoutTagsStep(skipProvider?: string): Step {
   };
 }
 
-export function ConfigureGcpCredentials(requiresGcp?: boolean): Step {
+export function GoogleAuth(requiresGcp?: boolean): Step {
   if (requiresGcp) {
     return {
-      name: "Configure GCP credentials",
+      name: "Authenticate to Google Cloud",
+      uses: action.googleAuth,
+      with: {
+        workload_identity_provider:
+          "projects/${{ env.GOOGLE_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{ env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}",
+        service_account: "${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}",
+      },
+    };
+  }
+  return {};
+}
+
+export function SetupGCloud(requiresGcp?: boolean): Step {
+  if (requiresGcp) {
+    return {
+      name: "Setup gcloud auth",
       uses: action.setupGcloud,
       with: {
         install_components: "gke-gcloud-auth-plugin",
-        project_id: "${{ env.GOOGLE_PROJECT }}",
-        service_account_email: "${{ secrets.GCP_SA_EMAIL }}",
-        service_account_key: "${{ secrets.GCP_SA_KEY }}",
-        export_default_credentials: true,
       },
     };
   }
