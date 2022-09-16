@@ -27,16 +27,6 @@ build_dotnet:
 		echo "$(DOTNET_VERSION)" >version.txt && \
 		dotnet build /p:Version=$(VERSION_DOTNET)
 
-install_plugins: install_plugins.sentinel
-
-install_plugins.sentinel: 
-	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
-	pulumi plugin install resource tls 4.1.0
-	pulumi plugin install resource github 4.10.0
-	pulumi plugin install resource kubernetes 3.17.0
-	pulumi plugin install resource random 4.8.2
-	@touch $@
-
 build_go: 
 	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 
@@ -87,8 +77,20 @@ install_java_sdk:
 install_nodejs_sdk: 
 	yarn link --cwd sdk/nodejs/bin
 
+install_plugins: install_plugins.sentinel
+
+install_python_sdk: 
+
+install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk install_go_sdk
+
+lint_provider: provider
+	cd provider && golangci-lint run -c ../.golangci.yml
+
 provider: tfgen install_plugins.sentinel
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
+
+test: 
+	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
 tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
 
@@ -98,6 +100,14 @@ bin/$(TFGEN):
 
 bin/pulumi-java-gen: 
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
+
+install_plugins.sentinel: 
+	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
+	pulumi plugin install resource tls 4.1.0
+	pulumi plugin install resource github 4.10.0
+	pulumi plugin install resource kubernetes 3.17.0
+	pulumi plugin install resource random 4.8.2
+	@touch $@
 
 only_build: build
 
@@ -120,14 +130,4 @@ sdk/java/.gen.sentinel: bin/pulumi-java-gen
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod
 	@touch $@
 
-install_python_sdk: 
-
-install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk install_go_sdk
-
-lint_provider: provider
-	cd provider && golangci-lint run -c ../.golangci.yml
-
-test: 
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
-
-.PHONY: development build build_dotnet install_plugins build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk provider tfgen install_python_sdk install_sdks lint_provider test
+.PHONY: development build build_dotnet build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_plugins install_python_sdk install_sdks lint_provider provider test tfgen

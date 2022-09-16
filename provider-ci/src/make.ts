@@ -117,18 +117,16 @@ function descendentTargets(target: Target): Target[] {
 function sortTargets(targets: Target[], defaultTarget?: Target | string) {
   const defaultName =
     typeof defaultTarget === "string" ? defaultTarget : defaultTarget?.name;
-  const sorted = [...targets].sort((a, b) => {
-    if (a.name == defaultName) {
-      return -1;
-    }
-    if (b.name == defaultName) {
-      return 1;
-    }
-    if (a.phony !== b.phony) {
-      return a.phony ? 1 : 0;
-    }
-    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-  });
+  function sortKey(target: Target) {
+    const isDefault = target.name === defaultName ? "0" : "1";
+    const isPhony = target.phony ? "0" : "1";
+    return `${isDefault}-${isPhony}-${target.name}`;
+  }
+  const sorted = [...targets].sort((a, b) =>
+    sortKey(a).localeCompare(sortKey(b), undefined, {
+      sensitivity: "base",
+    })
+  );
   return sorted;
 }
 
