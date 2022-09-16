@@ -70,15 +70,15 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       ],
     ],
   };
-  const providerSchema: Target = {
+  const provider_schema: Target = {
     name: "provider/cmd/$(PROVIDER)/schema.json",
     dependencies: [bin_tfgen, install_plugins_sentinel],
     commands: ["bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)"],
   };
-  const providerGen: Target = {
+  const providerGenSentinel: Target = {
     name: "provider/cmd/$(PROVIDER)/.gen.sentinel",
     autoTouch: true,
-    dependencies: [providerSchema],
+    dependencies: [provider_schema],
     commands: [
       ["cd provider", "VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go"],
     ],
@@ -89,8 +89,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     dependencies: [
       install_plugins_sentinel,
       bin_tfgen,
-      providerSchema,
-      providerGen,
+      provider_schema,
+      providerGenSentinel,
     ],
   };
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
@@ -98,13 +98,17 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ldFlagStatements.push(`-X ${config.providerVersion}=$(VERSION)`);
   }
   const ldflags = ldFlagStatements.join(" ");
-  const provider: Target = {
-    name: "provider",
-    phony: true,
-    dependencies: [tfgen, install_plugins_sentinel],
+  const bin_provider: Target = {
+    name: "bin/$(PROVIDER)",
+    dependencies: [providerGenSentinel, install_plugins_sentinel],
     commands: [
       `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
+  };
+  const provider: Target = {
+    name: "provider",
+    phony: true,
+    dependencies: [bin_provider],
   };
   const build_nodejs: Target = {
     name: "build_nodejs",
@@ -200,7 +204,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const lint_provider: Target = {
     name: "lint_provider",
     phony: true,
-    dependencies: [provider],
+    dependencies: [bin_provider],
     commands: ["cd provider && golangci-lint run -c ../.golangci.yml"],
   };
   const cleanup: Target = {
@@ -276,6 +280,15 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   return {
     variables,
     defaultTarget: development,
-    targets: [build, only_build, lint_provider, cleanup, help, clean, test],
+    targets: [
+      build,
+      only_build,
+      lint_provider,
+      cleanup,
+      help,
+      clean,
+      test,
+      tfgen,
+    ],
   };
 }

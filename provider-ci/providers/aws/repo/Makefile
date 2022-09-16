@@ -83,16 +83,18 @@ install_python_sdk:
 
 install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk install_go_sdk
 
-lint_provider: provider
+lint_provider: bin/$(PROVIDER)
 	cd provider && golangci-lint run -c ../.golangci.yml
 
-provider: tfgen install_plugins.sentinel
-	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
+provider: bin/$(PROVIDER)
 
 test: 
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
 tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
+
+bin/$(PROVIDER): provider/cmd/$(PROVIDER)/.gen.sentinel install_plugins.sentinel
+	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
 bin/$(TFGEN): 
 	cd provider && \
