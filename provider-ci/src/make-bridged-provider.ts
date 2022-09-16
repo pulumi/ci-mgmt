@@ -252,6 +252,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       install_python_sdk,
       install_nodejs_sdk,
       install_java_sdk,
+      install_go_sdk,
     ],
   };
   const development: Target = {
@@ -274,37 +275,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   return {
     variables,
-    targets: [
-      development,
-      build,
-      only_build,
-      bin_tfgen,
-      providerSchema,
-      providerGen,
-      tfgen,
-      provider,
-      build_sdks,
-      build_nodejs,
-      build_python,
-      build_go,
-      build_dotnet,
-      sdk_java_gen,
-      sdk_java_build,
-      build_java,
-      bin_pulumi_java_gen,
-      lint_provider,
-      cleanup,
-      help,
-      clean,
-      install_plugins,
-      install_plugins_sentinel,
-      install_dotnet_sdk,
-      install_python_sdk,
-      install_go_sdk,
-      install_java_sdk,
-      install_nodejs_sdk,
-      install_sdks,
-      test,
-    ],
+    defaultTarget: development,
+    targets: [build, only_build, lint_provider, cleanup, help, clean, test],
   };
 }

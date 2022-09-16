@@ -34,6 +34,7 @@ export type Target = {
 export type Makefile = {
   variables?: Variables;
   targets?: Target[];
+  defaultTarget?: Target | string;
 };
 
 function getAssignmentToken(type: AssignmentType): string {
@@ -96,17 +97,57 @@ function phonyTarget(targets: Target[]): Target | undefined {
   };
 }
 
+function deduplicateTargets(targets: Target[]): Target[] {
+  const map = new Map(targets.map((t) => [t.name, t]));
+  return Array.from(map.values());
+}
+
+function descendentTargets(target: Target): Target[] {
+  if (target.dependencies == undefined) {
+    return [target];
+  }
+  return deduplicateTargets([
+    target,
+    ...target.dependencies.flatMap((t) =>
+      typeof t != "string" ? descendentTargets(t) : []
+    ),
+  ]);
+}
+
+function sortTargets(targets: Target[], defaultTarget?: Target | string) {
+  const defaultName =
+    typeof defaultTarget === "string" ? defaultTarget : defaultTarget?.name;
+  const sorted = [...targets].sort((a, b) => {
+    if (a.name == defaultName) {
+      return -1;
+    }
+    if (b.name == defaultName) {
+      return 1;
+    }
+    if (a.phony !== b.phony) {
+      return a.phony ? 1 : 0;
+    }
+    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+  });
+  return sorted;
+}
+
 export function render(makefile: Makefile): string {
   const variableLines = Object.entries(makefile.variables ?? {}).map(
     renderVariable
   );
 
-  const inputTargets = makefile.targets ?? [];
-  const phony = phonyTarget(inputTargets);
-  if (phony !== undefined) {
-    inputTargets.push(phony);
+  const targets = makefile.targets ?? [];
+  if (typeof makefile.defaultTarget === "object") {
+    targets.push(makefile.defaultTarget);
   }
-  const targets = inputTargets.map(renderTarget);
+  const inputTargets = deduplicateTargets(targets.flatMap(descendentTargets));
+  const sortedTargets = sortTargets(inputTargets, makefile.defaultTarget);
+  const phony = phonyTarget(sortedTargets);
+  if (phony !== undefined) {
+    sortedTargets.push(phony);
+  }
+  const renderedTargets = sortedTargets.map(renderTarget);
 
-  return [variableLines.join("\n"), targets.join("\n\n")].join("\n\n");
+  return [variableLines.join("\n"), renderedTargets.join("\n\n")].join("\n\n");
 }

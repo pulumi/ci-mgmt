@@ -19,26 +19,28 @@ development: install_plugins provider build_sdks install_sdks
 
 build: install_plugins provider build_sdks install_sdks
 
-only_build: build
+build_dotnet: 
+	pulumictl get version --language dotnet
+	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
+	cd sdk/dotnet/ && \
+		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		echo "$(DOTNET_VERSION)" >version.txt && \
+		dotnet build /p:Version=$(VERSION_DOTNET)
 
-bin/$(TFGEN): 
-	cd provider && \
-		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
+install_plugins: install_plugins.sentinel
 
-provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
-	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
-
-provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
-	cd provider && \
-		VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go
+install_plugins.sentinel: 
+	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
+	pulumi plugin install resource tls 4.1.0
+	pulumi plugin install resource github 4.10.0
+	pulumi plugin install resource kubernetes 3.17.0
+	pulumi plugin install resource random 4.8.2
 	@touch $@
 
-tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
+build_go: 
+	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 
-provider: tfgen install_plugins.sentinel
-	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
-
-build_sdks: build_nodejs build_python build_go build_dotnet build_java
+build_java: sdk/java/.build.sentinel
 
 build_nodejs: 
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
@@ -60,35 +62,10 @@ build_python:
 		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
 		cd ./bin && python3 setup.py build sdist
 
-build_go: 
-	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
+build_sdks: build_nodejs build_python build_go build_dotnet build_java
 
-build_dotnet: 
-	pulumictl get version --language dotnet
-	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
-	cd sdk/dotnet/ && \
-		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
-		echo "$(DOTNET_VERSION)" >version.txt && \
-		dotnet build /p:Version=$(VERSION_DOTNET)
-
-sdk/java/.gen.sentinel: bin/pulumi-java-gen
-	bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
-	cd sdk/java && \
-		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod
-	@touch $@
-
-sdk/java/.build.sentinel: sdk/java/.gen.sentinel
-	cd sdk/java && \
-		gradle --console=plain build
-	@touch $@
-
-build_java: sdk/java/.build.sentinel
-
-bin/pulumi-java-gen: 
-	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
-
-lint_provider: provider
-	cd provider && golangci-lint run -c ../.golangci.yml
+clean: 
+	rm -rf sdk/{dotnet,nodejs,go,python}
 
 cleanup: 
 	rm -r bin
@@ -99,24 +76,9 @@ help:
 	sed "s/\(.\+\):\s*\(.*\) #\s*\(.*\)/`printf "\033[93m"`\1`printf "\033[0m"`	\3 [\2]/" | \
 	expand -t20
 
-clean: 
-	rm -rf sdk/{dotnet,nodejs,go,python}
-
-install_plugins: install_plugins.sentinel
-
-install_plugins.sentinel: 
-	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
-	pulumi plugin install resource tls 4.1.0
-	pulumi plugin install resource github 4.10.0
-	pulumi plugin install resource kubernetes 3.17.0
-	pulumi plugin install resource random 4.8.2
-	@touch $@
-
 install_dotnet_sdk: 
 	mkdir -p nuget
 	find sdk/dotnet -name '*.nupkg' -print -exec cp -p {} nuget \;
-
-install_python_sdk: 
 
 install_go_sdk: 
 
@@ -125,9 +87,47 @@ install_java_sdk:
 install_nodejs_sdk: 
 	yarn link --cwd sdk/nodejs/bin
 
-install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk
+provider: tfgen install_plugins.sentinel
+	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
+
+tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
+
+bin/$(TFGEN): 
+	cd provider && \
+		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
+
+bin/pulumi-java-gen: 
+	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
+
+only_build: build
+
+provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
+	cd provider && \
+		VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go
+	@touch $@
+
+provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
+	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
+
+sdk/java/.build.sentinel: sdk/java/.gen.sentinel
+	cd sdk/java && \
+		gradle --console=plain build
+	@touch $@
+
+sdk/java/.gen.sentinel: bin/pulumi-java-gen
+	bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+	cd sdk/java && \
+		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod
+	@touch $@
+
+install_python_sdk: 
+
+install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk install_go_sdk
+
+lint_provider: provider
+	cd provider && golangci-lint run -c ../.golangci.yml
 
 test: 
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
-.PHONY: development build tfgen provider build_sdks build_nodejs build_python build_go build_dotnet build_java lint_provider cleanup help clean install_plugins install_dotnet_sdk install_python_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_sdks test
+.PHONY: development build build_dotnet install_plugins build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk provider tfgen install_python_sdk install_sdks lint_provider test
