@@ -10,8 +10,11 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   CLOUDSDK_CORE_DISABLE_PROMPTS: 1
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-  GOOGLE_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-  GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
+  GOOGLE_PROJECT: pulumi-ci-gcp-provider
+  GOOGLE_PROJECT_NUMBER: "895284651812"
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}
@@ -97,6 +100,9 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     name: kubernetes
     needs: test-infra-setup
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -145,13 +151,18 @@ jobs:
         helm init -c
 
         helm repo add bitnami https://charts.bitnami.com/bitnami
-    - name: Configure GCP credentials
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: ${{ env.GOOGLE_PROJECT }}
-        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        version: 285.0.0
+        install_components: gke-gcloud-auth-plugin
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     - name: Configure AWS Credentials
@@ -229,6 +240,9 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: run-provider-tests
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -277,13 +291,18 @@ jobs:
         helm init -c
 
         helm repo add bitnami https://charts.bitnami.com/bitnami
-    - name: Configure GCP credentials
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: ${{ env.GOOGLE_PROJECT }}
-        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        version: 285.0.0
+        install_components: gke-gcloud-auth-plugin
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     - name: Configure AWS Credentials
@@ -373,6 +392,9 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     name: test-infra-destroy
     needs: kubernetes
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -421,13 +443,18 @@ jobs:
         helm init -c
 
         helm repo add bitnami https://charts.bitnami.com/bitnami
-    - name: Configure GCP credentials
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: ${{ env.GOOGLE_PROJECT }}
-        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        version: 285.0.0
+        install_components: gke-gcloud-auth-plugin
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     - name: Configure AWS Credentials
@@ -468,6 +495,9 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: test-infra-setup
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install DotNet ${{ matrix.dotnet-version }}
@@ -516,13 +546,18 @@ jobs:
         helm init -c
 
         helm repo add bitnami https://charts.bitnami.com/bitnami
-    - name: Configure GCP credentials
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
       uses: google-github-actions/setup-gcloud@v0
       with:
-        project_id: ${{ env.GOOGLE_PROJECT }}
-        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        version: 285.0.0
+        install_components: gke-gcloud-auth-plugin
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     - name: Configure AWS Credentials

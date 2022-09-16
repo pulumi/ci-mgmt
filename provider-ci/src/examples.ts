@@ -19,8 +19,12 @@ const env = () => ({
   ARM_LOCATION: "westus",
   DIGITALOCEAN_TOKEN: "${{ secrets.DIGITALOCEAN_TOKEN }}",
   CLOUDSDK_CORE_DISABLE_PROMPTS: 1,
-  GOOGLE_CREDENTIALS: "${{ secrets.GCP_CREDENTIALS }}",
-  GOOGLE_PROJECT: "${{ secrets.GCP_PROJECT_ID }}",
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL:
+    "pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com",
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: "pulumi-ci",
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: "pulumi-ci",
+  GOOGLE_PROJECT: "pulumi-ci-gcp-provider",
+  GOOGLE_PROJECT_NUMBER: "895284651812",
   GOOGLE_REGION: "us-central1",
   GOOGLE_ZONE: "us-central1-a",
   PACKET_AUTH_TOKEN: "${{ secrets.PACKET_AUTH_TOKEN }}",
@@ -143,6 +147,7 @@ export class ResultsCommentJob implements NormalJob {
 
 export abstract class EnvironmentSetup implements NormalJob {
   "runs-on": NormalJob["runs-on"];
+  permissions: NormalJob["permissions"];
   steps: NormalJob["steps"] = [
     {
       name: "Install DotNet ${{ matrix.dotnet-version }}",
@@ -198,13 +203,19 @@ export abstract class EnvironmentSetup implements NormalJob {
         "helm repo add bitnami https://charts.bitnami.com/bitnami",
     },
     {
-      name: "Configure GCP credentials",
-      uses: "google-github-actions/setup-gcloud@v0",
+      name: "Authenticate to Google Cloud",
+      uses: action.googleAuth,
       with: {
-        version: "285.0.0",
-        project_id: "${{ env.GOOGLE_PROJECT }}",
-        service_account_email: "${{ secrets.GCP_SA_EMAIL }}",
-        service_account_key: "${{ secrets.GCP_SA_KEY }}",
+        workload_identity_provider:
+          "projects/${{ env.GOOGLE_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{ env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}",
+        service_account: "${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}",
+      },
+    },
+    {
+      name: "Setup gcloud auth",
+      uses: action.setupGcloud,
+      with: {
+        install_components: "gke-gcloud-auth-plugin",
       },
     },
     {
@@ -240,6 +251,10 @@ export abstract class EnvironmentSetup implements NormalJob {
 
   constructor(name: string, params?: Partial<EnvironmentSetup>) {
     this.name = name;
+    this.permissions = {
+      contents: "read",
+      "id-token": "write",
+    };
     Object.assign(this, { name }, params);
   }
 
