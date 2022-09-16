@@ -113,7 +113,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const sdk_nodejs_gen: Target = {
     name: "sdk/nodejs/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen],
+    dependencies: [bin_tfgen, "$(shell find provider/overlays/nodejs -type f)"],
     commands: [
       "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
     ],

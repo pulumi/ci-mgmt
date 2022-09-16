@@ -134,7 +134,7 @@ sdk/nodejs/.build.sentinel: sdk/nodejs/.gen.sentinel
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json
 	@touch $@
 
-sdk/nodejs/.gen.sentinel: bin/$(TFGEN)
+sdk/nodejs/.gen.sentinel: bin/$(TFGEN) $(shell find provider/overlays/nodejs -type f)
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	@touch $@
 
