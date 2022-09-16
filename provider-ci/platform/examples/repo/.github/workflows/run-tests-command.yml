@@ -53,7 +53,7 @@ jobs:
     - name: Install Latest Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: dotnet test
       working-directory: ${{ matrix.source-dir }}
     strategy:
@@ -80,7 +80,7 @@ jobs:
     - name: Install Latest Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: go test
       working-directory: ${{ matrix.source-dir }}
     strategy:
@@ -163,9 +163,9 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -200,7 +200,7 @@ jobs:
     name: lint
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
@@ -295,9 +295,9 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -352,7 +352,7 @@ jobs:
     - name: Install Latest Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |-
         python3 -m venv venv
         source venv/bin/activate
@@ -439,9 +439,9 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -534,9 +534,9 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -572,7 +572,7 @@ jobs:
     - name: Install Latest Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v1.0.1
     - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |-
         npm install
         npm install --global mocha
