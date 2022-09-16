@@ -22,11 +22,18 @@ build: install_plugins provider build_sdks install_sdks
 only_build: build
 
 bin/$(TFGEN): 
-	cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
+	cd provider && \
+		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
 
-tfgen: install_plugins bin/$(TFGEN)
+provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins
 	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
-	(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)
+
+provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
+	cd provider && \
+		VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go
+	@touch $@
+
+tfgen: install_plugins bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
 
 provider: tfgen install_plugins
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))

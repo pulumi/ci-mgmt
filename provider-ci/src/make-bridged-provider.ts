@@ -59,17 +59,29 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const bin_tfgen: Target = {
     name: "bin/$(TFGEN)",
     commands: [
-      'cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)',
+      [
+        "cd provider",
+        'go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)',
+      ],
+    ],
+  };
+  const providerSchema: Target = {
+    name: "provider/cmd/$(PROVIDER)/schema.json",
+    dependencies: [bin_tfgen, install_plugins],
+    commands: ["bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)"],
+  };
+  const providerGen: Target = {
+    name: "provider/cmd/$(PROVIDER)/.gen.sentinel",
+    autoTouch: true,
+    dependencies: [providerSchema],
+    commands: [
+      ["cd provider", "VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go"],
     ],
   };
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins, bin_tfgen],
-    commands: [
-      "bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
-      "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
-    ],
+    dependencies: [install_plugins, bin_tfgen, providerSchema, providerGen],
   };
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
   if (config.providerVersion) {
@@ -257,6 +269,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       build,
       only_build,
       bin_tfgen,
+      providerSchema,
+      providerGen,
       tfgen,
       provider,
       build_sdks,
