@@ -941,7 +941,11 @@ export function CreateUpdatePulumiPR(): Step {
   };
 }
 
-export function SetPRAutoMerge(): Step {
+export function SetPRAutoMerge(provider?: string): Step {
+  if (provider === "kubernetes") {
+    // Temporarily disabled until https://github.com/pulumi/pulumi-kubernetes/issues/2169 is fixed.
+    return {};
+  }
   return {
     name: "Set AutoMerge",
     if: "steps.create-pr.outputs.has_changed_files",

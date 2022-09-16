@@ -979,7 +979,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
       steps.CreateUpdatePulumiPR(),
-      steps.SetPRAutoMerge(),
+      steps.SetPRAutoMerge(opts.provider),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
@@ -1012,7 +1012,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.SetGitSubmoduleCommitHash(opts.provider),
       steps.CommitAutomatedSDKUpdates(opts.provider),
       steps.PullRequestSdkGeneration(opts.provider),
-      steps.SetPRAutoMerge(),
+      steps.SetPRAutoMerge(opts.provider),
       steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
