@@ -110,11 +110,19 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [bin_provider],
   };
-  const build_nodejs: Target = {
-    name: "build_nodejs",
-    phony: true,
+  const sdk_nodejs_gen: Target = {
+    name: "sdk/nodejs/.gen.sentinel",
+    autoTouch: true,
+    dependencies: [bin_tfgen],
     commands: [
       "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
+    ],
+  };
+  const sdk_nodejs_build: Target = {
+    name: "sdk/nodejs/.build.sentinel",
+    autoTouch: true,
+    dependencies: [sdk_nodejs_gen],
+    commands: [
       [
         "cd sdk/nodejs/",
         'echo "module fake_nodejs_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -124,6 +132,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         'sed -i.bak -e "s/\\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json',
       ],
     ],
+  };
+  const build_nodejs: Target = {
+    name: "build_nodejs",
+    phony: true,
+    dependencies: [sdk_nodejs_build],
   };
   const build_python: Target = {
     name: "build_python",

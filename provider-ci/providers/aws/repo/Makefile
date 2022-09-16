@@ -32,14 +32,7 @@ build_go:
 
 build_java: sdk/java/.build.sentinel
 
-build_nodejs: 
-	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
-	cd sdk/nodejs/ && \
-		echo "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
-		yarn install && \
-		yarn run tsc && \
-		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
-		sed -i.bak -e "s/\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json
+build_nodejs: sdk/nodejs/.build.sentinel
 
 build_python: 
 	bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
@@ -130,6 +123,19 @@ sdk/java/.gen.sentinel: bin/pulumi-java-gen
 	bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
 	cd sdk/java && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod
+	@touch $@
+
+sdk/nodejs/.build.sentinel: sdk/nodejs/.gen.sentinel
+	cd sdk/nodejs/ && \
+		echo "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		yarn install && \
+		yarn run tsc && \
+		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
+		sed -i.bak -e "s/\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json
+	@touch $@
+
+sdk/nodejs/.gen.sentinel: bin/$(TFGEN)
+	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	@touch $@
 
 .PHONY: development build build_dotnet build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_plugins install_python_sdk install_sdks lint_provider provider test tfgen
