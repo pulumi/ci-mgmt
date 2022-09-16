@@ -635,9 +635,14 @@ export class TestsJob implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
+  permissions: NormalJob["permissions"];
 
   constructor(name: string, opts: BridgedConfig) {
     this.name = name;
+    this.permissions = {
+      contents: "read",
+      "id-token": "write",
+    };
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.CheckoutScriptsRepoStep(),
@@ -659,7 +664,8 @@ export class TestsJob implements NormalJob {
       steps.RunDockerComposeStep(opts.docker),
       steps.RunSetUpScriptStep(opts["setup-script"]),
       steps.ConfigureAwsCredentialsForTests(opts.aws),
-      steps.ConfigureGcpCredentials(opts.gcp),
+      steps.GoogleAuth(opts.gcp),
+      steps.SetupGCloud(opts.gcp),
       steps.InstallSDKDeps(),
       steps.SetupGotestfmt(),
       steps.RunTests(),
