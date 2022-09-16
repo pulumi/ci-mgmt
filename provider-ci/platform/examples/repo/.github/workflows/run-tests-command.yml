@@ -105,6 +105,8 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - name: Install DotNet ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1
       with:
@@ -174,7 +176,6 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
@@ -209,6 +210,9 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: lint
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v3
@@ -245,6 +249,8 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - name: Install DotNet ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1
       with:
@@ -314,7 +320,6 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
@@ -397,6 +402,8 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - name: Install DotNet ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1
       with:
@@ -466,7 +473,6 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
@@ -500,6 +506,8 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - name: Install DotNet ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1
       with:
@@ -569,7 +577,6 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:

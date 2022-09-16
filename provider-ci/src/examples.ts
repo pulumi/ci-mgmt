@@ -40,6 +40,10 @@ export class Linting implements NormalJob {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
+  permissions: NormalJob["permissions"] = {
+    contents: "read",
+    "id-token": "write",
+  };
   steps = [
     {
       uses: action.checkout,
@@ -150,6 +154,10 @@ export abstract class EnvironmentSetup implements NormalJob {
   permissions: NormalJob["permissions"];
   steps: NormalJob["steps"] = [
     {
+      name: "Checkout Repo",
+      uses: action.checkout,
+    },
+    {
       name: "Install DotNet ${{ matrix.dotnet-version }}",
       uses: "actions/setup-dotnet@v1",
       with: {
@@ -235,9 +243,6 @@ export abstract class EnvironmentSetup implements NormalJob {
       },
     },
     {
-      uses: action.checkout,
-    },
-    {
       name: "Checkout Scripts Repo",
       uses: action.checkout,
       with: {
@@ -284,6 +289,10 @@ export class TestInfraSetup extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
+  permissions: NormalJob["permissions"] = {
+    contents: "read",
+    "id-token": "write",
+  };
   steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
@@ -367,6 +376,10 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
+  permissions: NormalJob["permissions"] = {
+    contents: "read",
+    "id-token": "write",
+  };
   steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
@@ -522,6 +535,10 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
     },
   };
   "runs-on" = "${{ matrix.platform }}";
+  permissions: NormalJob["permissions"] = {
+    contents: "read",
+    "id-token": "write",
+  };
   steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Latest Stable Pulumi CLI",
@@ -598,6 +615,10 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
+  permissions: NormalJob["permissions"] = {
+    contents: "read",
+    "id-token": "write",
+  };
   steps: NormalJob["steps"] = this.steps?.concat([
     {
       name: "Install Specific Pulumi CLI",
