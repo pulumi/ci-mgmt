@@ -25,7 +25,7 @@ bin/$(TFGEN):
 	cd provider && \
 		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
 
-provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins
+provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
 	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 
 provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
@@ -33,9 +33,9 @@ provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
 		VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go
 	@touch $@
 
-tfgen: install_plugins bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
+tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
 
-provider: tfgen install_plugins
+provider: tfgen install_plugins.sentinel
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
 build_sdks: build_nodejs build_python build_go build_dotnet build_java
@@ -102,12 +102,15 @@ help:
 clean: 
 	rm -rf sdk/{dotnet,nodejs,go,python}
 
-install_plugins: 
+install_plugins: install_plugins.sentinel
+
+install_plugins.sentinel: 
 	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
 	pulumi plugin install resource tls 4.1.0
 	pulumi plugin install resource github 4.10.0
 	pulumi plugin install resource kubernetes 3.17.0
 	pulumi plugin install resource random 4.8.2
+	@touch $@
 
 install_dotnet_sdk: 
 	mkdir -p nuget

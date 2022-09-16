@@ -46,15 +46,20 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     },
   } as const;
 
-  const install_plugins: Target = {
-    name: "install_plugins",
-    phony: true,
+  const install_plugins_sentinel: Target = {
+    name: "install_plugins.sentinel",
+    autoTouch: true,
     commands: [
       "[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh",
       ...(config.plugins?.map(
         (p) => `pulumi plugin install resource ${p.name} ${p.version}`
       ) ?? []),
     ],
+  };
+  const install_plugins: Target = {
+    name: "install_plugins",
+    phony: true,
+    dependencies: [install_plugins_sentinel],
   };
   const bin_tfgen: Target = {
     name: "bin/$(TFGEN)",
@@ -67,7 +72,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   const providerSchema: Target = {
     name: "provider/cmd/$(PROVIDER)/schema.json",
-    dependencies: [bin_tfgen, install_plugins],
+    dependencies: [bin_tfgen, install_plugins_sentinel],
     commands: ["bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)"],
   };
   const providerGen: Target = {
@@ -81,7 +86,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins, bin_tfgen, providerSchema, providerGen],
+    dependencies: [
+      install_plugins_sentinel,
+      bin_tfgen,
+      providerSchema,
+      providerGen,
+    ],
   };
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
   if (config.providerVersion) {
@@ -91,7 +101,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const provider: Target = {
     name: "provider",
     phony: true,
-    dependencies: [tfgen, install_plugins],
+    dependencies: [tfgen, install_plugins_sentinel],
     commands: [
       `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
@@ -287,6 +297,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       help,
       clean,
       install_plugins,
+      install_plugins_sentinel,
       install_dotnet_sdk,
       install_python_sdk,
       install_go_sdk,
