@@ -1,7 +1,15 @@
 import { GithubWorkflow, NormalJob } from "./github-workflow";
 import { ProviderFile } from "./provider";
+import * as steps from "./steps";
 import { Step } from "./steps";
 import * as action from "./action-versions";
+
+const pythonVersion = "3.9";
+const goVersion = "1.19.x";
+const nodeVersion = "16.x";
+const dotnetVersion = "3.1.301";
+const javaVersion = "11";
+const yarnVersion = "1.13.0";
 
 const env = () => ({
   PULUMI_TEST_OWNER: "moolumi",
@@ -34,8 +42,8 @@ export class Linting implements NormalJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "yarn-version": ["1.13.0"],
-      "node-version": ["14.x"],
+      "yarn-version": [yarnVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -45,16 +53,8 @@ export class Linting implements NormalJob {
     "id-token": "write",
   };
   steps = [
-    {
-      uses: action.checkout,
-    },
-    {
-      name: "Install Node.js ${{ matrix.node-version }}",
-      uses: "actions/setup-node@v1",
-      with: {
-        "node-version": "${{matrix.node-version}}",
-      },
-    },
+    steps.CheckoutRepoStep(),
+    steps.InstallNodeJS(),
     {
       name: "Install Yarn",
       run: "curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version ${{ matrix.yarn-version }}",
@@ -95,19 +95,8 @@ export class CommentOnPrJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   if = "github.event.pull_request.head.repo.full_name != github.repository";
   steps = [
-    {
-      uses: action.checkout,
-    },
-    {
-      name: "Comment PR",
-      uses: "thollander/actions-comment-pull-request@1.0.1",
-      with: {
-        message:
-          "PR is now waiting for a maintainer to run the acceptance tests.\n\n" +
-          "**Note for the maintainer:** To run the acceptance tests, please comment */run-example-tests* on the PR",
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-      },
-    },
+    steps.CheckoutRepoStep(),
+    steps.CommentPRWithSlashCommandStep("/run-example-tests"),
   ];
   name: string;
 
@@ -153,42 +142,12 @@ export abstract class EnvironmentSetup implements NormalJob {
   "runs-on": NormalJob["runs-on"];
   permissions: NormalJob["permissions"];
   steps: NormalJob["steps"] = [
-    {
-      name: "Checkout Repo",
-      uses: action.checkout,
-    },
-    {
-      name: "Install DotNet ${{ matrix.dotnet-version }}",
-      uses: "actions/setup-dotnet@v1",
-      with: {
-        "dotnet-version": "${{matrix.dotnet-version}}",
-      },
-    },
-    {
-      name: "Install Node.js ${{ matrix.node-version }}",
-      uses: "actions/setup-node@v1",
-      with: {
-        "node-version": "${{matrix.node-version}}",
-      },
-    },
-    {
-      name: "Install Python ${{ matrix.python-version }}",
-      uses: "actions/setup-python@v1",
-      with: {
-        "python-version": "${{matrix.python-version}}",
-      },
-    },
-    {
-      name: "Install Go ${{ matrix.go-version }}",
-      uses: "actions/setup-go@v1",
-      with: {
-        "go-version": "${{matrix.go-version}}",
-      },
-    },
-    {
-      name: "Install Python Deps",
-      run: "pip3 install virtualenv==20.0.23\n" + "pip3 install pipenv",
-    },
+    steps.CheckoutRepoStep(),
+    steps.InstallDotNet(),
+    steps.InstallNodeJS(),
+    steps.InstallPython(),
+    steps.InstallPythonDeps(),
+    steps.InstallGo(),
     {
       name: "Install aws-iam-authenticator",
       run:
@@ -242,14 +201,7 @@ export abstract class EnvironmentSetup implements NormalJob {
         "role-to-assume": "${{ secrets.AWS_CI_ROLE_ARN }}",
       },
     },
-    {
-      name: "Checkout Scripts Repo",
-      uses: action.checkout,
-      with: {
-        path: "ci-scripts",
-        repository: "pulumi/scripts",
-      },
-    },
+    steps.CheckoutScriptsRepoStep(),
   ];
   name: string;
   if: NormalJob["if"];
@@ -281,10 +233,10 @@ export class TestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -294,13 +246,8 @@ export class TestInfraSetup extends EnvironmentSetup {
     "id-token": "write",
   };
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Create Test Infrastructure",
       run: 'make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}"',
@@ -312,22 +259,17 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
   "runs-on" = "${{ matrix.platform }}";
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Create Test Infrastructure",
       run: 'make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}"',
@@ -339,23 +281,18 @@ export class TestInfraDestroy extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "kubernetes";
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Destroy test infra",
       run: 'make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{ github.run_number }}"',
@@ -367,10 +304,10 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -381,13 +318,8 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
     "id-token": "write",
   };
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Go Dependencies",
       run: "make ensure",
@@ -409,26 +341,18 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
   "runs-on" = "${{ matrix.platform }}";
   needs = "test-infra-setup";
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Specific Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-      with: {
-        "pulumi-version": "${{ env.PULUMI_VERSION }}",
-      },
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli("${{ env.PULUMI_VERSION }}"),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Go Dependencies",
       run: "make ensure",
@@ -450,10 +374,10 @@ export class CronProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -489,7 +413,7 @@ export class CronProviderTestJob extends EnvironmentSetup {
     {
       if: "matrix.examples-test-matrix == 'no-latest-cli'",
       name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
+      uses: action.installPulumiCli,
     },
     {
       name: "Running ci-scripts/run-at-head with ${{ matrix.examples-test-matrix }} configuration",
@@ -517,10 +441,10 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -540,13 +464,8 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
     "id-token": "write",
   };
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Latest Stable Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Testing Dependencies",
       run: `make ensure`,
@@ -562,10 +481,10 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -581,16 +500,8 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
   };
   "runs-on" = "${{ matrix.platform }}";
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Specific Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-      with: {
-        "pulumi-version": "${{ env.PULUMI_VERSION }}",
-      },
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli("{{ env.PULUMI_VERSION }}"),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Testing Dependencies",
       run: `make ensure`,
@@ -606,10 +517,10 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -620,16 +531,8 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
     "id-token": "write",
   };
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Specific Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-      with: {
-        "pulumi-version": "${{ env.PULUMI_VERSION }}",
-      },
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli("{{ env.PULUMI_VERSION }}"),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Go Dependencies",
       run: "make ensure",
@@ -651,26 +554,18 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
-      "dotnet-version": ["3.1.301"],
-      "python-version": ["3.7"],
-      "node-version": ["13.x"],
+      "goversion": [goVersion],
+      "dotnetversion": [dotnetVersion],
+      "python-version": [pythonVersion],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
     },
   };
   "runs-on" = "${{ matrix.platform }}";
   steps: NormalJob["steps"] = this.steps?.concat([
-    {
-      name: "Install Specific Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-      with: {
-        "pulumi-version": "${{ env.PULUMI_VERSION }}",
-      },
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
+    steps.InstallPulumiCli("{{ env.PULUMI_VERSION }}"),
+    steps.PrintPulumiCliVersion(),
     {
       name: "Install Testing Dependencies",
       run: `make ensure`,
@@ -700,7 +595,7 @@ export class UnitTestDotNetJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "dotnet-version": ["3.1.x"],
+      "dotnetversion": [dotnetVersion],
       platform: ["ubuntu-latest"],
       "source-dir": [
         "testing-unit-cs",
@@ -710,23 +605,10 @@ export class UnitTestDotNetJob extends UnitTestingJob {
     },
   };
   steps = [
-    {
-      name: "Install DotNet ${{ matrix.dotnet-version }}",
-      uses: "actions/setup-dotnet@v1",
-      with: {
-        "dotnet-version": "${{matrix.dotnet-version}}",
-      },
-    },
-    {
-      name: "Install Latest Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
-    {
-      uses: action.checkout,
-    },
+    steps.InstallDotNet(),
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
+    steps.CheckoutRepoStep(),
     {
       run: "dotnet test",
       "working-directory": "${{ matrix.source-dir }}",
@@ -738,40 +620,24 @@ export class UnitTestPythonJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "python-version": ["3.7.x"],
+      "python-version": [pythonVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-py"],
     },
   };
   steps = [
-    {
-      name: "Install Python ${{ matrix.python-version }}",
-      uses: "actions/setup-python@v1",
-      with: {
-        "python-version": "${{matrix.python-version}}",
-      },
-    },
-    {
-      name: "Install Python Deps",
-      run: "pip3 install virtualenv==20.0.23\n" + "pip3 install pipenv",
-    },
-    {
-      name: "Install Latest Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
-    {
-      uses: action.checkout,
-    },
+    steps.InstallPython(),
+    steps.InstallPythonDeps(),
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
+    steps.CheckoutRepoStep(),
     {
       run:
         "python3 -m venv venv\n" +
         "source venv/bin/activate\n" +
         "pip3 install -r requirements.txt\n" +
         "python -m unittest",
-      "working-directory": "${{ matrix.source-dir }}",
+        "working-directory": "${{ matrix.source-dir }}",
     },
   ];
 }
@@ -780,36 +646,23 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "node-version": ["13.x"],
+      "node-version": [nodeVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-ts"],
     },
   };
   steps = [
-    {
-      name: "Install Node.js ${{ matrix.node-version }}",
-      uses: "actions/setup-node@v1",
-      with: {
-        "node-version": "${{matrix.node-version}}",
-      },
-    },
-    {
-      name: "Install Latest Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
-    {
-      uses: action.checkout,
-    },
+    steps.InstallNodeJS(),
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
+    steps.CheckoutRepoStep(),
     {
       run:
         "npm install\n" +
         "npm install --global mocha\n" +
         "npm install --global ts-node\n" +
         "mocha -r ts-node/register ec2tests.ts",
-      "working-directory": "${{ matrix.source-dir }}",
+        "working-directory": "${{ matrix.source-dir }}",
     },
   ];
 }
@@ -818,29 +671,16 @@ export class UnitTestGoJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "go-version": ["1.16.x"],
+      "goversion": [goVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-go"],
     },
   };
   steps = [
-    {
-      name: "Install Go ${{ matrix.go-version }}",
-      uses: "actions/setup-go@v1",
-      with: {
-        "go-version": "${{matrix.go-version}}",
-      },
-    },
-    {
-      name: "Install Latest Pulumi CLI",
-      uses: "pulumi/action-install-pulumi-cli@v1.0.1",
-    },
-    {
-      run: 'echo "Currently Pulumi $(pulumi version) is installed"',
-    },
-    {
-      uses: action.checkout,
-    },
+    steps.InstallGo(),
+    steps.InstallPulumiCli(),
+    steps.PrintPulumiCliVersion(),
+    steps.CheckoutRepoStep(),
     {
       run: "go test",
       "working-directory": "${{ matrix.source-dir }}",
@@ -960,9 +800,7 @@ export class CommandDispatchWorkflow implements GithubWorkflow {
     "command-dispatch-for-testing": {
       "runs-on": "ubuntu-latest",
       steps: [
-        {
-          uses: action.checkout,
-        },
+        steps.CheckoutRepoStep(),
         {
           name: "Run Build",
           uses: "peter-evans/slash-command-dispatch@v2",

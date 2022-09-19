@@ -28,21 +28,23 @@ jobs:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - run: dotnet test
       working-directory: ${{ matrix.source-dir }}
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
-        - 3.1.x
+        dotnetversion:
+        - 3.1.301
         platform:
         - ubuntu-latest
         source-dir:
@@ -53,21 +55,23 @@ jobs:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
+    - name: Install Go
+      uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        go-version: ${{matrix.goversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - run: go test
       working-directory: ${{ matrix.source-dir }}
     strategy:
       fail-fast: false
       matrix:
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         platform:
         - ubuntu-latest
         source-dir:
@@ -82,26 +86,27 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -156,11 +161,12 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Specific Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
       with:
         pulumi-version: ${{ env.PULUMI_VERSION }}
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Install Go Dependencies
       run: make ensure
     - name: Setup Config
@@ -173,16 +179,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         node-version:
-        - 13.x
+        - 16.x
         platform:
         - ubuntu-latest
         python-version:
-        - "3.7"
+        - "3.9"
   providers:
     name: smoke-test-cli-on-providers
     permissions:
@@ -192,26 +198,27 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -266,11 +273,12 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Specific Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
       with:
-        pulumi-version: ${{ env.PULUMI_VERSION }}
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+        pulumi-version: "{{ env.PULUMI_VERSION }}"
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Install Testing Dependencies
       run: make ensure
     - name: Running ${{ matrix.clouds }}${{ matrix.languages }} Tests
@@ -286,10 +294,10 @@ jobs:
         - Packet
         - EquinixMetal
         - Cloud
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         languages:
         - Cs
         - Js
@@ -297,27 +305,29 @@ jobs:
         - Py
         - Fs
         node-version:
-        - 13.x
+        - 16.x
         platform:
         - ubuntu-latest
         python-version:
-        - "3.7"
+        - "3.9"
   python-unit-testing:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - run: |-
         python3 -m venv venv
         source venv/bin/activate
@@ -330,7 +340,7 @@ jobs:
         platform:
         - ubuntu-latest
         python-version:
-        - 3.7.x
+        - "3.9"
         source-dir:
         - testing-unit-py
   test-infra-destroy:
@@ -343,26 +353,27 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -417,25 +428,26 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Destroy test infra
       run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
         github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         node-version:
-        - 13.x
+        - 16.x
         platform:
         - ubuntu-latest
         python-version:
-        - "3.7"
+        - "3.9"
   test-infra-setup:
     name: test-infra-setup
     permissions:
@@ -445,26 +457,27 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -519,37 +532,41 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Create Test Infrastructure
       run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
         github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         node-version:
-        - 13.x
+        - 16.x
         platform:
         - ubuntu-latest
         python-version:
-        - "3.7"
+        - "3.9"
   ts-unit-testing:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Checkout Repo
+      uses: actions/checkout@v3
     - run: |-
         npm install
         npm install --global mocha
@@ -560,7 +577,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-        - 13.x
+        - 16.x
         platform:
         - ubuntu-latest
         source-dir:
