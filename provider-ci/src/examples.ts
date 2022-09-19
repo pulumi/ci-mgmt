@@ -43,7 +43,7 @@ export class Linting implements NormalJob {
     "fail-fast": false,
     matrix: {
       "yarn-version": [yarnVersion],
-      "node-version": [nodeVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -235,8 +235,8 @@ export class TestInfraSetup extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -261,8 +261,8 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -283,8 +283,8 @@ export class TestInfraDestroy extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -306,8 +306,8 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -343,8 +343,8 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -376,8 +376,8 @@ export class CronProviderTestJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -443,8 +443,8 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -483,8 +483,8 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -519,8 +519,8 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -556,8 +556,8 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
     matrix: {
       "goversion": [goVersion],
       "dotnetversion": [dotnetVersion],
-      "python-version": [pythonVersion],
-      "node-version": [nodeVersion],
+      "pythonversion": [pythonVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
     },
@@ -620,7 +620,7 @@ export class UnitTestPythonJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "python-version": [pythonVersion],
+      "pythonversion": [pythonVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-py"],
     },
@@ -646,7 +646,7 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "node-version": [nodeVersion],
+      "nodeversion": [nodeVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-ts"],
     },
