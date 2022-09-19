@@ -605,10 +605,10 @@ export class UnitTestDotNetJob extends UnitTestingJob {
     },
   };
   steps = [
+    steps.CheckoutRepoStep(),
     steps.InstallDotNet(),
     steps.InstallPulumiCli(),
     steps.PrintPulumiCliVersion(),
-    steps.CheckoutRepoStep(),
     {
       run: "dotnet test",
       "working-directory": "${{ matrix.source-dir }}",
@@ -626,11 +626,11 @@ export class UnitTestPythonJob extends UnitTestingJob {
     },
   };
   steps = [
+    steps.CheckoutRepoStep(),
     steps.InstallPython(),
     steps.InstallPythonDeps(),
     steps.InstallPulumiCli(),
     steps.PrintPulumiCliVersion(),
-    steps.CheckoutRepoStep(),
     {
       run:
         "python3 -m venv venv\n" +
@@ -652,10 +652,10 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
     },
   };
   steps = [
+    steps.CheckoutRepoStep(),
     steps.InstallNodeJS(),
     steps.InstallPulumiCli(),
     steps.PrintPulumiCliVersion(),
-    steps.CheckoutRepoStep(),
     {
       run:
         "npm install\n" +
@@ -677,10 +677,10 @@ export class UnitTestGoJob extends UnitTestingJob {
     },
   };
   steps = [
+    steps.CheckoutRepoStep(),
     steps.InstallGo(),
     steps.InstallPulumiCli(),
     steps.PrintPulumiCliVersion(),
-    steps.CheckoutRepoStep(),
     {
       run: "go test",
       "working-directory": "${{ matrix.source-dir }}",
