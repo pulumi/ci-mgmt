@@ -138,6 +138,32 @@ export class ResultsCommentJob implements NormalJob {
   }
 }
 
+export class StatusCheckJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name";
+  needs = [
+    "dotnet-unit-testing",
+    "go-unit-testing",
+    "python-unit-testing",
+    "ts-unit-testing",
+    "kubernetes",
+    "linting",
+    "providers",
+  ]
+  steps = [
+    steps.CheckoutRepoStep(),
+    {
+      run: `echo "Ready for merge"`,
+    },
+  ];
+  name: string;
+
+  constructor(name: string, params?: Partial<ResultsCommentJob>) {
+    this.name = name;
+    Object.assign(this, { name }, params);
+  }
+}
+
 export abstract class EnvironmentSetup implements NormalJob {
   "runs-on": NormalJob["runs-on"];
   permissions: NormalJob["permissions"];
@@ -637,7 +663,7 @@ export class UnitTestPythonJob extends UnitTestingJob {
         "source venv/bin/activate\n" +
         "pip3 install -r requirements.txt\n" +
         "python -m unittest",
-        "working-directory": "${{ matrix.source-dir }}",
+      "working-directory": "${{ matrix.source-dir }}",
     },
   ];
 }
@@ -661,8 +687,9 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
         "npm install\n" +
         "npm install --global mocha\n" +
         "npm install --global ts-node\n" +
-        "mocha -r ts-node/register ec2tests.ts",
-        "working-directory": "${{ matrix.source-dir }}",
+        "mocha -r ts-node/register ec2tests.ts\n" +
+        "mocha -r ts-node/register bucket_pair_test.ts",
+      "working-directory": "${{ matrix.source-dir }}/mocha",
     },
   ];
 }
@@ -837,27 +864,20 @@ export function RunTestsCommandWorkflow(name: string): GithubWorkflow {
 
     jobs: {
       "comment-notification": new ResultsCommentJob("comment-notification"),
-      "test-infra-setup": new TestInfraSetup(
-        "test-infra-setup"
-      ).addDispatchConditional(true),
+      "test-infra-setup": new TestInfraSetup("test-infra-setup").addDispatchConditional(true),
       "test-infra-destroy": new TestInfraDestroy(
         "test-infra-destroy"
       ).addDispatchConditional(true),
       linting: new Linting("lint").addDispatchConditional(true),
-      kubernetes: new KubernetesProviderTestJob(
-        "kubernetes"
-      ).addDispatchConditional(true),
+      kubernetes: new KubernetesProviderTestJob("kubernetes").addDispatchConditional(true),
       providers: new RunProviderTestForPrTestJob(
         "run-provider-tests"
       ).addDispatchConditional(true),
-      "dotnet-unit-testing": new UnitTestDotNetJob().addDispatchConditional(
-        true
-      ),
+      "dotnet-unit-testing": new UnitTestDotNetJob().addDispatchConditional(true),
       "ts-unit-testing": new UnitTestNodeJSJob().addDispatchConditional(true),
       "go-unit-testing": new UnitTestGoJob().addDispatchConditional(true),
-      "python-unit-testing": new UnitTestPythonJob().addDispatchConditional(
-        true
-      ),
+      "python-unit-testing": new UnitTestPythonJob().addDispatchConditional(true),
+      "status-checks": new StatusCheckJob("Final Status Check"),
     },
   };
 }
