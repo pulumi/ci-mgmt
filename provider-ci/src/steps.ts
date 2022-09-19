@@ -218,10 +218,23 @@ export function DispatchDocsBuildEvent(): Step {
   };
 }
 
-export function InstallPulumiCli(): Step {
-  return {
+export function InstallPulumiCli(version?: string): Step {
+  const step: Step = {
     name: "Install Pulumi CLI",
     uses: action.installPulumiCli,
+  };
+  if (version) {
+    step.with = {
+      "pulumi-version": version,
+    }
+  }
+  return step;
+}
+
+export function PrintPulumiCliVersion(): Step {
+  return {
+    name: "Print CLI version",
+    run: 'echo "Currently Pulumi $(pulumi version) is installed"',
   };
 }
 
@@ -565,14 +578,15 @@ export function UpdatePRWithResultsStep(): Step {
   };
 }
 
-export function CommentPRWithSlashCommandStep(): Step {
+export function CommentPRWithSlashCommandStep(command?: string): Step {
+  const val = command ?? "/run-acceptance-tests";
   return {
     name: "Comment PR",
     uses: action.prComment,
     with: {
       message:
         "PR is now waiting for a maintainer to run the acceptance tests.\n" +
-        "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
+        `**Note for the maintainer:** To run the acceptance tests, please comment *${val}* on the PR\n`,
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
     },
   };

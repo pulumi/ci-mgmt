@@ -49,21 +49,23 @@ jobs:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - run: dotnet test
       working-directory: ${{ matrix.source-dir }}
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
-        - 3.1.x
+        dotnetversion:
+        - 3.1.301
         platform:
         - ubuntu-latest
         source-dir:
@@ -76,21 +78,23 @@ jobs:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Install Go
+      uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        go-version: ${{matrix.goversion}}
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - run: go test
       working-directory: ${{ matrix.source-dir }}
     strategy:
       fail-fast: false
       matrix:
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         platform:
         - ubuntu-latest
         source-dir:
@@ -105,26 +109,29 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -174,15 +181,15 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Install Go Dependencies
       run: make ensure
     - name: Setup Config
@@ -195,27 +202,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
-        node-version:
-        - 13.x
+        goversion:
+        - 1.19.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
-        python-version:
-        - "3.7"
+        pythonversion:
+        - "3.9"
   linting:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: lint
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
     - name: Install Yarn
       run: curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version ${{
         matrix.yarn-version }}
@@ -230,8 +242,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version:
-        - 14.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
         yarn-version:
@@ -245,26 +257,29 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -314,15 +329,15 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Install Testing Dependencies
       run: make ensure
     - name: Running ${{ matrix.clouds }}${{ matrix.languages }} Tests
@@ -338,40 +353,42 @@ jobs:
         - Packet
         - EquinixMetal
         - Cloud
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
+        goversion:
+        - 1.19.x
         languages:
         - Cs
         - Js
         - Ts
         - Py
         - Fs
-        node-version:
-        - 13.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
-        python-version:
-        - "3.7"
+        pythonversion:
+        - "3.9"
   python-unit-testing:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - run: |-
         python3 -m venv venv
         source venv/bin/activate
@@ -383,10 +400,27 @@ jobs:
       matrix:
         platform:
         - ubuntu-latest
-        python-version:
-        - 3.7.x
+        pythonversion:
+        - "3.9"
         source-dir:
         - testing-unit-py
+  status-checks:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name
+    name: Final Status Check
+    needs:
+    - dotnet-unit-testing
+    - go-unit-testing
+    - python-unit-testing
+    - ts-unit-testing
+    - kubernetes
+    - linting
+    - providers
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - run: echo "Ready for merge"
   test-infra-destroy:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -397,26 +431,29 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -466,31 +503,31 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Destroy test infra
       run: make destroy_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
         github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
-        node-version:
-        - 13.x
+        goversion:
+        - 1.19.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
-        python-version:
-        - "3.7"
+        pythonversion:
+        - "3.9"
   test-infra-setup:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -500,26 +537,29 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install DotNet ${{ matrix.dotnet-version }}
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnet-version}}
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+        dotnet-version: ${{matrix.dotnetversion}}
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.python-version}}
-    - name: Install Go ${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{matrix.go-version}}
-    - name: Install Python Deps
+        python-version: ${{matrix.pythonversion}}
+    - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.goversion}}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -569,56 +609,60 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: examples@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - uses: actions/checkout@v3
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
         path: ci-scripts
         repository: pulumi/scripts
-    - name: Install Latest Stable Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - name: Create Test Infrastructure
       run: make setup_test_infra StackName="${{ env.PULUMI_TEST_OWNER }}/${{
         github.sha }}-${{ github.run_number }}"
     strategy:
       fail-fast: false
       matrix:
-        dotnet-version:
+        dotnetversion:
         - 3.1.301
-        go-version:
-        - 1.16.x
-        node-version:
-        - 13.x
+        goversion:
+        - 1.19.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
-        python-version:
-        - "3.7"
+        pythonversion:
+        - "3.9"
   ts-unit-testing:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
     steps:
-    - name: Install Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.node-version}}
-    - name: Install Latest Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v1.0.1
-    - run: echo "Currently Pulumi $(pulumi version) is installed"
-    - uses: actions/checkout@v3
+        node-version: ${{matrix.nodeversion}}
+        registry-url: https://registry.npmjs.org
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
+    - name: Print CLI version
+      run: echo "Currently Pulumi $(pulumi version) is installed"
     - run: |-
         npm install
         npm install --global mocha
         npm install --global ts-node
         mocha -r ts-node/register ec2tests.ts
-      working-directory: ${{ matrix.source-dir }}
+        mocha -r ts-node/register bucket_pair_test.ts
+      working-directory: ${{ matrix.source-dir }}/mocha
     strategy:
       fail-fast: false
       matrix:
-        node-version:
-        - 13.x
+        nodeversion:
+        - 16.x
         platform:
         - ubuntu-latest
         source-dir:
