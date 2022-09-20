@@ -193,6 +193,7 @@ export function BuildWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -231,6 +232,7 @@ export function PrereleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -266,6 +268,7 @@ export function ReleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       tag_sdk: new TagSDKJob("tag_sdk"),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
@@ -821,7 +824,6 @@ export class PublishSDKJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
     },
   };
   name: string;
@@ -840,20 +842,50 @@ export class PublishSDKJob implements NormalJob {
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
-      steps.InstallJava(),
       steps.DownloadSpecificSDKStep("python"),
       steps.UnzipSpecificSDKStep("python"),
       steps.DownloadSpecificSDKStep("dotnet"),
       steps.UnzipSpecificSDKStep("dotnet"),
       steps.DownloadSpecificSDKStep("nodejs"),
       steps.UnzipSpecificSDKStep("nodejs"),
+      steps.InstallTwine(),
+      steps.RunPublishSDK(),
+      steps.NotifySlack("Failure in publishing SDK"),
+    ];
+  }
+}
+
+export class PublishJavaSDKJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  "continue-on-error" = true;
+  needs = "publish";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      javaversion: [javaVersion],
+    },
+  };
+  name: string;
+  steps: NormalJob["steps"];
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutScriptsRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.InstallJava(),
       steps.DownloadSpecificSDKStep("java"),
       steps.UnzipSpecificSDKStep("java"),
       steps.InstallTwine(),
       steps.RunPublishSDK(),
       steps.SetPackageVersionToEnv(),
       steps.RunPublishJavaSDK(),
-      steps.NotifySlack("Failure in publishing SDK"),
     ];
   }
 }

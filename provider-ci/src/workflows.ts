@@ -53,6 +53,7 @@ export function DefaultBranchWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       generate_coverage_data: new GenerateCoverageDataJob(
         "generate_coverage_data"
       ),
@@ -108,6 +109,7 @@ export function ReleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       tag_sdk: new TagSDKJob("tag_sdk"),
       create_docs_build: new DocsBuildJob("create_docs_build"),
     },
@@ -140,6 +142,7 @@ export function PrereleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
+      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
 
@@ -791,7 +794,6 @@ export class PublishSDKJob implements NormalJob {
       dotnetversion: [dotnetVersion],
       pythonversion: [pythonVersion],
       nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
     },
   };
   steps = [
@@ -804,20 +806,47 @@ export class PublishSDKJob implements NormalJob {
     steps.InstallNodeJS(),
     steps.InstallDotNet(),
     steps.InstallPython(),
-    steps.InstallJava(),
     steps.DownloadSpecificSDKStep("python"),
     steps.UnzipSpecificSDKStep("python"),
     steps.DownloadSpecificSDKStep("dotnet"),
     steps.UnzipSpecificSDKStep("dotnet"),
     steps.DownloadSpecificSDKStep("nodejs"),
     steps.UnzipSpecificSDKStep("nodejs"),
-    steps.DownloadSpecificSDKStep("java"),
-    steps.UnzipSpecificSDKStep("java"),
     steps.RunCommand("python -m pip install pip twine"),
     steps.RunPublishSDK(),
+    steps.NotifySlack("Failure in publishing SDK"),
+  ];
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+    Object.assign(this, { name });
+  }
+}
+
+export class PublishJavaSDKJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  "continue-on-error" = true;
+  needs = "publish";
+  strategy = {
+    "fail-fast": true,
+    matrix: {
+      goversion: [goVersion],
+      javaversion: [javaVersion],
+    },
+  };
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.CheckoutScriptsRepoStep(),
+    steps.CheckoutTagsStep(),
+    steps.InstallGo(),
+    steps.InstallPulumiCtl(),
+    steps.InstallPulumiCli(),
+    steps.InstallJava(),
+    steps.DownloadSpecificSDKStep("java"),
+    steps.UnzipSpecificSDKStep("java"),
     steps.SetPackageVersionToEnv(),
     steps.RunPublishJavaSDK(),
-    steps.NotifySlack("Failure in publishing SDK"),
   ];
   name: string;
 
