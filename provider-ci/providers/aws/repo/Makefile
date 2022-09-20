@@ -72,9 +72,9 @@ provider: bin/$(PROVIDER)
 test: 
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
-tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
+tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json
 
-bin/$(PROVIDER): install_plugins.sentinel provider/cmd/$(PROVIDER)/.gen.sentinel $(PROVIDER_MODS) $(PROVIDER_PKG_SRC) $(PROVIDER_CMD_SRC)
+bin/$(PROVIDER): install_plugins.sentinel provider/cmd/$(PROVIDER)/schema-embed.json $(PROVIDER_MODS) $(PROVIDER_PKG_SRC) $(PROVIDER_CMD_SRC)
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
 bin/$(TFGEN): install_plugins.sentinel $(PROVIDER_MODS) $(PROVIDER_PKG_SRC) $(TFGEN_CMD_SRC)
@@ -104,10 +104,9 @@ install_plugins.sentinel: bin/pulumictl
 
 only_build: build
 
-provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
+provider/cmd/$(PROVIDER)/schema-embed.json: provider/cmd/$(PROVIDER)/schema.json
 	cd provider && \
 		VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go
-	@touch $@
 
 provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
 	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)

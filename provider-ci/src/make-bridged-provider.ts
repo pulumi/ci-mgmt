@@ -125,9 +125,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     dependencies: [bin_tfgen, install_plugins_sentinel],
     commands: ["bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)"],
   };
-  const providerGenSentinel: Target = {
-    name: "provider/cmd/$(PROVIDER)/.gen.sentinel",
-    autoTouch: true,
+  const provider_schema_embed: Target = {
+    name: "provider/cmd/$(PROVIDER)/schema-embed.json",
     dependencies: [provider_schema],
     commands: [
       ["cd provider", "VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go"],
@@ -136,12 +135,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [
-      install_plugins_sentinel,
-      bin_tfgen,
-      provider_schema,
-      providerGenSentinel,
-    ],
+    dependencies: [install_plugins_sentinel, bin_tfgen, provider_schema],
   };
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
   if (config.providerVersion) {
@@ -152,7 +146,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "bin/$(PROVIDER)",
     dependencies: [
       install_plugins_sentinel,
-      providerGenSentinel,
+      provider_schema_embed,
       "$(PROVIDER_MODS)",
       "$(PROVIDER_PKG_SRC)",
       "$(PROVIDER_CMD_SRC)",
