@@ -168,24 +168,37 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [sdk_python_build],
   };
+  const sdk_go_gen: Target = {
+    name: "sdk/go/.gen.sentinel",
+    autoTouch: true,
+    dependencies: [bin_tfgen],
+    commands: ["bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/"],
+  };
   const build_go: Target = {
     name: "build_go",
     phony: true,
-    commands: ["bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/"],
+    dependencies: [sdk_go_gen],
+  };
+  const sdk_dotnet_gen: Target = {
+    name: "bin/dotnet/.gen.sentinel",
+    autoTouch: true,
+    dependencies: [bin_tfgen],
+    commands: [
+      "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
+      'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > sdk/dotnet/go.mod',
+      'echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt',
+    ],
+  };
+  const sdk_dotnet_build: Target = {
+    name: "bin/dotnet/.build.sentinel",
+    autoTouch: true,
+    dependencies: [sdk_dotnet_gen],
+    commands: [["cd sdk/dotnet/", "dotnet build /p:Version=$(VERSION_DOTNET)"]],
   };
   const build_dotnet: Target = {
     name: "build_dotnet",
     phony: true,
-    commands: [
-      "pulumictl get version --language dotnet",
-      "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
-      [
-        "cd sdk/dotnet/",
-        'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
-        'echo "$(DOTNET_VERSION)" >version.txt',
-        "dotnet build /p:Version=$(VERSION_DOTNET)",
-      ],
-    ],
+    dependencies: [sdk_dotnet_build],
   };
   const bin_pulumi_java_gen: Target = {
     name: "bin/pulumi-java-gen",

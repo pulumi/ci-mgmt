@@ -19,16 +19,9 @@ development: install_plugins provider build_sdks install_sdks
 
 build: install_plugins provider build_sdks install_sdks
 
-build_dotnet: 
-	pulumictl get version --language dotnet
-	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
-	cd sdk/dotnet/ && \
-		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
-		echo "$(DOTNET_VERSION)" >version.txt && \
-		dotnet build /p:Version=$(VERSION_DOTNET)
+build_dotnet: bin/dotnet/.build.sentinel
 
-build_go: 
-	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
+build_go: sdk/go/.gen.sentinel
 
 build_java: sdk/java/.build.sentinel
 
@@ -84,6 +77,17 @@ bin/$(TFGEN):
 	cd provider && \
 		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
 
+bin/dotnet/.build.sentinel: bin/dotnet/.gen.sentinel
+	cd sdk/dotnet/ && \
+		dotnet build /p:Version=$(VERSION_DOTNET)
+	@touch $@
+
+bin/dotnet/.gen.sentinel: bin/$(TFGEN)
+	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
+	echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > sdk/dotnet/go.mod
+	echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt
+	@touch $@
+
 bin/pulumi-java-gen: 
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
 
@@ -104,6 +108,10 @@ provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
 
 provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
 	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
+
+sdk/go/.gen.sentinel: bin/$(TFGEN)
+	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
+	@touch $@
 
 sdk/java/.build.sentinel: sdk/java/.gen.sentinel
 	cd sdk/java && \
