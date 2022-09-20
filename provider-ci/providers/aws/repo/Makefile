@@ -34,16 +34,7 @@ build_java: sdk/java/.build.sentinel
 
 build_nodejs: sdk/nodejs/.build.sentinel
 
-build_python: 
-	bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
-	cd sdk/python/ && \
-		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
-		cp ../../README.md . && \
-		python3 setup.py clean --all 2>/dev/null && \
-		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(VERSION_PYTHON)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION_PYTHON)"/g' ./bin/setup.py && \
-		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
-		cd ./bin && python3 setup.py build sdist
+build_python: sdk/python/.build.sentinel
 
 build_sdks: build_nodejs build_python build_go build_dotnet build_java
 
@@ -136,6 +127,21 @@ sdk/nodejs/.build.sentinel: sdk/nodejs/.gen.sentinel
 
 sdk/nodejs/.gen.sentinel: bin/$(TFGEN) $(shell find provider/overlays/nodejs -type f)
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
+	@touch $@
+
+sdk/python/.build.sentinel: sdk/python/.gen.sentinel
+	cd sdk/python/ && \
+		echo "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
+		cp ../../README.md . && \
+		python3 setup.py clean --all 2>/dev/null && \
+		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
+		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(VERSION_PYTHON)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION_PYTHON)"/g' ./bin/setup.py && \
+		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
+		cd ./bin && python3 setup.py build sdist
+	@touch $@
+
+sdk/python/.gen.sentinel: bin/$(TFGEN)
+	bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
 	@touch $@
 
 .PHONY: development build build_dotnet build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_plugins install_python_sdk install_sdks lint_provider provider test tfgen

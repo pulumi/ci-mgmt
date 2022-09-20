@@ -138,11 +138,19 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [sdk_nodejs_build],
   };
-  const build_python: Target = {
-    name: "build_python",
-    phony: true,
+  const sdk_python_gen: Target = {
+    name: "sdk/python/.gen.sentinel",
+    autoTouch: true,
+    dependencies: [bin_tfgen],
     commands: [
       "bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
+    ],
+  };
+  const sdk_python_build: Target = {
+    name: "sdk/python/.build.sentinel",
+    autoTouch: true,
+    dependencies: [sdk_python_gen],
+    commands: [
       [
         "cd sdk/python/",
         'echo "module fake_python_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -154,6 +162,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         "cd ./bin && python3 setup.py build sdist",
       ],
     ],
+  };
+  const build_python: Target = {
+    name: "build_python",
+    phony: true,
+    dependencies: [sdk_python_build],
   };
   const build_go: Target = {
     name: "build_go",
