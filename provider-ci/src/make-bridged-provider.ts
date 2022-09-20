@@ -236,7 +236,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     dependencies: [sdk_go_gen],
   };
   const sdk_dotnet_gen: Target = {
-    name: "bin/dotnet/.gen.sentinel",
+    name: "sdk/dotnet/.gen.sentinel",
     autoTouch: true,
     dependencies: [bin_tfgen, "$(OVERLAYS_DOTNET)"],
     commands: [
@@ -246,7 +246,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
   const sdk_dotnet_build: Target = {
-    name: "bin/dotnet/.build.sentinel",
+    name: "sdk/dotnet/.build.sentinel",
     autoTouch: true,
     dependencies: [sdk_dotnet_gen],
     commands: [["cd sdk/dotnet/", "dotnet build /p:Version=$(VERSION_DOTNET)"]],
