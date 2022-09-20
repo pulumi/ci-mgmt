@@ -96,10 +96,20 @@ bin/dotnet/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_DOTNET)
 	echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt
 	@touch $@
 
-bin/pulumi-java-gen: 
+bin/pulumi-java-gen: bin/pulumictl
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
 
-install_plugins.sentinel: 
+bin/pulumictl: PULUMICTL_VERSION := $(shell cat .version.pulumictl.txt)
+bin/pulumictl: PLAT := $(shell go version | sed -En "s/go version go.* (.*)\/(.*)/\1-\2/p")
+bin/pulumictl: PULUMICTL_URL := https://github.com/pulumi/pulumictl/releases/download/$(PULUMICTL_VERSION)/pulumictl-$(PULUMICTL_VERSION)-$(PLAT).tar.gz
+bin/pulumictl: .version.pulumictl.txt
+	@echo "Installing pulumictl"
+	@mkdir -p bin
+	wget -q -O - "$(PULUMICTL_URL)" | tar -xzf - -C $(WORKING_DIR)/bin pulumictl
+	@touch bin/pulumictl
+	@echo "pulumictl" $$(./bin/pulumictl version)
+
+install_plugins.sentinel: bin/pulumictl
 	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
 	pulumi plugin install resource tls 4.1.0
 	pulumi plugin install resource github 4.10.0

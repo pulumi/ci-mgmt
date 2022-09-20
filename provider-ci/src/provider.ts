@@ -89,10 +89,16 @@ export function generateProviderFiles(config: BridgedConfig) {
   ];
 
   if (config.makeTemplate) {
-    files.push({
-      path: "Makefile",
-      data: buildMakefile(config),
-    });
+    files.push(
+      {
+        path: "Makefile",
+        data: buildMakefile(config),
+      },
+      {
+        path: ".version.pulumictl.txt",
+        data: "v0.0.32",
+      }
+    );
   }
 
   return files;

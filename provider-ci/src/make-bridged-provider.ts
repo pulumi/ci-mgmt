@@ -57,26 +57,44 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     },
     // Recursive variables are also lazy and cached - so only calculated once, if accessed
     VERSION: {
-      value: "$(shell pulumictl get version --language generic)",
+      value: "$(shell bin/pulumictl get version --language generic)",
       type: "recursive",
     },
     VERSION_DOTNET: {
-      value: "$(shell pulumictl get version --language dotnet)",
+      value: "$(shell bin/pulumictl get version --language dotnet)",
       type: "recursive",
     },
     VERSION_JAVASCRIPT: {
-      value: "$(shell pulumictl get version --language javascript)",
+      value: "$(shell bin/pulumictl get version --language javascript)",
       type: "recursive",
     },
     VERSION_PYTHON: {
-      value: "$(shell pulumictl get version --language python)",
+      value: "$(shell bin/pulumictl get version --language python)",
       type: "recursive",
     },
   } as const;
 
+  const bin_pulumictl: Target = {
+    name: "bin/pulumictl",
+    dependencies: [".version.pulumictl.txt"],
+    variables: {
+      PULUMICTL_VERSION: "$(shell cat .version.pulumictl.txt)",
+      PLAT: `$(shell go version | sed -En "s/go version go.* (.*)\\/(.*)/\\1-\\2/p")`,
+      PULUMICTL_URL:
+        "https://github.com/pulumi/pulumictl/releases/download/$(PULUMICTL_VERSION)/pulumictl-$(PULUMICTL_VERSION)-$(PLAT).tar.gz",
+    },
+    commands: [
+      '@echo "Installing pulumictl"',
+      "@mkdir -p bin",
+      'wget -q -O - "$(PULUMICTL_URL)" | tar -xzf - -C $(WORKING_DIR)/bin pulumictl',
+      "@touch bin/pulumictl",
+      '@echo "pulumictl" $$(./bin/pulumictl version)',
+    ],
+  };
   const install_plugins_sentinel: Target = {
     name: "install_plugins.sentinel",
     autoTouch: true,
+    dependencies: [bin_pulumictl],
     commands: [
       "[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh",
       ...(config.plugins?.map(
@@ -242,8 +260,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   const bin_pulumi_java_gen: Target = {
     name: "bin/pulumi-java-gen",
+    dependencies: [bin_pulumictl],
     commands: [
-      "$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)",
+      "$(shell bin/pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)",
     ],
   };
   const sdk_java_gen: Target = {

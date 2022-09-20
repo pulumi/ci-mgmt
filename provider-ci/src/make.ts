@@ -109,7 +109,7 @@ function descendentTargets(target: Target): Target[] {
   return deduplicateTargets([
     target,
     ...target.dependencies.flatMap((t) =>
-      typeof t != "string" ? descendentTargets(t) : []
+      typeof t !== "string" ? descendentTargets(t) : []
     ),
   ]);
 }
