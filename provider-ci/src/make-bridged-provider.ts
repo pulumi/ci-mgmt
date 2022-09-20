@@ -322,13 +322,18 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     commands: ["rm -rf sdk/{dotnet,nodejs,go,python}"],
   };
-  const install_dotnet_sdk: Target = {
-    name: "install_dotnet_sdk",
-    phony: true,
+  const sdk_dotnet_install: Target = {
+    name: "sdk/dotnet/.install.sentinel",
+    autoTouch: true,
     commands: [
       "mkdir -p nuget",
       "find sdk/dotnet -name '*.nupkg' -print -exec cp -p {} nuget \\;",
     ],
+  };
+  const install_dotnet_sdk: Target = {
+    name: "install_dotnet_sdk",
+    phony: true,
+    dependencies: [sdk_dotnet_install],
   };
   const install_python_sdk: Target = {
     name: "install_python_sdk",
@@ -339,10 +344,15 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
   };
   const install_go_sdk: Target = { name: "install_go_sdk", phony: true };
+  const sdk_nodejs_install: Target = {
+    name: "sdk/nodejs/.install.sentinel",
+    autoTouch: true,
+    commands: ["yarn link --cwd sdk/nodejs/bin"],
+  };
   const install_nodejs_sdk: Target = {
     name: "install_nodejs_sdk",
     phony: true,
-    commands: ["yarn link --cwd sdk/nodejs/bin"],
+    dependencies: [sdk_nodejs_install],
   };
   const install_sdks: Target = {
     name: "install_sdks",

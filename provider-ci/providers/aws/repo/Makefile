@@ -50,16 +50,13 @@ help:
 	sed "s/\(.\+\):\s*\(.*\) #\s*\(.*\)/`printf "\033[93m"`\1`printf "\033[0m"`	\3 [\2]/" | \
 	expand -t20
 
-install_dotnet_sdk: 
-	mkdir -p nuget
-	find sdk/dotnet -name '*.nupkg' -print -exec cp -p {} nuget \;
+install_dotnet_sdk: sdk/dotnet/.install.sentinel
 
 install_go_sdk: 
 
 install_java_sdk: 
 
-install_nodejs_sdk: 
-	yarn link --cwd sdk/nodejs/bin
+install_nodejs_sdk: sdk/nodejs/.install.sentinel
 
 install_plugins: install_plugins.sentinel
 
@@ -126,6 +123,11 @@ sdk/dotnet/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_DOTNET)
 	echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt
 	@touch $@
 
+sdk/dotnet/.install.sentinel: 
+	mkdir -p nuget
+	find sdk/dotnet -name '*.nupkg' -print -exec cp -p {} nuget \;
+	@touch $@
+
 sdk/go/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_GO)
 	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 	@touch $@
@@ -152,6 +154,10 @@ sdk/nodejs/.build.sentinel: sdk/nodejs/.gen.sentinel
 
 sdk/nodejs/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_NODEJS)
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
+	@touch $@
+
+sdk/nodejs/.install.sentinel: 
+	yarn link --cwd sdk/nodejs/bin
 	@touch $@
 
 sdk/python/.build.sentinel: sdk/python/.gen.sentinel
