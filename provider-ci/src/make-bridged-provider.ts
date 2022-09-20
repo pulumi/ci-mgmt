@@ -13,7 +13,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const TFGEN = `pulumi-tfgen-$(PACK)`;
   const JAVA_GEN_VERSION = "v0.5.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
-  const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
   const variables: Variables = {
@@ -25,8 +24,24 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     TFGEN,
     PROVIDER,
     JAVA_GEN_VERSION,
-    TESTPARALLELISM,
+    TESTPARALLELISM: "10",
     WORKING_DIR,
+    OVERLAYS_GO: {
+      value: "$(shell find provider/overlays/go -type f)",
+      type: "recursive",
+    },
+    OVERLAYS_NODEJS: {
+      value: "$(shell find provider/overlays/nodejs -type f)",
+      type: "recursive",
+    },
+    OVERLAYS_PYTHON: {
+      value: "$(shell find provider/overlays/python -type f)",
+      type: "recursive",
+    },
+    OVERLAYS_DOTNET: {
+      value: "$(shell find provider/overlays/dotnet -type f)",
+      type: "recursive",
+    },
     // Recursive variables are also lazy and cached - so only calculated once, if accessed
     VERSION: {
       value: "$(shell pulumictl get version --language generic)",
@@ -113,7 +128,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const sdk_nodejs_gen: Target = {
     name: "sdk/nodejs/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen, "$(shell find provider/overlays/nodejs -type f)"],
+    dependencies: [bin_tfgen, "$(OVERLAYS_NODEJS)"],
     commands: [
       "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
     ],
@@ -141,7 +156,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const sdk_python_gen: Target = {
     name: "sdk/python/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen],
+    dependencies: [bin_tfgen, "$(OVERLAYS_PYTHON)"],
     commands: [
       "bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
     ],
@@ -171,7 +186,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const sdk_go_gen: Target = {
     name: "sdk/go/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen],
+    dependencies: [bin_tfgen, "$(OVERLAYS_GO)"],
     commands: ["bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/"],
   };
   const build_go: Target = {
@@ -182,7 +197,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const sdk_dotnet_gen: Target = {
     name: "bin/dotnet/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen],
+    dependencies: [bin_tfgen, "$(OVERLAYS_DOTNET)"],
     commands: [
       "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
       'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > sdk/dotnet/go.mod',

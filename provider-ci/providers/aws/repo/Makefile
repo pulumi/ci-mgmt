@@ -10,6 +10,10 @@ PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
+OVERLAYS_GO = $(shell find provider/overlays/go -type f)
+OVERLAYS_NODEJS = $(shell find provider/overlays/nodejs -type f)
+OVERLAYS_PYTHON = $(shell find provider/overlays/python -type f)
+OVERLAYS_DOTNET = $(shell find provider/overlays/dotnet -type f)
 VERSION = $(shell pulumictl get version --language generic)
 VERSION_DOTNET = $(shell pulumictl get version --language dotnet)
 VERSION_JAVASCRIPT = $(shell pulumictl get version --language javascript)
@@ -82,7 +86,7 @@ bin/dotnet/.build.sentinel: bin/dotnet/.gen.sentinel
 		dotnet build /p:Version=$(VERSION_DOTNET)
 	@touch $@
 
-bin/dotnet/.gen.sentinel: bin/$(TFGEN)
+bin/dotnet/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_DOTNET)
 	bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
 	echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > sdk/dotnet/go.mod
 	echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt
@@ -109,7 +113,7 @@ provider/cmd/$(PROVIDER)/.gen.sentinel: provider/cmd/$(PROVIDER)/schema.json
 provider/cmd/$(PROVIDER)/schema.json: bin/$(TFGEN) install_plugins.sentinel
 	bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 
-sdk/go/.gen.sentinel: bin/$(TFGEN)
+sdk/go/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_GO)
 	bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
 	@touch $@
 
@@ -133,7 +137,7 @@ sdk/nodejs/.build.sentinel: sdk/nodejs/.gen.sentinel
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION_JAVASCRIPT)/g" ./bin/package.json
 	@touch $@
 
-sdk/nodejs/.gen.sentinel: bin/$(TFGEN) $(shell find provider/overlays/nodejs -type f)
+sdk/nodejs/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_NODEJS)
 	bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	@touch $@
 
@@ -148,7 +152,7 @@ sdk/python/.build.sentinel: sdk/python/.gen.sentinel
 		cd ./bin && python3 setup.py build sdist
 	@touch $@
 
-sdk/python/.gen.sentinel: bin/$(TFGEN)
+sdk/python/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_PYTHON)
 	bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
 	@touch $@
 
