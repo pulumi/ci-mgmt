@@ -26,31 +26,31 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     WORKING_DIR,
     PROVIDER_MODS: "provider/go.mod provider/go.sum",
     PROVIDER_PKG_SRC: {
-      value: '$(shell find provider/pkg -type f -name "*.go")',
+      value: `$(shell find provider/pkg -type f -name "*.go")`,
       type: "recursive",
     },
     TFGEN_CMD_SRC: {
-      value: '$(shell find provider/cmd/$(TFGEN) -type f -name "*.go")',
+      value: `$(shell find provider/cmd/$(TFGEN) -type f -name "*.go")`,
       type: "recursive",
     },
     PROVIDER_CMD_SRC: {
-      value: '$(shell find provider/cmd/$(PROVIDER) -type f -name "*.go")',
+      value: `$(shell find provider/cmd/$(PROVIDER) -type f -name "*.go")`,
       type: "recursive",
     },
     OVERLAYS_GO: {
-      value: "$(shell find provider/overlays/go -type f)",
+      value: `$(shell [ -d "provider/overlays/go" ] && find provider/overlays/go -type f)`,
       type: "recursive",
     },
     OVERLAYS_NODEJS: {
-      value: "$(shell find provider/overlays/nodejs -type f)",
+      value: `$(shell [ -d "provider/overlays/nodejs" ] && find provider/overlays/nodejs -type f)`,
       type: "recursive",
     },
     OVERLAYS_PYTHON: {
-      value: "$(shell find provider/overlays/python -type f)",
+      value: `$(shell [ -d "provider/overlays/python" ] && find provider/overlays/python -type f)`,
       type: "recursive",
     },
     OVERLAYS_DOTNET: {
-      value: "$(shell find provider/overlays/dotnet -type f)",
+      value: `$(shell [ -d "provider/overlays/dotnet" ] && find provider/overlays/dotnet -type f)`,
       type: "recursive",
     },
     // Recursive variables are also lazy and cached - so only calculated once, if accessed
