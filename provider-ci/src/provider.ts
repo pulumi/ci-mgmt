@@ -97,6 +97,10 @@ export function generateProviderFiles(config: BridgedConfig) {
       {
         path: ".version.pulumictl.txt",
         data: "v0.0.32",
+      },
+      {
+        path: ".version.javagen.txt",
+        data: "v0.5.4",
       }
     );
   }

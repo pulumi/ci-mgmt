@@ -11,7 +11,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       : `provider`;
   const VERSION_PATH = `$(PROVIDER_PATH)/pkg/version.Version`;
   const TFGEN = `pulumi-tfgen-$(PACK)`;
-  const JAVA_GEN_VERSION = "v0.5.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
   const WORKING_DIR = "$(shell pwd)";
 
@@ -23,7 +22,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     VERSION_PATH,
     TFGEN,
     PROVIDER,
-    JAVA_GEN_VERSION,
     TESTPARALLELISM: "10",
     WORKING_DIR,
     PROVIDER_MODS: "provider/go.mod provider/go.sum",
@@ -260,9 +258,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   const bin_pulumi_java_gen: Target = {
     name: "bin/pulumi-java-gen",
-    dependencies: [bin_pulumictl],
+    dependencies: [bin_pulumictl, ".version.javagen.txt"],
     commands: [
-      "$(shell bin/pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)",
+      "$(shell bin/pulumictl download-binary -n pulumi-language-java -v $(shell cat .version.javagen.txt) -r pulumi/pulumi-java)",
     ],
   };
   const sdk_java_gen: Target = {

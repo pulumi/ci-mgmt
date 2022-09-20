@@ -7,7 +7,6 @@ PROVIDER_PATH := provider/v5
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
-JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
 PROVIDER_MODS := provider/go.mod provider/go.sum
@@ -18,10 +17,10 @@ OVERLAYS_GO = $(shell find provider/overlays/go -type f)
 OVERLAYS_NODEJS = $(shell find provider/overlays/nodejs -type f)
 OVERLAYS_PYTHON = $(shell find provider/overlays/python -type f)
 OVERLAYS_DOTNET = $(shell find provider/overlays/dotnet -type f)
-VERSION = $(shell pulumictl get version --language generic)
-VERSION_DOTNET = $(shell pulumictl get version --language dotnet)
-VERSION_JAVASCRIPT = $(shell pulumictl get version --language javascript)
-VERSION_PYTHON = $(shell pulumictl get version --language python)
+VERSION = $(shell bin/pulumictl get version --language generic)
+VERSION_DOTNET = $(shell bin/pulumictl get version --language dotnet)
+VERSION_JAVASCRIPT = $(shell bin/pulumictl get version --language javascript)
+VERSION_PYTHON = $(shell bin/pulumictl get version --language python)
 
 development: install_plugins provider build_sdks install_sdks
 
@@ -96,8 +95,8 @@ bin/dotnet/.gen.sentinel: bin/$(TFGEN) $(OVERLAYS_DOTNET)
 	echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt
 	@touch $@
 
-bin/pulumi-java-gen: bin/pulumictl
-	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
+bin/pulumi-java-gen: bin/pulumictl .version.javagen.txt
+	$(shell bin/pulumictl download-binary -n pulumi-language-java -v $(shell cat .version.javagen.txt) -r pulumi/pulumi-java)
 
 bin/pulumictl: PULUMICTL_VERSION := $(shell cat .version.pulumictl.txt)
 bin/pulumictl: PLAT := $(shell go version | sed -En "s/go version go.* (.*)\/(.*)/\1-\2/p")
