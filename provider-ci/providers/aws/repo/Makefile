@@ -10,6 +10,10 @@ PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
+PROVIDER_MODS := provider/go.mod provider/go.sum
+PROVIDER_PKG_SRC = $(shell find provider/pkg -type f -name "*.go")
+TFGEN_CMD_SRC = $(shell find provider/cmd/$(TFGEN) -type f -name "*.go")
+PROVIDER_CMD_SRC = $(shell find provider/cmd/$(PROVIDER) -type f -name "*.go")
 OVERLAYS_GO = $(shell find provider/overlays/go -type f)
 OVERLAYS_NODEJS = $(shell find provider/overlays/nodejs -type f)
 OVERLAYS_PYTHON = $(shell find provider/overlays/python -type f)
@@ -74,10 +78,10 @@ test:
 
 tfgen: install_plugins.sentinel bin/$(TFGEN) provider/cmd/$(PROVIDER)/schema.json provider/cmd/$(PROVIDER)/.gen.sentinel
 
-bin/$(PROVIDER): provider/cmd/$(PROVIDER)/.gen.sentinel install_plugins.sentinel
+bin/$(PROVIDER): install_plugins.sentinel provider/cmd/$(PROVIDER)/.gen.sentinel $(PROVIDER_MODS) $(PROVIDER_PKG_SRC) $(PROVIDER_CMD_SRC)
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
-bin/$(TFGEN): 
+bin/$(TFGEN): install_plugins.sentinel $(PROVIDER_MODS) $(PROVIDER_PKG_SRC) $(TFGEN_CMD_SRC)
 	cd provider && \
 		go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN)
 

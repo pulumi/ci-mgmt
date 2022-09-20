@@ -26,6 +26,19 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     JAVA_GEN_VERSION,
     TESTPARALLELISM: "10",
     WORKING_DIR,
+    PROVIDER_MODS: "provider/go.mod provider/go.sum",
+    PROVIDER_PKG_SRC: {
+      value: '$(shell find provider/pkg -type f -name "*.go")',
+      type: "recursive",
+    },
+    TFGEN_CMD_SRC: {
+      value: '$(shell find provider/cmd/$(TFGEN) -type f -name "*.go")',
+      type: "recursive",
+    },
+    PROVIDER_CMD_SRC: {
+      value: '$(shell find provider/cmd/$(PROVIDER) -type f -name "*.go")',
+      type: "recursive",
+    },
     OVERLAYS_GO: {
       value: "$(shell find provider/overlays/go -type f)",
       type: "recursive",
@@ -78,6 +91,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   const bin_tfgen: Target = {
     name: "bin/$(TFGEN)",
+    dependencies: [
+      install_plugins_sentinel,
+      "$(PROVIDER_MODS)",
+      "$(PROVIDER_PKG_SRC)",
+      "$(TFGEN_CMD_SRC)",
+    ],
     commands: [
       [
         "cd provider",
@@ -115,7 +134,13 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const ldflags = ldFlagStatements.join(" ");
   const bin_provider: Target = {
     name: "bin/$(PROVIDER)",
-    dependencies: [providerGenSentinel, install_plugins_sentinel],
+    dependencies: [
+      install_plugins_sentinel,
+      providerGenSentinel,
+      "$(PROVIDER_MODS)",
+      "$(PROVIDER_PKG_SRC)",
+      "$(PROVIDER_CMD_SRC)",
+    ],
     commands: [
       `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
