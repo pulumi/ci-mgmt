@@ -882,6 +882,12 @@ export function UpdatePulumi(provider: string): Step {
         "git config --local user.email 'bot@pulumi.com'\n" +
         "git config --local user.name 'pulumi-bot'\n" +
         "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
+        "cd provider\n" +
+        "go get github.com/pulumi/pulumi/pkg/v3\n" +
+        "go get github.com/pulumi/pulumi/sdk/v3\n" +
+        "cd ../sdk\n" +
+        "go get github.com/pulumi/pulumi/sdk/v3\n" +
+        "cd ..\n" +
         "make ensure\n" +
         "git update-index -q --refresh\n" +
         "if ! git diff-files --quiet; then \n\techo ::set-output name=changes::1 \nfi",
