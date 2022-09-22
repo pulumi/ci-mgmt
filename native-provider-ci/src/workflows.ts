@@ -1007,7 +1007,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.InstallDotNet(),
       steps.InstallNodeJS(),
       steps.InstallPython(),
-      steps.UpdatePulumi(),
+      steps.UpdatePulumi(opts.provider),
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
       steps.CreateUpdatePulumiPR(),
