@@ -138,7 +138,7 @@ export function RunAcceptanceTestsWorkflow(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
         .addStep(steps.EchoSuccessStep())
-        .addNeeds(calculateSentinelNeeds(opts.lint)),
+        .addNeeds(calculateSentinelNeeds(opts.lint, opts.provider)),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -161,11 +161,15 @@ export function RunAcceptanceTestsWorkflow(
   return workflow;
 }
 
-function calculateSentinelNeeds(requiresLint: boolean): string[] {
+function calculateSentinelNeeds(requiresLint: boolean, provider: string): string[] {
   const needs: string[] = ["test"];
 
   if (requiresLint) {
     needs.push("lint");
+  }
+
+  if (provider === "kubernetes") {
+    needs.push("destroy-test-cluster")
   }
 
   return needs;
