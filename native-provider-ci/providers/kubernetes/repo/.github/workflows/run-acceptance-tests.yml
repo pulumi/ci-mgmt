@@ -423,6 +423,7 @@ jobs:
     needs:
     - test
     - lint
+    - destroy-test-cluster
   build-test-cluster:
     runs-on: ubuntu-latest
     strategy:
