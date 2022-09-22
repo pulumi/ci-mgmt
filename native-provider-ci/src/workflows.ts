@@ -161,7 +161,10 @@ export function RunAcceptanceTestsWorkflow(
   return workflow;
 }
 
-function calculateSentinelNeeds(requiresLint: boolean, provider: string): string[] {
+function calculateSentinelNeeds(
+  requiresLint: boolean,
+  provider: string
+): string[] {
   const needs: string[] = ["test"];
 
   if (requiresLint) {
@@ -169,7 +172,7 @@ function calculateSentinelNeeds(requiresLint: boolean, provider: string): string
   }
 
   if (provider === "kubernetes") {
-    needs.push("destroy-test-cluster")
+    needs.push("destroy-test-cluster");
   }
 
   return needs;
@@ -886,8 +889,6 @@ export class PublishJavaSDKJob implements NormalJob {
       steps.InstallJava(),
       steps.DownloadSpecificSDKStep("java"),
       steps.UnzipSpecificSDKStep("java"),
-      steps.InstallTwine(),
-      steps.RunPublishSDK(),
       steps.SetPackageVersionToEnv(),
       steps.RunPublishJavaSDK(),
     ];
