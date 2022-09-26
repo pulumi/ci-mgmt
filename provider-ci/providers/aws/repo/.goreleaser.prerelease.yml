@@ -30,7 +30,7 @@ builds:
   ldflags:
   - -X github.com/pulumi/pulumi-aws/provider/v5/pkg/version.Version={{.Tag}}
   - -X
-    github.com/terraform-providers/terraform-provider-aws/version.ProviderVersion={{.Tag}}
+    github.com/hashicorp/terraform-provider-aws/version.ProviderVersion={{.Tag}}
   main: ./cmd/pulumi-resource-aws/
 changelog:
   skip: true
