@@ -53,13 +53,13 @@
               "type": "string",
               "default": ""
             },
-            "fail-on-extra-mapping": {
+            "skip-fail-on-extra-mapping": {
               "type": "boolean",
-              "default": true
+              "default": false
             },
-            "fail-on-missing-mapping": {
+            "skip-fail-on-missing-mapping": {
               "type": "boolean",
-              "default": true
+              "default": false
             },
             "upstream-provider-major-version": {
               "type": "string",

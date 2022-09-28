@@ -264,8 +264,8 @@ export function UpdatePulumiTerraformBridgeWorkflow(
       // If there are missing or extra mappings, they can not have been
       // introduced by updating the bridge, so for this workflow we'll
       // ignore mapping errors.
-      PULUMI_EXTRA_MAPPING_ERROR: false,
-      PULUMI_MISSING_MAPPING_ERROR: false,
+      PULUMI_SKIP_EXTRA_MAPPING_ERROR: true,
+      PULUMI_SKIP_MISSING_MAPPING_ERROR: true,
     },
     jobs: {
       update_bridge: new EmptyJob("update-bridge")
@@ -320,18 +320,18 @@ export function UpdatePulumiTerraformBridgeWorkflow(
             token: "${{ secrets.PULUMI_BOT_TOKEN }}",
           },
         }),
-        // .addStep({
-        //   name: "Set Automerge",
-        //   if: "steps.create-pr.outputs.pull-request-operation == 'created'",
-        //   uses: "peter-evans/enable-pull-request-automerge@v1",
-        //   with: {
-        //     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-        //     "pull-request-number":
-        //       "${{ steps.create-pr.outputs.pull-request-number }}",
-        //     repository: "${{ github.repository }}",
-        //     "merge-method": "squash",
-        //   },
-        // }),
+      // .addStep({
+      //   name: "Set Automerge",
+      //   if: "steps.create-pr.outputs.pull-request-operation == 'created'",
+      //   uses: "peter-evans/enable-pull-request-automerge@v1",
+      //   with: {
+      //     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+      //     "pull-request-number":
+      //       "${{ steps.create-pr.outputs.pull-request-number }}",
+      //     repository: "${{ github.repository }}",
+      //     "merge-method": "squash",
+      //   },
+      // }),
     },
   };
 }
@@ -379,8 +379,8 @@ export function UpdateUpstreamProviderWorkflow(
 
     env: {
       ...env(opts),
-      PULUMI_EXTRA_MAPPING_ERROR: opts["fail-on-extra-mapping"],
-      PULUMI_MISSING_MAPPING_ERROR: opts["fail-on-missing-mapping"],
+      PULUMI_SKIP_EXTRA_MAPPING_ERROR: opts["skip-fail-on-extra-mapping"],
+      PULUMI_SKIP_MISSING_MAPPING_ERROR: opts["skip-fail-on-missing-mapping"],
       UPSTREAM_PROVIDER_ORG: opts["upstream-provider-org"],
       UPSTREAM_PROVIDER_REPO: opts["upstream-provider-repo"],
       UPSTREAM_PROVIDER_MAJOR_VERSION: opts["upstream-provider-major-version"],

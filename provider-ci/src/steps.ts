@@ -226,7 +226,7 @@ export function InstallPulumiCli(version?: string): Step {
   if (version) {
     step.with = {
       "pulumi-version": version,
-    }
+    };
   }
   return step;
 }

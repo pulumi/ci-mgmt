@@ -25,8 +25,8 @@ const BridgedConfig = z
     // Provider options
     "upstream-provider-org": z.string(),
     "upstream-provider-repo": z.string().default(""),
-    "fail-on-extra-mapping": z.boolean().default(true),
-    "fail-on-missing-mapping": z.boolean().default(true),
+    "skip-fail-on-extra-mapping": z.boolean().default(false),
+    "skip-fail-on-missing-mapping": z.boolean().default(false),
     "upstream-provider-major-version": z.string().default(""),
     "provider-default-branch": z.string().default("master"),
     "golangci-timeout": z.string().default("20m"),

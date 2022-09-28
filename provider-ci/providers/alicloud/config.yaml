@@ -12,7 +12,7 @@ upstream-provider-org: aliyun
 # maintainers of the Pulumi repo must manually check the output for missing
 # mappings until we are able to explicitly able to tell tfgen that a mapping is
 # intentionally ignored.
-fail-on-missing-mapping: false
+skip-fail-on-missing-mapping: true
 makeTemplate: bridged
 plugins:
   - name: random 
