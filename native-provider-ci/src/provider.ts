@@ -5,6 +5,7 @@ import z from "zod";
 import * as shared from "../../provider-ci/src/shared-workflows";
 import * as wf from "./workflows";
 import * as goreleaser from "./goreleaser";
+import * as gitignore from "./gitignore";
 import { providersDir } from "../cmd/generate-providers";
 
 const Config = z.object({
@@ -75,6 +76,10 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     {
       path: ".goreleaser.yml",
       data: new goreleaser.PulumiGoreleaserConfig(config),
+    },
+    {
+      path: ".gitignore",
+      data: gitignore.PulumiGitIgnore,
     },
   ];
   // Add files that are unique to providers

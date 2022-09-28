@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as lint from "./golangci";
 import * as goreleaser from "./goreleaser";
+import * as gitignore from "./gitignore";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import { buildMakefile } from "./makefiles";
@@ -85,6 +86,10 @@ export function generateProviderFiles(config: BridgedConfig) {
     {
       path: ".golangci.yml",
       data: new lint.PulumiGolangCIConfig(config["golangci-timeout"]),
+    },
+    {
+      path: ".gitignore",
+      data: gitignore.PulumiGitIgnore,
     },
   ];
 
