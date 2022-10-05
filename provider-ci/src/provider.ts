@@ -88,21 +88,23 @@ export function generateProviderFiles(config: BridgedConfig) {
     },
   ];
 
-  if (config.makeTemplate) {
-    files.push(
-      {
-        path: "Makefile",
-        data: buildMakefile(config),
-      },
-      {
-        path: ".version.pulumictl.txt",
-        data: "v0.0.32",
-      },
-      {
-        path: ".version.javagen.txt",
-        data: "v0.5.4",
-      }
-    );
+  if (config.makeTemplate !== "none") {
+    files.push({
+      path: "Makefile",
+      data: buildMakefile(config),
+    });
+    if (config.makeTemplate === "bridged-v2") {
+      files.push(
+        {
+          path: ".version.pulumictl.txt",
+          data: "v0.0.32",
+        },
+        {
+          path: ".version.javagen.txt",
+          data: "v0.5.4",
+        }
+      );
+    }
   }
 
   return files;

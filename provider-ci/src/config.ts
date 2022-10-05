@@ -35,7 +35,7 @@ const BridgedConfig = z
     providerVersion: z.string().default(""),
     skipWindowsArmBuild: z.boolean().default(false),
     // Makefile options
-    makeTemplate: z.literal("bridged").optional(),
+    makeTemplate: z.enum(["none", "bridged", "bridged-v2"]).default("none"),
     plugins: z
       .array(z.object({ name: z.string(), version: z.string() }))
       .optional(),
