@@ -89,19 +89,13 @@ jobs:
 
         go get github.com/pulumi/pulumi/sdk/v3
 
-        go mod download
-
-        go mod tidy
-
         cd ../sdk
 
         go get github.com/pulumi/pulumi/sdk/v3
 
-        go mod download
-
-        go mod tidy
-
         cd ..
+
+        make ensure
 
         git update-index -q --refresh
 

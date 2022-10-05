@@ -138,7 +138,7 @@ export function RunAcceptanceTestsWorkflow(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
         .addStep(steps.EchoSuccessStep())
-        .addNeeds(calculateSentinelNeeds(opts.lint)),
+        .addNeeds(calculateSentinelNeeds(opts.lint, opts.provider)),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -161,11 +161,18 @@ export function RunAcceptanceTestsWorkflow(
   return workflow;
 }
 
-function calculateSentinelNeeds(requiresLint: boolean): string[] {
+function calculateSentinelNeeds(
+  requiresLint: boolean,
+  provider: string
+): string[] {
   const needs: string[] = ["test"];
 
   if (requiresLint) {
     needs.push("lint");
+  }
+
+  if (provider === "kubernetes") {
+    needs.push("destroy-test-cluster");
   }
 
   return needs;
@@ -882,8 +889,6 @@ export class PublishJavaSDKJob implements NormalJob {
       steps.InstallJava(),
       steps.DownloadSpecificSDKStep("java"),
       steps.UnzipSpecificSDKStep("java"),
-      steps.InstallTwine(),
-      steps.RunPublishSDK(),
       steps.SetPackageVersionToEnv(),
       steps.RunPublishJavaSDK(),
     ];
@@ -1007,11 +1012,11 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.InstallDotNet(),
       steps.InstallNodeJS(),
       steps.InstallPython(),
-      steps.UpdatePulumi(),
+      steps.UpdatePulumi(opts.provider),
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
       steps.CreateUpdatePulumiPR(),
-      steps.SetPRAutoMerge(opts.provider),
+      // steps.SetPRAutoMerge(opts.provider),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
@@ -1044,7 +1049,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.SetGitSubmoduleCommitHash(opts.provider),
       steps.CommitAutomatedSDKUpdates(opts.provider),
       steps.PullRequestSdkGeneration(opts.provider),
-      steps.SetPRAutoMerge(opts.provider),
+      // steps.SetPRAutoMerge(opts.provider),
       steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
