@@ -17,6 +17,18 @@ development: install_plugins provider build_sdks install_sdks
 
 build: install_plugins provider build_sdks install_sdks
 
+build_sdks: build_nodejs build_python build_go build_dotnet build_java
+
+install_go_sdk: 
+
+install_java_sdk: 
+
+install_python_sdk: 
+
+install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk
+
+only_build: build
+
 build_dotnet: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 build_dotnet: 
 	pulumictl get version --language dotnet
@@ -58,8 +70,6 @@ build_python:
 		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
 		cd ./bin && python3 setup.py build sdist
 
-build_sdks: build_nodejs build_python build_go build_dotnet build_java
-
 clean: 
 	rm -rf sdk/{dotnet,nodejs,go,python}
 
@@ -76,10 +86,6 @@ install_dotnet_sdk:
 	mkdir -p $(WORKING_DIR)/nuget
 	find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \;
 
-install_go_sdk: 
-
-install_java_sdk: 
-
 install_nodejs_sdk: 
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
@@ -90,14 +96,8 @@ install_plugins:
 	pulumi plugin install resource kubernetes 3.17.0
 	pulumi plugin install resource random 4.4.1
 
-install_python_sdk: 
-
-install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk
-
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
-
-only_build: build
 
 provider: tfgen install_plugins
 	(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
@@ -113,4 +113,4 @@ tfgen: install_plugins
 bin/pulumi-java-gen: 
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
 
-.PHONY: development build build_dotnet build_go build_java build_nodejs build_python build_sdks clean cleanup help install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_plugins install_python_sdk install_sdks lint_provider only_build provider test tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen

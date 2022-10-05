@@ -120,7 +120,9 @@ function sortTargets(targets: Target[], defaultTarget?: Target | string) {
   function sortKey(target: Target) {
     const isDefault = target.name === defaultName ? "0" : "1";
     const isPhony = target.phony ? "0" : "1";
-    return `${isDefault}-${isPhony}-${target.name}`;
+    const isAlias =
+      target.commands === undefined || target.commands.length === 0 ? "0" : "1";
+    return `${isDefault}-${isPhony}-${isAlias}-${target.name}`;
   }
   const sorted = [...targets].sort((a, b) =>
     sortKey(a).localeCompare(sortKey(b), undefined, {
