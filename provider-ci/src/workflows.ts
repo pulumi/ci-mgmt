@@ -320,18 +320,18 @@ export function UpdatePulumiTerraformBridgeWorkflow(
             token: "${{ secrets.PULUMI_BOT_TOKEN }}",
           },
         }),
-        // .addStep({
-        //   name: "Set Automerge",
-        //   if: "steps.create-pr.outputs.pull-request-operation == 'created'",
-        //   uses: "peter-evans/enable-pull-request-automerge@v1",
-        //   with: {
-        //     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-        //     "pull-request-number":
-        //       "${{ steps.create-pr.outputs.pull-request-number }}",
-        //     repository: "${{ github.repository }}",
-        //     "merge-method": "squash",
-        //   },
-        // }),
+      // .addStep({
+      //   name: "Set Automerge",
+      //   if: "steps.create-pr.outputs.pull-request-operation == 'created'",
+      //   uses: "peter-evans/enable-pull-request-automerge@v1",
+      //   with: {
+      //     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+      //     "pull-request-number":
+      //       "${{ steps.create-pr.outputs.pull-request-number }}",
+      //     repository: "${{ github.repository }}",
+      //     "merge-method": "squash",
+      //   },
+      // }),
     },
   };
 }
