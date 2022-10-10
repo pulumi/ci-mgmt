@@ -579,7 +579,7 @@ export function SetupGotestfmt(): Step {
     name: "Install gotestfmt",
     uses: "GoTestTools/gotestfmt-action@v2",
     with: {
-      version: "v2.0.0",
+      version: "v2.4.0",
       token: "${{ secrets.GITHUB_TOKEN }}",
     },
   };
