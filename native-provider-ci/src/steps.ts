@@ -577,9 +577,10 @@ export function SchemaFileChanged(provider: string): Step {
 export function SetupGotestfmt(): Step {
   return {
     name: "Install gotestfmt",
-    uses: action.installGhRelease,
+    uses: "GoTestTools/gotestfmt-action@v2",
     with: {
-      repo: "haveyoudebuggedit/gotestfmt",
+      version: "v2.0.0",
+      token: "${{ secrets.GITHUB_TOKEN }}",
     },
   };
 }
