@@ -43,7 +43,7 @@ export class Linting implements NormalJob {
     "fail-fast": false,
     matrix: {
       "yarn-version": [yarnVersion],
-      "nodeversion": [nodeVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -140,7 +140,8 @@ export class ResultsCommentJob implements NormalJob {
 
 export class StatusCheckJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  if = "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name";
+  if =
+    "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name";
   needs = [
     "dotnet-unit-testing",
     "go-unit-testing",
@@ -149,7 +150,7 @@ export class StatusCheckJob implements NormalJob {
     "kubernetes",
     "linting",
     "providers",
-  ]
+  ];
   steps = [
     steps.CheckoutRepoStep(),
     {
@@ -259,10 +260,10 @@ export class TestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -285,10 +286,10 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -307,10 +308,10 @@ export class TestInfraDestroy extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -330,10 +331,10 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -367,10 +368,10 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -400,10 +401,10 @@ export class CronProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -467,10 +468,10 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -507,10 +508,10 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -543,10 +544,10 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -580,10 +581,10 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
-      "dotnetversion": [dotnetVersion],
-      "pythonversion": [pythonVersion],
-      "nodeversion": [nodeVersion],
+      goversion: [goVersion],
+      dotnetversion: [dotnetVersion],
+      pythonversion: [pythonVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
     },
@@ -621,7 +622,7 @@ export class UnitTestDotNetJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "dotnetversion": [dotnetVersion],
+      dotnetversion: [dotnetVersion],
       platform: ["ubuntu-latest"],
       "source-dir": [
         "testing-unit-cs",
@@ -646,7 +647,7 @@ export class UnitTestPythonJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "pythonversion": [pythonVersion],
+      pythonversion: [pythonVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-py"],
     },
@@ -672,7 +673,7 @@ export class UnitTestNodeJSJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "nodeversion": [nodeVersion],
+      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-ts"],
     },
@@ -698,7 +699,7 @@ export class UnitTestGoJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      "goversion": [goVersion],
+      goversion: [goVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-go"],
     },
@@ -864,19 +865,27 @@ export function RunTestsCommandWorkflow(name: string): GithubWorkflow {
 
     jobs: {
       "comment-notification": new ResultsCommentJob("comment-notification"),
-      "test-infra-setup": new TestInfraSetup("test-infra-setup").addDispatchConditional(true),
+      "test-infra-setup": new TestInfraSetup(
+        "test-infra-setup"
+      ).addDispatchConditional(true),
       "test-infra-destroy": new TestInfraDestroy(
         "test-infra-destroy"
       ).addDispatchConditional(true),
       linting: new Linting("lint").addDispatchConditional(true),
-      kubernetes: new KubernetesProviderTestJob("kubernetes").addDispatchConditional(true),
+      kubernetes: new KubernetesProviderTestJob(
+        "kubernetes"
+      ).addDispatchConditional(true),
       providers: new RunProviderTestForPrTestJob(
         "run-provider-tests"
       ).addDispatchConditional(true),
-      "dotnet-unit-testing": new UnitTestDotNetJob().addDispatchConditional(true),
+      "dotnet-unit-testing": new UnitTestDotNetJob().addDispatchConditional(
+        true
+      ),
       "ts-unit-testing": new UnitTestNodeJSJob().addDispatchConditional(true),
       "go-unit-testing": new UnitTestGoJob().addDispatchConditional(true),
-      "python-unit-testing": new UnitTestPythonJob().addDispatchConditional(true),
+      "python-unit-testing": new UnitTestPythonJob().addDispatchConditional(
+        true
+      ),
       "status-checks": new StatusCheckJob("Final Status Check"),
     },
   };
