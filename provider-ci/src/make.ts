@@ -103,7 +103,7 @@ function deduplicateTargets(targets: Target[]): Target[] {
 }
 
 function descendentTargets(target: Target): Target[] {
-  if (target.dependencies == undefined) {
+  if (target.dependencies === undefined) {
     return [target];
   }
   return deduplicateTargets([
