@@ -350,7 +350,7 @@ export function RunSetUpScriptStep(setupScript?: string): Step {
 }
 
 export function BuildCodegenBinaries(provider: string): Step {
-  if (provider == "kubernetes") {
+  if (provider === "kubernetes") {
     return {};
   }
   return {
@@ -624,7 +624,7 @@ export function BuildSchema(provider: string): Step {
 }
 
 export function BuildProvider(provider: string): Step {
-  if (provider == "kubernetes") {
+  if (provider === "kubernetes") {
     return {};
   }
   return {
@@ -918,7 +918,7 @@ export function UpdatePulumi(provider: string): Step {
 
 export function ProviderWithPulumiUpgrade(provider: string): Step {
   let buildProvider = "make codegen && make local_generate\n";
-  if (provider === "command" || provider == "kubernetes") {
+  if (provider === "command" || provider === "kubernetes") {
     buildProvider = "make build\n";
   }
   return {

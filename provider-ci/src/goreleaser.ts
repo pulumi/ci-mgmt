@@ -113,7 +113,7 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
       ];
     }
 
-    if (opts.providerVersion != "") {
+    if (opts.providerVersion !== "") {
       ldflags.push(`-X ${opts.providerVersion}={{.Tag}}`);
     }
 

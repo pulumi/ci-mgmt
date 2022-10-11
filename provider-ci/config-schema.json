@@ -91,7 +91,12 @@
             },
             "makeTemplate": {
               "type": "string",
-              "const": "bridged"
+              "enum": [
+                "none",
+                "bridged",
+                "bridged-v2"
+              ],
+              "default": "none"
             },
             "plugins": {
               "type": "array",

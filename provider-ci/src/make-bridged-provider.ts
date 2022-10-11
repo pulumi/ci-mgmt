@@ -231,7 +231,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [install_plugins, provider, build_sdks, install_sdks],
   };
-  const only_build: Target = { name: "only_build", dependencies: [build] };
+  const only_build: Target = {
+    name: "only_build",
+    dependencies: [build],
+    phony: true,
+  };
   const test: Target = {
     name: "test",
     phony: true,
@@ -241,8 +245,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
   return {
     variables,
+    defaultTarget: development,
     targets: [
-      development,
       build,
       only_build,
       tfgen,

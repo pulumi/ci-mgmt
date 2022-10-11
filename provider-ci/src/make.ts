@@ -27,11 +27,14 @@ export type Target = {
   commands?: (string | string[])[];
   /** Auto-emit .PHONY target */
   phony?: boolean;
+  /** Auto-touch file on completion */
+  autoTouch?: boolean;
 };
 
 export type Makefile = {
   variables?: Variables;
   targets?: Target[];
+  defaultTarget?: Target | string;
 };
 
 function getAssignmentToken(type: AssignmentType): string {
@@ -54,17 +57,25 @@ function renderCommand(cmd: string | string[]) {
   return indent + cmd;
 }
 
+function renderCommands(
+  commands?: (string | string[])[] | undefined
+): string[] {
+  return commands?.map(renderCommand) ?? [];
+}
+
 function renderTarget(target: Target): string {
   const dependencies = target.dependencies ?? [];
   const dependencyNames = dependencies.map((d) =>
     typeof d === "string" ? d : d.name
   );
-  const declaration = `${target.name}:: ${dependencyNames.join(" ")}`;
-  const commands = target.commands?.map(renderCommand) ?? [];
+  const declaration = `${target.name}: ${dependencyNames.join(" ")}`;
+  const commands = renderCommands(target.commands);
+  const suffixCommands =
+    target.autoTouch ?? false ? renderCommands(["@touch $@"]) : [];
   const variables = Object.entries(target.variables ?? {})
     .map(renderVariable)
-    .map((v) => target.name + ":: " + v);
-  return [...variables, declaration, ...commands].join("\n");
+    .map((v) => target.name + ": " + v);
+  return [...variables, declaration, ...commands, ...suffixCommands].join("\n");
 }
 
 function renderVariable([name, assignment]: [string, Assignment]): string {
@@ -86,17 +97,57 @@ function phonyTarget(targets: Target[]): Target | undefined {
   };
 }
 
+function deduplicateTargets(targets: Target[]): Target[] {
+  const map = new Map(targets.map((t) => [t.name, t]));
+  return Array.from(map.values());
+}
+
+function descendentTargets(target: Target): Target[] {
+  if (target.dependencies === undefined) {
+    return [target];
+  }
+  return deduplicateTargets([
+    target,
+    ...target.dependencies.flatMap((t) =>
+      typeof t !== "string" ? descendentTargets(t) : []
+    ),
+  ]);
+}
+
+function sortTargets(targets: Target[], defaultTarget?: Target | string) {
+  const defaultName =
+    typeof defaultTarget === "string" ? defaultTarget : defaultTarget?.name;
+  function sortKey(target: Target) {
+    const isDefault = target.name === defaultName ? "0" : "1";
+    const isPhony = target.phony ? "0" : "1";
+    const isAlias =
+      target.commands === undefined || target.commands.length === 0 ? "0" : "1";
+    return `${isDefault}-${isPhony}-${isAlias}-${target.name}`;
+  }
+  const sorted = [...targets].sort((a, b) =>
+    sortKey(a).localeCompare(sortKey(b), undefined, {
+      sensitivity: "base",
+    })
+  );
+  return sorted;
+}
+
 export function render(makefile: Makefile): string {
   const variableLines = Object.entries(makefile.variables ?? {}).map(
     renderVariable
   );
 
-  const inputTargets = makefile.targets ?? [];
-  const phony = phonyTarget(inputTargets);
-  if (phony !== undefined) {
-    inputTargets.push(phony);
+  const targets = makefile.targets ?? [];
+  if (typeof makefile.defaultTarget === "object") {
+    targets.push(makefile.defaultTarget);
   }
-  const targets = inputTargets.map(renderTarget);
+  const inputTargets = deduplicateTargets(targets.flatMap(descendentTargets));
+  const sortedTargets = sortTargets(inputTargets, makefile.defaultTarget);
+  const phony = phonyTarget(sortedTargets);
+  if (phony !== undefined) {
+    sortedTargets.push(phony);
+  }
+  const renderedTargets = sortedTargets.map(renderTarget);
 
-  return [variableLines.join("\n"), targets.join("\n\n")].join("\n\n");
+  return [variableLines.join("\n"), renderedTargets.join("\n\n")].join("\n\n");
 }
