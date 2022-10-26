@@ -435,7 +435,7 @@ export class BuildSdkJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
+        "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
     }
     this.name = name;
     this.steps = [
@@ -479,7 +479,7 @@ export class BuildSdkJob implements NormalJob {
   addRunsOn(provider: string) {
     if (provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
+        "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
     }
     return this;
   }
@@ -764,7 +764,7 @@ export class PublishPrereleaseJob implements NormalJob {
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "azure-native" || opts.provider === "aws-native") {
-      this["runs-on"] = "macos-latest";
+      this["runs-on"] = "macos-11";
     }
     this.name = name;
     this.steps = [
@@ -803,7 +803,7 @@ export class PublishJob implements NormalJob {
     this.name = name;
     Object.assign(this, { name });
     if (opts.provider === "azure-native" || opts.provider === "aws-native") {
-      this["runs-on"] = "macos-latest";
+      this["runs-on"] = "macos-11";
     }
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -924,7 +924,7 @@ export class DocsBuildDispatchJob implements NormalJob {
 }
 
 export class Cf2PulumiRelease implements NormalJob {
-  "runs-on" = "macos-latest";
+  "runs-on" = "macos-11";
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutTagsStep(),
@@ -944,7 +944,7 @@ export class Cf2PulumiRelease implements NormalJob {
 }
 
 export class Arm2PulumiRelease implements NormalJob {
-  "runs-on" = "macos-latest";
+  "runs-on" = "macos-11";
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutTagsStep(),

@@ -137,7 +137,7 @@ jobs:
         status: ${{ job.status }}
   build_sdks:
     needs: prerequisites
-    runs-on: ${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}
     strategy:
       fail-fast: true
       matrix:
@@ -355,7 +355,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
   publish:
-    runs-on: macos-latest
+    runs-on: macos-11
     needs: test
     strategy:
       matrix:
