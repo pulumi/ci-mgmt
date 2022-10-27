@@ -13,6 +13,7 @@ const BridgedConfig = z
   .object({
     template: z.literal("bridged").default("bridged"),
     provider: z.string(),
+    preferredSchemaChecker: z.string().default("mikhailshilkov/schema-tools"),
     // Workflow options
     env: z.record(z.any()).optional(),
     docker: z.boolean().default(false),

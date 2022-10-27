@@ -48,14 +48,15 @@ export function DefaultBranchWorkflow(
     },
     env: env(opts),
     jobs: {
-      prerequisites: new PrerequisitesJob("prerequisites"),
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdk: new BuildSdkJob("build_sdk"),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       generate_coverage_data: new GenerateCoverageDataJob(
-        "generate_coverage_data"
+        "generate_coverage_data",
+        opts
       ),
     },
   };
@@ -84,7 +85,7 @@ export function NightlyCronWorkflow(
     },
     env: env(opts),
     jobs: {
-      prerequisites: new PrerequisitesJob("prerequisites"),
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdk: new BuildSdkJob("build_sdk"),
       test: new TestsJob("test", opts),
     },
@@ -104,7 +105,7 @@ export function ReleaseWorkflow(
     },
     env: env(opts),
     jobs: {
-      prerequisites: new PrerequisitesJob("prerequisites"),
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdk: new BuildSdkJob("build_sdk"),
       test: new TestsJob("test", opts),
       publish: new PublishJob("publish", opts),
@@ -137,7 +138,7 @@ export function PrereleaseWorkflow(
     },
     env: env(opts),
     jobs: {
-      prerequisites: new PrerequisitesJob("prerequisites"),
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdk: new BuildSdkJob("build_sdk"),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
@@ -180,7 +181,8 @@ export function RunAcceptanceTestsWorkflow(
         .addStep(steps.CreateCommentsUrlStep())
         .addStep(steps.UpdatePRWithResultsStep()),
       prerequisites: new PrerequisitesJob(
-        "prerequisites"
+        "prerequisites",
+        opts
       ).addDispatchConditional(true),
       build_sdk: new BuildSdkJob("build_sdk").addDispatchConditional(true),
       test: new TestsJob("test", opts).addDispatchConditional(true),
@@ -586,26 +588,27 @@ export class PrerequisitesJob implements NormalJob {
       nodeversion: [nodeVersion],
     },
   };
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallSchemaChecker(),
-    steps.BuildBinariesStep(),
-    steps.CheckSchemaChanges(),
-    steps.CommentSchemaChangesOnPR(),
-    steps.ZipProviderBinariesStep(),
-    steps.UploadProviderBinariesStep(),
-    steps.NotifySlack("Failure in building provider prerequisites"),
-  ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
+  steps: steps.Step[];
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string) {
+  constructor(name: string, config: BridgedConfig) {
     this.name = name;
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.CheckoutScriptsRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.InstallSchemaChecker(config.preferredSchemaChecker),
+      steps.BuildBinariesStep(),
+      steps.CheckSchemaChanges(config.preferredSchemaChecker),
+      steps.CommentSchemaChangesOnPR(),
+      steps.ZipProviderBinariesStep(),
+      steps.UploadProviderBinariesStep(),
+      steps.NotifySlack("Failure in building provider prerequisites"),
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
 
@@ -953,30 +956,32 @@ export class GenerateCoverageDataJob implements NormalJob {
       goversion: [goVersion],
     },
   };
-  steps = [
-    // Setting up prerequisites needed to run the coverage tracker
-    steps.CheckoutRepoStep(),
-    steps.ConfigureAwsCredentialsForCoverageDataUpload(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallSchemaChecker(),
 
-    // Generating and summarizing coverage data
-    steps.EchoCoverageOutputDirStep(),
-    steps.GenerateCoverageDataStep(),
-    steps.PrintCoverageDataStep(),
-
-    // Uploading coverage data
-    steps.UploadCoverageDataStep(),
-  ];
+  steps: steps.Step[];
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string) {
+  constructor(name: string, config: BridgedConfig) {
     this.name = name;
+    this.steps = [
+      // Setting up prerequisites needed to run the coverage tracker
+      steps.CheckoutRepoStep(),
+      steps.ConfigureAwsCredentialsForCoverageDataUpload(),
+      steps.CheckoutScriptsRepoStep(),
+      steps.CheckoutTagsStep(),
+      steps.InstallGo(),
+      steps.InstallPulumiCtl(),
+      steps.InstallPulumiCli(),
+      steps.InstallSchemaChecker(config.preferredSchemaChecker),
+
+      // Generating and summarizing coverage data
+      steps.EchoCoverageOutputDirStep(),
+      steps.GenerateCoverageDataStep(),
+      steps.PrintCoverageDataStep(),
+
+      // Uploading coverage data
+      steps.UploadCoverageDataStep(),
+    ];
     Object.assign(this, { name });
   }
 

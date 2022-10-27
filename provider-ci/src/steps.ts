@@ -197,13 +197,13 @@ export function InstallPulumiCtl(): Step {
   };
 }
 
-export function InstallSchemaChecker(): Step {
+export function InstallSchemaChecker(preferredSchemaChecker: string): Step {
   return {
     if: "github.event_name == 'pull_request'",
     name: "Install Schema Tools",
     uses: action.installGhRelease,
     with: {
-      repo: "mikhailshilkov/schema-tools",
+      repo: preferredSchemaChecker,
     },
   };
 }
@@ -509,13 +509,18 @@ export function PullRequest(
   };
 }
 
-export function CheckSchemaChanges(): Step {
+export function CheckSchemaChanges(preferredSchemaChecker: string): Step {
+  const schemaCheckerCommand =
+    preferredSchemaChecker == "mikhailshilkov/schema-tools"
+      ? "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n"
+      : "schema-tools compare -p ${{env.PROVIDER}} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n";
+
   return {
     if: "github.event_name == 'pull_request'",
     name: "Check Schema is Valid",
     run:
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
-      "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+      schemaCheckerCommand +
       "echo 'EOF' >> $GITHUB_ENV",
   };
 }

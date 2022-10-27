@@ -15,6 +15,10 @@
             "provider": {
               "type": "string"
             },
+            "preferredSchemaChecker": {
+              "type": "string",
+              "default": "mikhailshilkov/schema-tools"
+            },
             "env": {
               "type": "object",
               "additionalProperties": {}
