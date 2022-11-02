@@ -3,7 +3,7 @@ major-version: 1
 env:
   TAILSCALE_API_KEY: ${{ secrets.TAILSCALE_API_KEY }}
   TAILSCALE_TAILNET: ${{ secrets.TAILSCALE_TAILNET }}
-upstream-provider-org: davidsbond
+upstream-provider-org: tailscale
 makeTemplate: bridged
 plugins:
   - name: random 
