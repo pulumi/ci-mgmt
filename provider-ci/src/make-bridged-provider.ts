@@ -109,6 +109,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/",
+      `cd sdk && go list \`grep -e "^module" go.mod | cut -d ' ' -f 2\`/go/... | xargs go build`,
     ],
   };
   const build_dotnet: Target = {
