@@ -109,6 +109,10 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/",
+      // The following pulls out the `module` line from go.mod to determine the right
+      // module prefix path for the SDK (including versions etc.), then runs a `go list`
+      // to determine all packages under the SDK. Finally, this issues a go build on all
+      // the packages discovered.
       `cd sdk && go list \`grep -e "^module" go.mod | cut -d ' ' -f 2\`/go/... | xargs go build`,
     ],
   };

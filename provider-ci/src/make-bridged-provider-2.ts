@@ -228,6 +228,13 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     name: "build_go",
     phony: true,
     dependencies: [sdk_go_gen],
+    commands: [
+      // The following pulls out the `module` line from go.mod to determine the right
+      // module prefix path for the SDK (including versions etc.), then runs a `go list`
+      // to determine all packages under the SDK. Finally, this issues a go build on all
+      // the packages discovered.
+      `cd sdk && go list \`grep -e "^module" go.mod | cut -d ' ' -f 2\`/go/... | xargs go build`,
+    ],
   };
   const sdk_dotnet_gen: Target = {
     name: "sdk/dotnet/.gen.sentinel",
