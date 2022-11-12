@@ -319,6 +319,10 @@ export function UpdatePulumiTerraformBridgeWorkflow(
             "team-reviewers": "platform-integrations",
             token: "${{ secrets.PULUMI_BOT_TOKEN }}",
           },
+        })
+        .addStep({
+          if: "steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'",
+          run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}"
         }),
       // .addStep({
       //   name: "Set Automerge",
