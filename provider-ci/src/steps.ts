@@ -1,9 +1,29 @@
+import { check } from "yargs";
 import * as action from "./action-versions";
 import { NormalJob } from "./github-workflow";
 
 export type Step = Required<NormalJob>["steps"][0];
 
-export function CheckoutRepoStep(): Step {
+export interface checkoutArgs {
+  repo?: string;
+  path?: string;
+}
+
+export function CheckoutRepoStep(args?: checkoutArgs): Step {
+  if (args) {
+    const checkOutWith: { [k: string]: string } = {};
+    if (args.repo) {
+      checkOutWith["repository"] = args.repo;
+    }
+    if (args.path) {
+      checkOutWith["path"] = args.path;
+    }
+    return {
+      name: "Checkout repo",
+      uses: action.checkout,
+      with: checkOutWith,
+    };
+  }
   return {
     name: "Checkout Repo",
     uses: action.checkout,

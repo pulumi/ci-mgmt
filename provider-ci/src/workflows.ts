@@ -256,6 +256,12 @@ export function UpdatePulumiTerraformBridgeWorkflow(
               "The version of pulumi/pulumi/sdk to update to. Do not include the 'v' prefix. Must be major version 3.",
             type: "string",
           },
+          automerge: {
+            description: "Mark created PR for auto-merging?",
+            required: true,
+            type: "boolean",
+            default: false,
+          },
         },
       },
     },
@@ -322,7 +328,7 @@ export function UpdatePulumiTerraformBridgeWorkflow(
         })
         .addStep({
           if: "steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'",
-          run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}"
+          run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}",
         }),
       // .addStep({
       //   name: "Set Automerge",
@@ -336,6 +342,108 @@ export function UpdatePulumiTerraformBridgeWorkflow(
       //     "merge-method": "squash",
       //   },
       // }),
+    },
+  };
+}
+
+export function ResyncBuildWorkflow(opts: BridgedConfig): GithubWorkflow {
+  const prStepOptions = {
+    "commit-message": "Resync build for pulumi-${{ env.PROVIDER }}",
+    committer: "pulumi-bot <bot@pulumi.com>",
+    author: "pulumi-bot <bot@pulumi.com>",
+    branch: "pulumi-bot/resync-${{ github.run_id}}",
+    base: opts["provider-default-branch"],
+    labels: "impact/no-changelog-required",
+    title: "Fix up build for pulumi-${{ env.PROVIDER }}",
+    body: "This pull request was generated automatically by the resync-build workflow in this repository.",
+    "team-reviewers": "platform-integrations",
+    token: "${{ secrets.PULUMI_BOT_TOKEN }}",
+  };
+
+  return {
+    name: "Resync build",
+    on: {
+      workflow_dispatch: {
+        inputs: {
+          automerge: {
+            description: "Mark created PR for auto-merging?",
+            required: true,
+            type: "boolean",
+            default: false,
+          },
+        },
+      },
+    },
+
+    env: {
+      ...env(opts),
+      PULUMI_EXTRA_MAPPING_ERROR: opts["fail-on-extra-mapping"],
+      PULUMI_MISSING_MAPPING_ERROR: opts["fail-on-missing-mapping"],
+    },
+
+    jobs: {
+      resync_build: new EmptyJob("resync-build")
+        .addStrategy({
+          "fail-fast": true,
+          matrix: {
+            goversion: [goVersion],
+            dotnetversion: [dotnetVersion],
+            pythonversion: [pythonVersion],
+            nodeversion: [nodeVersion],
+          },
+        })
+        .addStep(steps.CheckoutRepoStep())
+        .addStep(
+          steps.CheckoutRepoStep({
+            repo: "pulumi/ci-mgmt",
+            path: "ci-mgmt",
+          })
+        )
+        .addStep({
+          id: "run-url",
+          name: "Create URL to the run output",
+          run: "echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+        })
+        .addStep(steps.CheckoutTagsStep())
+        .addStep(steps.InstallGo())
+        .addStep(steps.InstallPulumiCtl())
+        .addStep(steps.InstallPulumiCli())
+        .addStep(steps.InstallDotNet())
+        .addStep(steps.InstallNodeJS())
+        .addStep(steps.InstallPython())
+        .addStep({
+          name: "Sync with ci-mgmt",
+          run: `cp -r ci-mgmt/provider-ci/providers/$PROVIDER/repo/. .`,
+        })
+        .addStep({
+          name: "Remove ci-mgmt directory",
+          run: "rm -rf ci-mgmt",
+        })
+        // Ensure .gitignore includes java stuff
+        .addStep({
+          name: "Add required lines into .gitignore",
+          shell: "bash",
+          run: `cat <<- EOF > $RUNNER_TEMP/gitignore
+          sdk/java/build
+          sdk/java/.gradle
+          sdk/java/gradle
+          sdk/java/gradlew
+          sdk/java/gradlew.bat
+          EOF &&
+grep -F -x -v -f $RUNNER_TEMP/gitignore .gitignore >> .gitignore`,
+        })
+        .addStep({
+          name: "Build",
+          run: "make build",
+        })
+        .addStep({
+          name: "Create PR (no linked issue)",
+          uses: "peter-evans/create-pull-request@v3.12.0",
+          with: {
+            ...prStepOptions,
+            body: "This pull request was generated automatically by the resync-build workflow in this repository.",
+          },
+        }),
     },
   };
 }
@@ -376,6 +484,12 @@ export function UpdateUpstreamProviderWorkflow(
             description:
               "The issue number of a PR in this repository to which the generated pull request should be linked.",
             type: "string",
+          },
+          automerge: {
+            description: "Mark created PR for auto-merging?",
+            required: true,
+            type: "boolean",
+            default: false,
           },
         },
       },
