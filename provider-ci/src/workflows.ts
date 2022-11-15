@@ -330,18 +330,6 @@ export function UpdatePulumiTerraformBridgeWorkflow(
           if: "steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'",
           run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}",
         }),
-      // .addStep({
-      //   name: "Set Automerge",
-      //   if: "steps.create-pr.outputs.pull-request-operation == 'created'",
-      //   uses: "peter-evans/enable-pull-request-automerge@v1",
-      //   with: {
-      //     token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-      //     "pull-request-number":
-      //       "${{ steps.create-pr.outputs.pull-request-number }}",
-      //     repository: "${{ github.repository }}",
-      //     "merge-method": "squash",
-      //   },
-      // }),
     },
   };
 }
