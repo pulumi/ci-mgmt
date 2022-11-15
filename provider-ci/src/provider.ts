@@ -67,6 +67,10 @@ export function generateProviderFiles(config: BridgedConfig) {
       }),
     },
     {
+      path: path.join(githubWorkflowsDir, "resync-build.yml"),
+      data: wf.ResyncBuildWorkflow(config),
+    },
+    {
       path: path.join(githubWorkflowsDir, "update-upstream-provider.yml"),
       data: wf.UpdateUpstreamProviderWorkflow(config),
     },

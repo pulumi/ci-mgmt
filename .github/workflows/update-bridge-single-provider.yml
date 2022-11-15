@@ -20,6 +20,11 @@ on:
           the 'v' prefix. Must be major version 3.
         required: true
         type: string
+      automerge:
+        description: Mark created PR for auto-merging?
+        required: true
+        type: boolean
+        default: false
 
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -28,4 +33,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger workflow on pulumi-${{ github.event.inputs.provider_name }}
-        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ github.event.inputs.provider_name }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }}
+        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ github.event.inputs.provider_name }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }} -f automerge=${{ github.events.inputs.automerge }}

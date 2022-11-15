@@ -16,6 +16,11 @@ on:
           the 'v' prefix. Must be major version 3.
         required: true
         type: string
+      automerge:
+        description: Mark created PRs for auto-merging?
+        required: true
+        type: boolean
+        default: false
 
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -43,7 +48,8 @@ jobs:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
       - name: pulumi-${{ matrix.provider }}
-        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ matrix.provider }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }}
+        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ matrix.provider }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }} -f automerge=${{ github.events.inputs.automerge }}
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
+      
