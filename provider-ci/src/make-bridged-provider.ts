@@ -72,8 +72,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     variables: {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
+    dependencies: [tfgen],
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language nodejs --out sdk/nodejs/",
       [
         "cd sdk/nodejs/",
         'echo "module fake_nodejs_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -90,8 +91,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     variables: {
       PYPI_VERSION: "$(shell pulumictl get version --language python)",
     },
+    dependencies: [tfgen],
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language python --out sdk/python/",
       [
         "cd sdk/python/",
         'echo "module fake_python_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -107,8 +109,9 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_go: Target = {
     name: "build_go",
     phony: true,
+    dependencies: [tfgen],
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language go --out sdk/go/",
       // The following pulls out the `module` line from go.mod to determine the right
       // module prefix path for the SDK (including versions etc.), then runs a `go list`
       // to determine all packages under the SDK. Finally, this issues a go build on all
@@ -122,9 +125,10 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     variables: {
       DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
     },
+    dependencies: [tfgen],
     commands: [
       "pulumictl get version --language dotnet",
-      "$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language dotnet --out sdk/dotnet/",
       [
         "cd sdk/dotnet/",
         'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -133,21 +137,15 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       ],
     ],
   };
-  const bin_pulumi_java_gen: Target = {
-    name: "bin/pulumi-java-gen",
-    commands: [
-      "$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)",
-    ],
-  };
   const build_java: Target = {
     name: "build_java",
     phony: true,
-    dependencies: [bin_pulumi_java_gen],
     variables: {
       PACKAGE_VERSION: "$(shell pulumictl get version --language generic)",
     },
+    dependencies: [tfgen],
     commands: [
-      "$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language java --out sdk/java/",
       [
         "cd sdk/java/",
         'echo "module fake_java_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',

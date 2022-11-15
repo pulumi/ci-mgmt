@@ -163,8 +163,8 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
   const sdk_nodejs_gen: Target = {
     name: "sdk/nodejs/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen, "$(OVERLAYS_NODEJS)"],
-    commands: ["bin/$(TFGEN) nodejs --out sdk/nodejs/"],
+    dependencies: [provider_schema, "$(OVERLAYS_NODEJS)"],
+    commands: ["pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language nodejs --out sdk/nodejs/"],
   };
   const sdk_nodejs_build: Target = {
     name: "sdk/nodejs/.build.sentinel",
@@ -189,8 +189,8 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
   const sdk_python_gen: Target = {
     name: "sdk/python/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen, "$(OVERLAYS_PYTHON)"],
-    commands: ["bin/$(TFGEN) python --out sdk/python/"],
+    dependencies: [provider_schema, "$(OVERLAYS_PYTHON)"],
+    commands: ["pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language python --out sdk/python/"],
   };
   const sdk_python_build: Target = {
     name: "sdk/python/.build.sentinel",
@@ -217,8 +217,8 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
   const sdk_go_gen: Target = {
     name: "sdk/go/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen, "$(OVERLAYS_GO)"],
-    commands: ["bin/$(TFGEN) go --out sdk/go/"],
+    dependencies: [provider_schema, "$(OVERLAYS_GO)"],
+    commands: ["pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language go --out sdk/go/"],
   };
   const build_go: Target = {
     name: "build_go",
@@ -235,9 +235,9 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
   const sdk_dotnet_gen: Target = {
     name: "sdk/dotnet/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_tfgen, "$(OVERLAYS_DOTNET)"],
+    dependencies: [provider_schema, "$(OVERLAYS_DOTNET)"],
     commands: [
-      "bin/$(TFGEN) dotnet --out sdk/dotnet/",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language dotnet --out sdk/dotnet/",
       'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > sdk/dotnet/go.mod',
       'echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt',
     ],
@@ -253,19 +253,12 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [sdk_dotnet_build],
   };
-  const bin_pulumi_java_gen: Target = {
-    name: "bin/pulumi-java-gen",
-    dependencies: [bin_pulumictl, ".version.javagen.txt"],
-    commands: [
-      "$(shell bin/pulumictl download-binary -n pulumi-language-java -v $(shell cat .version.javagen.txt) -r pulumi/pulumi-java)",
-    ],
-  };
   const sdk_java_gen: Target = {
     name: "sdk/java/.gen.sentinel",
     autoTouch: true,
-    dependencies: [bin_pulumi_java_gen],
+    dependencies: [provider_schema],
     commands: [
-      "bin/pulumi-java-gen generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
+      "pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language java --out sdk/java/",
       [
         "cd sdk/java",
         'echo "module fake_java_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
