@@ -73,7 +73,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
+      "$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/",
       [
         "cd sdk/nodejs/",
         'echo "module fake_nodejs_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -91,7 +91,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       PYPI_VERSION: "$(shell pulumictl get version --language python)",
     },
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
+      "$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/",
       [
         "cd sdk/python/",
         'echo "module fake_python_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
@@ -108,7 +108,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "build_go",
     phony: true,
     commands: [
-      "$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/",
+      "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
       // The following pulls out the `module` line from go.mod to determine the right
       // module prefix path for the SDK (including versions etc.), then runs a `go list`
       // to determine all packages under the SDK. Finally, this issues a go build on all
@@ -124,7 +124,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     },
     commands: [
       "pulumictl get version --language dotnet",
-      "$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
+      "$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/",
       [
         "cd sdk/dotnet/",
         'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > go.mod',
