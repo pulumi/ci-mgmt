@@ -164,9 +164,7 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     name: "sdk/nodejs/.gen.sentinel",
     autoTouch: true,
     dependencies: [bin_tfgen, "$(OVERLAYS_NODEJS)"],
-    commands: [
-      "bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/",
-    ],
+    commands: ["bin/$(TFGEN) nodejs --out sdk/nodejs/"],
   };
   const sdk_nodejs_build: Target = {
     name: "sdk/nodejs/.build.sentinel",
@@ -192,9 +190,7 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     name: "sdk/python/.gen.sentinel",
     autoTouch: true,
     dependencies: [bin_tfgen, "$(OVERLAYS_PYTHON)"],
-    commands: [
-      "bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/",
-    ],
+    commands: ["bin/$(TFGEN) python --out sdk/python/"],
   };
   const sdk_python_build: Target = {
     name: "sdk/python/.build.sentinel",
@@ -222,7 +218,7 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     name: "sdk/go/.gen.sentinel",
     autoTouch: true,
     dependencies: [bin_tfgen, "$(OVERLAYS_GO)"],
-    commands: ["bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/"],
+    commands: ["bin/$(TFGEN) go --out sdk/go/"],
   };
   const build_go: Target = {
     name: "build_go",
@@ -241,7 +237,7 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
     autoTouch: true,
     dependencies: [bin_tfgen, "$(OVERLAYS_DOTNET)"],
     commands: [
-      "bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/",
+      "bin/$(TFGEN) dotnet --out sdk/dotnet/",
       'echo "module fake_dotnet_module // Exclude this directory from Go tools\\n\\ngo 1.17" > sdk/dotnet/go.mod',
       'echo "$(VERSION_DOTNET)" > sdk/dotnet/version.txt',
     ],
