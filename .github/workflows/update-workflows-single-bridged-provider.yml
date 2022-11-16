@@ -10,6 +10,11 @@ name: Update GH workflows, single bridged provider
         description: The name of the provider to deploy - do not include the pulumi prefix in the name.
         required: true
         type: string
+      automerge:
+        description: Mark created PRs for auto-merging?
+        required: true
+        type: boolean
+        default: false
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
@@ -46,5 +51,5 @@ jobs:
       - name: test
         run: echo ${{ github.repository }}
       - name: Set PR to auto-merge
-        if: steps.create-pr.outputs.pull-request-operation == 'created'
-        run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}"
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'
+        run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-url }}"

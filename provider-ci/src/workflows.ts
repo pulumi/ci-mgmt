@@ -409,16 +409,20 @@ export function ResyncBuildWorkflow(opts: BridgedConfig): GithubWorkflow {
         })
         // Ensure .gitignore includes java stuff
         .addStep({
-          name: "Add required lines into .gitignore",
+          name: "Required entries for gitignore",
           shell: "bash",
           run: `cat <<- EOF > $RUNNER_TEMP/gitignore
-          sdk/java/build
-          sdk/java/.gradle
-          sdk/java/gradle
-          sdk/java/gradlew
-          sdk/java/gradlew.bat
-          EOF &&
-grep -F -x -v -f $RUNNER_TEMP/gitignore .gitignore >> .gitignore`,
+sdk/java/build
+sdk/java/.gradle
+sdk/java/gradle
+sdk/java/gradlew
+sdk/java/gradlew.bat
+EOF`,
+        })
+        .addStep({
+          name: "Adding missing lines to .gitignore",
+          shell: "bash",
+          run: "comm -23 <(sort $RUNNER_TEMP/gitignore) <(sort .gitignore) >> .gitignore",
         })
         .addStep({
           name: "Build",
