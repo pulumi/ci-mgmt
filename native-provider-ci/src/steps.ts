@@ -464,8 +464,7 @@ export function RunTests(provider: string): Step {
     return {
       name: "Run tests",
       run:
-        "set -euo pipefail\n" +
-        "cd tests/sdk/${{ matrix.language }} && go test -v -json -count=1 -cover -timeout 2h -parallel 4 ./... 2>&1 | tee /tmp/gotest.log | gotestfmt",
+        "cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4 ./...",
     };
   }
   return {
