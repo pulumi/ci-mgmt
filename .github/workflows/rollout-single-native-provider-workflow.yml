@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ci-mgmt
+      - name: Which commit
+        run: |
+          echo "ci-mgmt branch: $GITHUB_REF, commit: $GITHUB_SHA"
       - name: Clone pulumi-${{ github.event.inputs.provider_name }}
         uses: actions/checkout@v2
         with:
