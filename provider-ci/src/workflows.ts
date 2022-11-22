@@ -522,7 +522,7 @@ export function UpdateUpstreamProviderWorkflow(
         .addStep(steps.InstallPython())
         .addStep({
           name: "Get upstream provider sha",
-          run: 'echo "UPSTREAM_PROVIDER_SHA=$(curl https://api.github.com/repos/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}/git/ref/tags/v${{ github.event.inputs.version }} | jq .object.sha -r)" >> $GITHUB_ENV',
+          run: 'echo "UPSTREAM_PROVIDER_SHA=$(curl -L https://api.github.com/repos/${{ env.UPSTREAM_PROVIDER_ORG }}/${{ env.UPSTREAM_PROVIDER_REPO }}/git/ref/tags/v${{ github.event.inputs.version }} | jq .object.sha -r)" >> $GITHUB_ENV',
         })
         .addStep({
           name: "Update shim/go.mod",
