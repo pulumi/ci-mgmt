@@ -10,6 +10,6 @@ provider-default-branch: main
 makeTemplate: bridged
 plugins:
   - name: random 
-    version: "4.3.1"
+    version: "4.8.2"
   - name: aws 
-    version: "5.1.0"
+    version: "5.18.0"
