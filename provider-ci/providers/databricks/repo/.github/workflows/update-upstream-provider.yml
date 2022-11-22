@@ -25,7 +25,7 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TRAVIS_OS_NAME: linux
   UPSTREAM_PROVIDER_MAJOR_VERSION: ""
-  UPSTREAM_PROVIDER_ORG: databrickslabs
+  UPSTREAM_PROVIDER_ORG: databricks
   UPSTREAM_PROVIDER_REPO: terraform-provider-databricks
 jobs:
   update_upstream_provider:
