@@ -92,8 +92,8 @@ install_nodejs_sdk:
 
 install_plugins: 
 	[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh
-	pulumi plugin install resource aws 4.5.0
-	pulumi plugin install resource azure 5.6.0
+	pulumi plugin install resource aws 5.21.1
+	pulumi plugin install resource azure 5.24.0
 
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
