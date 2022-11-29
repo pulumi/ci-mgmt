@@ -1,5 +1,5 @@
 provider: docker
-major-version: 3
+major-version: 4
 aws: true
 env:
   AWS_REGION: us-west-2
