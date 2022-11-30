@@ -2,6 +2,7 @@
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IS_PRERELEASE: true
   LIBVIRT_DEFAULT_URI: lxc://
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -135,7 +135,10 @@ export function PrereleaseWorkflow(
         tags: ["v*.*.*-**"],
       },
     },
-    env: env(opts),
+    env: {
+      ...env(opts),
+      IS_PRERELEASE: true,
+    },
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites"),
       build_sdk: new BuildSdkJob("build_sdk"),

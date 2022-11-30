@@ -2,6 +2,7 @@
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IS_PRERELEASE: true
   NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
   NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
