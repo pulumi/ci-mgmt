@@ -2,6 +2,7 @@
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IS_PRERELEASE: true
   MINIO_ACCESS_KEY: minio
   MINIO_ENABLE_HTTPS: false
   MINIO_ENDPOINT: localhost:9000
