@@ -232,7 +232,10 @@ export function PrereleaseWorkflow(
         tags: ["v*.*.*-**"],
       },
     },
-    env: env(opts),
+    env: {
+      ...env(opts),
+      IS_PRERELEASE: true,
+    },
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts),

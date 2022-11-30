@@ -30,6 +30,7 @@ env:
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   PULUMI_API: https://api.pulumi-staging.io
+  IS_PRERELEASE: true
 jobs:
   prerequisites:
     runs-on: ubuntu-latest
