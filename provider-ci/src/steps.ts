@@ -576,10 +576,16 @@ export function CreateCommentsUrlStep(): Step {
   };
 }
 
-export function EchoSuccessStep(): Step {
+export function EnableAutoMerge(): Step {
   return {
-    name: "Is workflow a success",
-    run: "echo yes",
+    name: "Enable automerge if successful for bot PRs",
+    if: "github.event.pull_request.user.login == 'pulumi-bot'",
+    id: "enable-automerge",
+    run: "gh pr merge --auto --squash $PR_URL",
+    env: {
+      PR_URL: "${{github.event.pull_request.html_url}}",
+      GITHUB_TOKEN: "${{secrets.PULUMI_BOT_TOKEN}}",
+    },
   };
 }
 

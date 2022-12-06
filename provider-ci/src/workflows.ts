@@ -191,7 +191,7 @@ export function RunAcceptanceTestsWorkflow(
         .addConditional(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
-        .addStep(steps.EchoSuccessStep())
+        .addStep(steps.EnableAutoMerge())
         .addNeeds(calculateSentinelNeeds(opts.lint)),
     },
   };
@@ -259,12 +259,6 @@ export function UpdatePulumiTerraformBridgeWorkflow(
               "The version of pulumi/pulumi/sdk to update to. Do not include the 'v' prefix. Must be major version 3.",
             type: "string",
           },
-          automerge: {
-            description: "Mark created PR for auto-merging?",
-            required: true,
-            type: "boolean",
-            default: false,
-          },
         },
       },
     },
@@ -328,10 +322,6 @@ export function UpdatePulumiTerraformBridgeWorkflow(
             "team-reviewers": "platform-integrations",
             token: "${{ secrets.PULUMI_BOT_TOKEN }}",
           },
-        })
-        .addStep({
-          if: "steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'",
-          run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}",
         }),
     },
   };
@@ -479,12 +469,6 @@ export function UpdateUpstreamProviderWorkflow(
             description:
               "The issue number of a PR in this repository to which the generated pull request should be linked.",
             type: "string",
-          },
-          automerge: {
-            description: "Mark created PR for auto-merging?",
-            required: true,
-            type: "boolean",
-            default: false,
           },
         },
       },
