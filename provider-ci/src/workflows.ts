@@ -30,6 +30,11 @@ const env = (opts: BridgedConfig) =>
       SIGNING_KEY: "${{ secrets.JAVA_SIGNING_KEY }}",
       SIGNING_PASSWORD: "${{ secrets.JAVA_SIGNING_PASSWORD }}",
       TF_APPEND_USER_AGENT: "pulumi",
+      GOVERSION: goVersion,
+      NODEVERSION: nodeVersion,
+      PYTHONVERSION: pythonVersion,
+      DOTNETVERSION: dotnetVersion,
+      JAVAVERSION: javaVersion,
     },
     opts.env
   );
@@ -279,15 +284,6 @@ export function UpdatePulumiTerraformBridgeWorkflow(
     },
     jobs: {
       update_bridge: new EmptyJob("update-bridge")
-        .addStrategy({
-          "fail-fast": true,
-          matrix: {
-            goversion: [goVersion],
-            dotnetversion: [dotnetVersion],
-            pythonversion: [pythonVersion],
-            nodeversion: [nodeVersion],
-          },
-        })
         .addStep(steps.CheckoutRepoStep())
         .addStep(steps.CheckoutTagsStep())
         .addStep(steps.InstallGo())
@@ -375,15 +371,6 @@ export function ResyncBuildWorkflow(opts: BridgedConfig): GithubWorkflow {
 
     jobs: {
       resync_build: new EmptyJob("resync-build")
-        .addStrategy({
-          "fail-fast": true,
-          matrix: {
-            goversion: [goVersion],
-            dotnetversion: [dotnetVersion],
-            pythonversion: [pythonVersion],
-            nodeversion: [nodeVersion],
-          },
-        })
         .addStep(steps.CheckoutRepoStep())
         .addStep(
           steps.CheckoutRepoStep({
@@ -502,15 +489,6 @@ export function UpdateUpstreamProviderWorkflow(
 
     jobs: {
       update_upstream_provider: new EmptyJob("update-upstream_provider")
-        .addStrategy({
-          "fail-fast": true,
-          matrix: {
-            goversion: [goVersion],
-            dotnetversion: [dotnetVersion],
-            pythonversion: [pythonVersion],
-            nodeversion: [nodeVersion],
-          },
-        })
         .addStep({
           id: "run-url",
           name: "Create URL to the run output",
@@ -639,11 +617,6 @@ export class BuildSdkJob implements NormalJob {
   strategy = {
     "fail-fast": true,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
@@ -691,15 +664,6 @@ export class BuildSdkJob implements NormalJob {
 
 export class PrerequisitesJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
@@ -741,11 +705,6 @@ export class TestsJob implements NormalJob {
   strategy = {
     "fail-fast": true,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
@@ -806,15 +765,6 @@ export class TestsJob implements NormalJob {
 export class PublishPrereleaseJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   constructor(name: string, opts: BridgedConfig) {
@@ -839,15 +789,6 @@ export class PublishPrereleaseJob implements NormalJob {
 export class PublishJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   name: string;
   steps: NormalJob["steps"];
 
@@ -901,15 +842,6 @@ export class TagSDKJob implements NormalJob {
 export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
@@ -942,13 +874,6 @@ export class PublishJavaSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   "continue-on-error" = true;
   needs = "publish";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      javaversion: [javaVersion],
-    },
-  };
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
@@ -973,12 +898,6 @@ export class PublishJavaSDKJob implements NormalJob {
 export class LintProviderJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   container = "golangci/golangci-lint:latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-    },
-  };
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
@@ -1015,12 +934,6 @@ export class LintSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "build_sdk";
   container = "golangci/golangci-lint:latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
@@ -1060,12 +973,6 @@ export class GenerateCoverageDataJob implements NormalJob {
   needs = "prerequisites";
   env = {
     COVERAGE_OUTPUT_DIR: "${{ secrets.COVERAGE_OUTPUT_DIR }}",
-  };
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-    },
   };
   steps = [
     // Setting up prerequisites needed to run the coverage tracker

@@ -36,6 +36,11 @@ const env = () => ({
   GOOGLE_REGION: "us-central1",
   GOOGLE_ZONE: "us-central1-a",
   PACKET_AUTH_TOKEN: "${{ secrets.PACKET_AUTH_TOKEN }}",
+  GOVERSION: goVersion,
+  NODEVERSION: nodeVersion,
+  PYTHONVERSION: pythonVersion,
+  DOTNETVERSION: dotnetVersion,
+  JAVAVERSION: javaVersion,
 });
 
 export class Linting implements NormalJob {
@@ -260,10 +265,6 @@ export class TestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -286,10 +287,6 @@ export class ConditionalTestInfraSetup extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -308,10 +305,6 @@ export class TestInfraDestroy extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -331,10 +324,6 @@ export class KubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -368,10 +357,6 @@ export class SmokeTestCliForKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -401,10 +386,6 @@ export class CronProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -468,10 +449,6 @@ export class RunProviderTestForPrTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -508,10 +485,6 @@ export class SmokeTestCliForProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
       clouds: [
@@ -544,10 +517,6 @@ export class SmokeTestKubernetesProviderTestJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
     },
   };
@@ -581,10 +550,6 @@ export class SmokeTestProvidersJob extends EnvironmentSetup {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
       platform: ["ubuntu-latest"],
       languages: ["Cs", "Js", "Ts", "Py", "Fs"],
     },
@@ -699,7 +664,6 @@ export class UnitTestGoJob extends UnitTestingJob {
   strategy = {
     "fail-fast": false,
     matrix: {
-      goversion: [goVersion],
       platform: ["ubuntu-latest"],
       "source-dir": ["testing-unit-go"],
     },
