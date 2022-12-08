@@ -230,8 +230,9 @@ jobs:
         GITHUB_TOKEN: ${{secrets.PULUMI_BOT_TOKEN}}
         PR_URL: ${{github.event.pull_request.html_url}}
       id: enable-automerge
-      if: github.event.pull_request.user.login == 'pulumi-bot'
-      name: Enable automerge if successful for bot PRs
+      if: github.event.pull_request.user.login == 'pulumi-bot' &&
+        contains(toJson(github.event.pull_request.labels.*.name), 'auto-merge')
+      name: Enable automerge if successful for bot PRs with 'auto-merge' label
       run: gh pr merge --auto --squash $PR_URL
   test:
     if: github.event_name == 'repository_dispatch' ||
