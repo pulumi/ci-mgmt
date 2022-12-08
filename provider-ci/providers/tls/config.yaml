@@ -2,6 +2,8 @@ provider: tls
 major-version: 4
 upstream-provider-org: terraform-providers
 makeTemplate: bridged
+# TODO: Enable this once our tls provider is updated with framework support
+# generate-nightly-test-workflow: true
 plugins:
   - name: aws
     version: "4.26.0"

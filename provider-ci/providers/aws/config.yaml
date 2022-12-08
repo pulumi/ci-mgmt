@@ -5,6 +5,7 @@ aws: true
 parallel: 1
 timeout: 120
 providerVersion: "github.com/hashicorp/terraform-provider-aws/version.ProviderVersion"
+generate-nightly-test-workflow: true
 env:
   AWS_REGION: us-west-2
   PULUMI_MISSING_DOCS_ERROR: true

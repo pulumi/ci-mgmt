@@ -13,6 +13,7 @@ const BridgedConfig = z
   .object({
     template: z.literal("bridged").default("bridged"),
     provider: z.string(),
+    "generate-nightly-test-workflow": z.boolean().default(false),
     // Workflow options
     env: z.record(z.any()).optional(),
     docker: z.boolean().default(false),

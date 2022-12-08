@@ -3,6 +3,7 @@ lint: false
 major-version: 5
 parallel: 2
 timeout: 90
+generate-nightly-test-workflow: true
 providerVersion: github.com/hashicorp/terraform-provider-azurerm/version.ProviderVersion
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
