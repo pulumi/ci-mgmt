@@ -578,8 +578,8 @@ export function CreateCommentsUrlStep(): Step {
 
 export function EnableAutoMerge(): Step {
   return {
-    name: "Enable automerge if successful for bot PRs",
-    if: "github.event.pull_request.user.login == 'pulumi-bot'",
+    name: "Enable automerge if successful for bot PRs with 'auto-merge' label",
+    if: "github.event.pull_request.user.login == 'pulumi-bot' && contains(toJson(github.event.pull_request.labels.*.name), 'auto-merge')",
     id: "enable-automerge",
     run: "gh pr merge --auto --squash $PR_URL",
     env: {
