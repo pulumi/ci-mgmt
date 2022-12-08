@@ -15,6 +15,10 @@
             "provider": {
               "type": "string"
             },
+            "generate-nightly-test-workflow": {
+              "type": "boolean",
+              "default": false
+            },
             "env": {
               "type": "object",
               "additionalProperties": {}

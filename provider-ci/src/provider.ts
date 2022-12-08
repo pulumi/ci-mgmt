@@ -49,10 +49,6 @@ export function generateProviderFiles(config: BridgedConfig) {
       data: wf.ReleaseWorkflow("release", config),
     },
     {
-      path: path.join(githubWorkflowsDir, "nightly-test.yml"),
-      data: wf.NightlyCronWorkflow("cron", config),
-    },
-    {
       path: path.join(githubWorkflowsDir, "artifact-cleanup.yml"),
       data: new shared.ArtifactCleanupWorkflow(),
     },
@@ -90,6 +86,14 @@ export function generateProviderFiles(config: BridgedConfig) {
       path: ".golangci.yml",
       data: new lint.PulumiGolangCIConfig(config["golangci-timeout"]),
     },
+    ...(config["generate-nightly-test-workflow"]
+      ? [
+          {
+            path: path.join(githubWorkflowsDir, "nightly-test.yml"),
+            data: wf.NightlyCronWorkflow("cron", config),
+          },
+        ]
+      : []),
   ];
 
   if (config.makeTemplate !== "none") {
