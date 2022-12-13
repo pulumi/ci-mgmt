@@ -66,9 +66,37 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
   };
+
+  const clean_dotnet: Target = {
+    name: "clean_dotnet",
+    phony: true,
+    commands: ["rm -rf sdk/dotnet"],
+  };
+  const clean_nodejs: Target = {
+    name: "clean_nodejs",
+    phony: true,
+    commands: ["rm -rf sdk/nodejs"],
+  };
+  const clean_go: Target = {
+    name: "clean_go",
+    phony: true,
+    commands: ["rm -rf sdk/go"],
+  };
+  const clean_python: Target = {
+    name: "clean_python",
+    phony: true,
+    commands: ["rm -rf sdk/python"],
+  };
+  const clean: Target = {
+    name: "clean",
+    phony: true,
+    dependencies: [clean_dotnet, clean_nodejs, clean_go, clean_python],
+  };
+
   const build_nodejs: Target = {
     name: "build_nodejs",
     phony: true,
+    dependencies: [clean_nodejs],
     variables: {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
@@ -87,6 +115,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_python: Target = {
     name: "build_python",
     phony: true,
+    dependencies: [clean_python],
     variables: {
       PYPI_VERSION: "$(shell pulumictl get version --language python)",
     },
@@ -107,6 +136,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_go: Target = {
     name: "build_go",
     phony: true,
+    dependencies: [clean_go],
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
       // The following pulls out the `module` line from go.mod to determine the right
@@ -119,6 +149,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_dotnet: Target = {
     name: "build_dotnet",
     phony: true,
+    dependencies: [clean_dotnet],
     variables: {
       DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
     },
@@ -159,6 +190,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "build_sdks",
     phony: true,
     dependencies: [
+      clean,
       build_nodejs,
       build_python,
       build_go,
@@ -189,11 +221,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
     phony: true,
   };
-  const clean: Target = {
-    name: "clean",
-    phony: true,
-    commands: ["rm -rf sdk/{dotnet,nodejs,go,python}"],
-  };
+
   const install_dotnet_sdk: Target = {
     name: "install_dotnet_sdk",
     phony: true,
