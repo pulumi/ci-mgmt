@@ -2,20 +2,20 @@
 # yarn lockfile v1
 
 
-"@pulumi/build-config@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@pulumi/build-config/-/build-config-0.0.1.tgz#bbb72f1eabc1bba9beb51e3fc8270ca475675a04"
-  integrity sha512-hqjTCwPqQPrGqtLTK7IMw7NFjgXwAFCgItD8fUQRAd+25pqOLJnQAGiqnIkZZ7XcVTK6dhS4d6bGaqYm3+W10A==
+"@pulumi/build-config@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/build-config/-/build-config-0.0.2.tgz#00d219f3196943c8c9f7dd8646d33fc2b8b6b23c"
+  integrity sha512-kbKSCsdMyueq5B+glthr3CCSCOgGHx/RD+ib5iILqxXFkz1nx5QcqewE/mAJdUm5L6rOk1ZthnhcPH0aDfrvTA==
   dependencies:
     zod "^3.20.2"
     zod-to-json-schema "^3.20.1"
 
-"@pulumi/github-workflows@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@pulumi/github-workflows/-/github-workflows-0.0.1.tgz#0d65148be529bb6b78770d2eabf84aa5c8e21f34"
-  integrity sha512-U8E+D/Epo3Y5ALlEWt97s47bAV+GMDA+bnryk/5kgcyfFjtM1Vb1Tke2Mij2ksJe7D69aAMr498tY0y6xYT3bw==
+"@pulumi/github-workflows@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/github-workflows/-/github-workflows-0.0.2.tgz#5796200623af6ef49cd325a4dbd5723280a792fd"
+  integrity sha512-/gJyBRYMk4ckSrjZvWvE5ZsV4Dc6n97xjJdmc2xtaQXpCfxLV7dTmLxzVm1Ef+3JEbLbLMEVFwjoGbBkRVnnaw==
   dependencies:
-    "@pulumi/build-config" "^0.0.1"
+    "@pulumi/build-config" "^0.0.2"
     yargs "^17.6.2"
 
 ansi-regex@^5.0.1:
