@@ -1,20 +1,14 @@
 NAME ?= all
 
-.PHONY: all ensure clean test format providers examples
+.PHONY: all ensure clean providers examples
 
-all: ensure clean test format providers
+all: ensure clean providers
 
 ensure:
-	npm i
+	npm ci
 
 clean:
 	rm -rf providers/*/repo
-
-test:	
-	npm run lint
-
-format:
-	npm run format
 
 ifneq ($(NAME),all)
 provider:
@@ -25,6 +19,5 @@ providers:
 	npm run gen-providers
 endif
 
-discovery:
-	npm run discovery
-	npm run format
+examples:
+	npm run gen-examples
