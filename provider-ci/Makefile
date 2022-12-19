@@ -1,6 +1,6 @@
 NAME ?= all
 
-all: ensure clean test format providers examples
+all: ensure clean providers examples
 
 gen: clean providers examples
 
@@ -8,22 +8,11 @@ node_modules:: package.json yarn.lock
 	yarn install
 	@touch node_modules
 
-config-schema.json:: node_modules cmd/generate-config-schema.ts src/*.ts
-	yarn gen-config-schema
-
-schema:: config-schema.json
-
-ensure:: node_modules config-schema.json
+ensure:: node_modules
 
 clean:
 	rm -rf providers/*/repo
 	rm -rf platform/examples/repo
-
-test:	
-	yarn run lint
-
-format:
-	yarn run format
 
 ifneq ($(NAME),all)
 provider:: node_modules
@@ -39,8 +28,4 @@ endif
 examples:: node_modules
 	yarn run gen-examples
 
-discovery:: node_modules
-	yarn run discovery
-	yarn run format
-
-.PHONY: all ensure clean test format providers examples discovery providers/ec/repo
+.PHONY: all ensure clean providers examples providers/ec/repo
