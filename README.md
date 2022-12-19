@@ -38,13 +38,9 @@ cd provider-ci && make
 
 Common commands:
 
-- `make gen`: Generate all code
 - `make providers`: Generate code for all providers
 - `make provider NAME=aws`: Generate code for single provider with debug information
 - `make examples`: Generate examples code
-- `make check`: Check for correctness
-- `make format`: Auto-format all code
-- `make discovery`: Check for GitHub workflow schema updates
 
 ## Adding a New Bridged Provider
 
@@ -99,8 +95,4 @@ If the underlying code generation has changed and we need to deploy the workflow
 
 ## Updating GitHub workflow schema
 
-Fetch the latest JSON Schema then re-generate type definitions:
-
-```bash
-make discovery
-```
+Dependabot is configured to track new versions of `@pulumi/github-workflows` and a PR will be created automatically when a new version is released.

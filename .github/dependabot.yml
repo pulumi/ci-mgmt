@@ -1,0 +1,22 @@
+# Update npm package dependencies
+
+version: 2
+updates:
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/provider-ci"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    assignees:
+      - "@pulumi/platform-providers"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/native-provider-ci"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    assignees:
+      - "@pulumi/platform-providers"
