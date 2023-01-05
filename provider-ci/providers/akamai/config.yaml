@@ -1,6 +1,6 @@
 provider: akamai
 lint: false
-major-version: 3
+major-version: 4
 env:
   AKAMAI_HOST: ${{ secrets.AKAMAI_HOST }}
   AKAMAI_ACCESS_TOKEN: ${{ secrets.AKAMAI_ACCESS_TOKEN }}
