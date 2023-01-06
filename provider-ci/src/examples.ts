@@ -7,7 +7,7 @@ import * as action from "./action-versions";
 const pythonVersion = "3.9";
 const goVersion = "1.19.x";
 const nodeVersion = "16.x";
-const dotnetVersion = "3.1.301";
+const dotnetVersion = "6.0.x\n3.1.301\n";
 const javaVersion = "11";
 const yarnVersion = "1.13.0";
 
