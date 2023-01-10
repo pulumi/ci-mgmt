@@ -29,6 +29,7 @@ const env = (opts: BridgedConfig) =>
       SIGNING_KEY_ID: "${{ secrets.JAVA_SIGNING_KEY_ID }}",
       SIGNING_KEY: "${{ secrets.JAVA_SIGNING_KEY }}",
       SIGNING_PASSWORD: "${{ secrets.JAVA_SIGNING_PASSWORD }}",
+      TF_APPEND_USER_AGENT: "pulumi",
     },
     opts.env
   );
