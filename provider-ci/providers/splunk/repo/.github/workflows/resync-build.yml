@@ -22,6 +22,7 @@ env:
   SPLUNK_PASSWORD: password
   SPLUNK_URL: localhost:8089
   SPLUNK_USERNAME: admin
+  TF_APPEND_USER_AGENT: pulumi
   TRAVIS_OS_NAME: linux
 jobs:
   resync_build:
