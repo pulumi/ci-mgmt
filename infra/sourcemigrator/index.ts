@@ -1,0 +1,83 @@
+// Automates automatically editing provider source code.
+//
+// Run this scirpt as:
+//
+//     npx ts-node index.ts ~/code/my-provider
+//
+// It will try every source code migration on the provided directory. Every migration that matches at least one file
+// will create a commit where all the matching files are migrated to the new version.
+//
+// Source code migrations should be very specifically targeted and idempotent.
+
+import * as child from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+
+interface SourceMigration {
+    name: string;
+    execute: (context: MigrateContext) => MigrateResult;
+}
+
+interface MigrateContext {
+    dir: string;
+}
+
+interface MigrateResult {
+    filesEdited: Number;
+}
+
+function updateExamplesToDotNet6(): SourceMigration {
+    let pattern = new RegExp("[<]TargetFramework[>]netcoreapp3.1[<][/]TargetFramework[>]");
+    let replacement = "<TargetFramework>net6.0</TargetFramework>"
+    let sm: SourceMigration = {
+        name: "updateExamplesToDotNet6",
+        execute: (ctx: MigrateContext) => {
+            let stdout = child.execSync("git ls-files", {cwd: ctx.dir});
+            let filesEdited = String(stdout).split("\n")
+                .filter(x => x.startsWith("examples"))
+                .filter(x => x.endsWith(".csproj"))
+                .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
+            return {filesEdited: filesEdited};
+        },
+    };
+    return sm;
+}
+
+function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
+    let contents = String(fs.readFileSync(f));
+    if (pattern.test(contents)) {
+        let updatedContents = contents.replace(pattern, replacement)
+        fs.writeFileSync(f, updatedContents);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
+    migrations.forEach(m => {
+        let result = m.execute(context);
+        if (result.filesEdited == 0) {
+            console.log(m.name, "no-op - source code already up to date");
+        } else {
+            child.execSync("git add .", {cwd: context.dir});
+            child.execSync(`git commit -m "[sourcemigrator] ${m.name}"`, {cwd: context.dir});
+            console.log(m.name, result.filesEdited + " file(s) edited");
+        }
+    });
+}
+
+function allMigrations(): SourceMigration[] {
+    return [updateExamplesToDotNet6()];
+}
+
+function main() {
+    let dir = process.argv[2];
+    if (dir === undefined) {
+        console.log("Usage: npx ts-node index.ts DIR");
+        return
+    }
+    runMigrations({dir: dir}, allMigrations());
+}
+
+main();
