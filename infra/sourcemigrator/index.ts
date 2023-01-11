@@ -77,6 +77,8 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
         if (result.filesEdited == 0) {
             console.log(m.name, "no-op - source code already up to date");
         } else {
+            child.execSync("git config user.name sourcemigrator", {cwd: context.dir});
+            child.execSync("git config user.email sourcemigrator@pulumi.com", {cwd: context.dir});
             child.execSync("git add .", {cwd: context.dir});
             child.execSync(`git commit -m "[sourcemigrator] ${m.name}"`, {cwd: context.dir});
             console.log(m.name, result.filesEdited + " file(s) edited");
