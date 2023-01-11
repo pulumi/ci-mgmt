@@ -37,10 +37,9 @@ jobs:
           cp -r ci-mgmt/provider-ci/providers/${{ github.event.inputs.provider_name }}/repo/. pulumi-${{ github.event.inputs.provider_name }}/.
       - name: Run source code migrations
         run: |
-          DIR=$PWD/pulumi-${{ matrix.provider }}
           cd ci-mgmt/infra/sourcemigrator
           npm ci
-          npx ts-node index.ts "$DIR"
+          npx ts-node index.ts ../../../pulumi-${{ matrix.provider }}
       - name: Create PR
         id: create-pr
         uses: peter-evans/create-pull-request@v3
