@@ -32,7 +32,7 @@ function updateExamplesToDotNet6(): SourceMigration {
     let sm: SourceMigration = {
         name: "updateExamplesToDotNet6",
         execute: (ctx: MigrateContext) => {
-            let stdout = child.execSync("git ls-files", {cwd: ctx.dir});
+            let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
                 .filter(x => x.startsWith("examples"))
                 .filter(x => x.endsWith(".csproj"))
@@ -49,7 +49,7 @@ function updatePulumiCoreRefTo3x(): SourceMigration {
     let sm: SourceMigration = {
         name: "updatePulumiCoreRefTo3x",
         execute: (ctx: MigrateContext) => {
-            let stdout = child.execSync("git ls-files", {cwd: ctx.dir});
+            let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
                 .filter(x => x.startsWith("examples"))
                 .filter(x => x.endsWith("package.json"))
