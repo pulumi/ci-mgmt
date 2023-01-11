@@ -35,7 +35,7 @@ jobs:
           cp -r ci-mgmt/native-provider-ci/providers/${{ github.event.inputs.provider_name }}/repo/. pulumi-${{ github.event.inputs.provider_name }}/.
       - name: Run source code migrations
         run: |
-          DIR=$PWD/pulumi-${{ matrix.provider }}
+          DIR="$PWD/pulumi-${{ github.event.inputs.provider_name }}"
           cd ci-mgmt/infra/sourcemigrator
           npm ci
           npx ts-node index.ts "$DIR"
