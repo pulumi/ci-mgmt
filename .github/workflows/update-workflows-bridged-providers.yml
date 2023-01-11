@@ -54,6 +54,7 @@ jobs:
         run: |
           DIR=$PWD/pulumi-${{ matrix.provider }}
           cd ci-mgmt/infra/sourcemigrator
+          npm ci
           npx ts-node index.ts "$DIR"
       - name: Create PR
         id: create-pr
