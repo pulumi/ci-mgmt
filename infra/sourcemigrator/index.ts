@@ -5,7 +5,7 @@
 //     npx ts-node index.ts ~/code/my-provider
 //
 // It will try every source code migration on the provided directory. Every migration that matches at least one file
-// will create a commit where all the matching files are migrated to the new version.
+// will edit it.
 //
 // Source code migrations should be very specifically targeted and idempotent.
 
@@ -77,10 +77,6 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
         if (result.filesEdited == 0) {
             console.log(m.name, "no-op - source code already up to date");
         } else {
-            child.execSync("git config user.name sourcemigrator", {cwd: context.dir});
-            child.execSync("git config user.email sourcemigrator@pulumi.com", {cwd: context.dir});
-            child.execSync("git add .", {cwd: context.dir});
-            child.execSync(`git commit -m "[sourcemigrator] ${m.name}"`, {cwd: context.dir});
             console.log(m.name, result.filesEdited + " file(s) edited");
         }
     });
