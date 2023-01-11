@@ -6,5 +6,6 @@ env:
   AKAMAI_ACCESS_TOKEN: ${{ secrets.AKAMAI_ACCESS_TOKEN }}
   AKAMAI_CLIENT_TOKEN: ${{ secrets.AKAMAI_CLIENT_TOKEN }}
   AKAMAI_CLIENT_SECRET: ${{ secrets.AKAMAI_CLIENT_SECRET }}
+  VERSION_PREFIX: 4.0.0
 upstream-provider-org: pulumi
 makeTemplate: bridged
