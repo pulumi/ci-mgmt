@@ -43,6 +43,23 @@ function updateExamplesToDotNet6(): SourceMigration {
     return sm;
 }
 
+function updatePulumiCoreRefTo3x(): SourceMigration {
+    let pattern = new RegExp('["][@]pulumi[/]pulumi["][:]\\s+["][^]2[.]0[.]0"');
+    let replacement = '"@pulumi/pulumi": "^3.0.0"';
+    let sm: SourceMigration = {
+        name: "updatePulumiCoreRefTo3x",
+        execute: (ctx: MigrateContext) => {
+            let stdout = child.execSync("git ls-files", {cwd: ctx.dir});
+            let filesEdited = String(stdout).split("\n")
+                .filter(x => x.startsWith("examples"))
+                .filter(x => x.endsWith("package.json"))
+                .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
+            return {filesEdited: filesEdited};
+        },
+    };
+    return sm;
+}
+
 function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
     let contents = String(fs.readFileSync(f));
     if (pattern.test(contents)) {
@@ -68,7 +85,10 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
 }
 
 function allMigrations(): SourceMigration[] {
-    return [updateExamplesToDotNet6()];
+    return [
+        updateExamplesToDotNet6(),
+        updatePulumiCoreRefTo3x()
+    ];
 }
 
 function main() {
