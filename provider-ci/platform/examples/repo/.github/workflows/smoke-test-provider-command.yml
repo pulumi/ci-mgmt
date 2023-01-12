@@ -10,6 +10,9 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   CLOUDSDK_CORE_DISABLE_PROMPTS: 1
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+  DOTNETVERSION: |
+    6.0.x
+    3.1.301
   GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
   GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
   GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
@@ -17,11 +20,15 @@ env:
   GOOGLE_PROJECT_NUMBER: "895284651812"
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
+  GOVERSION: 1.19.x
+  JAVAVERSION: "11"
+  NODEVERSION: 16.x
   PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}
   PROVIDER_TESTS_TAG: ${{ github.event.client_payload.ref }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_TEST_OWNER: moolumi
+  PYTHONVERSION: "3.9"
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   dotnet-unit-testing:
@@ -33,7 +40,7 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetversion}}
+        dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v2
     - name: Print CLI version
@@ -62,7 +69,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.goversion}}
+        go-version: ${{ env.GOVERSION }}
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v2
     - name: Print CLI version
@@ -72,8 +79,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        goversion:
-        - 1.19.x
         platform:
         - ubuntu-latest
         source-dir:
@@ -91,16 +96,16 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetversion}}
+        dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.nodeversion}}
+        node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.pythonversion}}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
@@ -108,7 +113,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.goversion}}
+        go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -181,18 +186,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnetversion:
-        - |
-          6.0.x
-          3.1.301
-        goversion:
-        - 1.19.x
-        nodeversion:
-        - 16.x
         platform:
         - ubuntu-latest
-        pythonversion:
-        - "3.9"
   providers:
     name: smoke-test-providers
     permissions:
@@ -205,16 +200,16 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetversion}}
+        dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.nodeversion}}
+        node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.pythonversion}}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
@@ -222,7 +217,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.goversion}}
+        go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -291,24 +286,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnetversion:
-        - |
-          6.0.x
-          3.1.301
-        goversion:
-        - 1.19.x
         languages:
         - Cs
         - Js
         - Ts
         - Py
         - Fs
-        nodeversion:
-        - 16.x
         platform:
         - ubuntu-latest
-        pythonversion:
-        - "3.9"
   python-unit-testing:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
@@ -318,7 +303,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.pythonversion}}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
@@ -355,16 +340,16 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetversion}}
+        dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.nodeversion}}
+        node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.pythonversion}}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
@@ -372,7 +357,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.goversion}}
+        go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -437,18 +422,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnetversion:
-        - |
-          6.0.x
-          3.1.301
-        goversion:
-        - 1.19.x
-        nodeversion:
-        - 16.x
         platform:
         - ubuntu-latest
-        pythonversion:
-        - "3.9"
   test-infra-setup:
     name: test-infra-setup
     permissions:
@@ -461,16 +436,16 @@ jobs:
     - name: Setup DotNet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{matrix.dotnetversion}}
+        dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.nodeversion}}
+        node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{matrix.pythonversion}}
+        python-version: ${{ env.PYTHONVERSION }}
     - name: Install Python deps
       run: |-
         pip3 install virtualenv==20.0.23
@@ -478,7 +453,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{matrix.goversion}}
+        go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -543,18 +518,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnetversion:
-        - |
-          6.0.x
-          3.1.301
-        goversion:
-        - 1.19.x
-        nodeversion:
-        - 16.x
         platform:
         - ubuntu-latest
-        pythonversion:
-        - "3.9"
   ts-unit-testing:
     name: Running ${{ matrix.source-dir }} test
     runs-on: ${{ matrix.platform }}
@@ -564,7 +529,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: ${{matrix.nodeversion}}
+        node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v2

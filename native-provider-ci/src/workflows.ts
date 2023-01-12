@@ -5,7 +5,7 @@ import { Step } from "./steps";
 
 const pythonVersion = "3.7";
 const goVersion = "1.19.x";
-const nodeVersion = "14.x";
+const nodeVersion = "16.x";
 const dotnetVersion = "3.1.301";
 const javaVersion = "11";
 
@@ -45,6 +45,11 @@ const env = (opts: WorkflowOpts) =>
       SIGNING_KEY_ID: "${{ secrets.JAVA_SIGNING_KEY_ID }}",
       SIGNING_KEY: "${{ secrets.JAVA_SIGNING_KEY }}",
       SIGNING_PASSWORD: "${{ secrets.JAVA_SIGNING_PASSWORD }}",
+      GOVERSION: goVersion,
+      NODEVERSION: nodeVersion,
+      PYTHONVERSION: pythonVersion,
+      DOTNETVERSION: dotnetVersion,
+      JAVAVERSION: javaVersion,
     },
     opts.env
   );
@@ -423,11 +428,6 @@ export class BuildSdkJob implements NormalJob {
   strategy = {
     "fail-fast": true,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
@@ -490,15 +490,6 @@ export class BuildSdkJob implements NormalJob {
 
 export class PrerequisitesJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
@@ -551,11 +542,6 @@ export class TestsJob implements NormalJob {
   strategy = {
     "fail-fast": true,
     matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-      javaversion: [javaVersion],
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
   };
@@ -622,15 +608,6 @@ export class TestsJob implements NormalJob {
 
 export class BuildTestClusterJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
@@ -676,15 +653,6 @@ export class BuildTestClusterJob implements NormalJob {
 
 export class TeardownTestClusterJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": false,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
@@ -726,12 +694,6 @@ export class TeardownTestClusterJob implements NormalJob {
 
 export class LintKubernetesJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-    },
-  };
   steps = [steps.CheckoutRepoStep(), steps.InstallGo(), steps.GolangciLint()];
   name: string;
   if: NormalJob["if"];
@@ -758,11 +720,6 @@ export class LintKubernetesJob implements NormalJob {
 export class PublishPrereleaseJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
-  strategy = {
-    matrix: {
-      goversion: [goVersion],
-    },
-  };
   steps: NormalJob["steps"];
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
@@ -790,15 +747,6 @@ export class PublishPrereleaseJob implements NormalJob {
 export class PublishJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "test";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   name: string;
   steps: NormalJob["steps"];
 
@@ -827,15 +775,6 @@ export class PublishJob implements NormalJob {
 export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   name: string;
   steps: NormalJob["steps"];
 
@@ -869,13 +808,6 @@ export class PublishJavaSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   "continue-on-error" = true;
   needs = "publish";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      javaversion: [javaVersion],
-    },
-  };
   name: string;
   steps: NormalJob["steps"];
 
@@ -994,15 +926,6 @@ export class Arm2PulumiCoverageReport implements NormalJob {
 
 export class WeeklyPulumiUpdate implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      goversion: [goVersion],
-      dotnetversion: [dotnetVersion],
-      pythonversion: [pythonVersion],
-      nodeversion: [nodeVersion],
-    },
-  };
   steps: NormalJob["steps"];
   if: NormalJob["if"];
   constructor(name: string, opts: WorkflowOpts) {

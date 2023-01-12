@@ -219,7 +219,7 @@ export function InstallGo(version?: string): Step {
     name: "Install Go",
     uses: action.setupGo,
     with: {
-      "go-version": version || "${{matrix.goversion}}",
+      "go-version": version || "${{ env.GOVERSION }}",
     },
   };
 }
@@ -229,7 +229,7 @@ export function InstallNodeJS(version?: string): Step {
     name: "Setup Node",
     uses: action.setupNode,
     with: {
-      "node-version": version || "${{matrix.nodeversion}}",
+      "node-version": version || "${{ env.NODEVERSION }}",
       "registry-url": "https://registry.npmjs.org",
     },
   };
@@ -240,7 +240,7 @@ export function InstallDotNet(version?: string): Step {
     name: "Setup DotNet",
     uses: action.setupDotNet,
     with: {
-      "dotnet-version": version || "${{matrix.dotnetversion}}",
+      "dotnet-version": version || "${{ env.DOTNETVERSION }}",
     },
   };
 }
@@ -250,7 +250,7 @@ export function InstallJava(version?: string): Step {
     name: "Setup Java",
     uses: action.setupJava,
     with: {
-      "java-version": version || "${{matrix.javaversion}}",
+      "java-version": version || "${{ env.JAVAVERSION }}",
       distribution: "temurin",
       cache: "gradle",
     },
@@ -262,7 +262,7 @@ export function InstallPython(version?: string): Step {
     name: "Setup Python",
     uses: action.setupPython,
     with: {
-      "python-version": version || "${{matrix.pythonversion}}",
+      "python-version": version || "${{ env.PYTHONVERSION }}",
     },
   };
 }
