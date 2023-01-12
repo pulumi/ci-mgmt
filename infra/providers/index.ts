@@ -12,6 +12,19 @@ const providers = [...tfProviders, ...nativeProviders];
 for (let provider of providers) {
     const contexts: string[] = [
         "Update Changelog",
+        "prerequisites",
+        "lint",
+        "lint-sdk",
+        "build_sdk (dotnet)",
+        "build_sdk (go)",
+        "build_sdk (java)",
+        "build_sdk (nodejs)",
+        "build_sdk (python)",
+        "test (dotnet)",
+        "test (go)",
+        "test (java)",
+        "test (nodejs)",
+        "test (python)",
         "sentinel",
     ];
 
