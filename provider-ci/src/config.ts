@@ -34,6 +34,7 @@ const BridgedConfig = z
     "major-version": z.number().default(2),
     skipTfGen: z.boolean().default(false),
     providerVersion: z.string().default(""),
+    javaGenVersion: z.string().default(""),
     skipWindowsArmBuild: z.boolean().default(false),
     // Makefile options
     makeTemplate: z.enum(["none", "bridged", "bridged-v2"]).default("none"),

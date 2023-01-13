@@ -11,6 +11,7 @@ env:
   PULUMI_MISSING_DOCS_ERROR: true
 upstream-provider-org: pulumi
 makeTemplate: bridged
+javaGenVersion: v0.7.1
 plugins:
   - name: tls
     version: "4.1.0"

@@ -89,6 +89,10 @@
               "type": "string",
               "default": ""
             },
+            "javaGenVersion": {
+              "type": "string",
+              "default": ""
+            },
             "skipWindowsArmBuild": {
               "type": "boolean",
               "default": false
