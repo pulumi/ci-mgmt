@@ -26,15 +26,14 @@ interface MigrateResult {
     filesEdited: Number;
 }
 
-function updateExamplesToDotNet6(): SourceMigration {
+function updateExamplesFromCore31DotNet6(): SourceMigration {
     let pattern = new RegExp("[<]TargetFramework[>]netcoreapp3.1[<][/]TargetFramework[>]");
     let replacement = "<TargetFramework>net6.0</TargetFramework>"
     let sm: SourceMigration = {
-        name: "updateExamplesToDotNet6",
+        name: "updateExamplesFromCore31DotNet6",
         execute: (ctx: MigrateContext) => {
             let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
-                .filter(x => x.startsWith("examples"))
                 .filter(x => x.endsWith(".csproj"))
                 .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
             return {filesEdited: filesEdited};
@@ -51,7 +50,6 @@ function updatePulumiCoreRefTo3x(): SourceMigration {
         execute: (ctx: MigrateContext) => {
             let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
-                .filter(x => x.startsWith("examples"))
                 .filter(x => x.endsWith("package.json"))
                 .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
             return {filesEdited: filesEdited};
@@ -84,7 +82,7 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
 
 function allMigrations(): SourceMigration[] {
     return [
-        updateExamplesToDotNet6(),
+        updateExamplesFromCore31DotNet6(),
         updatePulumiCoreRefTo3x()
     ];
 }
