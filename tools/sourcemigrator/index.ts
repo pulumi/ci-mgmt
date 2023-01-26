@@ -62,7 +62,7 @@ function updateGo_1_19(): SourceMigration {
     let pattern = new RegExp('^go \\d+[.]\\d+$', 'm');
     let replacement = "go 1.19";
     let sm: SourceMigration = {
-        name: "updateGoTo_1_19",
+        name: "updateGo_1_19",
         execute: (ctx: MigrateContext) => {
             let stdout = child.execSync("git ls-files -- '**/go.mod'", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
