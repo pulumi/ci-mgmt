@@ -58,7 +58,7 @@ function updatePulumiCoreRefTo3x(): SourceMigration {
     return sm;
 }
 
-function updateGoTo_1_19(): SourceMigration {
+function updateGo_1_19(): SourceMigration {
     let pattern = new RegExp('^go \\d+[.]\\d+$', 'm');
     let replacement = "go 1.19";
     let sm: SourceMigration = {
