@@ -117,7 +117,7 @@ function allMigrations(): SourceMigration[] {
     return [
         updateExamplesFromCore31DotNet6(),
         updatePulumiCoreRefTo3x(),
-        updateGoTo_1_19(),
+        updateGo_1_19(),
     ];
 }
 
