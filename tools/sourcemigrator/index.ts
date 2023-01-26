@@ -67,6 +67,7 @@ function updateGoTo_1_19(): SourceMigration {
             let stdout = child.execSync("git ls-files -- '**/go.mod'", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
                 .filter(x => x.endsWith("go.mod"))
+                .filter(x => !fileContains(path.join(ctx.dir, x), new RegExp("Exclude[ ]this[ ]directory")))
                 .filter(x => {
                     let f = path.join(ctx.dir, x);
                     let replaced = replaceInFile(f, pattern, replacement);
@@ -81,12 +82,21 @@ function updateGoTo_1_19(): SourceMigration {
     return sm;
 }
 
+function fileContains(f: string, pattern: RegExp): boolean {
+    let contents = String(fs.readFileSync(f));
+    return pattern.test(contents);
+}
+
 function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
     let contents = String(fs.readFileSync(f));
     if (pattern.test(contents)) {
         let updatedContents = contents.replace(pattern, replacement)
-        fs.writeFileSync(f, updatedContents);
-        return true;
+        if (updatedContents != contents) {
+            fs.writeFileSync(f, updatedContents);
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
