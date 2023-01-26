@@ -58,12 +58,45 @@ function updatePulumiCoreRefTo3x(): SourceMigration {
     return sm;
 }
 
+function updateGo_1_19(): SourceMigration {
+    let pattern = new RegExp('^go \\d+[.]\\d+$', 'm');
+    let replacement = "go 1.19";
+    let sm: SourceMigration = {
+        name: "updateGo_1_19",
+        execute: (ctx: MigrateContext) => {
+            let stdout = child.execSync("git ls-files -- '**/go.mod'", {cwd: ctx.dir});
+            let filesEdited = String(stdout).split("\n")
+                .filter(x => x.endsWith("go.mod"))
+                .filter(x => !fileContains(path.join(ctx.dir, x), new RegExp("Exclude[ ]this[ ]directory")))
+                .filter(x => {
+                    let f = path.join(ctx.dir, x);
+                    let replaced = replaceInFile(f, pattern, replacement);
+                    if (replaced) {
+                        child.execSync("go mod tidy", {cwd: path.dirname(f)});
+                    }
+                    return replaced;
+                }).length;
+            return {filesEdited: filesEdited};
+        },
+    };
+    return sm;
+}
+
+function fileContains(f: string, pattern: RegExp): boolean {
+    let contents = String(fs.readFileSync(f));
+    return pattern.test(contents);
+}
+
 function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
     let contents = String(fs.readFileSync(f));
     if (pattern.test(contents)) {
         let updatedContents = contents.replace(pattern, replacement)
-        fs.writeFileSync(f, updatedContents);
-        return true;
+        if (updatedContents != contents) {
+            fs.writeFileSync(f, updatedContents);
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
@@ -83,7 +116,8 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
 function allMigrations(): SourceMigration[] {
     return [
         updateExamplesFromCore31DotNet6(),
-        updatePulumiCoreRefTo3x()
+        updatePulumiCoreRefTo3x(),
+        updateGo_1_19(),
     ];
 }
 
