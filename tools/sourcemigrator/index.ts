@@ -1,6 +1,6 @@
 // Automates automatically editing provider source code.
 //
-// Run this scirpt as:
+// Run this script as:
 //
 //     npx ts-node index.ts ~/code/my-provider
 //
