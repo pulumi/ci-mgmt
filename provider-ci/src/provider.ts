@@ -15,7 +15,7 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const config = getConfig(provider);
   if (config.template !== "bridged") {
     throw new Error(
-      `Expected bridged template config, found "${config.template}"`
+      `Expected bridged template config, found "${config.template}"`,
     );
   }
   return generateProviderFiles(config);
@@ -86,13 +86,18 @@ export function generateProviderFiles(config: BridgedConfig) {
       path: ".golangci.yml",
       data: new lint.PulumiGolangCIConfig(config["golangci-timeout"]),
     },
+    {
+      path: path.join("provider", "pkg", "version", "go.mod"),
+      data:
+        `module github.com/pulumi-${config.provider}/provider/pkg/version\n\ngo 1.19\n`,
+    },
     ...(config["generate-nightly-test-workflow"]
       ? [
-          {
-            path: path.join(githubWorkflowsDir, "nightly-test.yml"),
-            data: wf.NightlyCronWorkflow("cron", config),
-          },
-        ]
+        {
+          path: path.join(githubWorkflowsDir, "nightly-test.yml"),
+          data: wf.NightlyCronWorkflow("cron", config),
+        },
+      ]
       : []),
   ];
 
@@ -110,7 +115,7 @@ export function generateProviderFiles(config: BridgedConfig) {
         {
           path: ".version.javagen.txt",
           data: "v0.5.4",
-        }
+        },
       );
     }
   }

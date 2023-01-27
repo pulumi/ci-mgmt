@@ -5,11 +5,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const PACK = config.provider;
   const ORG = "pulumi";
   const PROJECT = `github.com/$(ORG)/pulumi-$(PACK)`;
-  const PROVIDER_PATH =
-    config["major-version"] > 1
-      ? `provider/v${config["major-version"]}`
-      : `provider`;
-  const VERSION_PATH = `$(PROVIDER_PATH)/pkg/version.Version`;
+  const VERSION_PATH = `$(PROJECT)/provider/pkg/version.Version`;
   const TFGEN = `pulumi-tfgen-$(PACK)`;
   const JAVA_GEN = `pulumi-java-gen`;
   const JAVA_GEN_VERSION = config.javaGenVersion || "v0.5.4";
@@ -22,7 +18,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     PACK,
     ORG,
     PROJECT,
-    PROVIDER_PATH,
     VERSION_PATH,
     TFGEN,
     PROVIDER,
@@ -48,12 +43,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [install_plugins],
     commands: [
-      '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
+      '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" ./cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
   };
-  const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
+  const ldFlagStatements = ["-X $(VERSION_PATH)=$(VERSION)"];
   if (config.providerVersion) {
     ldFlagStatements.push(`-X ${config.providerVersion}=$(VERSION)`);
   }
@@ -63,7 +58,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
-      `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
+      `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" ./cmd/$(PROVIDER))`,
     ],
   };
   const build_nodejs: Target = {

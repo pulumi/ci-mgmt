@@ -27,7 +27,7 @@ format:
 
 ifneq ($(NAME),all)
 provider:: node_modules
-	echo $(NAME)
+	@echo $(NAME)
 	yarn run gen-providers -- --name $(NAME) --debug
 else 
 providers:: node_modules
