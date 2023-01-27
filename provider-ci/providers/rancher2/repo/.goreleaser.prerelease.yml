@@ -28,7 +28,7 @@ builds:
   - linux
   ignore: []
   ldflags:
-  - -X github.com/pulumi/pulumi-rancher2/provider/v3/pkg/version.Version={{.Tag}}
+  - -X github.com/pulumi/pulumi-rancher2/provider/pkg/version.Version={{.Tag}}
   main: ./cmd/pulumi-resource-rancher2/
 changelog:
   skip: true
