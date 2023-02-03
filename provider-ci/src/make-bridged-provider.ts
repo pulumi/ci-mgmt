@@ -33,6 +33,19 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     WORKING_DIR,
   } as const;
 
+
+  const docs: Target = {
+    name: "docs",
+    phony: true,
+  }
+
+  if (config.provider == "docker" ) {
+    console.log("this works")
+    docs.commands = [
+      "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
+    ]
+  }
+
   const install_plugins: Target = {
     name: "install_plugins",
     phony: true,
@@ -43,10 +56,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       ) ?? []),
     ],
   };
+
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins],
+    dependencies: [install_plugins, docs],
     commands: [
       '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
@@ -275,6 +289,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       install_nodejs_sdk,
       install_sdks,
       test,
+      docs,
     ],
   };
 }
