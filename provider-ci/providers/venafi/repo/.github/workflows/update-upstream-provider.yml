@@ -31,7 +31,8 @@ env:
   UPSTREAM_PROVIDER_MAJOR_VERSION: ""
   UPSTREAM_PROVIDER_ORG: pulumi
   UPSTREAM_PROVIDER_REPO: terraform-provider-venafi
-  VENAFI_TOKEN: ${{ secrets.VENAFI_TOKEN }}
+  VENAFI_TPP_PASSWORD: ${{ secrets.VENAFI_TPP_PASSWORD }}
+  VENAFI_TPP_USER: ${{ secrets.VENAFI_TPP_USER }}
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
 jobs:
