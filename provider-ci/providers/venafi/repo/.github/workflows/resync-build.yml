@@ -28,7 +28,8 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TF_APPEND_USER_AGENT: pulumi
   TRAVIS_OS_NAME: linux
-  VENAFI_TOKEN: ${{ secrets.VENAFI_TOKEN }}
+  VENAFI_TPP_PASSWORD: ${{ secrets.VENAFI_TPP_PASSWORD }}
+  VENAFI_TPP_USER: ${{ secrets.VENAFI_TPP_USER }}
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
   VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
 jobs:
