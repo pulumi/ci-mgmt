@@ -1,8 +1,0 @@
-provider: aws-native
-lint: false
-major-version: 0
-aws: true
-submodules: true
-env:
-  AWS_REGION: us-west-2
-  PULUMI_API: "https://api.pulumi-staging.io"
