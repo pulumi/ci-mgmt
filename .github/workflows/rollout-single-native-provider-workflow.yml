@@ -33,6 +33,10 @@ jobs:
       - name: Copy files from ci-mgmt to pulumi-${{ github.event.inputs.provider_name }}
         run: |
           cp -r ci-mgmt/native-provider-ci/providers/${{ github.event.inputs.provider_name }}/repo/. pulumi-${{ github.event.inputs.provider_name }}/.
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: stable
       - name: Run source code migrations
         run: |
           DIR="$PWD/pulumi-${{ github.event.inputs.provider_name }}"

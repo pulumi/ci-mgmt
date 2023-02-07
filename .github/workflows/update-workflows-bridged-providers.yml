@@ -50,6 +50,10 @@ jobs:
       - name: Copy files from ci-mgmt to pulumi-${{ matrix.provider }}
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ matrix.provider }}/repo/. pulumi-${{ matrix.provider }}/.
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: stable
       - name: Run source code migrations
         run: |
           DIR="$PWD/pulumi-${{ matrix.provider }}"
