@@ -75,11 +75,16 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
           {
             test: `else`,
             then: [
+              "# Checkout the submodule at the pinned commit.",
+              "# `--force`: If the submodule is at a different commit, move it to the pinned commit.",
+              "# `--init`: If the submodule is not initialized, initialize it.",
               `git submodule update --force --init`,
+              "# Iterating over the patches folder in sorted order,",
+              "# apply the patch using a 3-way merge strategy. This mirrors the default behavior of `git merge`",
               [
                 `cd upstream`,
                 `for patch in $(sort $(wildcard patches/*.patch)); do git apply --3way ../$$patch || exit 1; done`
-              ],
+              ]
             ]
           },
         ],
