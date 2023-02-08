@@ -124,6 +124,14 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "docsCmd": {
+              "type": "string",
+              "default": ""
+            },
+            "hybrid": {
+              "type": "boolean",
+              "default": false
             }
           },
           "required": [
