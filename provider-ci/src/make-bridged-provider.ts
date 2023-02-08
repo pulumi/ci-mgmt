@@ -50,10 +50,101 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
+  let startPatch: Target | null = null;
+  let finishPatch: Target | null = null;
+  let upstream: Target | null = null;
+  if (config.team === "ecosystem") {
+    upstream = {
+      name: "upstream",
+      phony: true,
+      commands: [{
+        parts: [
+          {
+            test: `ifeq ("$(wildcard upstream)","")`,
+            then: [`# upstream doesn't exist, so skip`],
+          },
+          {
+            test: `else ifeq ("$(wildcard patches/*.patch)","")`,
+            then: [
+              `# upstream exists, but patches don't exist. This is probably an error.`,
+              `@echo "No patches found within the patch operation"`,
+              `@echo "patches were expected because upstream exists"`,
+              `@exit 1`,
+            ]
+          },
+          {
+            test: `else`,
+            then: [
+              "# Checkout the submodule at the pinned commit.",
+              "# `--force`: If the submodule is at a different commit, move it to the pinned commit.",
+              "# `--init`: If the submodule is not initialized, initialize it.",
+              `git submodule update --force --init`,
+              "# Iterating over the patches folder in sorted order,",
+              "# apply the patch using a 3-way merge strategy. This mirrors the default behavior of `git merge`",
+              [
+                `cd upstream`,
+                `for patch in $(sort $(wildcard patches/*.patch)); do git apply --3way ../$$patch || exit 1; done`
+              ]
+            ]
+          },
+        ],
+        end: "endif",
+      }]
+    };
+
+    startPatch = {
+      name: "start-patch",
+      phony: true,
+      dependencies: [upstream],
+      commands: [{
+        parts: [
+          {
+            test: `ifeq ("$(wildcard upstream)","")`,
+            then: [`@echo "No upstream found, so upstream can't be patched"`, `@exit 1`],
+          },
+          {
+            test: `else`,
+            then: [
+              `# To add an additional patch:`,
+              `#`,
+              "#	1. Run this command (`make start-patch`).",
+              `#`,
+              "#	2. Edit the `upstream` repo, making whatever changes you want to appear in the new",
+              `#	patch. It's fine to edit multiple files.`,
+              `#`,
+              `#	3. Commit your changes. The slugified first line of your commit description will`,
+              `#	be used to generate the patch file name. Only the diff from the latest commit will`,
+              `#	end up in the final patch.`,
+              `#`,
+              "#	4. Run `make finish-patch`.",
+              `#`,
+              "# It is safe to run `make start-patch` as many times as you want, but any changes",
+              "# might be reverted until `make finish-patch` is run.",
+              `@cd upstream && git commit --quiet -m "existing patches"`,
+            ],
+          },
+        ],
+        end: "endif",
+      }]
+    }
+    finishPatch = {
+      name: "finish-patch",
+      phony: true,
+      commands: [
+        `@if [ ! -z "$$(cd upstream && git status --porcelain)" ]; then echo "Please commit your changes before finishing the patch"; exit 1; fi`,
+        [
+          "@cd upstream",
+          `git format-patch HEAD~ -o ../patches --start-number $$(($$(ls ../patches | wc -l | xargs)+1))`,
+        ],
+      ],
+    }
+  }
+
+
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins],
+    dependencies: [install_plugins, upstream],
     commands: [
       '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
@@ -81,6 +172,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_nodejs: Target = {
     name: "build_nodejs",
     phony: true,
+    dependencies: [upstream],
     variables: {
       VERSION: "$(shell pulumictl get version --language javascript)",
     },
@@ -99,6 +191,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_python: Target = {
     name: "build_python",
     phony: true,
+    dependencies: [upstream],
     variables: {
       PYPI_VERSION: "$(shell pulumictl get version --language python)",
     },
@@ -119,6 +212,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_go: Target = {
     name: "build_go",
     phony: true,
+    dependencies: [upstream],
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
       // The following pulls out the `module` line from go.mod to determine the right
@@ -134,6 +228,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     variables: {
       DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
     },
+    dependencies: [upstream],
     commands: [
       "pulumictl get version --language dotnet",
       "$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/",
@@ -154,7 +249,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_java: Target = {
     name: "build_java",
     phony: true,
-    dependencies: [bin_pulumi_java_gen],
+    dependencies: [bin_pulumi_java_gen, upstream],
     variables: {
       PACKAGE_VERSION: "$(shell pulumictl get version --language generic)",
     },
@@ -238,7 +333,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       install_java_sdk,
     ],
   };
-  const development: Target = {
+  const defaultTarget: Target = {
     name: "development",
     phony: true,
     dependencies: [install_plugins, provider, build_sdks, install_sdks],
@@ -261,7 +356,10 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
-  const returnTargets = [
+  const targets = [
+    upstream,
+    startPatch,
+    finishPatch,
     build,
     only_build,
     tfgen,
@@ -285,15 +383,16 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     install_nodejs_sdk,
     install_sdks,
     test,
-  ];
+  ].filter((x): x is Target => x !== null);
+
 
   if (config.hybrid) {
-    returnTargets.push(docs);
+    targets.push(docs);
   }
 
   return {
     variables,
-    defaultTarget: development,
-    targets: returnTargets,
+    defaultTarget,
+    targets,
   };
 }

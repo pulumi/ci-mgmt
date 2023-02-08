@@ -9,3 +9,4 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
 upstream-provider-org: hashicorp
 makeTemplate: bridged
+team: providers

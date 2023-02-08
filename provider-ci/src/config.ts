@@ -43,6 +43,7 @@ const BridgedConfig = z
       .optional(),
     docsCmd: z.string().default(""),
     hybrid: z.boolean().default(false),
+    team: z.enum(["ecosystem", "providers"]).default("ecosystem"),
   })
   .transform((input) => {
     if (input["upstream-provider-repo"] !== "") {
