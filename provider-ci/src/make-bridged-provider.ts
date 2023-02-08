@@ -50,86 +50,91 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
-  const upstream: Target = {
-    name: "upstream",
-    phony: true,
-    commands: [{
-      parts: [
-        {
-          test: `ifeq ("$(wildcard upstream)","")`,
-          then: [`# upstream doesn't exist, so skip`],
-        },
-        {
-          test: `else ifeq ("$(wildcard patches/*.patch)","")`,
-          then: [
-            `# upstream exists, but patches don't exist. This is probably an error.`,
-            `@echo "No patches found within the patch operation"`,
-            `@echo "patches were expected because upstream exists"`,
-            `@exit 1`,
-          ]
-        },
-        {
-          test: `else`,
-          then: [
-            `git submodule update --force --init`,
-            [
-              `cd upstream`,
-              `for patch in $(sort $(wildcard patches/*.patch)); do git apply --3way ../$$patch || exit 1; done`
+  let startPatch: Target | null = null;
+  let finishPatch: Target | null = null;
+  let upstream: Target | null = null;
+  if (config.team === "ecosystem") {
+    upstream = {
+      name: "upstream",
+      phony: true,
+      commands: [{
+        parts: [
+          {
+            test: `ifeq ("$(wildcard upstream)","")`,
+            then: [`# upstream doesn't exist, so skip`],
+          },
+          {
+            test: `else ifeq ("$(wildcard patches/*.patch)","")`,
+            then: [
+              `# upstream exists, but patches don't exist. This is probably an error.`,
+              `@echo "No patches found within the patch operation"`,
+              `@echo "patches were expected because upstream exists"`,
+              `@exit 1`,
+            ]
+          },
+          {
+            test: `else`,
+            then: [
+              `git submodule update --force --init`,
+              [
+                `cd upstream`,
+                `for patch in $(sort $(wildcard patches/*.patch)); do git apply --3way ../$$patch || exit 1; done`
+              ],
+            ]
+          },
+        ],
+        end: "endif",
+      }]
+    };
+
+    startPatch = {
+      name: "start-patch",
+      phony: true,
+      dependencies: [upstream],
+      commands: [{
+        parts: [
+          {
+            test: `ifeq ("$(wildcard upstream)","")`,
+            then: [`@echo "No upstream found, so upstream can't be patched"`, `@exit 1`],
+          },
+          {
+            test: `else`,
+            then: [
+              `# To add an additional patch:`,
+              `#`,
+              "#	1. Run this command (`make start-patch`).",
+              `#`,
+              "#	2. Edit the `upstream` repo, making whatever changes you want to appear in the new",
+              `#	patch. It's fine to edit multiple files.`,
+              `#`,
+              `#	3. Commit your changes. The slugified first line of your commit description will`,
+              `#	be used to generate the patch file name. Only the diff from the latest commit will`,
+              `#	end up in the final patch.`,
+              `#`,
+              "#	4. Run `make finish-patch`.",
+              `#`,
+              "# It is safe to run `make start-patch` as many times as you want, but any changes",
+              "# might be reverted until `make finish-patch` is run.",
+              `@cd upstream && git commit --quiet -m "existing patches"`,
             ],
-          ]
-        },
+          },
+        ],
+        end: "endif",
+      }]
+    }
+    finishPatch = {
+      name: "finish-patch",
+      phony: true,
+      commands: [
+        `@if [ ! -z "$$(cd upstream && git status --porcelain)" ]; then echo "Please commit your changes before finishing the patch"; exit 1; fi`,
+        [
+          "@cd upstream",
+          `git format-patch HEAD~ -o ../patches --start-number $$(($$(ls ../patches | wc -l | xargs)+1))`,
+        ],
       ],
-      end: "endif",
-    }]
-  };
-
-  const startPatch: Target = {
-    name: "start-patch",
-    phony: true,
-    dependencies: [upstream],
-    commands: [{
-      parts: [
-        {
-          test: `ifeq ("$(wildcard upstream)","")`,
-          then: [`@echo "No upstream found, so upstream can't be patched"`, `@exit 1`],
-        },
-        {
-          test: `else`,
-          then: [
-            `# To add an additional patch:`,
-            `#`,
-            "#	1. Run this command (`make start-patch`).",
-            `#`,
-            "#	2. Edit the `upstream` repo, making whatever changes you want to appear in the new",
-            `#	patch. It's fine to edit multiple files.`,
-            `#`,
-            `#	3. Commit your changes. The slugified first line of your commit description will`,
-            `#	be used to generate the patch file name. Only the diff from the latest commit will`,
-            `#	end up in the final patch.`,
-            `#`,
-            "#	4. Run `make finish-patch`.",
-            `#`,
-            "# It is safe to run `make start-patch` as many times as you want, but any changes",
-            "# might be reverted until `make finish-patch` is run.",
-            `@cd upstream && git commit --quiet -m "existing patches"`,
-          ],
-        },
-      ],
-      end: "endif",
-    }]
+    }
   }
 
-  const finishPatch: Target = {
-    name: "finish-patch",
-    phony: true,
-    commands: [
-      `@if [ ! -z "$$(cd upstream && git status --porcelain)" ]; then echo "Please commit your changes before finishing the patch"; exit 1; fi`,
-      [
-        "@cd upstream",
-        `git format-patch HEAD~ -o ../patches --start-number $$(($$(ls ../patches | wc -l | xargs)+1))`,
-      ],
-    ],
-  }
 
   const tfgen: Target = {
     name: "tfgen",
@@ -373,7 +378,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     install_nodejs_sdk,
     install_sdks,
     test,
-  ];
+  ].filter((x): x is Target => x !== null);
 
 
   if (config.hybrid) {

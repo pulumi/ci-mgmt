@@ -21,3 +21,4 @@ plugins:
     version: "3.17.0"
   - name: random
     version: "4.8.2"
+team: providers

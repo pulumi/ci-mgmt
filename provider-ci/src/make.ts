@@ -18,7 +18,7 @@ export type Target = {
   /** Name of the target */
   name: string;
   /** Names or references of dependencies */
-  dependencies?: (string | Target)[];
+  dependencies?: (string | Target | null)[];
   /** Target-specific variable assignments */
   variables?: Variables;
   /** List of commands to execute
@@ -92,7 +92,9 @@ function renderCommands(
 
 function renderTarget(target: Target): string {
   const dependencies = target.dependencies ?? [];
-  const dependencyNames = dependencies.map(
+  const dependencyNames = dependencies.filter(
+    (x): x is (string | Target) => x !== null,
+  ).map(
     (d) => " " + (typeof d === "string" ? d : d.name)
   );
   const declaration = `${target.name}:${dependencyNames.join("")}`;
@@ -133,9 +135,12 @@ function descendentTargets(target: Target): Target[] {
   if (target.dependencies === undefined) {
     return [target];
   }
+  const dependencies: (string | Target)[] = target.dependencies.filter(
+    (x): x is (string | Target) => x !== null,
+  );
   return deduplicateTargets([
     target,
-    ...target.dependencies.flatMap((t) =>
+    ...dependencies.flatMap((t) =>
       typeof t !== "string" ? descendentTargets(t) : []
     ),
   ]);
