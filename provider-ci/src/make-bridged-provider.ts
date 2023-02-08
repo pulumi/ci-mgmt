@@ -33,12 +33,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     WORKING_DIR,
   } as const;
 
-
   const docs: Target = {
     name: "docs",
     phony: true,
-    commands: [config.docsCmd]
-  }
+    commands: [config.docsCmd],
+  };
 
   const install_plugins: Target = {
     name: "install_plugins",
@@ -62,8 +61,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
-  if (config.provider == "docker" ) {
-    tfgen.dependencies = [install_plugins, docs]
+  if (config.provider == "docker") {
+    tfgen.dependencies = [install_plugins, docs];
   }
 
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
@@ -263,34 +262,33 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
 
   const returnTargets = [
-        build,
-        only_build,
-        tfgen,
-        provider,
-        build_sdks,
-        build_nodejs,
-        build_python,
-        build_go,
-        build_dotnet,
-        build_java,
-        bin_pulumi_java_gen,
-        lint_provider,
-        cleanup,
-        help,
-        clean,
-        install_plugins,
-        install_dotnet_sdk,
-        install_python_sdk,
-        install_go_sdk,
-        install_java_sdk,
-        install_nodejs_sdk,
-        install_sdks,
-        test,
-      ]
-
+    build,
+    only_build,
+    tfgen,
+    provider,
+    build_sdks,
+    build_nodejs,
+    build_python,
+    build_go,
+    build_dotnet,
+    build_java,
+    bin_pulumi_java_gen,
+    lint_provider,
+    cleanup,
+    help,
+    clean,
+    install_plugins,
+    install_dotnet_sdk,
+    install_python_sdk,
+    install_go_sdk,
+    install_java_sdk,
+    install_nodejs_sdk,
+    install_sdks,
+    test,
+  ];
 
   if (config.hybrid) {
-    returnTargets.push(docs)
+    returnTargets.push(docs);
   }
 
   return {

@@ -51,6 +51,13 @@ export function CheckoutScriptsRepoStep(): Step {
   };
 }
 
+export function CheckoutSafeDirectoryStep(): Step {
+  return {
+    name: "Mark repo as safe directory",
+    run: "git config --global --add safe.directory /__w/pulumi-${{ env.PROVIDER }}/pulumi-${{ env.PROVIDER }}",
+  };
+}
+
 export function CheckoutTagsStep(): Step {
   return {
     name: "Unshallow clone for tags",

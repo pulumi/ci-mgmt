@@ -42,7 +42,7 @@ const BridgedConfig = z
       .array(z.object({ name: z.string(), version: z.string() }))
       .optional(),
     docsCmd: z.string().default(""),
-    hybrid: z.boolean().default(false)
+    hybrid: z.boolean().default(false),
   })
   .transform((input) => {
     if (input["upstream-provider-repo"] !== "") {
