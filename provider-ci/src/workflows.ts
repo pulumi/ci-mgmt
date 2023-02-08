@@ -901,6 +901,7 @@ export class LintProviderJob implements NormalJob {
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
+    steps.CheckoutSafeDirectoryStep(),
     steps.CheckoutTagsStep(),
     steps.InstallGo(),
     steps.InstallPulumiCtl(),
@@ -944,6 +945,7 @@ export class LintSDKJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.CheckoutScriptsRepoStep(),
+      steps.CheckoutSafeDirectoryStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
