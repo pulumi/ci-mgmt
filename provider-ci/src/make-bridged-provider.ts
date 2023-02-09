@@ -43,7 +43,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "install_plugins",
     phony: true,
     commands: [
-      "[ -x $(shell which pulumi) ] || curl -fsSL https://get.pulumi.com | sh",
+      '[ -x "$(shell command -v pulumi)" ] || curl -fsSL https://get.pulumi.com | sh',
       ...(config.plugins?.map(
         (p) => `pulumi plugin install resource ${p.name} ${p.version}`
       ) ?? []),
