@@ -73,8 +73,11 @@ jobs:
           title: "Update GitHub Actions workflows."
           path: pulumi-${{ matrix.provider }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
+      - id: team-responsible
+        run: |
+          echo "team=$(sed -nr 's/team: (.*)/\1/p' ci-mgmt/provider-ci/providers/${{ matrix.provider }}/config.yaml)" >> $GITHUB_OUTPUT
       - name: Set PR to auto-merge
-        if: steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true'
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && github.event.inputs.automerge == 'true' && steps.team-responsible.output.team != 'providers'
         run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-url }}"
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
