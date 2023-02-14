@@ -46,4 +46,5 @@ jobs:
           work-dir: infra/providers
           github-token: ${{ secrets.PULUMI_BOT_TOKEN }}
         env:
+          GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN_PRODUCTION }}
