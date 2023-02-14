@@ -7,12 +7,6 @@ import * as fs from 'fs';
 const tfProviders = fs.readdirSync('../../provider-ci/providers/');
 const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
-function hasManagedBranchProtection(provider: string): boolean {
-    // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to
-    // manage branch protections in this stack. This list might grow as needed.
-    return !provider.includes("azure-native");
-}
-
 const providers = [...tfProviders, ...nativeProviders].filter(hasManagedBranchProtection);
 
 function hasManagedBranchProtection(provider: string): boolean {
