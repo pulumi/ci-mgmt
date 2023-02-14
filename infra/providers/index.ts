@@ -9,6 +9,12 @@ const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
 const providers = [...tfProviders, ...nativeProviders];
 
+function hasManagedBranchProtection(provider: string): boolean {
+    // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to
+    // manage branch protections in this stack. This list might grow as needed.
+    return !provider.includes("azure-native");
+}
+
 for (let provider of providers) {
     const contexts: string[] = [
         "Update Changelog",
@@ -34,13 +40,16 @@ for (let provider of providers) {
         "main"
     ]
     for (let branch of branches) {
-        const masterBranchProtection = new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
+        new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
             repositoryId: `pulumi-${provider}`,
             pattern: `${branch}`,
             requiredStatusChecks: [{
                 strict: false,
                 contexts: contexts,
             }]
+        }, {
+            // Prepare for no-op delete of azure-native and similar.
+            retainOnDelete: !hasManagedBranchProtection(provider),
         })
     }
 }
