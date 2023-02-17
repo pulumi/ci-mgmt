@@ -8,3 +8,4 @@ env:
   AKAMAI_CLIENT_SECRET: ${{ secrets.AKAMAI_CLIENT_SECRET }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

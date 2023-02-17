@@ -9,3 +9,4 @@ plugins:
     version: "5.0.0"
   - name: tls
     version: "4.0.0"
+team: ecosystem

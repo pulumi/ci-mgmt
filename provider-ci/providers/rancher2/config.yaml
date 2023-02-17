@@ -8,3 +8,4 @@ env:
   RANCHER_URL: https://localhost # docker
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

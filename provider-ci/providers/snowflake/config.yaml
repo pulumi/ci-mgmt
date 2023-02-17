@@ -17,3 +17,4 @@ plugins:
     version: "5.10.0"
   - name: azure 
     version: "4.7.0"
+team: ecosystem

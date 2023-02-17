@@ -6,3 +6,4 @@ makeTemplate: bridged
 plugins:
   - name: gcp 
     version: "5.26.0"
+team: ecosystem

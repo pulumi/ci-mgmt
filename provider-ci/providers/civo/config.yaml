@@ -3,3 +3,4 @@ env:
   CIVO_TOKEN: ${{ secrets.CIVO_TOKEN }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

@@ -13,3 +13,4 @@ plugins:
     version: "4.0.0"
   - name: gcp 
     version: "5.0.0"
+team: ecosystem

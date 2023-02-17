@@ -4,3 +4,4 @@ env:
   PAGERDUTY_TOKEN: ${{ secrets.PAGERDUTY_TOKEN }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

@@ -13,3 +13,4 @@ plugins:
     version: "4.8.2"
   - name: aws 
     version: "5.18.0"
+team: ecosystem

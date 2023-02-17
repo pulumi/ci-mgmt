@@ -2,3 +2,4 @@ provider: cloudamqp
 major-version: 3
 upstream-provider-org: cloudamqp
 makeTemplate: bridged
+team: ecosystem

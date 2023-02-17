@@ -6,3 +6,4 @@ env:
   AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

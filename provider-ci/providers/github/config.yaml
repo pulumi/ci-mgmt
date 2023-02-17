@@ -6,3 +6,4 @@ env:
   GH_TESTING_TOKEN: ${{ secrets.GH_TESTING_TOKEN }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

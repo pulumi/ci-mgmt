@@ -13,3 +13,4 @@ upstream-provider-org: kreuzwerker
 makeTemplate: bridged
 docsCmd: "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
 hybrid: true
+team: ecosystem

@@ -9,3 +9,4 @@ env:
 upstream-provider-org: F5Networks
 upstream-provider-repo: terraform-provider-bigip
 makeTemplate: bridged
+team: ecosystem

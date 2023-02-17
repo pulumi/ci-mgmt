@@ -3,7 +3,8 @@ major-version: 4
 upstream-provider-org: cloudflare
 makeTemplate: bridged
 plugins:
-  - name: gcp 
+  - name: gcp
     version: "5.0.0"
-  - name: tls 
+  - name: tls
     version: "4.0.0"
+team: ecosystem

@@ -4,3 +4,4 @@ env:
   LINODE_TOKEN: ${{ secrets.LINODE_API_TOKEN }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

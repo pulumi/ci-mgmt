@@ -12,3 +12,4 @@ env:
   OS_PROJECT_DOMAIN_NAME: Default
 upstream-provider-org: terraform-provider-openstack
 makeTemplate: bridged
+team: ecosystem

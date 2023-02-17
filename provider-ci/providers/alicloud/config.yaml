@@ -17,3 +17,4 @@ makeTemplate: bridged
 plugins:
   - name: random 
     version: "4.3.1"
+team: ecosystem
