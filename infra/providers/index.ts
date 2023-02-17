@@ -7,26 +7,24 @@ import * as fs from 'fs';
 const tfProviders = fs.readdirSync('../../provider-ci/providers/');
 const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
-const providers = [...tfProviders, ...nativeProviders].filter(hasManagedBranchProtection);
-
 function hasManagedBranchProtection(provider: string): boolean {
     // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to
     // manage branch protections in this stack. This list might grow as needed.
     return !provider.includes("azure-native");
 }
 
-for (let provider of providers.filter(hasManagedBranchProtection)) {
+function defineResources(buildSdkJobName: string, provider: string) {
     const contexts: string[] = [
         "Update Changelog",
 
         "prerequisites",
         "lint",
         "lint-sdk",
-        "build_sdk (dotnet)",
-        "build_sdk (go)",
-        "build_sdk (java)",
-        "build_sdk (nodejs)",
-        "build_sdk (python)",
+        buildSdkJobName + " (dotnet)",
+        buildSdkJobName + " (go)",
+        buildSdkJobName + " (java)",
+        buildSdkJobName + " (nodejs)",
+        buildSdkJobName + " (python)",
         "test (dotnet)",
         "test (go)",
         "test (java)",
@@ -35,7 +33,6 @@ for (let provider of providers.filter(hasManagedBranchProtection)) {
 
         "sentinel",
     ];
-
     // enable branchProtection
     const branches: string[] = [
         "master",
@@ -51,4 +48,12 @@ for (let provider of providers.filter(hasManagedBranchProtection)) {
             }]
         })
     }
+}
+
+for (let bridgedProvider of [...tfProviders].filter(hasManagedBranchProtection)) {
+    defineResources("build_sdk", bridgedProvider);
+}
+
+for (let nativeProvider of [...nativeProviders].filter(hasManagedBranchProtection)) {
+    defineResources("build_sdks", nativeProvider);
 }
