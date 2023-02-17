@@ -18,8 +18,15 @@ function defineResources(buildSdkJobName: string, provider: string) {
         "Update Changelog",
 
         "prerequisites",
-        "lint",
-        "lint-sdk",
+
+        // Currently lint and lint-sdk are not universally present accross providers
+        // due to drift, and making them required checks makes PRs unmerge-able for example on pulumi/command.
+        //
+        // TODO figure out in this codebase which providers have them and require accordingly.
+        //
+        // "lint",
+        // "lint-sdk",
+
         buildSdkJobName + " (dotnet)",
         buildSdkJobName + " (go)",
         buildSdkJobName + " (java)",
