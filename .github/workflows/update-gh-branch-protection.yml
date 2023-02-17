@@ -27,6 +27,7 @@ jobs:
           github-token: ${{ secrets.PULUMI_BOT_TOKEN }}
           comment-on-pr: true
         env:
+          GITHUB_TOKEN: ${{ secrets.GH_BRANCH_PROTECTION_TOKEN }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN_PRODUCTION }}
   deployment:
     if: github.event_name == 'workflow_dispatch'
