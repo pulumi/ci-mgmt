@@ -19,21 +19,19 @@ for (let provider of providers.filter(hasManagedBranchProtection)) {
     const contexts: string[] = [
         "Update Changelog",
 
-        // Undoing #310 for a bit so we can get retainOnDelete rolled out.
-        //
-        // "prerequisites",
-        // "lint",
-        // "lint-sdk",
-        // "build_sdk (dotnet)",
-        // "build_sdk (go)",
-        // "build_sdk (java)",
-        // "build_sdk (nodejs)",
-        // "build_sdk (python)",
-        // "test (dotnet)",
-        // "test (go)",
-        // "test (java)",
-        // "test (nodejs)",
-        // "test (python)",
+        "prerequisites",
+        "lint",
+        "lint-sdk",
+        "build_sdk (dotnet)",
+        "build_sdk (go)",
+        "build_sdk (java)",
+        "build_sdk (nodejs)",
+        "build_sdk (python)",
+        "test (dotnet)",
+        "test (go)",
+        "test (java)",
+        "test (nodejs)",
+        "test (python)",
 
         "sentinel",
     ];
