@@ -15,7 +15,7 @@ function hasManagedBranchProtection(provider: string): boolean {
     return !provider.includes("azure-native");
 }
 
-for (let provider of providers) {
+for (let provider of providers.filter(hasManagedBranchProtection)) {
     const contexts: string[] = [
         "Update Changelog",
 
@@ -51,9 +51,6 @@ for (let provider of providers) {
                 strict: false,
                 contexts: contexts,
             }]
-        }, {
-            // Prepare for no-op delete of azure-native and similar.
-            retainOnDelete: !hasManagedBranchProtection(provider),
         })
     }
 }
