@@ -177,6 +177,10 @@ jobs:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
         cache: gradle
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: "7.6"
     - name: Download provider + tfgen binaries
       if: ${{ matrix.language != 'dotnet' }}
       uses: actions/download-artifact@v2
@@ -275,6 +279,10 @@ jobs:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
         cache: gradle
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: "7.6"
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v2
       with:
@@ -477,6 +485,10 @@ jobs:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
         cache: gradle
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: "7.6"
     - name: Download java SDK
       uses: actions/download-artifact@v2
       with:

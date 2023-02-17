@@ -31,20 +31,17 @@ export type Target = {
   autoTouch?: boolean;
 };
 
-export type Command =
-  | string
-  | string[]
-  | Conditional<Command>
+export type Command = string | string[] | Conditional<Command>;
 
 // Note: Conditional cannot be an interface because interfaces prevent recursive
 // definition.
 // Note: Nested conditionals are not supported.
 export interface Conditional<T> {
   parts: {
-    test: string,
-    then: T[],
-  }[]
-  end: string,
+    test: string;
+    then: T[];
+  }[];
+  end: string;
 }
 
 function isConditional<T>(value: unknown): value is Conditional<T> {
@@ -72,7 +69,9 @@ const indent = "\t";
 
 function renderCommand(cmd: Command) {
   if (isConditional(cmd)) {
-    return renderConditional(cmd, (c: Command[]) => renderCommands(c).join("\n"));
+    return renderConditional(cmd, (c: Command[]) =>
+      renderCommands(c).join("\n")
+    );
   }
   if (Array.isArray(cmd)) {
     return cmd.map((step) => indent + step).join(" && \\\n" + indent);
@@ -80,23 +79,26 @@ function renderCommand(cmd: Command) {
   return indent + cmd;
 }
 
-function renderConditional<T>(cond: Conditional<T>, render: (v: T[]) => string): string {
-  return cond.parts.map((part) => part.test + "\n" + render(part.then)).join("\n") + "\n" + cond.end;
+function renderConditional<T>(
+  cond: Conditional<T>,
+  render: (v: T[]) => string
+): string {
+  return (
+    cond.parts.map((part) => part.test + "\n" + render(part.then)).join("\n") +
+    "\n" +
+    cond.end
+  );
 }
 
-function renderCommands(
-  commands?: Command[] | undefined
-): string[] {
+function renderCommands(commands?: Command[] | undefined): string[] {
   return commands?.map(renderCommand) ?? [];
 }
 
 function renderTarget(target: Target): string {
   const dependencies = target.dependencies ?? [];
-  const dependencyNames = dependencies.filter(
-    (x): x is (string | Target) => x !== null,
-  ).map(
-    (d) => " " + (typeof d === "string" ? d : d.name)
-  );
+  const dependencyNames = dependencies
+    .filter((x): x is string | Target => x !== null)
+    .map((d) => " " + (typeof d === "string" ? d : d.name));
   const declaration = `${target.name}:${dependencyNames.join("")}`;
   const commands = renderCommands(target.commands);
   const suffixCommands =
@@ -136,7 +138,7 @@ function descendentTargets(target: Target): Target[] {
     return [target];
   }
   const dependencies: (string | Target)[] = target.dependencies.filter(
-    (x): x is (string | Target) => x !== null,
+    (x): x is string | Target => x !== null
   );
   return deduplicateTargets([
     target,

@@ -257,6 +257,16 @@ export function InstallJava(version?: string): Step {
   };
 }
 
+export function InstallGradle(version: string): Step {
+  return {
+    name: "Setup Gradle",
+    uses: action.setupGradle,
+    with: {
+      "gradle-version": version,
+    },
+  };
+}
+
 export function InstallPython(version?: string): Step {
   return {
     name: "Setup Python",
