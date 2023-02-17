@@ -4,3 +4,4 @@ env:
   GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 upstream-provider-org: gitlabhq
 makeTemplate: bridged
+team: ecosystem

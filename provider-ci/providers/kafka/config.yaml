@@ -3,3 +3,4 @@ major-version: 3
 docker: true
 upstream-provider-org: Mongey
 makeTemplate: bridged
+team: ecosystem

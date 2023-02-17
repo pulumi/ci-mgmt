@@ -3,3 +3,4 @@ major-version: 1
 lint: false
 upstream-provider-org: hashicorp
 makeTemplate: bridged
+team: ecosystem

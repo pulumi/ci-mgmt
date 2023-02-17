@@ -6,3 +6,4 @@ env:
 upstream-provider-org: equinix
 upstream-provider-repo: terraform-provider-metal
 makeTemplate: bridged
+team: ecosystem

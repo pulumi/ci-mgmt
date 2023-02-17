@@ -8,3 +8,4 @@ plugins:
     version: "4.0.0"
   - name: vault 
     version: "4.0.0"
+team: ecosystem

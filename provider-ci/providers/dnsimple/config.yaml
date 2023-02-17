@@ -5,3 +5,4 @@ env:
   DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

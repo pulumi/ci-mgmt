@@ -4,3 +4,4 @@ env:
   HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
 upstream-provider-org: hetznercloud
 makeTemplate: bridged
+team: ecosystem

@@ -7,3 +7,4 @@ makeTemplate: bridged
 plugins:
   - name: aws 
     version: "4.0.0"
+team: ecosystem

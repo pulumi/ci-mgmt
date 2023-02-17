@@ -2,3 +2,4 @@ provider: vsphere
 major-version: 4
 upstream-provider-org: pulumi
 makeTemplate: bridged
+team: ecosystem

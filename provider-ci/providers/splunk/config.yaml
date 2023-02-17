@@ -7,3 +7,4 @@ env:
   SPLUNK_PASSWORD: password
 upstream-provider-org: splunk
 makeTemplate: bridged
+team: ecosystem

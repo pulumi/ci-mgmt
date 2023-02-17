@@ -9,3 +9,4 @@ plugins:
     version: "5.21.1"
   - name: azure
     version: "5.24.0"
+team: ecosystem
