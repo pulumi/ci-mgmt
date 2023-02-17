@@ -10,8 +10,7 @@ const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 const providers = [...tfProviders, ...nativeProviders].filter(hasManagedBranchProtection);
 
 function hasManagedBranchProtection(provider: string): boolean {
-    return provider.includes("venafi");
-
+    return true;
     // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to
     // manage branch protections in this stack. This list might grow as needed.
     // return !provider.includes("azure-native");
