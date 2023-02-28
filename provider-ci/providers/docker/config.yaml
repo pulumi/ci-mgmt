@@ -1,6 +1,7 @@
 provider: docker
 major-version: 4
 aws: true
+gcp: true
 env:
   AWS_REGION: us-west-2
   ARM_CLIENT_ID: "30e520fa-12b4-4e21-b473-9426c5ac2e1e"
@@ -8,6 +9,13 @@ env:
   ARM_TENANT_ID: "706143bc-e1d4-4593-aee2-c9dc60ab9be7"
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   AZURE_LOCATION: westus
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
+  GOOGLE_PROJECT: pulumi-ci-gcp-provider
+  GOOGLE_PROJECT_NUMBER: 895284651812
+  GOOGLE_REGION: us-central1
+  GOOGLE_ZONE: us-central1-a
   PULUMI_GO_DEP_ROOT: /home/runner/work/pulumi-docker
 upstream-provider-org: kreuzwerker
 makeTemplate: bridged

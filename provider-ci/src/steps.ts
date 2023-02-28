@@ -80,6 +80,16 @@ export function GoogleAuth(requiresGcp?: boolean): Step {
   return {};
 }
 
+export function LoginGCloudDocker(requiresGcp?: boolean, provider?: string): Step {
+  if (requiresGcp && provider == "docker") {
+    return {
+      name: "Login to Google Cloud Registry",
+      run: "gcloud --quiet auth configure-docker",
+    };
+  }
+  return {};
+}
+
 export function SetupGCloud(requiresGcp?: boolean): Step {
   if (requiresGcp) {
     return {
