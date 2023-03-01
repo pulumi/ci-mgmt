@@ -1,0 +1,58 @@
+# This is the version of update-bridge=all-providers.yml scoped down to Ecosystem team owned providers.
+#
+# Generates a PR for the files in provider-ci/providers/* to each corresponding Pulumi provider.
+#
+# Note that this workflow does not generate any files - workflows must already be generated and committed to this repo
+# when this workflow is run.
+name: Update bridge, ecosystem providers
+on:
+  workflow_dispatch:
+    inputs:
+      bridge_version:
+        description:
+          The version of pulumi/pulumi-terraform-bridge to update to. Do
+          not include the 'v' prefix. Must be major version 3.
+        required: true
+        type: string
+      sdk_version:
+        description:
+          The version of pulumi/pulumi/sdk to update to. Do not include
+          the 'v' prefix. Must be major version 3.
+        required: true
+        type: string
+      automerge:
+        description: Mark created PRs for auto-merging?
+        required: true
+        type: boolean
+        default: false
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+jobs:
+  generate-providers-list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: get-providers
+        run: echo "::set-output name=providers::$(python generate_providers_list.py --team ecosystem)'"
+        working-directory: scripts
+    outputs:
+      providers: ${{ steps.get-providers.outputs.providers }}
+
+  update-bridge:
+    needs: generate-providers-list
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # GitHub recommends only issuing 1 API request per second, and never
+      # concurrently.  For more information, see:
+      # https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      max-parallel: 1
+      matrix:
+        provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
+    steps:
+      - name: pulumi-${{ matrix.provider }}
+        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ matrix.provider }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }} -f automerge=${{ github.events.inputs.automerge }}
+      # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      - name: Sleep to prevent hitting secondary rate limits
+        run: sleep 1
