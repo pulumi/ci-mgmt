@@ -138,13 +138,13 @@
               "enum": [
                 "ecosystem",
                 "providers"
-              ],
-              "default": "ecosystem"
+              ]
             }
           },
           "required": [
             "provider",
-            "upstream-provider-org"
+            "upstream-provider-org",
+			"team"
           ],
           "additionalProperties": false
         },
