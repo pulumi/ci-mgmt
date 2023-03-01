@@ -132,6 +132,14 @@
             "hybrid": {
               "type": "boolean",
               "default": false
+            },
+            "team": {
+              "type": "string",
+              "enum": [
+                "ecosystem",
+                "providers"
+              ],
+              "default": "ecosystem"
             }
           },
           "required": [

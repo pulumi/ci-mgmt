@@ -1,6 +1,6 @@
 // Languages
 export const goLint = "golangci/golangci-lint-action@v3";
-export const setupGo = "actions/setup-go@v2";
+export const setupGo = "actions/setup-go@v3";
 export const setupDotNet = "actions/setup-dotnet@v1";
 export const setupJava = "actions/setup-java@v3";
 export const setupGradle = "gradle/gradle-build-action@v2";
