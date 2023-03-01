@@ -132,11 +132,19 @@
             "hybrid": {
               "type": "boolean",
               "default": false
+            },
+            "team": {
+              "type": "string",
+              "enum": [
+                "ecosystem",
+                "providers"
+              ]
             }
           },
           "required": [
             "provider",
-            "upstream-provider-org"
+            "upstream-provider-org",
+			"team"
           ],
           "additionalProperties": false
         },

@@ -67,7 +67,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
     - name: Install Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install Pulumi CLI
@@ -111,7 +111,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
@@ -247,7 +247,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
@@ -408,7 +408,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
@@ -504,7 +504,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install aws-iam-authenticator
