@@ -744,6 +744,7 @@ export class TestsJob implements NormalJob {
       steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
+      steps.LoginGCloudDocker(opts.gcp, opts.provider),
       steps.InstallSDKDeps(),
       steps.SetupGotestfmt(),
       steps.RunTests(),
