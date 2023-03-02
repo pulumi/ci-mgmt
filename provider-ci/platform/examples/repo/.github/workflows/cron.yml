@@ -69,7 +69,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.GOVERSION }}
+        go-version: 1.20.1
     - name: Install Pulumi CLI
       uses: pulumi/action-install-pulumi-cli@v2
     - name: Print CLI version
@@ -113,7 +113,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.GOVERSION }}
+        go-version: 1.20.1
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -249,7 +249,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.GOVERSION }}
+        go-version: 1.20.1
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -410,7 +410,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.GOVERSION }}
+        go-version: 1.20.1
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
@@ -506,7 +506,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ env.GOVERSION }}
+        go-version: 1.20.1
     - name: Install aws-iam-authenticator
       run: >-
         curl -o aws-iam-authenticator
