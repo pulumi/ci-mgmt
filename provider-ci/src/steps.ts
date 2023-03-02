@@ -154,7 +154,7 @@ export function ConfigureAwsCredentialsForCoverageDataUpload(): Step {
 }
 
 export function InstallGo(version?: string): Step {
-	version = "1.20.1"
+	version = "1.19.6"
   return {
     name: "Install Go",
     uses: action.setupGo,
