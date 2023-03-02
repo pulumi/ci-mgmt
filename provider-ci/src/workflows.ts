@@ -286,7 +286,7 @@ export function UpdatePulumiTerraformBridgeWorkflow(
       update_bridge: new EmptyJob("update-bridge")
         .addStep(steps.CheckoutRepoStep())
         .addStep(steps.CheckoutTagsStep())
-        .addStep(steps.InstallGo("1.19.6"))
+        .addStep(steps.InstallGo())
         .addStep(steps.InstallPulumiCtl())
         .addStep(steps.InstallPulumiCli())
         .addStep(steps.InstallDotNet())
