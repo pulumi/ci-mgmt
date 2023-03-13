@@ -28,7 +28,7 @@ builds:
   - linux
   ignore: []
   ldflags:
-  - -X github.com/pulumi/pulumi-ns1/provider/v2/pkg/version.Version={{.Tag}}
+  - -X github.com/pulumi/pulumi-ns1/provider/v3/pkg/version.Version={{.Tag}}
   main: ./cmd/pulumi-resource-ns1/
 changelog:
   skip: true

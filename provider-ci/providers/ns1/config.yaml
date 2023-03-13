@@ -1,4 +1,5 @@
 provider: ns1
+major-version: 3
 env:
   NS1_APIKEY: ${{ secrets.NS1_APIKEY }}
 upstream-provider-org: pulumi
