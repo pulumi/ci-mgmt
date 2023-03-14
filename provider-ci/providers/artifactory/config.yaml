@@ -1,11 +1,11 @@
 provider: artifactory
-major-version: 2
+major-version: 3
 env:
   ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
   ARTIFACTORY_ACCESS_TOKEN: ${{ secrets.ARTIFACTORY_ACCESS_TOKEN}}
   PULUMI_MISSING_DOCS_ERROR: true
 upstream-provider-org: jfrog
-upstream-provider-major-version: /v2
+upstream-provider-major-version: /v7
 provider-default-branch: main
 makeTemplate: bridged
 plugins:
