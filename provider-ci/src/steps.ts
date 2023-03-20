@@ -1,6 +1,7 @@
 import { check } from "yargs";
 import * as action from "./action-versions";
 import { NormalJob } from "./github-workflow";
+import { goVersion } from "./workflows";
 
 export type Step = Required<NormalJob>["steps"][0];
 
@@ -153,13 +154,12 @@ export function ConfigureAwsCredentialsForCoverageDataUpload(): Step {
   };
 }
 
-export function InstallGo(version?: string): Step {
-  version = "1.20.1";
+export function InstallGo(): Step {
   return {
     name: "Install Go",
     uses: action.setupGo,
     with: {
-      "go-version": version || "${{ env.GOVERSION }}",
+      "go-version": goVersion || "${{ env.GOVERSION }}",
     },
   };
 }
