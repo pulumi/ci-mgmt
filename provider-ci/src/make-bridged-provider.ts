@@ -158,8 +158,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
-  if (config.provider == "docker") {
-    tfgen.dependencies = [install_plugins, docs];
+  if (config.hybrid) {
+    tfgen.dependencies?.push(docs);
   }
 
   const ldFlagStatements = ["-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)"];
