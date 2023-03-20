@@ -1,5 +1,5 @@
 provider: aiven
-major-version: 5
+major-version: 6
 lint: false
 env:
   AIVEN_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
