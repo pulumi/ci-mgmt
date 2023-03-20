@@ -4,10 +4,13 @@ import * as steps from "./steps";
 import { Step } from "./steps";
 
 const pythonVersion = "3.9";
-const goVersion = "1.19.x";
+export const goVersion = "1.20.1";
 const nodeVersion = "16.x";
 const dotnetVersion = "6.0.x\n3.1.301\n";
 const javaVersion = "11";
+
+// We need to make sure that this container uses the same version of Go that we install.
+const golangciLintContainerVersion = "v1.51";
 
 const env = (opts: BridgedConfig) =>
   Object.assign(
@@ -901,7 +904,7 @@ export class PublishJavaSDKJob implements NormalJob {
 
 export class LintProviderJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  container = "golangci/golangci-lint:latest";
+  container = `golangci/golangci-lint:${golangciLintContainerVersion}`;
   steps = [
     steps.CheckoutRepoStep(),
     steps.CheckoutScriptsRepoStep(),
@@ -938,7 +941,7 @@ export class LintProviderJob implements NormalJob {
 export class LintSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "build_sdk";
-  container = "golangci/golangci-lint:latest";
+  container = `golangci/golangci-lint:${golangciLintContainerVersion}`;
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
