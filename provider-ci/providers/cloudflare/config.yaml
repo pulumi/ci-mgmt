@@ -1,5 +1,5 @@
 provider: cloudflare
-major-version: 4
+major-version: 5
 upstream-provider-org: cloudflare
 makeTemplate: bridged
 plugins:
