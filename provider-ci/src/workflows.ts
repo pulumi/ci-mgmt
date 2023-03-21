@@ -707,7 +707,7 @@ export class TestsJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "build_sdk";
   strategy = {
-    "fail-fast": true,
+    "fail-fast": false,
     matrix: {
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
