@@ -362,6 +362,13 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
 
+  // We sometimes add regression unit tests under the examples/ folder, and those depend on upstream code to be present
+  // to link against. This is not ideal and perhaps eventually a dedicated tests/ folder with its own go.mod to not
+  // pollute the provider with test deps is more appropriate.
+  if (upstream != null) {
+      test.dependencies = [upstream];
+  }
+
   const targets = [
     upstream,
     startPatch,
