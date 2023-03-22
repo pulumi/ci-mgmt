@@ -127,7 +127,7 @@ else
 	@cd upstream && git commit --quiet -m "existing patches"
 endif
 
-test:
+test: upstream
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
 tfgen: install_plugins upstream

@@ -366,7 +366,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   // to link against. This is not ideal and perhaps eventually a dedicated tests/ folder with its own go.mod to not
   // pollute the provider with test deps is more appropriate.
   if (upstream != null) {
-      test.dependencies = [upstream];
+    test.dependencies = [upstream];
   }
 
   const targets = [
