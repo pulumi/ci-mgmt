@@ -6,3 +6,4 @@ env:
 upstream-provider-org: pulumi
 makeTemplate: bridged
 team: ecosystem
+extra-ld-flags: true

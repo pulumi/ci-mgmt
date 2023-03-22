@@ -32,6 +32,7 @@ const BridgedConfig = z
     "provider-default-branch": z.string().default("master"),
     "golangci-timeout": z.string().default("20m"),
     "major-version": z.number().default(2),
+	"extra-ld-flags": z.boolean().default(false),
     skipTfGen: z.boolean().default(false),
     providerVersion: z.string().default(""),
     javaGenVersion: z.string().default(""),
