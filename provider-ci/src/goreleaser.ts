@@ -113,6 +113,10 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
       ];
     }
 
+	if (opts.provider === "newrelic") {
+		ldflags.push(`-X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi`)
+	}
+
     if (opts.providerVersion !== "") {
       ldflags.push(`-X ${opts.providerVersion}={{.Tag}}`);
     }
