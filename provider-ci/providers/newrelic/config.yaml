@@ -6,3 +6,5 @@ env:
 upstream-provider-org: pulumi
 makeTemplate: bridged
 team: ecosystem
+extra-ld-flags:
+- -X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi

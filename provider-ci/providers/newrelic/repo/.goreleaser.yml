@@ -29,6 +29,8 @@ builds:
   ignore: []
   ldflags:
   - -X github.com/pulumi/pulumi-newrelic/provider/v5/pkg/version.Version={{.Tag}}
+  - -X
+    github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi
   main: ./cmd/pulumi-resource-newrelic/
 changelog:
   filters:

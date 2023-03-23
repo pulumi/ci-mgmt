@@ -83,6 +83,7 @@ interface GoReleaserOpts {
   "major-version": number;
   providerVersion: string;
   skipTfGen: boolean;
+  "extra-ld-flags"?: string[];
 }
 
 export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
@@ -111,6 +112,15 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
       ldflags = [
         `-X github.com/pulumi/pulumi-${opts.provider}/provider/pkg/version.Version={{.Tag}}`,
       ];
+    }
+
+    if (opts["extra-ld-flags"]) {
+        const flags = opts["extra-ld-flags"]
+        if (flags) {
+            for (var f of flags) {
+                ldflags.push(f)
+            }
+        }
     }
 
     if (opts.providerVersion !== "") {
