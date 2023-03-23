@@ -83,12 +83,8 @@ interface GoReleaserOpts {
   "major-version": number;
   providerVersion: string;
   skipTfGen: boolean;
-  "extra-ld-flags": boolean;
+  "extra-ld-flags"?: string[];
 }
-
-const extraLdFlags = new Map<string, string[]>([
-    ['newrelic', [`-X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi`]],
-]);
 
 export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
   name?: string;
@@ -118,9 +114,8 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
       ];
     }
 
-    console.log("here", opts, opts["extra-ld-flags"])
     if (opts["extra-ld-flags"]) {
-        var flags = extraLdFlags.get(opts.provider)
+        var flags = opts["extra-ld-flags"]
         if (flags) {
             for (var f of flags) {
                 ldflags.push(f)
