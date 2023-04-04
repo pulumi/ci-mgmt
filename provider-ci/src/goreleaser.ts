@@ -115,12 +115,12 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     }
 
     if (opts["extra-ld-flags"]) {
-        const flags = opts["extra-ld-flags"]
-        if (flags) {
-            for (var f of flags) {
-                ldflags.push(f)
-            }
+      const flags = opts["extra-ld-flags"];
+      if (flags) {
+        for (var f of flags) {
+          ldflags.push(f);
         }
+      }
     }
 
     if (opts.providerVersion !== "") {

@@ -20,6 +20,7 @@ env:
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   GOVERSION: 1.20.1
+  GOWORK: off
   JAVAVERSION: "11"
   NODEVERSION: 16.x
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

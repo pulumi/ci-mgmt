@@ -10,9 +10,13 @@ type Assignment =
        * - recursive `=`
        * @default "simple" */
       type?: AssignmentType;
+      /** Whether to export the variable */
+      export?: boolean;
     };
 
-export type Variables = Record<string, Assignment>;
+type VariableAssignment = Assignment | Conditional<Assignment>;
+
+export type Variables = Record<string, VariableAssignment>;
 
 export type Target = {
   /** Name of the target */
@@ -76,6 +80,9 @@ function renderCommand(cmd: Command) {
   if (Array.isArray(cmd)) {
     return cmd.map((step) => indent + step).join(" && \\\n" + indent);
   }
+  if (cmd.startsWith("#")) {
+    return cmd;
+  }
   return indent + cmd;
 }
 
@@ -109,12 +116,21 @@ function renderTarget(target: Target): string {
   return [...variables, declaration, ...commands, ...suffixCommands].join("\n");
 }
 
-function renderVariable([name, assignment]: [string, Assignment]): string {
+function renderVariable([name, assignment]: [
+  string,
+  VariableAssignment
+]): string {
+  if (isConditional(assignment)) {
+    return renderConditional(assignment, (a: VariableAssignment[]) =>
+      a.map((a) => renderVariable([name, a])).join("\n")
+    );
+  }
   if (typeof assignment === "string") {
     return `${name} := ${assignment}`;
   }
   const assignmentToken = getAssignmentToken(assignment.type ?? "simple");
-  return `${name} ${assignmentToken} ${assignment.value}`;
+  const exportModifier = assignment.export ? "export " : "";
+  return `${exportModifier}${name} ${assignmentToken} ${assignment.value}`;
 }
 
 function phonyTarget(targets: Target[]): Target | undefined {
@@ -183,5 +199,7 @@ export function render(makefile: Makefile): string {
   }
   const renderedTargets = sortedTargets.map(renderTarget);
 
-  return [variableLines.join("\n"), renderedTargets.join("\n\n")].join("\n\n");
+  return (
+    [variableLines.join("\n"), renderedTargets.join("\n\n")].join("\n\n") + "\n"
+  );
 }

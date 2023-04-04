@@ -5,13 +5,16 @@ import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import { buildMakefile } from "./makefiles";
 import { BridgedConfig, getConfig } from "./config";
+import * as fs from "fs/promises";
 
 export interface ProviderFile {
   path: string;
   data: unknown;
 }
 
-export const buildProviderFiles = (provider: string): ProviderFile[] => {
+export const buildProviderFiles = async (
+  provider: string
+): Promise<ProviderFile[]> => {
   const config = getConfig(provider);
   if (config.template !== "bridged") {
     throw new Error(
@@ -21,7 +24,7 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   return generateProviderFiles(config);
 };
 
-export function generateProviderFiles(config: BridgedConfig) {
+export async function generateProviderFiles(config: BridgedConfig) {
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
   const files: ProviderFile[] = [
     {
@@ -100,6 +103,13 @@ export function generateProviderFiles(config: BridgedConfig) {
     files.push({
       path: "Makefile",
       data: buildMakefile(config),
+    });
+    files.push({
+      path: "CONTRIBUTING.md",
+      data: await fs.readFile(
+        path.join(__dirname, "templates", "CONTRIBUTING.md"),
+        "utf8"
+      ),
     });
     if (config.makeTemplate === "bridged-v2") {
       files.push(

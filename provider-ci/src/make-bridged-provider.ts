@@ -1,5 +1,5 @@
 import { BridgedConfig } from "./config";
-import { Makefile, Target } from "./make";
+import { Makefile, Target, Variables } from "./make";
 
 export function bridgedProvider(config: BridgedConfig): Makefile {
   const PACK = config.provider;
@@ -18,7 +18,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
-  const variables = {
+  const variables: Variables = {
     PACK,
     ORG,
     PROJECT,
@@ -31,7 +31,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     JAVA_GEN_VERSION,
     TESTPARALLELISM,
     WORKING_DIR,
-  } as const;
+  };
 
   const docs: Target = {
     name: "docs",
@@ -43,13 +43,14 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "install_plugins",
     phony: true,
     commands: [
-      '[ -x "$(shell command -v pulumi 2>/dev/null)" ] || curl -fsSL https://get.pulumi.com | sh',
+      '@[ -x "$(shell command -v pulumi 2>/dev/null)" ] || curl -fsSL https://get.pulumi.com | sh',
       ...(config.plugins?.map(
         (p) => `pulumi plugin install resource ${p.name} ${p.version}`
       ) ?? []),
     ],
   };
 
+  let workspace: Target | null = null;
   let startPatch: Target | null = null;
   let finishPatch: Target | null = null;
   let upstream: Target | null = null;
@@ -145,12 +146,50 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
         ],
       ],
     };
+
+    workspace = {
+      name: "workspace",
+      phony: true,
+      dependencies: [upstream],
+      commands: [
+        `# based on the use of the GOWORK env var:`,
+        `# - GOWORK=off     => a release build, uses only single-module dependencies and replace directives`,
+        `# - default        => a local build, we use the user's Go workspace, or create one`,
+        {
+          parts: [
+            {
+              test: "ifeq ($(GOWORK),off)",
+              then: [
+                `@echo "# Creating a release build. For local development, unset the GOWORK environment variable."`,
+              ],
+            },
+            {
+              test: "else",
+              then: [
+                `@echo "# ⚠️ Creating a local dev build. For release builds prior to making a pull request, set GOWORK=off."`,
+                `@if [ ! -f "$$(go env GOWORK)" ]; then \\`,
+                `  echo "go work init"; \\`,
+                `  go work init; \\`,
+                `fi`,
+                `# Codegen prior to adopting Go workspaces and this make target used "fake" go.mod files to exclude`,
+                `# the generated code from the Go toolchain. We want to hide those from 'go work use -r' so that they`,
+                `# are not included in the workspace. To do that, we rename them to go.mod.tmp, and restore after.`,
+                `@find sdk/*/* -name go.mod -exec sh -c 'mv "$$1" "$$1.tmp"' sh {} \\;`,
+                `go work use -r .`,
+                `@find sdk/*/* -name go.mod.tmp -exec sh -c 'mv "$$1" "$\${1%.tmp}"' sh {} \\;`,
+              ],
+            },
+          ],
+          end: "endif",
+        },
+      ],
+    };
   }
 
   const tfgen: Target = {
     name: "tfgen",
     phony: true,
-    dependencies: [install_plugins, upstream],
+    dependencies: [workspace, install_plugins, upstream],
     commands: [
       '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
@@ -170,7 +209,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const provider: Target = {
     name: "provider",
     phony: true,
-    dependencies: [tfgen, install_plugins],
+    dependencies: [workspace, tfgen, install_plugins],
     commands: [
       `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
@@ -218,7 +257,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const build_go: Target = {
     name: "build_go",
     phony: true,
-    dependencies: [upstream],
+    dependencies: [workspace, upstream],
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
       // The following pulls out the `module` line from go.mod to determine the right
@@ -228,6 +267,13 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       `cd sdk && go list \`grep -e "^module" go.mod | cut -d ' ' -f 2\`/go/... | xargs go build`,
     ],
   };
+  if (config.team === "ecosystem") {
+    // Go workspaces simplifies this and we just tidy & `go vet`.
+    build_go.commands = [
+      "$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/",
+      `cd sdk && go mod tidy && go vet ./go/...`,
+    ];
+  }
   const build_dotnet: Target = {
     name: "build_dotnet",
     phony: true,
@@ -342,12 +388,24 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const defaultTarget: Target = {
     name: "development",
     phony: true,
-    dependencies: [install_plugins, provider, build_sdks, install_sdks],
+    dependencies: [
+      workspace,
+      install_plugins,
+      provider,
+      build_sdks,
+      install_sdks,
+    ],
   };
   const build: Target = {
     name: "build",
     phony: true,
-    dependencies: [install_plugins, provider, build_sdks, install_sdks],
+    dependencies: [
+      workspace,
+      install_plugins,
+      provider,
+      build_sdks,
+      install_sdks,
+    ],
   };
   const only_build: Target = {
     name: "only_build",
@@ -363,6 +421,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   };
 
   const targets = [
+    workspace,
     upstream,
     startPatch,
     finishPatch,
