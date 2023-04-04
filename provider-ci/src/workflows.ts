@@ -38,6 +38,7 @@ const env = (opts: BridgedConfig) =>
       PYTHONVERSION: pythonVersion,
       DOTNETVERSION: dotnetVersion,
       JAVAVERSION: javaVersion,
+      GOWORK: "off",
     },
     opts.env
   );
@@ -411,6 +412,8 @@ sdk/java/.gradle
 sdk/java/gradle
 sdk/java/gradlew
 sdk/java/gradlew.bat
+go.work
+go.work.sum
 EOF`,
         })
         .addStep({
