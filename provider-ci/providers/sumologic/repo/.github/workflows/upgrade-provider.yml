@@ -4,7 +4,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   update_bridge:
-    if: ${{ github.event.issues.issue.title }} =~ 'Upgrade terraform-provider-'
+    if: ${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'
     name: upgrade-provider
     runs-on: ubuntu-latest
     steps:
@@ -14,14 +14,14 @@ jobs:
         script: |-
           await github.rest.actions.createWorkflowDispatch({
               owner: 'pulumi',
-              repo: 'ci-mgmt',
+              repo: 'upgrade-provider',
               workflow_id: 'upgrade-provider.yml',
               ref: 'main',
               inputs: {
-          	    "provider-name": pulumi-sumologic
+          	    'provider-name': 'pulumi-sumologic'
               }})
 name: Upgrade provider
 on:
-  issues:
+  pull_request:
     types:
     - opened

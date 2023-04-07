@@ -14,11 +14,11 @@ jobs:
         script: |-
           await github.rest.actions.createWorkflowDispatch({
               owner: 'pulumi',
-              repo: 'ci-mgmt',
+              repo: 'upgrade-provider',
               workflow_id: 'upgrade-provider.yml',
               ref: 'main',
               inputs: {
-          	    "provider-name": pulumi-f5bigip
+          	    'provider-name': 'pulumi-f5bigip'
               }})
 name: Upgrade provider
 on:

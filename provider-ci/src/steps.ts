@@ -731,11 +731,11 @@ export function UpgradeProviderStep(providerName: string): Step {
 	  "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
       script: `await github.rest.actions.createWorkflowDispatch({
     owner: 'pulumi',
-    repo: 'ci-mgmt',
+    repo: 'upgrade-provider',
     workflow_id: 'upgrade-provider.yml',
     ref: 'main',
     inputs: {
-	    "provider-name": ${providerName}
+	    'provider-name': '${providerName}'
     }})`,
     },
   };
