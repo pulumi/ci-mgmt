@@ -36,3 +36,4 @@ export const pullRequest = "repo-sync/pull-request@v2.6.2";
 export const prComment = "thollander/actions-comment-pull-request@v1";
 export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const uploadArtifact = "actions/upload-artifact@v2";
+export const githubScript = "actions/github-script@v6";

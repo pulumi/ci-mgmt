@@ -723,3 +723,20 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
+
+export function UpgradeProviderStep(providerName: string): Step {
+  return {
+    uses: action.githubScript,
+    with: {
+	  "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
+      script: `await github.rest.actions.createWorkflowDispatch({
+    owner: 'pulumi',
+    repo: 'upgrade-provider',
+    workflow_id: 'upgrade-provider.yml',
+    ref: 'main',
+    inputs: {
+	    'provider-name': '${providerName}'
+    }})`,
+    },
+  };
+}
