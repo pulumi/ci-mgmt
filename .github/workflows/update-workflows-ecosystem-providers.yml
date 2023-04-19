@@ -6,6 +6,9 @@
 # when this workflow is run.
 name: Update GH workflows, ecosystem providers
 on:
+  schedule:
+  # 5 AM UTC ~ 10 PM PDT - specifically selected to avoid putting load on the CI system during working hours.
+  - cron: 0 5 * * *
   workflow_dispatch:
     inputs:
       automerge:
