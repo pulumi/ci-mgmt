@@ -725,17 +725,18 @@ export function SendCodegenWarnCommentPr(): Step {
 }
 
 export function UpgradeProviderStep(providerName: string): Step {
+  const indent_t4 = "\t    ";
   return {
     uses: action.githubScript,
     with: {
-	  "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
+      "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
       script: `await github.rest.actions.createWorkflowDispatch({
     owner: 'pulumi',
     repo: 'upgrade-provider',
     workflow_id: 'upgrade-provider.yml',
     ref: 'main',
     inputs: {
-	    'provider-name': '${providerName}'
+${indent_t4}'provider-name': '${providerName}'
     }})`,
     },
   };

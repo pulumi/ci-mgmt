@@ -62,10 +62,10 @@ export function generateProviderFiles(config: BridgedConfig) {
         providerDefaultBranch: config["provider-default-branch"],
       }),
     },
-	{
-		path: path.join(githubWorkflowsDir, "upgrade-provider.yml"),
-		data: wf.UpgradeProvider(config),
-	},
+    {
+      path: path.join(githubWorkflowsDir, "upgrade-provider.yml"),
+      data: wf.UpgradeProvider(config),
+    },
     {
       path: path.join(githubWorkflowsDir, "resync-build.yml"),
       data: wf.ResyncBuildWorkflow(config),

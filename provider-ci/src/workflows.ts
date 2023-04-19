@@ -1062,7 +1062,7 @@ export function ModerationWorkflow(
 }
 
 export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
-  const providerName = "pulumi-" + opts.provider
+  const providerName = "pulumi-" + opts.provider;
   return {
     name: "Upgrade provider",
     on: {
@@ -1074,9 +1074,11 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
     },
     jobs: {
-      update_bridge: new EmptyJob("upgrade-provider").addStep(
-		  steps.UpgradeProviderStep(providerName)).addConditional("${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'"),
+      update_bridge: new EmptyJob("upgrade-provider")
+        .addStep(steps.UpgradeProviderStep(providerName))
+        .addConditional(
+          "${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'"
+        ),
     },
   };
 }
-
