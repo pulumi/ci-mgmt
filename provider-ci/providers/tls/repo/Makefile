@@ -12,7 +12,6 @@ JAVA_GEN := pulumi-java-gen
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
-PULUMI_PROVIDER_BUILD_PARALLELISM ?= 
 
 development: install_plugins provider build_sdks install_sdks
 

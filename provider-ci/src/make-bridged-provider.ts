@@ -18,12 +18,6 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
-  const PULUMI_PROVIDER_BUILD_PARALLELISM = {
-    value:
-      config.goBuildParallelism != 0 ? `-p ${config.goBuildParallelism}` : "",
-    type: <any>"conditional",
-  };
-
   const variables: Variables = {
     PACK,
     ORG,
@@ -37,8 +31,14 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     JAVA_GEN_VERSION,
     TESTPARALLELISM,
     WORKING_DIR,
-    PULUMI_PROVIDER_BUILD_PARALLELISM,
-  } as const;
+  };
+
+  if (config.goBuildParallelism != 0) {
+    variables.PULUMI_PROVIDER_BUILD_PARALLELISM = {
+      value: `-p ${config.goBuildParallelism}`,
+      type: "conditional",
+    };
+  }
 
   const docs: Target = {
     name: "docs",
