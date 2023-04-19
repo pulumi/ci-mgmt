@@ -11,12 +11,13 @@ env:
 upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
-  - name: tls 
+  - name: tls
     version: "4.1.0"
-  - name: github 
+  - name: github
     version: "4.10.0"
-  - name: kubernetes 
+  - name: kubernetes
     version: "3.17.0"
-  - name: random 
+  - name: random
     version: "4.4.1"
 team: ecosystem
+goBuildParallelism: 1

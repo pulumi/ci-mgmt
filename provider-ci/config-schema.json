@@ -81,6 +81,7 @@
               "type": "number",
               "default": 2
             },
+            "extra-ld-flags": {},
             "skipTfGen": {
               "type": "boolean",
               "default": false
@@ -140,6 +141,10 @@
                 "providers"
               ],
               "default": "ecosystem"
+            },
+            "goBuildParallelism": {
+              "type": "number",
+              "default": 0
             }
           },
           "required": [

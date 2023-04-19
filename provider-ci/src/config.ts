@@ -32,7 +32,7 @@ const BridgedConfig = z
     "provider-default-branch": z.string().default("master"),
     "golangci-timeout": z.string().default("20m"),
     "major-version": z.number().default(2),
-	"extra-ld-flags": z.any().optional(),
+    "extra-ld-flags": z.any().optional(),
     skipTfGen: z.boolean().default(false),
     providerVersion: z.string().default(""),
     javaGenVersion: z.string().default(""),
@@ -45,6 +45,8 @@ const BridgedConfig = z
     docsCmd: z.string().default(""),
     hybrid: z.boolean().default(false),
     team: z.enum(["ecosystem", "providers"]).default("ecosystem"),
+    // Go options
+    goBuildParallelism: z.number().default(0), // translates to "go build -p $X" flag, 0=omit.
   })
   .transform((input) => {
     if (input["upstream-provider-repo"] !== "") {
