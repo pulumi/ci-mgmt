@@ -22,3 +22,4 @@ plugins:
   - name: random
     version: "4.8.2"
 team: providers
+goBuildParallelism: 2
