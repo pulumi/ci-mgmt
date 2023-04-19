@@ -45,6 +45,8 @@ const BridgedConfig = z
     docsCmd: z.string().default(""),
     hybrid: z.boolean().default(false),
     team: z.enum(["ecosystem", "providers"]).default("ecosystem"),
+    // Go options
+    goBuildParallelism: z.number().default(0), // translates to "go build -p $X" flag, 0=omit.
   })
   .transform((input) => {
     if (input["upstream-provider-repo"] !== "") {
