@@ -1,5 +1,5 @@
 import { BridgedConfig } from "./config";
-import { Makefile, Target } from "./make";
+import { Makefile, Target, Variables } from "./make";
 
 export function bridgedProvider(config: BridgedConfig): Makefile {
   const PACK = config.provider;
@@ -18,7 +18,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
-  const variables = {
+  const PULUMI_PROVIDER_BUILD_PARALLELISM = {
+    value: "1",
+    type: <any>"conditional",
+  };
+
+  const variables: Variables = {
     PACK,
     ORG,
     PROJECT,
@@ -31,6 +36,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     JAVA_GEN_VERSION,
     TESTPARALLELISM,
     WORKING_DIR,
+    PULUMI_PROVIDER_BUILD_PARALLELISM,
   } as const;
 
   const docs: Target = {
@@ -152,7 +158,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [install_plugins, upstream],
     commands: [
-      '(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
+      '(cd provider && go build -p $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))',
       "$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)",
       "(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)",
     ],
@@ -172,7 +178,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [tfgen, install_plugins],
     commands: [
-      `(cd provider && go build -p 1 -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
+      `(cd provider && go build -p $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "${ldflags}" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))`,
     ],
   };
   const build_nodejs: Target = {

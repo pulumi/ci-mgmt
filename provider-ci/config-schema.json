@@ -81,6 +81,7 @@
               "type": "number",
               "default": 2
             },
+            "extra-ld-flags": {},
             "skipTfGen": {
               "type": "boolean",
               "default": false
