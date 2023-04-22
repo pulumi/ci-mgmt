@@ -1069,13 +1069,33 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
       pull_request: {
         types: ["opened"],
       },
+	  workflow_dispatch: {},
     },
     env: {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+	  GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
     jobs: {
-      update_bridge: new EmptyJob("upgrade-provider")
-        .addStep(steps.UpgradeProviderStep(providerName))
+      upgrade_provider: new EmptyJob("upgrade-provider")
+		.addStep(steps.InstallGo())
+		.addStep(steps.InstallPulumiCtl())
+		.addStep(steps.InstallPulumiCli())
+		.addStep(steps.CheckoutRepoStep({ref: opts["provider-default-branch"]}))
+		.addStep({
+			name: "Install `upgrade-provider`",
+			run: "go install github.com/pulumi/upgrade-provider@latest",
+		})
+		.addStep(steps.InstallGradle("7.6"))
+		.addStep({
+			name: "Set up git identity",
+			run: `git config --global user.name "Pulumi Bot" && git config--global user.email "bot@pulumi.com"`,
+		})
+		.addStep({
+			name: "Run upgrade-provider",
+			run: `upgrade-provider ${providerName} --kind=all`
+		})
+		.addStep(steps.ProviderUpgradeSuccessNotify(providerName))
+		.addStep(steps.ProviderUpgradeFailureNotify(providerName))
         .addConditional(
           "${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'"
         ),

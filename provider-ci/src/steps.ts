@@ -8,6 +8,7 @@ export type Step = Required<NormalJob>["steps"][0];
 export interface checkoutArgs {
   repo?: string;
   path?: string;
+  ref?: string;
 }
 
 export function CheckoutRepoStep(args?: checkoutArgs): Step {
@@ -19,6 +20,9 @@ export function CheckoutRepoStep(args?: checkoutArgs): Step {
     if (args.path) {
       checkOutWith["path"] = args.path;
     }
+	if (args.ref) {
+		checkOutWith["ref"] = args.ref;
+	}
     return {
       name: "Checkout repo",
       uses: action.checkout,
@@ -724,20 +728,35 @@ export function SendCodegenWarnCommentPr(): Step {
   };
 }
 
-export function UpgradeProviderStep(providerName: string): Step {
-  const indent_t4 = "\t    ";
-  return {
-    uses: action.githubScript,
-    with: {
-      "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
-      script: `await github.rest.actions.createWorkflowDispatch({
-    owner: 'pulumi',
-    repo: 'upgrade-provider',
-    workflow_id: 'upgrade-provider.yml',
-    ref: 'main',
-    inputs: {
-${indent_t4}'provider-name': '${providerName}'
-    }})`,
-    },
-  };
+export function ProviderUpgradeSuccessNotify(name: string): Step {
+	return {
+		name: "Notify success",
+		uses: action.slackChannelNotify,
+		env: {
+			"SLACK_CHANNEL": "provider-upgrade-status",
+			"SLACK_COLOR": "${{ job.status }}",
+			"SLACK_MESSAGE": `Upgrade succeeded: :heart_decoration: \nView the PR at github.com/pulumi/${name}`,
+			"SLACK_TITLE": "${{ inputs.provider-name }} upgrade result",
+			"SLACK_USERNAME": "provider-bot",
+			"SLACK_WEBHOOK": "${{ secrets.SLACK_WEBHOOK_URL }}",
+			"SLACK_ICON_EMOJI": ":taco:",
+		},
+	};
+}
+
+export function ProviderUpgradeFailureNotify(name: string): Step {
+	return {
+		if: "failure()",
+		name: "Notify failure",
+		uses: action.slackChannelNotify,
+		env: {
+			"SLACK_CHANNEL": "provider-upgrade-status",
+			"SLACK_COLOR": "${{ job.status }}",
+			"SLACK_MESSAGE": "Upgrade failed: :sad:",
+			"SLACK_TITLE": "${{ inputs.provider-name }} upgrade result",
+			"SLACK_USERNAME": "provider-bot",
+			"SLACK_WEBHOOK": "${{ secrets.SLACK_WEBHOOK_URL }}",
+			"SLACK_ICON_EMOJI": ":taco:",
+		},
+	};
 }
