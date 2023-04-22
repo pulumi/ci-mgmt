@@ -727,36 +727,18 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
-
-export function ProviderUpgradeSuccessNotify(name: string): Step {
+export function UpgradeProviderAction(providerName: string, defaultBranch: string): Step {
 	return {
-		name: "Notify success",
-		uses: action.slackChannelNotify,
-		env: {
-			"SLACK_CHANNEL": "provider-upgrade-status",
-			"SLACK_COLOR": "${{ job.status }}",
-			"SLACK_MESSAGE": `Upgrade succeeded: :heart_decoration: \nView the PR at github.com/pulumi/${name}`,
-			"SLACK_TITLE": "${{ inputs.provider-name }} upgrade result",
-			"SLACK_USERNAME": "provider-bot",
-			"SLACK_WEBHOOK": "${{ secrets.SLACK_WEBHOOK_URL }}",
-			"SLACK_ICON_EMOJI": ":taco:",
-		},
-	};
-}
-
-export function ProviderUpgradeFailureNotify(name: string): Step {
-	return {
-		if: "failure()",
-		name: "Notify failure",
-		uses: action.slackChannelNotify,
-		env: {
-			"SLACK_CHANNEL": "provider-upgrade-status",
-			"SLACK_COLOR": "${{ job.status }}",
-			"SLACK_MESSAGE": "Upgrade failed: :sad:",
-			"SLACK_TITLE": "${{ inputs.provider-name }} upgrade result",
-			"SLACK_USERNAME": "provider-bot",
-			"SLACK_WEBHOOK": "${{ secrets.SLACK_WEBHOOK_URL }}",
-			"SLACK_ICON_EMOJI": ":taco:",
-		},
-	};
+		name: "Call upgrade provider action",
+		uses: action.upgradeProviderAction,
+		with: {
+			"provider-repo": providerName,
+			"gh-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
+			"branch": defaultBranch,
+			"slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
+			"slack-channel": "provider-upgrade-status",
+			"git-username": "Pulumi bot",
+       		"git-email": "bot@pulumi.com",
+		}
+	}
 }

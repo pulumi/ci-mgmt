@@ -9,54 +9,16 @@ jobs:
     name: upgrade-provider
     runs-on: ubuntu-latest
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v3
+    - name: Call upgrade provider action
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.4
       with:
-        go-version: 1.20.1
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
-      with:
-        repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v2
-    - name: Checkout repo
-      uses: actions/checkout@v3
-      with:
-        ref: master
-    - name: Install `upgrade-provider`
-      run: go install github.com/pulumi/upgrade-provider@latest
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: "7.6"
-    - name: Set up git identity
-      run: git config --global user.name "Pulumi Bot" && git config--global user.email
-        "bot@pulumi.com"
-    - name: Run upgrade-provider
-      run: upgrade-provider pulumi-nomad --kind=all
-    - env:
-        SLACK_CHANNEL: provider-upgrade-status
-        SLACK_COLOR: ${{ job.status }}
-        SLACK_ICON_EMOJI: ":taco:"
-        SLACK_MESSAGE: |-
-          Upgrade succeeded: :heart_decoration: 
-          View the PR at github.com/pulumi/pulumi-nomad
-        SLACK_TITLE: ${{ inputs.provider-name }} upgrade result
-        SLACK_USERNAME: provider-bot
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-      name: Notify success
-      uses: rtCamp/action-slack-notify@v2
-    - env:
-        SLACK_CHANNEL: provider-upgrade-status
-        SLACK_COLOR: ${{ job.status }}
-        SLACK_ICON_EMOJI: ":taco:"
-        SLACK_MESSAGE: "Upgrade failed: :sad:"
-        SLACK_TITLE: ${{ inputs.provider-name }} upgrade result
-        SLACK_USERNAME: provider-bot
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-      if: failure()
-      name: Notify failure
-      uses: rtCamp/action-slack-notify@v2
+        branch: master
+        gh-token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        git-email: bot@pulumi.com
+        git-username: Pulumi bot
+        provider-repo: pulumi-nomad
+        slack-channel: provider-upgrade-status
+        slack-webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
 name: Upgrade provider
 on:
   pull_request:
