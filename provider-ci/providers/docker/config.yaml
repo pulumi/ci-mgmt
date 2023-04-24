@@ -22,4 +22,7 @@ upstream-provider-org: kreuzwerker
 makeTemplate: bridged
 docsCmd: "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
 hybrid: true
+plugins:
+  - name: aws
+    version: "5.37.0"
 team: ecosystem
