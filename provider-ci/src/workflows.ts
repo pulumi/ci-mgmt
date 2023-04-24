@@ -1066,7 +1066,7 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
   return {
     name: "Upgrade provider",
     on: {
-      pull_request: {
+      issues: {
         types: ["opened"],
       },
 	  workflow_dispatch: {},
@@ -1079,7 +1079,7 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
       upgrade_provider: new EmptyJob("upgrade-provider")
 			.addStep(steps.UpgradeProviderAction(providerName, opts["provider-default-branch"]))
         .addConditional(
-          "${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'"
+          "${{ github.event.issue.title }} =~ 'Upgrade terraform-provider-'"
         ),
     },
   };
