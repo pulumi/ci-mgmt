@@ -8,6 +8,7 @@ export type Step = Required<NormalJob>["steps"][0];
 export interface checkoutArgs {
   repo?: string;
   path?: string;
+  ref?: string;
 }
 
 export function CheckoutRepoStep(args?: checkoutArgs): Step {
@@ -19,6 +20,9 @@ export function CheckoutRepoStep(args?: checkoutArgs): Step {
     if (args.path) {
       checkOutWith["path"] = args.path;
     }
+	if (args.ref) {
+		checkOutWith["ref"] = args.ref;
+	}
     return {
       name: "Checkout repo",
       uses: action.checkout,
@@ -723,21 +727,18 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
-
-export function UpgradeProviderStep(providerName: string): Step {
-  const indent_t4 = "\t    ";
-  return {
-    uses: action.githubScript,
-    with: {
-      "github-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
-      script: `await github.rest.actions.createWorkflowDispatch({
-    owner: 'pulumi',
-    repo: 'upgrade-provider',
-    workflow_id: 'upgrade-provider.yml',
-    ref: 'main',
-    inputs: {
-${indent_t4}'provider-name': '${providerName}'
-    }})`,
-    },
-  };
+export function UpgradeProviderAction(providerName: string, defaultBranch: string): Step {
+	return {
+		name: "Call upgrade provider action",
+		uses: action.upgradeProviderAction,
+		with: {
+			"provider-repo": providerName,
+			"gh-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
+			"branch": defaultBranch,
+			"slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
+			"slack-channel": "provider-upgrade-status",
+			"git-username": "Pulumi bot",
+       		"git-email": "bot@pulumi.com",
+		}
+	}
 }

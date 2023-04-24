@@ -1069,13 +1069,15 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
       pull_request: {
         types: ["opened"],
       },
+	  workflow_dispatch: {},
     },
     env: {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+	  GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
     jobs: {
-      update_bridge: new EmptyJob("upgrade-provider")
-        .addStep(steps.UpgradeProviderStep(providerName))
+      upgrade_provider: new EmptyJob("upgrade-provider")
+			.addStep(steps.UpgradeProviderAction(providerName, opts["provider-default-branch"]))
         .addConditional(
           "${{ github.event.pull_request.title }} =~ 'Upgrade terraform-provider-'"
         ),
