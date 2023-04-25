@@ -1,5 +1,5 @@
 provider: linode
-major-version: 3
+major-version: 4
 env:
   LINODE_TOKEN: ${{ secrets.LINODE_API_TOKEN }}
 upstream-provider-org: pulumi
