@@ -6,6 +6,6 @@
     "dependencies": {
         "@pulumi/github": "^4.17.0",
         "@pulumi/pulumi": "^3.55.0",
-        "yaml": "^2.0.0-1"
+        "yaml": "^2.2.2"
     }
 }
