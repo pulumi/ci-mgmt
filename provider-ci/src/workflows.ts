@@ -846,24 +846,7 @@ export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
   steps = [
-    steps.CheckoutRepoStep(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallNodeJS(),
-    steps.InstallDotNet(),
-    steps.InstallPython(),
-    steps.DownloadSpecificSDKStep("python"),
-    steps.UnzipSpecificSDKStep("python"),
-    steps.DownloadSpecificSDKStep("dotnet"),
-    steps.UnzipSpecificSDKStep("dotnet"),
-    steps.DownloadSpecificSDKStep("nodejs"),
-    steps.UnzipSpecificSDKStep("nodejs"),
-    steps.RunCommand("python -m pip install pip twine"),
     steps.RunPublishSDK(),
-    steps.NotifySlack("Failure in publishing SDK"),
   ];
   name: string;
 
