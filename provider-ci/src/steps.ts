@@ -494,22 +494,7 @@ export function RunCommand(command: string): Step {
 export function RunPublishSDK(): Step {
   return {
     name: "Publish SDKs",
-    run: "./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
-    env: {
-      NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
-    },
-  };
-}
-
-export function RunPublishJavaSDK(): Step {
-  return {
-    name: "Publish Java SDK",
-    uses: action.gradleBuildAction,
-    with: {
-      arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
-      "build-root-directory": "./sdk/java",
-      "gradle-version": "7.4.1",
-    },
+    uses: action.publishProviderSDKs,
   };
 }
 
@@ -738,7 +723,14 @@ export function UpgradeProviderAction(providerName: string, defaultBranch: strin
 			"slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
 			"slack-channel": "provider-upgrade-status",
 			"git-username": "Pulumi bot",
-       		"git-email": "bot@pulumi.com",
+            "git-email": "bot@pulumi.com",
 		}
 	}
+}
+
+export function PublishProviderSDKs(): Step {
+  return {
+    name: "Publish SDKs",
+    uses: action.publishProviderSDKs,
+  }
 }

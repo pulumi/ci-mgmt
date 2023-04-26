@@ -62,7 +62,6 @@ export function DefaultBranchWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
-      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       generate_coverage_data: new GenerateCoverageDataJob(
         "generate_coverage_data"
       ),
@@ -118,7 +117,6 @@ export function ReleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
-      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
       tag_sdk: new TagSDKJob("tag_sdk"),
       create_docs_build: new DocsBuildJob("create_docs_build"),
     },
@@ -154,7 +152,6 @@ export function PrereleaseWorkflow(
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
-      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
 
@@ -849,24 +846,7 @@ export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
   steps = [
-    steps.CheckoutRepoStep(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallNodeJS(),
-    steps.InstallDotNet(),
-    steps.InstallPython(),
-    steps.DownloadSpecificSDKStep("python"),
-    steps.UnzipSpecificSDKStep("python"),
-    steps.DownloadSpecificSDKStep("dotnet"),
-    steps.UnzipSpecificSDKStep("dotnet"),
-    steps.DownloadSpecificSDKStep("nodejs"),
-    steps.UnzipSpecificSDKStep("nodejs"),
-    steps.RunCommand("python -m pip install pip twine"),
     steps.RunPublishSDK(),
-    steps.NotifySlack("Failure in publishing SDK"),
   ];
   name: string;
 
@@ -875,33 +855,6 @@ export class PublishSDKJob implements NormalJob {
     Object.assign(this, { name });
   }
 }
-
-export class PublishJavaSDKJob implements NormalJob {
-  "runs-on" = "ubuntu-latest";
-  "continue-on-error" = true;
-  needs = "publish";
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.CheckoutScriptsRepoStep(),
-    steps.CheckoutTagsStep(),
-    steps.InstallGo(),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.InstallJava(),
-    steps.InstallGradle("7.6"),
-    steps.DownloadSpecificSDKStep("java"),
-    steps.UnzipSpecificSDKStep("java"),
-    steps.SetPackageVersionToEnv(),
-    steps.RunPublishJavaSDK(),
-  ];
-  name: string;
-
-  constructor(name: string) {
-    this.name = name;
-    Object.assign(this, { name });
-  }
-}
-
 export class LintProviderJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   container = `golangci/golangci-lint:${golangciLintContainerVersion}`;
@@ -1069,11 +1022,11 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
       issues: {
         types: ["opened"],
       },
-	  workflow_dispatch: {},
+      workflow_dispatch: {},
     },
     env: {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-	  GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+      GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
     jobs: {
       upgrade_provider: new EmptyJob("upgrade-provider")

@@ -38,3 +38,4 @@ export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const uploadArtifact = "actions/upload-artifact@v2";
 export const githubScript = "actions/github-script@v6";
 export const upgradeProviderAction = "pulumi/pulumi-upgrade-provider-action@v0.0.4"
+export const publishProviderSDKs = "pulumi/pulumi-package-publisher@v0.0.5"
