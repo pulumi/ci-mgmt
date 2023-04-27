@@ -15,7 +15,7 @@ on:
         description: Mark created PRs for auto-merging?
         required: true
         type: boolean
-        default: false
+        default: true
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
