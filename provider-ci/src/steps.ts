@@ -717,13 +717,8 @@ export function UpgradeProviderAction(providerName: string, defaultBranch: strin
 		name: "Call upgrade provider action",
 		uses: action.upgradeProviderAction,
 		with: {
-			"provider-repo": providerName,
-			"gh-token": "${{ secrets.PULUMI_BOT_TOKEN }}",
-			"branch": defaultBranch,
 			"slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
 			"slack-channel": "provider-upgrade-status",
-			"git-username": "Pulumi bot",
-            "git-email": "bot@pulumi.com",
 		}
 	}
 }
