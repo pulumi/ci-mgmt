@@ -66,91 +66,24 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       phony: true,
       commands: [
         {
-          parts: [
-            {
-              test: `ifeq ("$(wildcard upstream)","")`,
-              then: [`# upstream doesn't exist, so skip`],
-            },
-            {
-              test: `else ifeq ("$(wildcard patches/*.patch)","")`,
-              then: [
-                `# upstream exists, but patches don't exist. This is probably an error.`,
-                `@echo "No patches found within the patch operation"`,
-                `@echo "patches were expected because upstream exists"`,
-                `@exit 1`,
-              ],
-            },
-            {
-              test: `else`,
-              then: [
-                "# Checkout the submodule at the pinned commit.",
-                "# `--force`: If the submodule is at a different commit, move it to the pinned commit.",
-                "# `--init`: If the submodule is not initialized, initialize it.",
-                `git submodule update --force --init`,
-                "# Iterating over the patches folder in sorted order,",
-                "# apply the patch using a 3-way merge strategy. This mirrors the default behavior of `git merge`",
-                [
-                  `cd upstream`,
-                  `for patch in $(sort $(wildcard patches/*.patch)); do git apply --3way ../$$patch || exit 1; done`,
-                ],
-              ],
-            },
-          ],
+          parts: [{
+            test: `ifneq ("$(wildcard upstream)","")`,
+            then: [`@$(SHELL) ./scripts/upstream.sh "$@" apply`],
+          }],
           end: "endif",
         },
       ],
     };
 
     startPatch = {
-      name: "start-patch",
+      name: "upstream.rebase",
       phony: true,
-      dependencies: [upstream],
-      commands: [
-        {
-          parts: [
-            {
-              test: `ifeq ("$(wildcard upstream)","")`,
-              then: [
-                `@echo "No upstream found, so upstream can't be patched"`,
-                `@exit 1`,
-              ],
-            },
-            {
-              test: `else`,
-              then: [
-                `# To add an additional patch:`,
-                `#`,
-                "#	1. Run this command (`make start-patch`).",
-                `#`,
-                "#	2. Edit the `upstream` repo, making whatever changes you want to appear in the new",
-                `#	patch. It's fine to edit multiple files.`,
-                `#`,
-                `#	3. Commit your changes. The slugified first line of your commit description will`,
-                `#	be used to generate the patch file name. Only the diff from the latest commit will`,
-                `#	end up in the final patch.`,
-                `#`,
-                "#	4. Run `make finish-patch`.",
-                `#`,
-                "# It is safe to run `make start-patch` as many times as you want, but any changes",
-                "# might be reverted until `make finish-patch` is run.",
-                `@cd upstream && git commit --quiet -m "existing patches"`,
-              ],
-            },
-          ],
-          end: "endif",
-        },
-      ],
+      commands: [`@$(SHELL) ./scripts/upstream.sh "$@" start_rebase`],
     };
     finishPatch = {
-      name: "finish-patch",
+      name: "upstream.finalize",
       phony: true,
-      commands: [
-        `@if [ ! -z "$$(cd upstream && git status --porcelain)" ]; then echo "Please commit your changes before finishing the patch"; exit 1; fi`,
-        [
-          "@cd upstream",
-          `git format-patch HEAD~ -o ../patches --start-number $$(($$(ls ../patches | wc -l | xargs)+1))`,
-        ],
-      ],
+      commands: [`@$(SHELL) ./scripts/upstream.sh "$@" end_rebase`],
     };
   }
 

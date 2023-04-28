@@ -3,7 +3,7 @@ import * as lint from "./golangci";
 import * as goreleaser from "./goreleaser";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
-import { buildMakefile } from "./makefiles";
+import { buildMakefile, scripts } from "./makefiles";
 import { BridgedConfig, getConfig } from "./config";
 
 export interface ProviderFile {
@@ -105,6 +105,12 @@ export function generateProviderFiles(config: BridgedConfig) {
       path: "Makefile",
       data: buildMakefile(config),
     });
+    if (config.makeTemplate === "bridged" && config.team === "ecosystem") {
+      files.push({
+        path: path.join("scripts","upstream.sh"),
+        data: scripts.upstream(),
+      });
+    }
     if (config.makeTemplate === "bridged-v2") {
       files.push(
         {
