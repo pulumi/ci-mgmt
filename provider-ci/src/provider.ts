@@ -3,7 +3,7 @@ import * as lint from "./golangci";
 import * as goreleaser from "./goreleaser";
 import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
-import { buildMakefile, scripts } from "./makefiles";
+import { buildMakefile, scripts, configFile } from "./makefiles";
 import { BridgedConfig, getConfig } from "./config";
 
 export interface ProviderFile {
@@ -110,6 +110,11 @@ export function generateProviderFiles(config: BridgedConfig) {
         path: path.join("scripts","upstream.sh"),
         data: scripts.upstream(),
       });
+	const upstreamProviderName = getUpstreamProviderName(config.provider)
+	files.push({
+		path: ".upgrade-config.yml",
+		data: configFile.upgradeProvider(upstreamProviderName),
+	});
     }
     if (config.makeTemplate === "bridged-v2") {
       files.push(
@@ -126,4 +131,15 @@ export function generateProviderFiles(config: BridgedConfig) {
   }
 
   return files;
+}
+
+export function getUpstreamProviderName(providerName: string) {
+	let nameMap = new Map<string, string>([
+		["f5bigip", "bigip"],
+		["confluentcloud", "confluent"]
+	])
+	if (nameMap.has(providerName)) {
+		providerName = nameMap.get(providerName)!
+	}
+	return "terraform-provider-" + providerName
 }

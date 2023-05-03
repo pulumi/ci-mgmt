@@ -208,3 +208,10 @@ EOF
 esac
 `,
 };
+
+export const configFile = {
+	upgradeProvider: (upstreamProviderName: string) => `---
+upstream-provider-name: ${upstreamProviderName}
+
+`
+}
