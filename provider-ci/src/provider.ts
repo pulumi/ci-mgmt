@@ -110,7 +110,7 @@ export function generateProviderFiles(config: BridgedConfig) {
         path: path.join("scripts","upstream.sh"),
         data: scripts.upstream(),
       });
-	const upstreamProviderName = getUpstreamProviderName(config.provider)
+	const upstreamProviderName = config["upstream-provider-repo"]
 	files.push({
 		path: ".upgrade-config.yml",
 		data: configFile.upgradeProvider(upstreamProviderName),
@@ -131,15 +131,4 @@ export function generateProviderFiles(config: BridgedConfig) {
   }
 
   return files;
-}
-
-export function getUpstreamProviderName(providerName: string) {
-	let nameMap = new Map<string, string>([
-		["f5bigip", "bigip"],
-		["confluentcloud", "confluent"]
-	])
-	if (nameMap.has(providerName)) {
-		providerName = nameMap.get(providerName)!
-	}
-	return "terraform-provider-" + providerName
 }
