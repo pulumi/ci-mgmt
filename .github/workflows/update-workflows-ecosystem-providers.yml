@@ -65,6 +65,26 @@ jobs:
           cd ci-mgmt/tools/sourcemigrator
           npm ci
           npx ts-node index.ts "$DIR"
+      - name: Find obsolete PRs started by this workflow
+        uses: octokit/request-action@v2.x
+        id: find-obsolete-prs
+        with:
+          route: GET /repos/:owner/:repo/pulls?state=open
+          owner: pulumi
+          repo: pulumi-${{ matrix.provider }}
+      - name: Close obsolete PRs started by this workflow
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/:owner/:repo/pulls/:pull_number
+          owner: pulumi
+          repo: pulumi-${{ matrix.provider }}
+          pull_number: ${{ fromJson(steps.find-matching-prs.outputs.data).filter(pr => /Update GitHub Actions workflows/i.test(pr.title)).map(pr => pr.number).join(',') }}
+          body: |
+            This obsolete pull request has been automatically closed by update-workflows-ecosystem-providers.yml.
+          headers: |
+            { "Content-Type": "application/json" }
+            { "Authorization": "Bearer ${{ secrets.GITHUB_TOKEN }}" }
+          body-encoding: json
       - name: Create PR
         id: create-pr
         uses: peter-evans/create-pull-request@v3
