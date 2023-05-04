@@ -52,7 +52,7 @@ jobs:
           script: |
             const regex = /Update GitHub Actions workflows/i;
             const octokit = github.rest;
-            const repo = 'pulumi-' + github.event.inputs.provider_name;
+            const repo = 'pulumi-${{ github.event.inputs.provider_name }}'
             console.log('Checking ' + repo);
             const { data: pullRequests } = await octokit.pulls.list({
               owner: 'pulumi',
