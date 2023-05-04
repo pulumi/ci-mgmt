@@ -48,7 +48,7 @@ jobs:
       - name: Close obsolete PRs started by this workflow
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PULUMI_BOT_TOKEN }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
             const octokit = github.rest;
