@@ -51,8 +51,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
-            const octokit = await github.getOctokit();
+            const octokit = github.rest;
             const repo = 'pulumi-' + github.event.inputs.provider_name;
+            console.log('Checking ' + repo);
             const { data: pullRequests } = await octokit.pulls.list({
               owner: 'pulumi',
               repo: repo,
