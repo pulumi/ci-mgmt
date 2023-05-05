@@ -20,9 +20,9 @@ export function CheckoutRepoStep(args?: checkoutArgs): Step {
     if (args.path) {
       checkOutWith["path"] = args.path;
     }
-	if (args.ref) {
-		checkOutWith["ref"] = args.ref;
-	}
+    if (args.ref) {
+      checkOutWith["ref"] = args.ref;
+    }
     return {
       name: "Checkout repo",
       uses: action.checkout,
@@ -712,20 +712,33 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
-export function UpgradeProviderAction(providerName: string, defaultBranch: string): Step {
-	return {
-		name: "Call upgrade provider action",
-		uses: action.upgradeProviderAction,
-		with: {
-			"slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
-			"slack-channel": "provider-upgrade-status",
-		}
-	}
+export function UpgradeProviderAction(
+  providerName: string,
+  defaultBranch: string
+): Step {
+  return {
+    name: "Call upgrade provider action",
+    uses: action.upgradeProviderAction,
+    with: {
+      "slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
+      "slack-channel": "provider-upgrade-status",
+    },
+  };
 }
 
-export function PublishProviderSDKs(): Step {
+export function NotifySlackPublish(): Step {
   return {
-    name: "Publish SDKs",
-    uses: action.publishProviderSDKs,
-  }
+    name: "Send Publish Failure To Slack",
+    if: "failure()",
+    env: {
+      SLACK_CHANNEL: "provider-upgrade-publish-status",
+      SLACK_COLOR: "#FF0000",
+      SLACK_MESSAGE: " Publish failed :x:",
+      SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
+      SLACK_USERNAME: "provider-bot",
+      SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+      SLACK_ICON_EMOJI: ":taco:",
+    },
+    uses: action.slackNotification,
+  };
 }

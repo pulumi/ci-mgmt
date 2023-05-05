@@ -845,9 +845,7 @@ export class TagSDKJob implements NormalJob {
 export class PublishSDKJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   needs = "publish";
-  steps = [
-    steps.RunPublishSDK(),
-  ];
+  steps = [steps.RunPublishSDK(), steps.NotifySlackPublish()];
   name: string;
 
   constructor(name: string) {
@@ -1030,7 +1028,12 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
     },
     jobs: {
       upgrade_provider: new EmptyJob("upgrade-provider")
-			.addStep(steps.UpgradeProviderAction(providerName, opts["provider-default-branch"]))
+        .addStep(
+          steps.UpgradeProviderAction(
+            providerName,
+            opts["provider-default-branch"]
+          )
+        )
         .addConditional(
           "contains(github.event.issue.title, 'Upgrade terraform-provider-')"
         ),
