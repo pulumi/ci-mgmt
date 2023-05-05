@@ -722,10 +722,3 @@ export function UpgradeProviderAction(providerName: string, defaultBranch: strin
 		}
 	}
 }
-
-export function PublishProviderSDKs(): Step {
-  return {
-    name: "Publish SDKs",
-    uses: action.publishProviderSDKs,
-  }
-}
