@@ -21,5 +21,6 @@ plugins:
     version: "4.8.2"
   - name: azuread
     version: "5.33.0"
-team: providers
+team: ecosystem
 goBuildParallelism: 2
+javaGenVersion: "0.8.0"
