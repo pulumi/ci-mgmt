@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-confluent
+pulumi-infer-version: true
 

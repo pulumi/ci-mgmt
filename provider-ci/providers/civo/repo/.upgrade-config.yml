@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-civo
+pulumi-infer-version: true
 

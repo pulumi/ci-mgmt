@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-venafi
+pulumi-infer-version: true
 

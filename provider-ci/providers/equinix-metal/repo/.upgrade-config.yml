@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-metal
+pulumi-infer-version: true
 

@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-dnsimple
+pulumi-infer-version: true
 

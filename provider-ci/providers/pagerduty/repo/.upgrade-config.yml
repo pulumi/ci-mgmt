@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-pagerduty
+pulumi-infer-version: true
 

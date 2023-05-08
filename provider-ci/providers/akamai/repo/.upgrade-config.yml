@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-akamai
+pulumi-infer-version: true
 
