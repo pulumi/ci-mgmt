@@ -1038,7 +1038,7 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
 			steps.NotifySlackUpgradeFailure()
 		)
         .addConditional(
-          "contains(github.event.issue.title, 'Upgrade terraform-provider-')"
+          "contains(${{ github.event.issue.title }}, 'Upgrade terraform-provider-')"
         ),
     },
   };
