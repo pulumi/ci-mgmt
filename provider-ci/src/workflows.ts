@@ -1029,13 +1029,16 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
     jobs: {
       upgrade_provider: new EmptyJob("upgrade-provider")
         .addStep(
-          steps.UpgradeProviderAction(
-            providerName,
-            opts["provider-default-branch"]
-          )
+          steps.UpgradeProviderAction()
         )
+		.addStep(
+			steps.NotifySlackUpgradeSuccess()
+		)
+		.addStep(
+			steps.NotifySlackUpgradeFailure()
+		)
         .addConditional(
-          "contains(github.event.issue.title, 'Upgrade terraform-provider-')"
+          "contains(${{ github.event.issue.title }}, 'Upgrade terraform-provider-')"
         ),
     },
   };

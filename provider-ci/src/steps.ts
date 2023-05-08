@@ -712,10 +712,7 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
-export function UpgradeProviderAction(
-  providerName: string,
-  defaultBranch: string
-): Step {
+export function UpgradeProviderAction(): Step {
   return {
     name: "Call upgrade provider action",
     uses: action.upgradeProviderAction,
@@ -733,7 +730,7 @@ export function NotifySlackPublish(): Step {
     env: {
       SLACK_CHANNEL: "provider-upgrade-publish-status",
       SLACK_COLOR: "#FF0000",
-      SLACK_MESSAGE: " Publish failed :x:",
+      SLACK_MESSAGE: "Publish failed :x:",
       SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
       SLACK_USERNAME: "provider-bot",
       SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
@@ -741,4 +738,38 @@ export function NotifySlackPublish(): Step {
     },
     uses: action.slackNotification,
   };
+}
+
+export function NotifySlackUpgradeSuccess(): Step {
+	return {
+		name: "Send Upgrade Success To Slack",
+		env: {
+			SLACK_CHANNEL: "provider-upgrade-publish-status",
+			SLACK_COLOR: "#FF0000",
+			SLACK_MESSAGE: "Upgrade succeeded :heart_decoration:\n" +
+			"PR opened at github.com/pulumi/${{ github.event.repository.name }}/pulls",
+			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
+			SLACK_USERNAME: "provider-bot",
+			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+			SLACK_ICON_EMOJI: ":taco:",
+		},
+		uses: action.slackNotification,
+	};
+}
+
+export function NotifySlackUpgradeFailure(): Step {
+	return {
+		name: "Send Upgrade Failure To Slack",
+		if: "failure()",
+		env: {
+			SLACK_CHANNEL: "provider-upgrade-publish-status",
+			SLACK_COLOR: "#FF0000",
+			SLACK_MESSAGE: " Upgrade failed :x:",
+			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
+			SLACK_USERNAME: "provider-bot",
+			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+			SLACK_ICON_EMOJI: ":taco:",
+		},
+		uses: action.slackNotification,
+	};
 }
