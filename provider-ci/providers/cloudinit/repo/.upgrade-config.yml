@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-cloudinit
+pulumi-infer-version: true
 

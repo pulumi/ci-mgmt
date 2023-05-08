@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-artifactory
+pulumi-infer-version: true
 

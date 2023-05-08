@@ -2,4 +2,5 @@
 
 ---
 upstream-provider-name: terraform-provider-rke
+pulumi-infer-version: true
 
