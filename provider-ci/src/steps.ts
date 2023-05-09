@@ -716,10 +716,6 @@ export function UpgradeProviderAction(): Step {
   return {
     name: "Call upgrade provider action",
     uses: action.upgradeProviderAction,
-    with: {
-      "slack-webhook": "${{ secrets.SLACK_WEBHOOK_URL }}",
-      "slack-channel": "provider-upgrade-status",
-    },
   };
 }
 
@@ -733,7 +729,7 @@ export function NotifySlackPublish(): Step {
       SLACK_MESSAGE: "Publish failed :x:",
       SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
       SLACK_USERNAME: "provider-bot",
-      SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+      SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK_URL }}",
       SLACK_ICON_EMOJI: ":taco:",
     },
     uses: action.slackNotification,
@@ -750,7 +746,7 @@ export function NotifySlackUpgradeSuccess(): Step {
 			"PR opened at github.com/pulumi/${{ github.event.repository.name }}/pulls",
 			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
 			SLACK_USERNAME: "provider-bot",
-			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+			SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK_URL }}",
 			SLACK_ICON_EMOJI: ":taco:",
 		},
 		uses: action.slackNotification,
@@ -767,7 +763,7 @@ export function NotifySlackUpgradeFailure(): Step {
 			SLACK_MESSAGE: " Upgrade failed :x:",
 			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
 			SLACK_USERNAME: "provider-bot",
-			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+			SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK_URL }}",
 			SLACK_ICON_EMOJI: ":taco:",
 		},
 		uses: action.slackNotification,
