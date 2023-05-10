@@ -568,7 +568,8 @@ export function CommentSchemaChangesOnPR(): Step {
     with: {
       message:
         "### Does the PR have any schema changes?\n\n" +
-        "${{ env.SCHEMA_CHANGES }}\n",
+        "${{ env.SCHEMA_CHANGES }}\n\n" +
+        "Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.\n\n",
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
     },
   };
@@ -741,35 +742,36 @@ export function NotifySlackPublish(): Step {
 }
 
 export function NotifySlackUpgradeSuccess(): Step {
-	return {
-		name: "Send Upgrade Success To Slack",
-		env: {
-			SLACK_CHANNEL: "provider-upgrade-publish-status",
-			SLACK_COLOR: "#FF0000",
-			SLACK_MESSAGE: "Upgrade succeeded :heart_decoration:\n" +
-			"PR opened at github.com/pulumi/${{ github.event.repository.name }}/pulls",
-			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
-			SLACK_USERNAME: "provider-bot",
-			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
-			SLACK_ICON_EMOJI: ":taco:",
-		},
-		uses: action.slackNotification,
-	};
+  return {
+    name: "Send Upgrade Success To Slack",
+    env: {
+      SLACK_CHANNEL: "provider-upgrade-publish-status",
+      SLACK_COLOR: "#FF0000",
+      SLACK_MESSAGE:
+        "Upgrade succeeded :heart_decoration:\n" +
+        "PR opened at github.com/pulumi/${{ github.event.repository.name }}/pulls",
+      SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
+      SLACK_USERNAME: "provider-bot",
+      SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+      SLACK_ICON_EMOJI: ":taco:",
+    },
+    uses: action.slackNotification,
+  };
 }
 
 export function NotifySlackUpgradeFailure(): Step {
-	return {
-		name: "Send Upgrade Failure To Slack",
-		if: "failure()",
-		env: {
-			SLACK_CHANNEL: "provider-upgrade-publish-status",
-			SLACK_COLOR: "#FF0000",
-			SLACK_MESSAGE: " Upgrade failed :x:",
-			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
-			SLACK_USERNAME: "provider-bot",
-			SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
-			SLACK_ICON_EMOJI: ":taco:",
-		},
-		uses: action.slackNotification,
-	};
+  return {
+    name: "Send Upgrade Failure To Slack",
+    if: "failure()",
+    env: {
+      SLACK_CHANNEL: "provider-upgrade-publish-status",
+      SLACK_COLOR: "#FF0000",
+      SLACK_MESSAGE: " Upgrade failed :x:",
+      SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
+      SLACK_USERNAME: "provider-bot",
+      SLACK_WEBHOOK: "${{ env.SLACK_WEBHOOK_URL }}",
+      SLACK_ICON_EMOJI: ":taco:",
+    },
+    uses: action.slackNotification,
+  };
 }

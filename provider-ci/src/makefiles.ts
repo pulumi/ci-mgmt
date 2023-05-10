@@ -211,9 +211,9 @@ esac
 };
 
 export const configFile = {
-	upgradeProvider: (upstreamProviderName: string) => `---
+  upgradeProvider: (upstreamProviderName: string) => `---
 upstream-provider-name: ${upstreamProviderName}
 pulumi-infer-version: true
 
-`
-}
+`,
+};
