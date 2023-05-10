@@ -24,7 +24,6 @@ const BridgedConfig = z
     parallel: z.number().default(3),
     timeout: z.number().default(60),
     // Provider options
-    "upstream-provider-org": z.string(),
     "upstream-provider-repo": z.string().default(""),
     "fail-on-extra-mapping": z.boolean().default(true),
     "fail-on-missing-mapping": z.boolean().default(true),

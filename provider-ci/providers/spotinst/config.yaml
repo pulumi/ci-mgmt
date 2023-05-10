@@ -5,7 +5,6 @@ env:
   SPOTINST_ACCOUNT: ${{ secrets.SPOTINST_ACCOUNT }}
   SPOTINST_TOKEN: ${{ secrets.SPOTINST_TOKEN }}
   AWS_REGION: "us-west-2"
-upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
   - name: aws 

@@ -1,6 +1,5 @@
 provider: random
 major-version: 4
-upstream-provider-org: pulumi
 makeTemplate: bridged
 # TODO: Enable this once our random provider is updated with framework support
 # generate-nightly-test-workflow: true

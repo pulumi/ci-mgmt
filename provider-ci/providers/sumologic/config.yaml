@@ -4,7 +4,6 @@ env:
   SUMOLOGIC_ACCESSID: ${{ secrets.SUMOLOGIC_ACCESSID }}
   SUMOLOGIC_ACCESSKEY: ${{ secrets.SUMOLOGIC_ACCESSKEY }}
   SUMOLOGIC_ENVIRONMENT: ${{ secrets.SUMOLOGIC_ENVIRONMENT }}
-upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
   - name: aws 

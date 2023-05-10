@@ -2,7 +2,6 @@ provider: mailgun
 major-version: 3
 env:
   MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
   - name: aws 

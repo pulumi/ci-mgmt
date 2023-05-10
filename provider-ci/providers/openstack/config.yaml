@@ -10,6 +10,5 @@ env:
   OS_USERNAME: "jrGMbHHjkUQ7"
   OS_USER_DOMAIN_NAME: Default
   OS_PROJECT_DOMAIN_NAME: Default
-upstream-provider-org: terraform-provider-openstack
 makeTemplate: bridged
 team: ecosystem

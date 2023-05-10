@@ -8,7 +8,6 @@ env: # these are in plaintext in the setup script
   KEYCLOAK_PASSWORD: "password"
   KEYCLOAK_URL: "http://localhost:8080/auth"
   KEYCLOAK_USER: "keycloak"
-upstream-provider-org: pulumi
 makeTemplate: bridged
 plugins:
   - name: aws

@@ -71,10 +71,6 @@ export function generateProviderFiles(config: BridgedConfig) {
       data: wf.ResyncBuildWorkflow(config),
     },
     {
-      path: path.join(githubWorkflowsDir, "update-upstream-provider.yml"),
-      data: wf.UpdateUpstreamProviderWorkflow(config),
-    },
-    {
       path: path.join(githubWorkflowsDir, "community-moderation.yml"),
       data: wf.ModerationWorkflow("warn-codegen", config),
     },

@@ -2,6 +2,5 @@ provider: opsgenie
 major-version: 1
 env:
   OPSGENIE_API_KEY: ${{ secrets.OPSGENIE_API_KEY }}
-upstream-provider-org: opsgenie
 makeTemplate: bridged
 team: ecosystem
