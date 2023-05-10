@@ -9,7 +9,6 @@ generate-nightly-test-workflow: true
 env:
   AWS_REGION: us-west-2
   PULUMI_MISSING_DOCS_ERROR: true
-upstream-provider-org: pulumi
 makeTemplate: bridged
 javaGenVersion: v0.7.1
 plugins:

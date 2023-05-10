@@ -6,7 +6,6 @@ env:
   MINIO_ACCESS_KEY: minio
   MINIO_SECRET_KEY: minio123
   MINIO_ENABLE_HTTPS: false
-upstream-provider-org: pulumi
 skipWindowsArmBuild: true
 makeTemplate: bridged
 plugins:

@@ -18,7 +18,6 @@ env:
   GOOGLE_ZONE: us-central1-a
   PULUMI_GO_DEP_ROOT: /home/runner/work/pulumi-docker
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-upstream-provider-org: kreuzwerker
 makeTemplate: bridged
 docsCmd: "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
 hybrid: true

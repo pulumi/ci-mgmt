@@ -50,9 +50,6 @@
               "type": "number",
               "default": 60
             },
-            "upstream-provider-org": {
-              "type": "string"
-            },
             "upstream-provider-repo": {
               "type": "string",
               "default": ""
@@ -148,8 +145,7 @@
             }
           },
           "required": [
-            "provider",
-            "upstream-provider-org"
+            "provider"
           ],
           "additionalProperties": false
         },

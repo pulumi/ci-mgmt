@@ -5,6 +5,5 @@ env:
   VENAFI_URL: ${{ secrets.VENAFI_URL }}
   VENAFI_TPP_USER: ${{ secrets.VENAFI_TPP_USER }}
   VENAFI_TPP_PASSWORD: ${{ secrets.VENAFI_TPP_PASSWORD }}
-upstream-provider-org: pulumi
 makeTemplate: bridged
 team: ecosystem

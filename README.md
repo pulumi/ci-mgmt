@@ -67,7 +67,6 @@ To add a new provider:
      ANOTHER_OPTION: true
      # etc.
    lint: true # Linting should be true in most cases, unless failing rules in the upstream provider makes this impractical.
-   upstream-provider-org: # Name of org hosting Pulumi provider.
 
    # Optional values:
    docker: true # Whether the provider's tests use Docker to run. If set to true, a file `testing/docker-compose.yml` must be present in the provider repository.

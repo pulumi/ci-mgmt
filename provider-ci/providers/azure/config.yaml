@@ -13,7 +13,6 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   PULUMI_MISSING_DOCS_ERROR: true
-upstream-provider-org: pulumi
 upstream-provider-repo: terraform-provider-azurerm
 makeTemplate: bridged
 plugins:

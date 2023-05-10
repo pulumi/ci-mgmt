@@ -4,7 +4,6 @@ major-version: 1
 env:
   CONFLUENT_CLOUD_API_KEY: ${{ secrets.CONFLUENT_CLOUD_API_KEY }}
   CONFLUENT_CLOUD_API_SECRET: ${{ secrets.CONFLUENT_CLOUD_API_SECRET }}
-upstream-provider-org: confluentinc
 upstream-provider-repo: terraform-provider-confluent
 makeTemplate: bridged
 plugins:

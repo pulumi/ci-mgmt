@@ -1,6 +1,5 @@
 provider: tls
 major-version: 5
-upstream-provider-org: terraform-providers
 makeTemplate: bridged
 # TODO: Enable this once our tls provider is updated with framework support
 # generate-nightly-test-workflow: true
