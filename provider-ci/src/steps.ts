@@ -568,7 +568,8 @@ export function CommentSchemaChangesOnPR(): Step {
     with: {
       message:
         "### Does the PR have any schema changes?\n\n" +
-        "${{ env.SCHEMA_CHANGES }}\n",
+        "${{ env.SCHEMA_CHANGES }}\n\n" +
+        "Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.\n\n",
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
     },
   };

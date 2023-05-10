@@ -66,10 +66,12 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       phony: true,
       commands: [
         {
-          parts: [{
-            test: `ifneq ("$(wildcard upstream)","")`,
-            then: [`@$(SHELL) ./scripts/upstream.sh "$@" apply`],
-          }],
+          parts: [
+            {
+              test: `ifneq ("$(wildcard upstream)","")`,
+              then: [`@$(SHELL) ./scripts/upstream.sh "$@" apply`],
+            },
+          ],
           end: "endif",
         },
       ],

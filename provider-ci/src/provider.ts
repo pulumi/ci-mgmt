@@ -107,14 +107,14 @@ export function generateProviderFiles(config: BridgedConfig) {
     });
     if (config.makeTemplate === "bridged" && config.team === "ecosystem") {
       files.push({
-        path: path.join("scripts","upstream.sh"),
+        path: path.join("scripts", "upstream.sh"),
         data: scripts.upstream(),
       });
-	const upstreamProviderName = config["upstream-provider-repo"]
-	files.push({
-		path: ".upgrade-config.yml",
-		data: configFile.upgradeProvider(upstreamProviderName),
-	});
+      const upstreamProviderName = config["upstream-provider-repo"];
+      files.push({
+        path: ".upgrade-config.yml",
+        data: configFile.upgradeProvider(upstreamProviderName),
+      });
     }
     if (config.makeTemplate === "bridged-v2") {
       files.push(
