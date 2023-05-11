@@ -25,3 +25,4 @@ plugins:
     version: "4.6.0"
 team: providers
 goBuildParallelism: 2
+javaGenVersion: "v0.5.4"
