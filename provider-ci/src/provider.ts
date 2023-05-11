@@ -120,7 +120,7 @@ export function generateProviderFiles(config: BridgedConfig) {
         },
         {
           path: ".version.javagen.txt",
-          data: "v0.5.4",
+          data: "v0.9.3",
         }
       );
     }

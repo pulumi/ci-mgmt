@@ -22,4 +22,3 @@ plugins:
     version: "5.33.0"
 team: ecosystem
 goBuildParallelism: 2
-javaGenVersion: "0.8.0"
