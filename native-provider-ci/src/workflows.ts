@@ -162,6 +162,12 @@ export function RunAcceptanceTestsWorkflow(
     workflow.jobs = Object.assign(workflow.jobs, {
       lint: new LintKubernetesJob("lint").addDispatchConditional(true),
     });
+    workflow.on = Object.assign(workflow.on, {
+      pull_request: {
+        branches: ["master", "main", "v4"],
+        "paths-ignore": ["CHANGELOG.md"],
+      },
+    });
   }
   return workflow;
 }
