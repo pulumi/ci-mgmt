@@ -742,7 +742,7 @@ export function NotifySlackUpgradeSuccess(): Step {
 		name: "Send Upgrade Success To Slack",
 		env: {
 			SLACK_CHANNEL: "provider-upgrade-publish-status",
-			SLACK_COLOR: "#FF0000",
+			SLACK_COLOR: "#7CFC00",
 			SLACK_MESSAGE: "Upgrade succeeded :heart_decoration:\n" +
 			"PR opened at github.com/pulumi/${{ github.event.repository.name }}/pulls",
 			SLACK_TITLE: "${{ github.event.repository.name }} upgrade result",
