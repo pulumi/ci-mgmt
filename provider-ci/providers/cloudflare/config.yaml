@@ -11,4 +11,4 @@ env:
   CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
   CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
 team: ecosystem
-javaGenVersion: "v0.8.3"
+javaGenVersion: "v0.9.3"
