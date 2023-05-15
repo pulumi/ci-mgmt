@@ -6,4 +6,8 @@ plugins:
     version: "5.0.0"
   - name: tls
     version: "4.0.0"
+env:
+  CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+  CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+  CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
 team: ecosystem
