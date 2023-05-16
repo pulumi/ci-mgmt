@@ -12,8 +12,8 @@ const javaVersion = "11";
 // We need to make sure that this container uses the same version of Go that we install.
 const golangciLintContainerVersion = "v1.51";
 
-const env = (opts: BridgedConfig, excludeKeys?: string[]) => {
-  const result = Object.assign(
+const env = (opts: BridgedConfig) =>
+  Object.assign(
     {
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
       PROVIDER: opts.provider,
@@ -41,11 +41,6 @@ const env = (opts: BridgedConfig, excludeKeys?: string[]) => {
     },
     opts.env
   );
-  excludeKeys?.forEach((k) => {
-    delete result[k];
-  });
-  return result;
-};
 
 export function DefaultBranchWorkflow(
   name: string,
@@ -115,7 +110,7 @@ export function ReleaseWorkflow(
         tags: ["v*.*.*", "!v*.*.*-**"],
       },
     },
-    env: env(opts, ["GITLAB_TOKEN"]),
+    env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites"),
       build_sdk: new BuildSdkJob("build_sdk"),
@@ -148,7 +143,7 @@ export function PrereleaseWorkflow(
       },
     },
     env: {
-      ...env(opts, ["GITLAB_TOKEN"]),
+      ...env(opts),
       IS_PRERELEASE: true,
     },
     jobs: {
