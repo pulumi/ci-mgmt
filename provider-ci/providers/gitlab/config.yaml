@@ -4,3 +4,4 @@ env:
   GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 makeTemplate: bridged
 team: ecosystem
+javaGenVersion: "v0.9.3"
