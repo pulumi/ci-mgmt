@@ -122,7 +122,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [upstream],
     variables: {
-      VERSION: '$(shell pulumictl convert-version -l javascript -v "$(VERSION)")',
+      VERSION:
+        '$(shell pulumictl convert-version -l javascript -v "$(VERSION)")',
     },
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/",
@@ -141,7 +142,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [upstream],
     variables: {
-      PYPI_VERSION: '$(shell pulumictl convert-version -l python -v "$(VERSION)")',
+      PYPI_VERSION:
+        '$(shell pulumictl convert-version -l python -v "$(VERSION)")',
     },
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/",
@@ -174,7 +176,8 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "build_dotnet",
     phony: true,
     variables: {
-      DOTNET_VERSION: '$(shell pulumictl convert-version -l dotnet -v "$(VERSION)")',
+      DOTNET_VERSION:
+        '$(shell pulumictl convert-version -l dotnet -v "$(VERSION)")',
     },
     dependencies: [upstream],
     commands: [

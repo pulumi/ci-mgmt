@@ -7,7 +7,7 @@ PROVIDER_PATH := provider/v4
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
-VERSION := $(shell pulumictl get version)
+VERSION := $(shell pulumictl get version --language generic)
 JAVA_GEN := pulumi-java-gen
 JAVA_GEN_VERSION := v0.5.4
 TESTPARALLELISM := 10
@@ -29,9 +29,9 @@ install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_j
 
 only_build: build
 
-build_dotnet: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
+build_dotnet: DOTNET_VERSION := $(shell pulumictl convert-version -l dotnet -v "$(VERSION)")
 build_dotnet: upstream
-	pulumictl get version --language dotnet
+	@echo $(DOTNET_VERSION)
 	$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/
 	cd sdk/dotnet/ && \
 		echo "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
@@ -42,14 +42,14 @@ build_go: upstream
 	$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
 	cd sdk && go list `grep -e "^module" go.mod | cut -d ' ' -f 2`/go/... | xargs go build
 
-build_java: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
+build_java: PACKAGE_VERSION := "$(VERSION)"
 build_java: bin/pulumi-java-gen upstream
 	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
 	cd sdk/java/ && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build
 
-build_nodejs: VERSION := $(shell pulumictl get version --language javascript)
+build_nodejs: VERSION := $(shell pulumictl convert-version -l javascript -v "$(VERSION)")
 build_nodejs: upstream
 	$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
 	cd sdk/nodejs/ && \
@@ -59,7 +59,7 @@ build_nodejs: upstream
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION)/g" ./bin/package.json
 
-build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
+build_python: PYPI_VERSION := $(shell pulumictl convert-version -l python -v "$(VERSION)")
 build_python: upstream
 	$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
 	cd sdk/python/ && \
@@ -122,7 +122,10 @@ upstream.finalize:
 upstream.rebase:
 	@$(SHELL) ./scripts/upstream.sh "$@" start_rebase
 
+version.generic:
+	@echo $(VERSION)
+
 bin/pulumi-java-gen:
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup docs help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen upstream upstream.finalize upstream.rebase
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup docs help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen upstream upstream.finalize upstream.rebase version.generic
