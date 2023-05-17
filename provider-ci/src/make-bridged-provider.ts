@@ -14,7 +14,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const JAVA_GEN = `pulumi-java-gen`;
   const JAVA_GEN_VERSION = config.javaGenVersion || "v0.5.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
-  const VERSION = "$(shell pulumictl get version)";
+  const VERSION = "$(shell pulumictl get version --language generic)";
   const TESTPARALLELISM = "10";
   const WORKING_DIR = "$(shell pwd)";
 
@@ -122,7 +122,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [upstream],
     variables: {
-      VERSION: "$(shell pulumictl get version --language javascript)",
+      VERSION: '$(shell pulumictl convert-version -l javascript -v "$(VERSION)")',
     },
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/",
@@ -141,7 +141,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [upstream],
     variables: {
-      PYPI_VERSION: "$(shell pulumictl get version --language python)",
+      PYPI_VERSION: '$(shell pulumictl convert-version -l python -v "$(VERSION)")',
     },
     commands: [
       "$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/",
@@ -174,11 +174,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     name: "build_dotnet",
     phony: true,
     variables: {
-      DOTNET_VERSION: "$(shell pulumictl get version --language dotnet)",
+      DOTNET_VERSION: '$(shell pulumictl convert-version -l dotnet -v "$(VERSION)")',
     },
     dependencies: [upstream],
     commands: [
-      "pulumictl get version --language dotnet",
+      "@echo $(DOTNET_VERSION)",
       "$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/",
       [
         "cd sdk/dotnet/",
@@ -199,7 +199,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     phony: true,
     dependencies: [bin_pulumi_java_gen, upstream],
     variables: {
-      PACKAGE_VERSION: "$(shell pulumictl get version --language generic)",
+      PACKAGE_VERSION: '"$(VERSION)"',
     },
     commands: [
       "$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus",
@@ -303,7 +303,11 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
       "cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h",
     ],
   };
-
+  const versionGeneric: Target = {
+    name: "version:generic",
+    phony: true,
+    commands: ["@echo $(VERSION)"],
+  };
   const targets = [
     upstream,
     startPatch,
@@ -331,6 +335,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     install_nodejs_sdk,
     install_sdks,
     test,
+    versionGeneric,
   ].filter((x): x is Target => x !== null);
 
   if (config.hybrid) {
