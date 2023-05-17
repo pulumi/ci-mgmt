@@ -380,6 +380,11 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
       "cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h",
     ],
   };
+  // const versionGeneric: Target = {
+  //   name: "version:generic",
+  //   phony: true,
+  //   commands: ["pulumictl get version --language generic"],
+  // };
   return {
     variables,
     defaultTarget: development,
@@ -392,6 +397,7 @@ export function bridgedProviderV2(config: BridgedConfig): Makefile {
       clean,
       test,
       tfgen,
+      //versionGeneric,
     ],
   };
 }
