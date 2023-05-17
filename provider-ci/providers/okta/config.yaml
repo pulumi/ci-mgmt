@@ -1,11 +1,12 @@
 provider: okta
-major-version: 3
+major-version: 4
 env:
   OKTA_BASE_URL: ${{ secrets.OKTA_BASE_URL }}
   OKTA_ORG_NAME: ${{ secrets.OKTA_ORG_NAME }}
   OKTA_API_TOKEN: ${{ secrets.OKTA_API_TOKEN }}
+  VERSION_PREFIX: 4.0.0
 makeTemplate: bridged
 plugins:
-  - name: random 
+  - name: random
     version: "4.1.1"
 team: ecosystem
