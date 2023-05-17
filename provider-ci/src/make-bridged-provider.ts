@@ -304,7 +304,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
     ],
   };
   const versionGeneric: Target = {
-    name: "version:generic",
+    name: "version.generic",
     phony: true,
     commands: ["@echo $(VERSION)"],
   };

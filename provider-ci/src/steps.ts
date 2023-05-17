@@ -456,7 +456,7 @@ export function SetPackageVersionToEnv(): Step {
   return {
     // This is required for the Java Provider Build + Publish Steps
     name: "Set PACKAGE_VERSION to Env",
-    run: 'echo "PACKAGE_VERSION=$(make version:generic)" >> $GITHUB_ENV',
+    run: 'echo "PACKAGE_VERSION=$(make version.generic)" >> $GITHUB_ENV',
   };
 }
 
@@ -470,7 +470,7 @@ export function RunTests(): Step {
 export function SetPreReleaseVersion(): Step {
   return {
     name: "Set PreRelease Version",
-    run: 'echo "GORELEASER_CURRENT_TAG=v$(make version:generic)" >> $GITHUB_ENV',
+    run: 'echo "GORELEASER_CURRENT_TAG=v$(make version.generic)" >> $GITHUB_ENV',
   };
 }
 
@@ -501,7 +501,7 @@ export function RunPublishSDK(): Step {
 export function TagSDKTag(): Step {
   return {
     name: "Add SDK version tag",
-    run: "git tag sdk/v$(make version:generic) && git push origin sdk/v$(make version:generic)",
+    run: "git tag sdk/v$(make version.generic) && git push origin sdk/v$(make version.generic)",
   };
 }
 
