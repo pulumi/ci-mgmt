@@ -4,7 +4,7 @@ import * as steps from "./steps";
 import { Step } from "./steps";
 
 const pythonVersion = "3.7";
-const goVersion = "1.19.x";
+const goVersion = "1.20.x";
 const nodeVersion = "16.x";
 const dotnetVersion = "6.0.x\n3.1.301\n";
 const javaVersion = "11";
