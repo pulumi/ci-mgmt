@@ -571,6 +571,7 @@ export function CommentSchemaChangesOnPR(): Step {
         "${{ env.SCHEMA_CHANGES }}\n\n" +
         "Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.\n\n",
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+	  comment_tag: "schemaCheck",
     },
   };
 }
