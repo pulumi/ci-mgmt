@@ -891,8 +891,7 @@ export function ModerationWorkflow(
   return workflow;
 }
 
-export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
-  const providerName = "pulumi-" + opts.provider;
+export function UpgradeProvider(): GithubWorkflow {
   return {
     name: "Upgrade provider",
     on: {
@@ -907,7 +906,7 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
     },
     jobs: {
       upgrade_provider: new EmptyJob("upgrade-provider")
-        .addStep(steps.UpgradeProviderAction())
+        .addStep(steps.UpgradeProviderAction("all"))
         .addStep(steps.NotifySlackUpgradeSuccess())
         .addStep(steps.NotifySlackUpgradeFailure())
         .addConditional(
@@ -915,4 +914,23 @@ export function UpgradeProvider(opts: BridgedConfig): GithubWorkflow {
         ),
     },
   };
+}
+
+export function UpgradeBridge(): GithubWorkflow {
+	return {
+		name: "Upgrade bridge",
+		on: {
+			workflow_dispatch: {},
+		},
+		env: {
+			GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+			GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+		},
+		jobs: {
+			upgrade_provider: new EmptyJob("upgrade-provider")
+				.addStep(steps.UpgradeProviderAction("bridge"))
+				.addStep(steps.NotifySlackUpgradeSuccess())
+				.addStep(steps.NotifySlackUpgradeFailure())
+		},
+	};
 }

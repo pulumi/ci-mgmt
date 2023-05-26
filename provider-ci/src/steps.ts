@@ -714,10 +714,13 @@ export function SendCodegenWarnCommentPr(): Step {
     },
   };
 }
-export function UpgradeProviderAction(): Step {
+export function UpgradeProviderAction(kind: string): Step {
   return {
     name: "Call upgrade provider action",
     uses: action.upgradeProviderAction,
+	with: {
+		kind: kind,
+	}
   };
 }
 
