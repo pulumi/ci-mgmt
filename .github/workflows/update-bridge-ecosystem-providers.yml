@@ -40,7 +40,7 @@ jobs:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
       - name: pulumi-${{ matrix.provider }}
-        uses: benc-uk/workflow-dispatch@v1.2.2
+        uses: benc-uk/workflow-dispatch@v1
         with:
             workflow: upgrade-bridge.yml
             repo: pulumi-${{ matrix.provider }}
