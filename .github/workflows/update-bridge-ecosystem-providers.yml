@@ -40,12 +40,13 @@ jobs:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
       - name: pulumi-${{ matrix.provider }}
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@v1.2.2
         with:
             workflow: upgrade-bridge.yml
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 
-            repo: pulumi-${{ matrix.provider }}
+            repo: pulumi/pulumi-${{ matrix.provider }}
             inputs: '{ "kind": "bridge" }'
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
+        
