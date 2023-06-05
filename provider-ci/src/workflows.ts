@@ -917,20 +917,20 @@ export function UpgradeProvider(): GithubWorkflow {
 }
 
 export function UpgradeBridge(): GithubWorkflow {
-	return {
-		name: "Upgrade bridge",
-		on: {
-			workflow_dispatch: {},
-		},
-		env: {
-			GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-			GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
-		},
-		jobs: {
-			upgrade_provider: new EmptyJob("upgrade-provider")
-				.addStep(steps.UpgradeProviderAction("bridge"))
-				.addStep(steps.NotifySlackUpgradeSuccess())
-				.addStep(steps.NotifySlackUpgradeFailure())
-		},
-	};
+  return {
+    name: "Upgrade bridge",
+    on: {
+      workflow_dispatch: {},
+    },
+    env: {
+      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      GH_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+    },
+    jobs: {
+      upgrade_provider: new EmptyJob("upgrade-provider")
+        .addStep(steps.UpgradeProviderAction("bridge"))
+        .addStep(steps.NotifySlackUpgradeSuccess())
+        .addStep(steps.NotifySlackUpgradeFailure()),
+    },
+  };
 }
