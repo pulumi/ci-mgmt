@@ -42,6 +42,7 @@ jobs:
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
         uses: benc-uk/workflow-dispatch@v1.2.2
+        continue-on-error: true
         with:
             workflow: upgrade-bridge.yml
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 
@@ -49,7 +50,7 @@ jobs:
             ref: master
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
-        if: failure() && steps.upgrade-on-master.outcome != 'success'
+        if: steps.upgrade-on-master.outcome != 'success'
         uses: benc-uk/workflow-dispatch@v1.2.2
         with:
             workflow: upgrade-bridge.yml
