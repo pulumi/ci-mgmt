@@ -66,10 +66,10 @@ export function generateProviderFiles(config: BridgedConfig) {
       path: path.join(githubWorkflowsDir, "upgrade-provider.yml"),
       data: wf.UpgradeProvider(),
     },
-	{
-		path: path.join(githubWorkflowsDir, "upgrade-bridge.yml"),
-		data: wf.UpgradeBridge(),
-	},
+    {
+      path: path.join(githubWorkflowsDir, "upgrade-bridge.yml"),
+      data: wf.UpgradeBridge(),
+    },
     {
       path: path.join(githubWorkflowsDir, "resync-build.yml"),
       data: wf.ResyncBuildWorkflow(config),
