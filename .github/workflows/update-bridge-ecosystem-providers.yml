@@ -39,13 +39,23 @@ jobs:
       matrix:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
-      - name: pulumi-${{ matrix.provider }}
+      - name: pulumi-${{ matrix.provider }} master
+        id: upgrade-on-master
         uses: benc-uk/workflow-dispatch@v1.2.2
         with:
             workflow: upgrade-bridge.yml
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 
             repo: pulumi/pulumi-${{ matrix.provider }}
-            ref: ${{ github.event.repository.default_branch }}
+            ref: master
+      - name: pulumi-${{ matrix.provider }} main
+        id: upgrade-on-main
+        if: failure() && steps.upgrade-on-master.outcome != 'success'
+        uses: benc-uk/workflow-dispatch@v1.2.2
+        with:
+            workflow: upgrade-bridge.yml
+            token: ${{ secrets.PULUMI_BOT_TOKEN }} 
+            repo: pulumi/pulumi-${{ matrix.provider }}
+            ref: main
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
