@@ -5,6 +5,7 @@ parallel: 1
 timeout: 90
 generate-nightly-test-workflow: true
 providerVersion: github.com/hashicorp/terraform-provider-azurerm/version.ProviderVersion
+skipTfGen: true  # when running goreleaser, avoid repeat `make tfgen` to save disk space
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_ENVIRONMENT: "public"
