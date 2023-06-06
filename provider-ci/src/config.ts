@@ -46,6 +46,7 @@ const BridgedConfig = z
     team: z.enum(["ecosystem", "providers"]).default("ecosystem"),
     // Go options
     goBuildParallelism: z.number().default(0), // translates to "go build -p $X" flag, 0=omit.
+    cleanCacheBetweenBuilds: z.boolean().default(false),
   })
   .transform((input) => {
     if (input["upstream-provider-repo"] !== "") {
