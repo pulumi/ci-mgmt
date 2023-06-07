@@ -84,6 +84,8 @@ interface GoReleaserOpts {
   providerVersion: string;
   skipTfGen: boolean;
   "extra-ld-flags"?: string[];
+  // Turning this on increases the wall-clock time but reduces disk space usage, mitigating out-of-disk issues.
+  cleanCacheBetweenBuilds: boolean;
 }
 
 export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
@@ -132,18 +134,29 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
         hooks: ["make tfgen"],
       };
     }
-    this.builds = [
-      {
-        dir: "provider",
-        env: ["CGO_ENABLED=0", "GO111MODULE=on"],
-        goos: ["darwin", "windows", "linux"],
-        goarch: ["amd64", "arm64"],
-        ignore: ignores,
-        main: `./cmd/pulumi-resource-${opts.provider}/`,
-        ldflags: ldflags,
-        binary: `pulumi-resource-${opts.provider}`,
-      },
-    ];
+
+    const theBuild: any = {
+      dir: "provider",
+      env: ["CGO_ENABLED=0", "GO111MODULE=on"],
+      goos: ["darwin", "windows", "linux"],
+      goarch: ["amd64", "arm64"],
+      ignore: ignores,
+      main: `./cmd/pulumi-resource-${opts.provider}/`,
+      ldflags: ldflags,
+      binary: `pulumi-resource-${opts.provider}`,
+    };
+
+    if (opts.cleanCacheBetweenBuilds) {
+      theBuild["hooks"] = {
+        post: [
+          "env GOOS={{ .Os }} GOARCH={{ .Arch }} go clean -cache",
+          "env GOOS={{ .Os }} GOARCH={{ .Arch }} go clean -modcache",
+        ],
+      };
+    }
+
+    this.builds = [theBuild];
+
     this.archives = [
       {
         name_template: "{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}",

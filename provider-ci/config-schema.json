@@ -142,6 +142,10 @@
             "goBuildParallelism": {
               "type": "number",
               "default": 0
+            },
+            "cleanCacheBetweenBuilds": {
+              "type": "boolean",
+              "default": false
             }
           },
           "required": [
