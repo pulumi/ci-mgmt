@@ -215,6 +215,7 @@ export const configFile = {
 upstream-provider-name: ${upstreamProviderName}
 pulumi-infer-version: true
 remove-plugins: true
+pr-reviewers: pulumi/Ecosystem
 
 `,
 };
