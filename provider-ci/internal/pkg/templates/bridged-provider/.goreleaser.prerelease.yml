@@ -41,13 +41,12 @@ builds:
   #{{- end }}#
   ldflags:
   #{{- if ge (index .Config "major-version") 2 }}#
-  - -X#{{if (gt (len .Repository) 22)}}##{{ "\n   " }}##{{end}}# github.com/#{{ .Repository }}#/provider/v#{{ index .Config "major-version" }}#/pkg/version.Version={{.Tag}}
+  - -X github.com/#{{ .Repository }}#/provider/v#{{ index .Config "major-version" }}#/pkg/version.Version={{.Tag}}
   #{{- else }}#
-  - -X#{{if (gt (len .Repository) 24)}}##{{ "\n   " }}##{{end}}# github.com/#{{ .Repository }}#/provider/pkg/version.Version={{.Tag}}
+  - -X github.com/#{{ .Repository }}#/provider/pkg/version.Version={{.Tag}}
   #{{- end }}#
   #{{- if .Config.providerVersion }}#
-  - -X
-    #{{ .Config.providerVersion }}#={{.Tag}}
+  - -X #{{ .Config.providerVersion }}#={{.Tag}}
   #{{- end }}#
   #{{- range (index .Config "extra-ld-flags") }}#
   - #{{ . }}#

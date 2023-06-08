@@ -1,19 +1,28 @@
 NAME ?= all
 PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
+PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
-all: ensure clean test format providers
+# These targets are versioned to cause Make to rebuild them when the version changes.
+ACTIONLINT_VERSION := 1.6.24
+ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
+
+all: ensure test format providers providers lint-providers
 
 gen: clean providers
 
-# Go build caching is fast enough to use that instead of Make to avoid rebuilds.
-bin/package-ci:
-	go build -o bin/package-ci
+bin/provider-ci: $(shell find internal -type f)
+	go build -o bin/provider-ci
 
-ensure:: bin/package-ci
+$(ACTIONLINT):
+	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.6.24
+	mv bin/actionlint $(ACTIONLINT)
+
+ensure:: bin/provider-ci
 
 clean:
 	rm -rf providers/*/repo
 	rm -rf platform/examples/repo
+	rm -rf bin
 
 test:
 	golangci-lint run
@@ -21,19 +30,28 @@ test:
 format:
 	go fmt ./...
 
-providers/%/repo: bin/package-ci
-	@echo Generating $*
-	@./bin/package-ci generate \
+providers/%/repo: bin/provider-ci
+	@./bin/provider-ci generate \
 		--name pulumi/pulumi-$* \
 		--out ./providers/$*/repo \
 		--template bridged-provider \
 		--config ./providers/$*/config.yaml
+	@touch ./providers/$*/repo
+	@echo "Generated providers/$*/repo"
 
-providers: $(addsuffix /repo, $(PROVIDERS))
+lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
+	@echo Linting $*
+	$(ACTIONLINT) providers/$*/repo/.github/workflows/*
+	@scripts/shellcheck.sh providers/$*/repo
+
+LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
+lint-providers: $(LINT_RULES)
+
+providers: $(PROVIDER_REPOS)
 ifeq ($(NAME), all)
 provider: providers
 else
-provider: provider/$(NAME)/repo
+provider: providers/$(NAME)/repo
 endif
 
-.PHONY: all gen ensure clean test format provider providers provider/%/repo bin/package-ci
+.PHONY: all gen ensure clean test format provider providers lint-providers

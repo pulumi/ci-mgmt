@@ -33,18 +33,15 @@ The following tools are required for generating and deploying GitHub Actions wor
 After checking out the code, run the following command:
 
 ```bash
-cd provider-ci && make
+cd provider-ci && make clean && make -j
 ```
 
 Common commands:
 
-- `make gen`: Generate all code
-- `make providers`: Generate code for all providers
+- `make`: Generate all code and check the output.
 - `make provider NAME=aws`: Generate code for single provider with debug information
-- `make examples`: Generate examples code
-- `make check`: Check for correctness
-- `make format`: Auto-format all code
-- `make discovery`: Check for GitHub workflow schema updates
+- `make lint-providers`: Check the generated code for all providers.
+- `make lint-providers/aws/repo`: Check the generated code for a specific provider.
 
 ## Adding a New Bridged Provider
 
@@ -54,7 +51,9 @@ To add a new provider:
 
    ```bash
    # Change the value of PROVIDER_NAME below:
-   PROVIDER_NAME=foo && mkdir provider-ci/providers/${PROVIDER_NAME} && touch provider-ci/providers/${PROVIDER_NAME}/config.yaml
+   PROVIDER_NAME=foo && \
+      mkdir provider-ci/providers/${PROVIDER_NAME} && \
+      touch provider-ci/providers/${PROVIDER_NAME}/config.yaml
    ```
 
 1. In the `config.yaml` you created, add the configuration to be applied to the generated GitHub Actions workflows for the provider:
