@@ -1,12 +1,9 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
 
-	"github.com/pulumi/ci-mgmt/package-ci/pkg"
+	"github.com/pulumi/ci-mgmt/package-ci/internal/pkg"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )

@@ -1,10 +1,7 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
-	"github.com/pulumi/ci-mgmt/package-ci/pkg"
+	"github.com/pulumi/ci-mgmt/package-ci/internal/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -17,9 +14,9 @@ var generateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := pkg.GeneratePackage(pkg.GenerateOpts{
 			RepositoryName: generateOpts.RepositoryName,
-			OutDir:      generateOpts.OutDir,
-			TemplateName: generateOpts.TemplateName,
-			ConfigPath:   generateOpts.ConfigPath,
+			OutDir:         generateOpts.OutDir,
+			TemplateName:   generateOpts.TemplateName,
+			ConfigPath:     generateOpts.ConfigPath,
 		})
 		return err
 	},
