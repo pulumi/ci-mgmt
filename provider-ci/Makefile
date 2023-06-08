@@ -1,46 +1,39 @@
 NAME ?= all
+PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 
-all: ensure clean test format providers examples
+all: ensure clean test format providers
 
-gen: clean providers examples
+gen: clean providers
 
-node_modules:: package.json yarn.lock
-	yarn install
-	@touch node_modules
+# Go build caching is fast enough to use that instead of Make to avoid rebuilds.
+bin/package-ci:
+	go build -o bin/package-ci
 
-config-schema.json:: node_modules cmd/generate-config-schema.ts src/*.ts
-	yarn gen-config-schema
-
-schema:: config-schema.json
-
-ensure:: node_modules config-schema.json
+ensure:: bin/package-ci
 
 clean:
 	rm -rf providers/*/repo
 	rm -rf platform/examples/repo
 
-test:	
-	yarn run lint
+test:
+	golangci-lint run
 
 format:
-	yarn run format
+	go fmt ./...
 
-ifneq ($(NAME),all)
-provider:: node_modules
-	echo $(NAME)
-	yarn run gen-providers -- --name $(NAME) --debug
-else 
-providers:: node_modules
-	yarn run gen-providers
+providers/%/repo: bin/package-ci
+	@echo Generating $*
+	@./bin/package-ci generate \
+		--name pulumi/pulumi-$* \
+		--out ./providers/$*/repo \
+		--template bridged-provider \
+		--config ./providers/$*/config.yaml
+
+providers: $(addsuffix /repo, $(PROVIDERS))
+ifeq ($(NAME), all)
+provider: providers
+else
+provider: provider/$(NAME)/repo
 endif
 
-# Generate the GitHub Actions for the examples repo
-# It will generate the files to a platform directory and then examples directory
-examples:: node_modules
-	yarn run gen-examples
-
-discovery:: node_modules
-	yarn run discovery
-	yarn run format
-
-.PHONY: all ensure clean test format providers examples discovery providers/ec/repo
+.PHONY: all gen ensure clean test format provider providers provider/%/repo bin/package-ci
