@@ -12,7 +12,7 @@ export function bridgedProvider(config: BridgedConfig): Makefile {
   const VERSION_PATH = `$(PROVIDER_PATH)/pkg/version.Version`;
   const TFGEN = `pulumi-tfgen-$(PACK)`;
   const JAVA_GEN = `pulumi-java-gen`;
-  const JAVA_GEN_VERSION = config.javaGenVersion || "v0.5.4";
+  const JAVA_GEN_VERSION = config.javaGenVersion || "v0.9.4";
   const PROVIDER = `pulumi-resource-$(PACK)`;
   const VERSION = "$(shell pulumictl get version)";
   const TESTPARALLELISM = "10";
