@@ -14,7 +14,7 @@ Pulumi providers use [GitHub Actions](https://docs.github.com/en/actions) for CI
 
 This repository has the following components:
 
-- The `provider-ci` directory contains code to generate [GitHub Actions workflow files](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions) for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
+- The `provider-ci` and `native-provider-ci` directories contain code to generate [GitHub Actions workflow files](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions) for Pulumi providers, as well as the generated output for each provider (retained for the purpose of convenient output diffing).
 - The `infra/providers/` directory contains a Pulumi program which uses the [Pulumi GitHub provider](https://www.pulumi.com/registry/packages/github/) to ensure consistent [branch protections](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches) across our provider repositories.
 
   For an overview of how Pulumi programs work, see [the Pulumi docs](https://www.pulumi.com/docs/).
@@ -33,18 +33,15 @@ The following tools are required for generating and deploying GitHub Actions wor
 After checking out the code, run the following command:
 
 ```bash
-cd provider-ci && make
+cd provider-ci && make clean && make -j
 ```
 
 Common commands:
 
-- `make gen`: Generate all code
-- `make providers`: Generate code for all providers
+- `make`: Generate all code and check the output.
 - `make provider NAME=aws`: Generate code for single provider with debug information
-- `make examples`: Generate examples code
-- `make check`: Check for correctness
-- `make format`: Auto-format all code
-- `make discovery`: Check for GitHub workflow schema updates
+- `make lint-providers`: Check the generated code for all providers.
+- `make lint-providers/aws/repo`: Check the generated code for a specific provider.
 
 ## Adding a New Bridged Provider
 
@@ -54,7 +51,9 @@ To add a new provider:
 
    ```bash
    # Change the value of PROVIDER_NAME below:
-   PROVIDER_NAME=foo && mkdir provider-ci/providers/${PROVIDER_NAME} && touch provider-ci/providers/${PROVIDER_NAME}/config.yaml
+   PROVIDER_NAME=foo && \
+      mkdir provider-ci/providers/${PROVIDER_NAME} && \
+      touch provider-ci/providers/${PROVIDER_NAME}/config.yaml
    ```
 
 1. In the `config.yaml` you created, add the configuration to be applied to the generated GitHub Actions workflows for the provider:

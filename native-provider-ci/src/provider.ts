@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
 import z from "zod";
-import * as shared from "../../provider-ci/src/shared-workflows";
+import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import * as goreleaser from "./goreleaser";
 import { providersDir } from "../cmd/generate-providers";

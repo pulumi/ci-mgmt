@@ -1,4 +1,4 @@
-import * as action from "../../provider-ci/src/action-versions";
+import * as action from "./action-versions";
 import { NormalJob } from "./github-workflow";
 
 export type Step = Required<NormalJob>["steps"][0];

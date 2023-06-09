@@ -1,46 +1,57 @@
 NAME ?= all
+PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
+PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
-all: ensure clean test format providers examples
+# These targets are versioned to cause Make to rebuild them when the version changes.
+ACTIONLINT_VERSION := 1.6.24
+ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
-gen: clean providers examples
+all: ensure test format providers providers lint-providers
 
-node_modules:: package.json yarn.lock
-	yarn install
-	@touch node_modules
+gen: clean providers
 
-config-schema.json:: node_modules cmd/generate-config-schema.ts src/*.ts
-	yarn gen-config-schema
+bin/provider-ci: $(shell find internal -type f)
+	go build -o bin/provider-ci
 
-schema:: config-schema.json
+$(ACTIONLINT):
+	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.6.24
+	mv bin/actionlint $(ACTIONLINT)
 
-ensure:: node_modules config-schema.json
+ensure:: bin/provider-ci
 
 clean:
 	rm -rf providers/*/repo
 	rm -rf platform/examples/repo
+	rm -rf bin
 
-test:	
-	yarn run lint
+test:
+	golangci-lint run
 
 format:
-	yarn run format
+	go fmt ./...
 
-ifneq ($(NAME),all)
-provider:: node_modules
-	echo $(NAME)
-	yarn run gen-providers -- --name $(NAME) --debug
-else 
-providers:: node_modules
-	yarn run gen-providers
+providers/%/repo: bin/provider-ci
+	@./bin/provider-ci generate \
+		--name pulumi/pulumi-$* \
+		--out ./providers/$*/repo \
+		--template bridged-provider \
+		--config ./providers/$*/config.yaml
+	@touch ./providers/$*/repo
+	@echo "Generated providers/$*/repo"
+
+lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
+	@echo Linting $*
+	$(ACTIONLINT) providers/$*/repo/.github/workflows/*
+	@scripts/shellcheck.sh providers/$*/repo
+
+LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
+lint-providers: $(LINT_RULES)
+
+providers: $(PROVIDER_REPOS)
+ifeq ($(NAME), all)
+provider: providers
+else
+provider: providers/$(NAME)/repo
 endif
 
-# Generate the GitHub Actions for the examples repo
-# It will generate the files to a platform directory and then examples directory
-examples:: node_modules
-	yarn run gen-examples
-
-discovery:: node_modules
-	yarn run discovery
-	yarn run format
-
-.PHONY: all ensure clean test format providers examples discovery providers/ec/repo
+.PHONY: all gen ensure clean test format provider providers lint-providers
