@@ -30,7 +30,7 @@ test:
 format:
 	go fmt ./...
 
-providers/%/repo: bin/provider-ci
+providers/%/repo: bin/provider-ci providers/%/config.yaml
 	@./bin/provider-ci generate \
 		--name pulumi/pulumi-$* \
 		--out ./providers/$*/repo \
