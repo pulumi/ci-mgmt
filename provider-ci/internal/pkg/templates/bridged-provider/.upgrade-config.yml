@@ -10,5 +10,6 @@ upstream-provider-name: terraform-provider-#{{ .Config.provider }}#
 pulumi-infer-version: true
 remove-plugins: true
 pr-reviewers: pulumi/Ecosystem
+create-failure-issue: true
 
 #{{ end -}}#
