@@ -1,5 +1,5 @@
 provider: rancher2
-major-version: 4
+major-version: 5
 lint: false
 setup-script: testing/setup.sh
 golangci-timeout: 20m
