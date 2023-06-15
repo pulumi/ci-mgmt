@@ -3,6 +3,7 @@
 env:
   PROVIDER: cloudamqp
   IS_PRERELEASE: true
+  CLOUDAMQP_APIKEY: ${{ secrets.CLOUDAMQP_APIKEY }}
   DOTNETVERSION: |
       6.0.x
       3.1.301
