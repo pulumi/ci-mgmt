@@ -3,6 +3,7 @@ major-version: 5
 lint: false
 setup-script: testing/setup.sh
 golangci-timeout: 20m
+javaGenVersion: v0.9.3
 env:
   RANCHER_INSECURE: "true"
   RANCHER_URL: https://localhost # docker
