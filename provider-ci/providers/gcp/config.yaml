@@ -23,5 +23,5 @@ plugins:
     version: "3.20.0"
   - name: tls
     version: "4.6.0"
-team: providers
+team: ecosystem
 goBuildParallelism: 2
