@@ -473,7 +473,7 @@ export function RunTests(provider: string): Step {
   if (provider === "kubernetes") {
     return {
       name: "Run tests",
-      run: "cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4 ./...",
+      run: "cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4 ./... 2>&1 | tee /tmp/gotest.log | gotestfmt",
     };
   }
   return {
