@@ -9,4 +9,4 @@ plugins:
   - name: azure
     version: "5.24.0"
 team: ecosystem
-javaVersion: 0.9.3
+javaGenVersion: "v0.9.3"
