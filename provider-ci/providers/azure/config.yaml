@@ -22,6 +22,8 @@ plugins:
     version: "5.33.0"
   - name: time
     version: "0.0.15"
+  - name: local
+    version: "0.0.1"
 team: ecosystem
 goBuildParallelism: 2
 javaGenVersion: "v0.8.0"
