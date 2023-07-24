@@ -238,7 +238,6 @@ jobs:
     - test
     #{{ if .Config.lint -}}#
     - lint
-    - lint_sdk
     #{{ end -}}#
     runs-on: ubuntu-latest
     steps:
