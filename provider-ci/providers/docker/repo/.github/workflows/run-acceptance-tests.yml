@@ -272,7 +272,6 @@ jobs:
     needs:
     - test
     - lint
-    - lint_sdk
     runs-on: ubuntu-latest
     steps:
     - name: Is workflow a success
