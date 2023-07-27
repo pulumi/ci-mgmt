@@ -397,6 +397,7 @@ export function UploadSDKs(): Step {
     with: {
       name: "${{ matrix.language  }}-sdk.tar.gz",
       path: "${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz",
+      "retention-days": 30,
     },
   };
 }

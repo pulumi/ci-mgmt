@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as yaml from "yaml";
 import z from "zod";
-import * as shared from "./shared-workflows";
 import * as wf from "./workflows";
 import * as goreleaser from "./goreleaser";
 import { providersDir } from "../cmd/generate-providers";
@@ -36,10 +35,6 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const config = getProviderConfig(provider);
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
   const files = [
-    {
-      path: path.join(githubWorkflowsDir, "artifact-cleanup.yml"),
-      data: new shared.ArtifactCleanupWorkflow(),
-    },
     {
       path: path.join(githubWorkflowsDir, "command-dispatch.yml"),
       data: wf.CommandDispatchWorkflow("command-dispatch", config),
