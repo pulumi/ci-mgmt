@@ -7,6 +7,7 @@ env:
       3.1.301
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GOVERSION: 1.20.1
+  HTTP_TOKEN: ${{ secrets.HTTP_TOKEN }}
   JAVAVERSION: "11"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NODEVERSION: 16.x

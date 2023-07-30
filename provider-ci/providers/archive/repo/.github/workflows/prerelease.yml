@@ -3,6 +3,7 @@
 env:
   PROVIDER: archive
   IS_PRERELEASE: true
+  ARCHIVE_TOKEN: ${{ secrets.ARCHIVE_TOKEN }}
   DOTNETVERSION: |
       6.0.x
       3.1.301

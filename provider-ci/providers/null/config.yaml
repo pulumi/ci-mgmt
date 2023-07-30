@@ -3,3 +3,5 @@ major-version: 0
 lint: false
 makeTemplate: bridged
 publishRegistry: false
+env:
+  NULL_TOKEN: ${{ secrets.NULL_TOKEN }}

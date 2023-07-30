@@ -7,6 +7,7 @@ env:
   DOTNETVERSION: |
       6.0.x
       3.1.301
+  EXTERNAL_TOKEN: ${{ secrets.EXTERNAL_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GOVERSION: 1.20.1
   JAVAVERSION: "11"

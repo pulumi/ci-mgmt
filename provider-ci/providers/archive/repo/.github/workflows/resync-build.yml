@@ -4,6 +4,7 @@ env:
   PROVIDER: archive
   PULUMI_EXTRA_MAPPING_ERROR: true
   PULUMI_MISSING_MAPPING_ERROR: true
+  ARCHIVE_TOKEN: ${{ secrets.ARCHIVE_TOKEN }}
   DOTNETVERSION: |
       6.0.x
       3.1.301
