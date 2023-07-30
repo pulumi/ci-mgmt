@@ -96,6 +96,7 @@ jobs:
         - dotnet
         - go
         - java
+  #{{ if .Config.publishRegistry -}}#
   create_docs_build:
     name: create_docs_build
     needs: tag_sdk
@@ -110,6 +111,7 @@ jobs:
       name: Dispatch Event
       run: pulumictl create docs-build pulumi-${{ env.PROVIDER }}
         "${GITHUB_REF#refs/tags/}"
+  #{{ end -}}#
   #{{ if .Config.lint -}}#
   lint:
     container: golangci/golangci-lint:v1.51

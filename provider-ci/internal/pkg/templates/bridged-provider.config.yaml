@@ -6,6 +6,7 @@ lint: true
 provider-default-branch: master
 fail-on-missing-mapping: true
 fail-on-extra-mapping: true
+publishRegistry: true
 env:
   DOTNETVERSION: |
     6.0.x
