@@ -1,0 +1,4 @@
+provider: archive
+major-version: 0
+lint: false
+makeTemplate: bridged

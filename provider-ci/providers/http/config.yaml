@@ -1,0 +1,4 @@
+provider: http
+major-version: 0
+lint: false
+makeTemplate: bridged
