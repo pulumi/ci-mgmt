@@ -1,7 +1,7 @@
-provider: http
+provider: local
 major-version: 0
 lint: false
 makeTemplate: bridged
 publishRegistry: false
 env:
-  HTTP_TOKEN: ${{ secrets.HTTP_TOKEN }}
+  LOCAL_TOKEN: ${{ secrets.LOCAL_TOKEN }}
