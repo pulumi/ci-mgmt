@@ -25,5 +25,7 @@ plugins:
     version: "4.6.0"
   - name: http
     version: "0.0.1"
+  - name: time
+    version: "0.0.15"
 team: ecosystem
 goBuildParallelism: 2
