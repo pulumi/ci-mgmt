@@ -1,0 +1,7 @@
+provider: local
+major-version: 0
+lint: false
+makeTemplate: bridged
+publishRegistry: false
+env:
+  LOCAL_TOKEN: ${{ secrets.LOCAL_TOKEN }}

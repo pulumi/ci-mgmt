@@ -1,0 +1,7 @@
+provider: archive
+major-version: 0
+lint: false
+makeTemplate: bridged
+publishRegistry: false
+env:
+  ARCHIVE_TOKEN: ${{ secrets.ARCHIVE_TOKEN }}
