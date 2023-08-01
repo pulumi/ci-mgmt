@@ -134,7 +134,7 @@ export function RunAcceptanceTestsWorkflow(
         "prerequisites",
         opts
       ).addDispatchConditional(true),
-      build_sdks: new BuildSdkJob("build_sdks", opts)
+      build_sdks: new BuildSdkJob("build_sdks", opts, false)
         .addDispatchConditional(true)
         .addRunsOn(opts.provider),
       test: new TestsJob("test", opts).addDispatchConditional(true),
@@ -207,7 +207,7 @@ export function BuildWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts).addRunsOn(opts.provider),
+      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(opts.provider),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
@@ -249,7 +249,7 @@ export function PrereleaseWorkflow(
     },
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts, true),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
@@ -285,7 +285,7 @@ export function ReleaseWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts, true),
       test: new TestsJob("test", opts),
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
@@ -441,7 +441,7 @@ export class BuildSdkJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: WorkflowOpts) {
+  constructor(name: string, opts: WorkflowOpts, tag: boolean) {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
         "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
@@ -469,7 +469,7 @@ export class BuildSdkJob implements NormalJob {
       steps.CheckCleanWorkTree(),
       steps.Porcelain(),
       steps.ZipSDKsStep(),
-      steps.UploadSDKs(),
+      steps.UploadSDKs(tag),
       steps.NotifySlack("Failure while building SDKs"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
