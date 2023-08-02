@@ -5,3 +5,4 @@ makeTemplate: bridged
 publishRegistry: false
 env:
   HTTP_TOKEN: ${{ secrets.HTTP_TOKEN }}
+team: ecosystem

@@ -5,3 +5,4 @@ makeTemplate: bridged
 publishRegistry: false
 env:
   LOCAL_TOKEN: ${{ secrets.LOCAL_TOKEN }}
+team: ecosystem
