@@ -58,11 +58,11 @@ function updatePulumiCoreRefTo3x(): SourceMigration {
     return sm;
 }
 
-function updateGo_1_19(): SourceMigration {
+function updateGo_1_20(): SourceMigration {
     let pattern = new RegExp('^go \\d+[.]\\d+$', 'm');
-    let replacement = "go 1.19";
+    let replacement = "go 1.20";
     let sm: SourceMigration = {
-        name: "updateGo_1_19",
+        name: "updateGo_1_20",
         execute: (ctx: MigrateContext) => {
             let stdout = child.execSync("git ls-files -- '**/go.mod'", {cwd: ctx.dir});
             let filesEdited = String(stdout).split("\n")
@@ -117,7 +117,7 @@ function allMigrations(): SourceMigration[] {
     return [
         updateExamplesFromCore31DotNet6(),
         updatePulumiCoreRefTo3x(),
-        updateGo_1_19(),
+        updateGo_1_20(),
     ];
 }
 
