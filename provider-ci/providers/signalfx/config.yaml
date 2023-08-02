@@ -1,5 +1,5 @@
 provider: signalfx
-major-version: 5
+major-version: 6
 makeTemplate: bridged
 plugins:
   - name: aws 
