@@ -5,3 +5,4 @@ makeTemplate: bridged
 publishRegistry: false
 env:
   ARCHIVE_TOKEN: ${{ secrets.ARCHIVE_TOKEN }}
+team: ecosystem
