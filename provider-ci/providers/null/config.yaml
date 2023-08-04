@@ -1,4 +1,4 @@
-provider: null
+provider: "null"
 major-version: 0
 lint: false
 makeTemplate: bridged
