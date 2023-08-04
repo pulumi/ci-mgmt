@@ -1,5 +1,5 @@
 major-version: 2
-javaGenVersion: v0.5.4
+javaGenVersion: v0.9.5
 parallel: 3
 timeout: 60
 lint: true
