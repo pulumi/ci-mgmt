@@ -14,7 +14,7 @@ blobs:
   provider: s3
   region: us-west-2
 builds:
-- binary: pulumi-resource-<no value>
+- binary: pulumi-resource-null
   dir: provider
   env:
   - CGO_ENABLED=0
@@ -33,7 +33,7 @@ builds:
   ignore: []
   ldflags:
   - -X github.com/pulumi/pulumi-null/provider/pkg/version.Version={{.Tag}}
-  main: ./cmd/pulumi-resource-<no value>/
+  main: ./cmd/pulumi-resource-null/
 changelog:
   filters:
     exclude:
