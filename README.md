@@ -27,6 +27,8 @@ The following tools are required for generating and deploying GitHub Actions wor
 
 - [Make](https://www.gnu.org/software/make/)
 - [npm](https://www.npmjs.com/)
+- [golangci-lint](https://golangci-lint.run/)
+- [shellcheck](https://github.com/koalaman/shellcheck)
 
 ## Building
 

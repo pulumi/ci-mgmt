@@ -6,7 +6,7 @@ PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 ACTIONLINT_VERSION := 1.6.24
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
-all: ensure test format providers providers lint-providers
+all: ensure test format providers lint-providers
 
 gen: clean providers
 
