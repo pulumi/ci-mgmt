@@ -50,6 +50,8 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ matrix.provider }}
           path: pulumi-${{ matrix.provider }}
+      - name: Initialize submodule in pulumi-${{ matrix.provider }}
+        run: cd pulumi-${{ matrix.provider }} && make upstream && cd ..
       - name: Delete existing workflows
         run: rm pulumi-${{ matrix.provider }}/.github/workflows/*.yml
       - name: Copy files from ci-mgmt to pulumi-${{ matrix.provider }}
