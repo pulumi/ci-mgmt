@@ -1,7 +1,8 @@
 provider: wavefront
-major-version: 1
+major-version: 3
 env:
   WAVEFRONT_ADDRESS: ${{ secrets.WAVEFRONT_ADDRESS }}
   WAVEFRONT_TOKEN: ${{ secrets.WAVEFRONT_TOKEN }}
 makeTemplate: bridged
 team: ecosystem
+javaGenVersion: "v0.9.5"
