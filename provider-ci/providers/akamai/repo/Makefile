@@ -3,13 +3,13 @@
 PACK := akamai
 ORG := pulumi
 PROJECT := github.com/$(ORG)/pulumi-$(PACK)
-PROVIDER_PATH := provider/v5
+PROVIDER_PATH := provider/v6
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 TFGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 VERSION := $(shell pulumictl get version)
 JAVA_GEN := pulumi-java-gen
-JAVA_GEN_VERSION := v0.5.4
+JAVA_GEN_VERSION := v0.9.5
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
 
