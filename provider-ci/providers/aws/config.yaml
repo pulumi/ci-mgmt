@@ -1,0 +1,27 @@
+provider: aws
+lint: false
+major-version: 6
+parallel: 1
+timeout: 150
+generate-nightly-test-workflow: true
+providerVersion: github.com/hashicorp/terraform-provider-aws/version.ProviderVersion
+env:
+  PULUMI_MISSING_DOCS_ERROR: true
+  AWS_REGION: "us-west-2"
+makeTemplate: bridged
+plugins:
+  - name: archive
+    version: "0.0.1"
+  - name: tls
+    version: "4.10.0"
+  - name: github
+    version: "4.10.0"
+  - name: kubernetes
+    version: "3.17.0"
+  - name: random
+    version: "4.8.2"
+  - name: github
+    version: "5.14.0"
+team: ecosystem
+goBuildParallelism: 2
+javaGenVersion: "v0.9.5"
