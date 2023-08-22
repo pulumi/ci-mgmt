@@ -52,8 +52,10 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
+        cache-dependency-path: |
+            sdk/go.sum
         go-version: 1.20.1
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.5.0
@@ -146,8 +148,10 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
+        cache-dependency-path: |
+            sdk/go.sum
         go-version: 1.20.1
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.5.0
@@ -177,8 +181,10 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
+        cache-dependency-path: |
+            sdk/go.sum
         go-version: 1.20.1
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.5.0
@@ -243,8 +249,10 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
+        cache-dependency-path: |
+            sdk/go.sum
         go-version: 1.20.1
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.5.0
@@ -313,8 +321,10 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v4
       with:
+        cache-dependency-path: |
+            sdk/go.sum
         go-version: 1.20.1
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.5.0
