@@ -23,10 +23,7 @@ jobs:
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
-      with:
-        go-version: 1.20.1
+#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -138,10 +135,7 @@ jobs:
       run: git config --global --add safe.directory /__w/pulumi-${{ env.PROVIDER }}/pulumi-${{ env.PROVIDER }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
-      with:
-        go-version: 1.20.1
+#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -174,10 +168,7 @@ jobs:
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
-      with:
-        go-version: 1.20.1
+#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -266,10 +257,7 @@ jobs:
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
-      with:
-        go-version: 1.20.1
+#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
