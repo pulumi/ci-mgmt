@@ -4,3 +4,7 @@ env:
   PAGERDUTY_TOKEN: ${{ secrets.PAGERDUTY_TOKEN }}
 makeTemplate: bridged
 team: ecosystem
+javaGenVersion: "v0.9.5"
+plugins:
+  - name: time
+    version: "0.0.15"
