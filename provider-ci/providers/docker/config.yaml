@@ -3,6 +3,7 @@ major-version: 4
 aws: true
 gcp: true
 gcpRegistry: true
+digitalOceanSshKey: true
 env:
   AWS_REGION: us-west-2
   ARM_CLIENT_ID: "30e520fa-12b4-4e21-b473-9426c5ac2e1e"
