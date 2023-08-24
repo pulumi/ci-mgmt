@@ -3,7 +3,6 @@ major-version: 4
 aws: true
 gcp: true
 gcpRegistry: true
-digitalOceanSshKey: true
 env:
   AWS_REGION: us-west-2
   ARM_CLIENT_ID: "30e520fa-12b4-4e21-b473-9426c5ac2e1e"
@@ -28,3 +27,9 @@ plugins:
   - name: aws
     version: "5.37.0"
 team: ecosystem
+actions:
+  preTest:
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
