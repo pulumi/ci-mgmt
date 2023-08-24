@@ -8,7 +8,7 @@ jobs:
   build_sdk:
     name: build_sdk
     needs: prerequisites
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -101,7 +101,7 @@ jobs:
   lint:
     container: golangci/golangci-lint:v1.51
     name: lint
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -135,7 +135,7 @@ jobs:
   #{{ end -}}#
   prerequisites:
     name: prerequisites
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -206,7 +206,7 @@ jobs:
   publish:
     name: publish
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -250,7 +250,7 @@ jobs:
   publish_sdk:
     name: publish_sdk
     needs: publish
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Publish SDKs
       uses: #{{ .Config.actionVersions.publishProviderSDKs }}#
@@ -271,7 +271,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#

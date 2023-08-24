@@ -8,7 +8,7 @@ jobs:
   build_sdk:
     name: build_sdk
     needs: prerequisites
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -100,7 +100,7 @@ jobs:
         - java
   prerequisites:
     name: prerequisites
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
@@ -175,7 +175,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#

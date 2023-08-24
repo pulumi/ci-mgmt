@@ -5,7 +5,7 @@ env:
 jobs:
   warn_codegen:
     name: warn_codegen
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
