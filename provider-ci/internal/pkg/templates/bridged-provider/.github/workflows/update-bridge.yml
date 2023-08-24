@@ -46,6 +46,9 @@ jobs:
     - name: Update Pulumi SDK (sdk/go.mod)
       run: cd sdk && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{
         github.event.inputs.sdk_version }} && go mod tidy
+#{{- if .Config.actions.preBuild }}#
+#{{ .Config.actions.preBuild | toYaml | indent 4 }}#
+#{{- end }}#
     - run: make tfgen
     - run: make build_sdks
     - id: create-pr
