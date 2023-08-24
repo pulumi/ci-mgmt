@@ -9,6 +9,7 @@ env:
   PULUMI_MISSING_DOCS_ERROR: true
   AWS_REGION: "us-west-2"
 makeTemplate: bridged
+checkoutSubmodules: true
 plugins:
   - name: archive
     version: "0.0.1"

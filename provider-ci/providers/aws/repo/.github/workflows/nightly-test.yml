@@ -36,6 +36,8 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
+      with:
+        submodules: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
@@ -130,6 +132,8 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
+      with:
+        submodules: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
@@ -207,6 +211,8 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
+      with:
+        submodules: true
     - name: Checkout Scripts Repo
       uses: actions/checkout@v3
       with:
