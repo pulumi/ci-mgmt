@@ -186,6 +186,9 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/schema-tools
+#{{- if .Config.actions.preBuild }}#
+#{{ .Config.actions.preBuild | toYaml | indent 4 }}#
+#{{- end }}#
     - name: Build tfgen & provider binaries
       run: make provider
     - if: github.event_name == 'pull_request'
