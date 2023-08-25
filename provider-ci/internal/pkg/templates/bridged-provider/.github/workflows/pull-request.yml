@@ -11,6 +11,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Comment PR
       uses: #{{ .Config.actionVersions.prComment }}#
       with:
