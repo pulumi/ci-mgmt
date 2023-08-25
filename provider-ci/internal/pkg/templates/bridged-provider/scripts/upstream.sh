@@ -87,7 +87,9 @@ start_rebase() {
   fi
 
   git branch -f local
-  git checkout -B pulumi-patch "${FROM}"
+  # ${FROM} is intentionally unquoted, so that not supplying a ${FROM} argument works.
+  # This way we don't pass an empty string to `git checkout` (which breaks).
+  git checkout -B pulumi-patch ${FROM}
   git branch --set-upstream-to=local pulumi-patch
 
   for patch in ../patches/*.patch; do
