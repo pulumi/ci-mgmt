@@ -45,7 +45,9 @@ actions:
         cache-dependency-path: |
           sdk/go.sum
   # preBuild:
+  #  - Your action here
   # preTest:
+  #  - Your action here
 runner:
   default: ubuntu-latest
   publish: ubuntu-latest
