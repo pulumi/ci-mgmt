@@ -9,6 +9,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - id: schema_changed
       name: Check for diff in schema
       uses: #{{ .Config.actionVersions.pathsFilter }}#

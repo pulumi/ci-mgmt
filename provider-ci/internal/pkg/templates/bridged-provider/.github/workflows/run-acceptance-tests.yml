@@ -16,6 +16,9 @@ jobs:
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -126,6 +129,9 @@ jobs:
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -161,6 +167,9 @@ jobs:
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -250,6 +259,9 @@ jobs:
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:

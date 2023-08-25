@@ -7,6 +7,7 @@ provider-default-branch: master
 fail-on-missing-mapping: true
 fail-on-extra-mapping: true
 publishRegistry: true
+checkoutSubmodules: false
 env:
   DOTNETVERSION: |
     6.0.x

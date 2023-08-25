@@ -12,6 +12,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -102,6 +106,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -133,6 +141,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -201,6 +213,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
@@ -263,6 +279,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
