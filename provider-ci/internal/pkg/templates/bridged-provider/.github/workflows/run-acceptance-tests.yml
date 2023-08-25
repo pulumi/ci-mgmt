@@ -238,9 +238,12 @@ jobs:
     name: sentinel
     needs:
     - test
-    #{{ if .Config.lint -}}#
+    #{{- if .Config.lint }}#
     - lint
-    #{{ end -}}#
+    #{{- end }}#
+    #{{- range $action, $_ := .Config.extraTests }}#
+    - #{{ $action }}#
+    #{{- end }}#
     runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Is workflow a success
@@ -390,6 +393,9 @@ jobs:
         - dotnet
         - go
         - java
+#{{- if .Config.extraTests }}#
+#{{ .Config.extraTests | toYaml | indent 2 }}#
+#{{ end }}#
 name: run-acceptance-tests
 on:
   pull_request:

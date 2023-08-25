@@ -60,3 +60,24 @@ actions:
         # http://azure.archive.ubuntu.com/ubuntu/pool/universe/d/dotnet7/aspnetcore-targeting-pack-7.0_7.0.105-0ubuntu1%7e22.04.1_amd64.deb
         # 404 Not Found [IP: 40.81.13.82 80]
         large-packages: false
+extraTests:
+  go_test_shim:
+    name: Run test of provider shim
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ env.PR_COMMIT_SHA }}
+        submodules: true
+    - uses: actions/setup-go@v4
+      with:
+       go-version-file: 'provider/shim/go.mod'
+       cache-dependency-path: 'provider/shim/go.sum'
+    - name: go test
+      run: |
+        cd provider/shim
+        go test -v .

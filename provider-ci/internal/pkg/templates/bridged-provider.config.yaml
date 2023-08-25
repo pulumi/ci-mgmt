@@ -48,6 +48,13 @@ actions:
   #  - Your action here
   # preTest:
   #  - Your action here
+
+# Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
+# `prerelease.yml` and `release.yml`.
+extraTests:
+#   your_test_name:
+#     name: My Test
+#     ...
 runner:
   default: ubuntu-latest
   publish: ubuntu-latest

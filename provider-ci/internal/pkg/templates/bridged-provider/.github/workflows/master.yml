@@ -257,7 +257,15 @@ jobs:
         status: ${{ job.status }}
   publish:
     name: publish
+    #{{- if .Config.extraTests }}#
+    needs:
+      - test
+      #{{- range $action, $_ := .Config.extraTests }}#
+      - #{{ $action }}#
+      #{{- end -}}#
+    #{{ else }}#
     needs: test
+    #{{- end }}#
     runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Checkout Repo
@@ -459,6 +467,9 @@ jobs:
         - dotnet
         - go
         - java
+#{{- if .Config.extraTests }}#
+#{{ .Config.extraTests | toYaml | indent 2 }}#
+#{{ end }}#
 name: master
 on:
   push:
