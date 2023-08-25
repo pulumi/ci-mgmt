@@ -31,8 +31,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup DotNet
       uses: #{{ .Config.actionVersions.setupDotNet }}#
       with:

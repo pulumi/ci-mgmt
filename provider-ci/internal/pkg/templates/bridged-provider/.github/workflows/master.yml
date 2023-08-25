@@ -27,8 +27,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:
@@ -130,8 +129,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
       uses: #{{ .Config.actionVersions.installGhRelease }}#
@@ -176,8 +174,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - run: make lint_provider
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
@@ -209,8 +206,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
       uses: #{{ .Config.actionVersions.installGhRelease }}#
@@ -277,8 +273,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Configure AWS Credentials
       uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
       with:
@@ -348,8 +343,7 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.installPulumiCli }}#
+#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:

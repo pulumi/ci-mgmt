@@ -34,6 +34,9 @@ env:
   TF_APPEND_USER_AGENT: pulumi
   TRAVIS_OS_NAME: linux
 actions:
+  setupPulumi:
+    - name: Install Pulumi CLI
+      uses: pulumi/action-install-pulumi-cli@v2
   setupGo:
     - name: Install Go
       uses: actions/setup-go@v4
@@ -53,7 +56,6 @@ actionVersions:
   googleAuth: google-github-actions/auth@v0
   goReleaser: goreleaser/goreleaser-action@v2
   installGhRelease: jaxxstorm/action-install-gh-release@v1.5.0
-  installPulumiCli: pulumi/action-install-pulumi-cli@v2
   checkout: actions/checkout@v3
   cleanupArtifact: c-hive/gha-remove-artifacts@v1
   createOrUpdateComment: peter-evans/create-or-update-comment@v1
