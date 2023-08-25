@@ -91,6 +91,12 @@ func GeneratePackage(opts GenerateOpts) error {
 		if d.IsDir() {
 			return nil
 		}
+		// TODO: Back this option out after we convert pulumi-aws to use a standard Makefile.
+		//
+		// This is tracked in https://github.com/pulumi/pulumi-aws/issues/2694
+		if v, ok := config["XskipMakefile"]; ok && v.(bool) && strings.HasSuffix(path, "Makefile") {
+			return nil
+		}
 		inPath := path
 		outPath, err := filepath.Rel(templateDir, path)
 		if err != nil {

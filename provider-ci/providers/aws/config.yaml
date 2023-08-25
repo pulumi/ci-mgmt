@@ -10,6 +10,7 @@ env:
   AWS_REGION: "us-west-2"
 makeTemplate: bridged
 checkoutSubmodules: true
+XskipMakefile: true
 plugins:
   - name: archive
     version: "0.0.1"
