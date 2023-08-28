@@ -7,33 +7,39 @@ env:
 jobs:
   update_bridge:
     name: update-bridge
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
+      uses: actions/checkout@v3
       with:
-        submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        submodules: true
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: actions/setup-go@v4
+      with:
+        cache-dependency-path: |
+            sdk/go.sum
+        go-version: 1.20.1
     - name: Install pulumictl
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      uses: jaxxstorm/action-install-gh-release@v1.5.0
       with:
         repo: pulumi/pulumictl
-#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
+    - name: Install Pulumi CLI
+      uses: pulumi/actions@v4
+      with:
+        pulumi-version: v3.77.1
     - name: Setup DotNet
-      uses: #{{ .Config.actionVersions.setupDotNet }}#
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNETVERSION }}
     - name: Setup Node
-      uses: #{{ .Config.actionVersions.setupNode }}#
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Setup Python
-      uses: #{{ .Config.actionVersions.setupPython }}#
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Update pulumi-terraform-bridge
@@ -46,9 +52,15 @@ jobs:
     - name: Update Pulumi SDK (sdk/go.mod)
       run: cd sdk && go mod edit -require github.com/pulumi/pulumi/sdk/v3@v${{
         github.event.inputs.sdk_version }} && go mod tidy
-#{{- if .Config.actions.preBuild }}#
-#{{ .Config.actions.preBuild | toYaml | indent 4 }}#
-#{{- end }}#
+    - name: Clear GitHub Actions Ubuntu runner disk space
+      uses: jlumbroso/free-disk-space@main
+      with:
+        android: true
+        dotnet: false
+        haskell: true
+        large-packages: false
+        swap-storage: true
+        tool-cache: false
     - run: make tfgen
     - run: make build_sdks
     - id: create-pr
@@ -56,7 +68,7 @@ jobs:
       uses: peter-evans/create-pull-request@v3.12.0
       with:
         author: pulumi-bot <bot@pulumi.com>
-        base: #{{ index .Config "provider-default-branch" }}#
+        base: master
         body: This pull request was generated automatically by the update-bridge
           workflow in this repository.
         branch: pulumi-bot/bridge-v${{ github.event.inputs.bridge_version }}-${{

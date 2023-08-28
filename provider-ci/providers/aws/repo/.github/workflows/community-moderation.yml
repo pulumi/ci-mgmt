@@ -5,29 +5,27 @@ env:
 jobs:
   warn_codegen:
     name: warn_codegen
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
+      uses: actions/checkout@v3
       with:
-        submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        submodules: true
     - id: schema_changed
       name: Check for diff in schema
-      uses: #{{ .Config.actionVersions.pathsFilter }}#
+      uses: dorny/paths-filter@v2
       with:
         filters: "changed: 'provider/cmd/**/schema.json'"
     - id: sdk_changed
       if: steps.schema_changed.outputs.changed == 'false'
       name: Check for diff in sdk/**
-      uses: #{{ .Config.actionVersions.pathsFilter }}#
+      uses: dorny/paths-filter@v2
       with:
         filters: "changed: 'sdk/**'"
     - if: steps.sdk_changed.outputs.changed == 'true' &&
         github.event.pull_request.head.repo.full_name != github.repository
       name: Send codegen warning as comment on PR
-      uses: #{{ .Config.actionVersions.prComment }}#
+      uses: thollander/actions-comment-pull-request@v2
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         message: >

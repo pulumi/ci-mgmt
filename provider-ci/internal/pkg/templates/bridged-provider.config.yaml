@@ -44,6 +44,20 @@ actions:
         go-version: "1.20.1"
         cache-dependency-path: |
           sdk/go.sum
+  # preBuild:
+  #  - Your action here
+  # preTest:
+  #  - Your action here
+
+# Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
+# `prerelease.yml` and `release.yml`.
+extraTests:
+#   your_test_name:
+#     name: My Test
+#     ...
+runner:
+  default: ubuntu-latest
+  publish: ubuntu-latest
 actionVersions:
   setupDotNet: actions/setup-dotnet@v1
   setupJava: actions/setup-java@v3

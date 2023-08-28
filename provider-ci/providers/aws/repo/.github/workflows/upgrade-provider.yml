@@ -7,10 +7,10 @@ jobs:
   upgrade_provider:
     if: ${{ contains(github.event.issue.title, 'Upgrade terraform-provider-') }}
     name: upgrade-provider
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: ubuntu-latest
     steps:
     - name: Call upgrade provider action
-      uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.5
       with:
         kind: all
     - env:
@@ -25,7 +25,7 @@ jobs:
         SLACK_USERNAME: provider-bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
       name: Send Upgrade Success To Slack
-      uses: #{{ .Config.actionVersions.slackNotification }}#
+      uses: rtCamp/action-slack-notify@v2
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#FF0000"
@@ -36,7 +36,7 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
       if: failure()
       name: Send Upgrade Failure To Slack
-      uses: #{{ .Config.actionVersions.slackNotification }}#
+      uses: rtCamp/action-slack-notify@v2
 name: Upgrade provider
 on:
   issues:
