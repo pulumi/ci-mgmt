@@ -391,14 +391,14 @@ export function UploadProviderBinaries(): Step {
 }
 
 export function UploadSDKs(tag: boolean): Step {
-  if(tag === false){
+  if (tag === false) {
     return {
       name: "Upload artifacts",
       uses: action.uploadArtifact,
       with: {
         name: "${{ matrix.language  }}-sdk.tar.gz",
         path: "${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz",
-        "retention-days": 30
+        "retention-days": 30,
       },
     };
   }

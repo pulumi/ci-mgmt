@@ -4,7 +4,7 @@ import * as steps from "./steps";
 import { Step } from "./steps";
 
 const pythonVersion = "3.7";
-const goVersion = "1.20.x";
+const goVersion = "1.21.x";
 const nodeVersion = "16.x";
 const dotnetVersion = "6.0.x\n3.1.301\n";
 const javaVersion = "11";
@@ -207,7 +207,9 @@ export function BuildWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(opts.provider),
+      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
+        opts.provider
+      ),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
