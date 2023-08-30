@@ -1,6 +1,6 @@
 ---
-name: Ecosystem Providers
-about: Tracks tasks requiring action for every provider maintained by Ecosystem Team
+name: Providers
+about: Tracks tasks requiring action for every provider
 labels: ''
 assignees: ''
 
@@ -10,17 +10,34 @@ assignees: ''
 
 ## Native Providers
 
+- [ ] aws-apigateway
+- [ ] aws-native
+- [ ] awsx
+- [ ] azure-native
 - [ ] command
+- [ ] eks
+- [ ] google-native
+- [ ] kubernetes
+- [ ] kubernetes-operator
 
 ## Bridged Providers
+
+### Tier 1
+
+- [ ] aws
+- [ ] gcp
+- [ ] azure
+- [ ] azuread
+
+### Tier 2
 
 - [ ] aiven
 - [ ] akamai
 - [ ] alicloud
+- [ ] archive
 - [ ] artifactory
 - [ ] auth0
-- [ ] azure
-- [ ] azuread
+- [ ] azuredevops
 - [ ] civo
 - [ ] cloudamqp
 - [ ] cloudflare
@@ -34,16 +51,19 @@ assignees: ''
 - [ ] docker
 - [ ] ec
 - [ ] equinix-metal
+- [ ] external
 - [ ] f5bigip
 - [ ] fastly
 - [ ] github
 - [ ] gitlab
 - [ ] hcloud
+- [ ] http
 - [ ] kafka
 - [ ] keycloak
 - [ ] kong
 - [ ] libvirt
 - [ ] linode
+- [ ] local
 - [ ] mailgun
 - [ ] minio
 - [ ] mongodbatlas
@@ -51,6 +71,7 @@ assignees: ''
 - [ ] newrelic
 - [ ] nomad
 - [ ] ns1
+- [ ] null
 - [ ] oci
 - [ ] okta
 - [ ] onelogin
@@ -73,4 +94,4 @@ assignees: ''
 - [ ] vault
 - [ ] venafi
 - [ ] vsphere
-- [ ] wavefron
+- [ ] wavefront
