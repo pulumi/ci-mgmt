@@ -1205,3 +1205,13 @@ export function MakeDiscovery(provider: string): Step {
   }
   return {};
 }
+
+export function Codecov(): Step {
+  return {
+    name: "Upload coverage reports to Codecov",
+    uses: action.codecov,
+    env: {
+      CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}",
+    },
+  };
+}

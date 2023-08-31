@@ -528,6 +528,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.TarProviderBinaries(),
       steps.UploadProviderBinaries(),
       steps.TestProviderLibrary(),
+      steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
