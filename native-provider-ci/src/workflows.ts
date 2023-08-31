@@ -207,7 +207,9 @@ export function BuildWorkflow(
     env: env(opts),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(opts.provider),
+      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
+        opts.provider
+      ),
       test: new TestsJob("test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
@@ -526,6 +528,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.TarProviderBinaries(),
       steps.UploadProviderBinaries(),
       steps.TestProviderLibrary(),
+      steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
