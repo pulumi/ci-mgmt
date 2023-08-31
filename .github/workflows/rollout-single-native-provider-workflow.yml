@@ -31,26 +31,26 @@ jobs:
           path: ci-mgmt
       - name: Echo env
         run: env
-      - name: Clone pulumi-${{ github.event.inputs.provider_name }}
+      - name: Clone pulumi-${{ inputs.provider_name }}
         uses: actions/checkout@v2
         with:
-          repository: pulumi/pulumi-${{ github.event.inputs.provider_name }}
-          path: pulumi-${{ github.event.inputs.provider_name }}
+          repository: pulumi/pulumi-${{ inputs.provider_name }}
+          path: pulumi-${{ inputs.provider_name }}
       - name: Delete existing workflows
         run: |
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
-      - name: Copy files from ci-mgmt to pulumi-${{ github.event.inputs.provider_name }}
+      - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
         run: |
-          cp -r ci-mgmt/native-provider-ci/providers/${{ github.event.inputs.provider_name }}/repo/. pulumi-${{ github.event.inputs.provider_name }}/.
+          cp -r ci-mgmt/native-provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: stable
       - name: Run source code migrations
         run: |
-          DIR="$PWD/pulumi-${{ github.event.inputs.provider_name }}"
+          DIR="$PWD/pulumi-${{ inputs.provider_name }}"
           cd ci-mgmt/tools/sourcemigrator
           npm ci
           npx ts-node index.ts "$DIR"
@@ -69,7 +69,7 @@ jobs:
             (commit ${{ github.sha }})
           labels: "impact/no-changelog-required"
           title: "Update GitHub Actions workflows."
-          path: pulumi-${{ github.event.inputs.provider_name }}
+          path: pulumi-${{ inputs.provider_name }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
       # - name: Set PR to auto-merge
       #   if: steps.create-pr.outputs.pull-request-operation == 'created'
@@ -77,5 +77,5 @@ jobs:
       #   with:
       #     token: ${{ secrets.PULUMI_BOT_TOKEN }}
       #     pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
-      #     repository: pulumi/pulumi-${{ github.event.inputs.provider_name }}
+      #     repository: pulumi/pulumi-${{ inputs.provider_name }}
       #     merge-method: squash
