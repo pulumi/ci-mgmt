@@ -10,6 +10,15 @@ name: Update GH workflows, single native provider
         description: The name of the provider to deploy - do not include the pulumi prefix in the name.
         required: true
         type: string
+  workflow_call:
+    inputs:
+      provider_name:
+        description: The name of the provider to deploy - do not include the pulumi prefix in the name.
+        required: true
+        type: string
+    secrets:
+      PULUMI_BOT_TOKEN:
+        required: true
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
