@@ -4,6 +4,7 @@
 # when this workflow is run.
 name: Update GH workflows, native providers (auto-pr)
 on:
+  workflow_dispatch:
   schedule:
   # 5 AM UTC ~ 10 PM PDT - specifically selected to avoid putting load on the CI system during working hours.
   - cron: 0 5 * * *
