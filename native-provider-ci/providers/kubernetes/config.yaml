@@ -2,7 +2,7 @@ provider: kubernetes
 lint: true
 aws: true
 gcp: true
-major-version: 3
+major-version: 4
 env:
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi
