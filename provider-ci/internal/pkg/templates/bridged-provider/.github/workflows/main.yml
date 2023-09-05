@@ -150,7 +150,7 @@ jobs:
         aws s3 cp "${{ env.COVERAGE_OUTPUT_DIR }}/summary.json" "${s3FullURI}" --acl bucket-owner-full-control
   #{{ if .Config.lint -}}#
   lint:
-    container: golangci/golangci-lint:v1.51
+    container: golangci/golangci-lint:v1.54.1
     name: lint
     runs-on: #{{ .Config.runner.default }}#
     steps:

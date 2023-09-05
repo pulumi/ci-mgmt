@@ -99,7 +99,7 @@ jobs:
         - java
   #{{ if .Config.lint -}}#
   lint:
-    container: golangci/golangci-lint:v1.51
+    container: golangci/golangci-lint:v1.54.1
     name: lint
     runs-on: #{{ .Config.runner.default }}#
     steps:

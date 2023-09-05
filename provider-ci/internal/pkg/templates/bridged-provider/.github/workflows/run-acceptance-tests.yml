@@ -118,7 +118,7 @@ jobs:
         token: ${{ secrets.PULUMI_BOT_TOKEN }}
   #{{ if .Config.lint -}}#
   lint:
-    container: golangci/golangci-lint:v1.51
+    container: golangci/golangci-lint:v1.54.1
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: lint
