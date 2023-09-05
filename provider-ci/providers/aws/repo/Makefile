@@ -114,10 +114,20 @@ tfgen: install_plugins upstream
 	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)
 
-upstream:
+upstream::
+# Use upstream.sh script to apply patches
 ifneq ("$(wildcard upstream)","")
 	@$(SHELL) ./scripts/upstream.sh "$@" apply
 endif
+
+upstream::
+
+	# Ensure tool is installed
+	cd upstream-tools && yarn install --frozen-lockfile
+	# Apply all automated changes
+	cd upstream-tools && yarn --silent run apply
+	# Check for any pending replacements
+	cd upstream-tools && yarn --silent run check
 
 upstream.finalize:
 	@$(SHELL) ./scripts/upstream.sh "$@" end_rebase

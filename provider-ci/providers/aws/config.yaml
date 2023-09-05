@@ -10,7 +10,9 @@ env:
   AWS_REGION: "us-west-2"
 makeTemplate: bridged
 checkoutSubmodules: true
-#XskipMakefile: true
+# TODO: remove XrunUpstreamTools flag after work to add docs replacement strategies to resources.go is completed
+# Tracked in in https://github.com/pulumi/pulumi-aws/issues/2757
+XrunUpstreamTools: true
 plugins:
   - name: archive
     version: "0.0.1"

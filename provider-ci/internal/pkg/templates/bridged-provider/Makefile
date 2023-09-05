@@ -125,10 +125,31 @@ tfgen: install_plugins#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}#
 
 #{{- if eq .Config.team "ecosystem" }}#
 
+#{{- if .Config.XrunUpstreamTools }}#
+
+upstream::
+# Use upstream.sh script to apply patches
+ifneq ("$(wildcard upstream)","")
+	@$(SHELL) ./scripts/upstream.sh "$@" apply
+endif
+
+upstream::
+
+	# Ensure tool is installed
+	cd upstream-tools && yarn install --frozen-lockfile
+	# Apply all automated changes
+	cd upstream-tools && yarn --silent run apply
+	# Check for any pending replacements
+	cd upstream-tools && yarn --silent run check
+
+#{{- else }}#
+
 upstream:
 ifneq ("$(wildcard upstream)","")
 	@$(SHELL) ./scripts/upstream.sh "$@" apply
 endif
+
+#{{- end }}#
 
 upstream.finalize:
 	@$(SHELL) ./scripts/upstream.sh "$@" end_rebase
