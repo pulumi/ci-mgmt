@@ -47,6 +47,9 @@ actions:
         role-duration-seconds: 3600
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+    - name: Make upstream
+      run: make upstream
+
   preBuild:
     - name: Clear GitHub Actions Ubuntu runner disk space
       uses: jlumbroso/free-disk-space@main
@@ -75,11 +78,11 @@ extraTests:
         submodules: true
     - uses: actions/setup-go@v4
       with:
-       go-version-file: 'provider/shim/go.mod'
-       cache-dependency-path: 'provider/shim/go.sum'
+       go-version-file: 'provider/go.mod'
+       cache-dependency-path: 'provider/go.sum'
     - name: go test
       run: |
-        cd provider/shim
+        cd upstream/shim
         go test -v -coverprofile="coverage.txt" .
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
