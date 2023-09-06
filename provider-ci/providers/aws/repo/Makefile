@@ -105,17 +105,9 @@ lint_provider: provider
 
 provider: tfgen install_plugins
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION) -X github.com/hashicorp/terraform-provider-aws/version.ProviderVersion=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
+
 test:
-	cd provider/shim && go test -v -coverprofile="coverage.txt" .
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
-test.upgrade::
-	cd examples && go test -v -tags=all -run TestProviderUpgrade -timeout 2h
-
-test.upgrade.quick::
-	cd examples && go test -v -tags=all -run TestProviderUpgrade/Quick
-
-test.upgrade.record::
-	cd examples && PULUMI_ACCEPT=true go test -v -tags all -run TestProviderUpgrade -timeout 2h
 
 tfgen: install_plugins upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
