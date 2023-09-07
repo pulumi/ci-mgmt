@@ -6,3 +6,4 @@ env:
   AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
 makeTemplate: bridged
 team: ecosystem
+javaGenVersion: "v0.9.4"
