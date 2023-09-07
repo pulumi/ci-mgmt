@@ -10,7 +10,9 @@ env:
   AWS_REGION: "us-west-2"
 makeTemplate: bridged
 checkoutSubmodules: true
-XskipMakefile: true
+# TODO: remove XrunUpstreamTools flag after work to add docs replacement strategies to resources.go is completed
+# Tracked in in https://github.com/pulumi/pulumi-aws/issues/2757
+XrunUpstreamTools: true
 plugins:
   - name: archive
     version: "0.0.1"
@@ -45,6 +47,9 @@ actions:
         role-duration-seconds: 3600
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+    - name: Make upstream
+      run: make upstream
+
   preBuild:
     - name: Clear GitHub Actions Ubuntu runner disk space
       uses: jlumbroso/free-disk-space@main
@@ -71,13 +76,15 @@ extraTests:
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
         submodules: true
+    - name: Make upstream
+      run: make upstream
     - uses: actions/setup-go@v4
       with:
-       go-version-file: 'provider/shim/go.mod'
-       cache-dependency-path: 'provider/shim/go.sum'
+       go-version-file: 'provider/go.mod'
+       cache-dependency-path: 'provider/go.sum'
     - name: go test
       run: |
-        cd provider/shim
+        cd upstream/shim
         go test -v -coverprofile="coverage.txt" .
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
