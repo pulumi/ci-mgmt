@@ -57,7 +57,8 @@ extraTests:
 #     ...
 runner:
   default: ubuntu-latest
-  publish: ubuntu-latest
+  # publish: ubuntu-latest
+  # buildSdk: ubuntu-latest
 actionVersions:
   setupDotNet: actions/setup-dotnet@v1
   setupJava: actions/setup-java@v3
