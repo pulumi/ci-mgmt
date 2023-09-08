@@ -8,4 +8,6 @@ plugins:
   - name: aws
     version: "5.42.0"
 team: ecosystem
+env:
+  VAULT_DEV_ROOT_TOKEN_ID: "root"
 javaGenVersion: "v0.9.5"
