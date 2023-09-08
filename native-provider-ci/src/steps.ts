@@ -1076,6 +1076,9 @@ export function RunPublishSDK(): Step {
     run: "./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
     env: {
       NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
+      // See https://github.com/pulumi/scripts/pull/138/files
+      // Possible values: "all", "wheel".
+      PYPI_PUBLISH_ARTIFACTS: "all",
     },
   };
 }
