@@ -432,9 +432,9 @@ export function Arm2PulumiReleaseWorkflow(
 
 export class BuildSdkJob implements NormalJob {
   needs = "prerequisites";
-   
+
   "runs-on" = "pulumi-ubuntu-8core"; // insufficient resources to run Go builds on ubuntu-latest
-    
+
   strategy = {
     "fail-fast": true,
     matrix: {
