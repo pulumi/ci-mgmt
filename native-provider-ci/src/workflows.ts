@@ -549,7 +549,8 @@ export class PrerequisitesJob implements NormalJob {
 }
 
 export class TestsJob implements NormalJob {
-  "runs-on" = "ubuntu-latest";
+  "runs-on" = "pulumi-ubuntu-8core"; // insufficient resources to run Go builds on ubuntu-latest, specifically for K8S
+
   needs = ["build_sdks"];
   strategy = {
     "fail-fast": true,
