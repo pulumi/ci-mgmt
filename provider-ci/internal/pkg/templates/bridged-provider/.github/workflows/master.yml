@@ -331,7 +331,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
