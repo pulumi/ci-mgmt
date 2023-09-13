@@ -95,7 +95,7 @@ function introducePythonWheels(): SourceMigration {
                 return {filesEdited: 0};
             };
             child.execSync("gofmt -w -r '" + edit + "' provider/resources.go", {cwd: ctx.dir});
-            child.execSync("make build_python");
+            child.execSync("make tfgen build_python", {cwd: ctx.dir, stdio: 'ignore'});
             return {filesEdited: 1};
         },
     };
