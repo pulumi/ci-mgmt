@@ -82,6 +82,26 @@ function updateGo_1_21(): SourceMigration {
     return sm;
 }
 
+function introducePythonWheels(): SourceMigration {
+    let edit = '&tfbridge.PythonInfo{x} -> (func () *tfbridge.PythonInfo { i := &tfbridge.PythonInfo{x}; i.PyProject.Enabled = true; return i })()';
+    let sm: SourceMigration = {
+        name: "introducePythonWheels",
+        execute: (ctx: MigrateContext) => {
+            let usesPyProjectTOML = fileContains(path.join(ctx.dir, "Makefile"),
+                                                 new RegExp("pyproject.toml"));
+            let alreadyApplied = fileContains(path.join(ctx.dir, "provider", "resources.go"),
+                                              new RegExp("PyProject.Enabled"));
+            if (alreadyApplied || !usesPyProjectTOML) {
+                return {filesEdited: 0};
+            };
+            child.execSync("gofmt -w -r '" + edit + "' provider/resources.go", {cwd: ctx.dir});
+            child.execSync("make build_python");
+            return {filesEdited: 1};
+        },
+    };
+    return sm;
+}
+
 function fileContains(f: string, pattern: RegExp): boolean {
     let contents = String(fs.readFileSync(f));
     return pattern.test(contents);
@@ -118,6 +138,7 @@ function allMigrations(): SourceMigration[] {
         updateExamplesFromCore31DotNet6(),
         updatePulumiCoreRefTo3x(),
         updateGo_1_21(),
+        introducePythonWheels(),
     ];
 }
 
