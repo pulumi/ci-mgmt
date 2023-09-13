@@ -304,7 +304,7 @@ jobs:
     - name: Publish SDKs
       uses: pulumi/pulumi-package-publisher@v0.0.9
     - env:
-        SLACK_CHANNEL: provider-upgrade-publish-status
+        SLACK_CHANNEL: provider-upgrade-status
         SLACK_COLOR: "#FF0000"
         SLACK_ICON_EMOJI: ":taco:"
         SLACK_MESSAGE: "Publish failed :x:"

@@ -14,7 +14,7 @@ jobs:
       with:
         kind: all
     - env:
-        SLACK_CHANNEL: provider-upgrade-publish-status
+        SLACK_CHANNEL: provider-upgrade-status
         SLACK_COLOR: "#7CFC00"
         SLACK_ICON_EMOJI: ":taco:"
         SLACK_MESSAGE: >-
@@ -27,7 +27,7 @@ jobs:
       name: Send Upgrade Success To Slack
       uses: rtCamp/action-slack-notify@v2
     - env:
-        SLACK_CHANNEL: provider-upgrade-publish-status
+        SLACK_CHANNEL: provider-upgrade-status
         SLACK_COLOR: "#FF0000"
         SLACK_ICON_EMOJI: ":taco:"
         SLACK_MESSAGE: " Upgrade failed :x:"
