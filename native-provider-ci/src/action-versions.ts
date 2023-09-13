@@ -40,5 +40,5 @@ export const uploadArtifact = "actions/upload-artifact@v3";
 export const githubScript = "actions/github-script@v6";
 export const upgradeProviderAction =
   "pulumi/pulumi-upgrade-provider-action@v0.0.5";
-export const publishProviderSDKs = "pulumi/pulumi-package-publisher@v0.0.7";
+export const publishProviderSDKs = "pulumi/pulumi-package-publisher@v0.0.11";
 export const slackNotification = "rtCamp/action-slack-notify@v2";
