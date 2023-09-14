@@ -164,6 +164,9 @@ jobs:
     - name: disarm go:embed directives to enable lint
       run: |
         git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
+    - name: prepare upstream
+      continue-on-error: true
+      run: make upstream
     - name: Install go
       uses: actions/setup-go@v4
       with:
