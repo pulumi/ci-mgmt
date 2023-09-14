@@ -160,6 +160,9 @@ jobs:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: disarm go:embed directives to enable lint
+      run: |
+        git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:
