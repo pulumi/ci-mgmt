@@ -109,7 +109,7 @@ install_plugins:
 	pulumi plugin install resource #{{ .name }}# #{{ .version }}#
 	#{{- end }}#
 
-lint_provider: provider
+lint_provider:
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins
