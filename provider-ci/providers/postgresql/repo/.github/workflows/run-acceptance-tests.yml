@@ -154,6 +154,9 @@ jobs:
         cache-dependency-path: |
             sdk/go.sum
         go-version: 1.21.x
+    - name: disarm go:embed directives to enable lint
+      run: |
+        git grep -l 'go:embed' -- provider | xargs sed -e 's/go:embed/ goembed/g'
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:
