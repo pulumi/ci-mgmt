@@ -54,6 +54,10 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: stable
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
       - name: Run source code migrations
         run: |
           DIR="$PWD/pulumi-${{ matrix.provider }}"
