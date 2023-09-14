@@ -62,6 +62,7 @@ build_nodejs: upstream
 
 build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
 build_python: upstream
+	rm -rf sdk/python/
 	$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
