@@ -114,7 +114,6 @@ jobs:
   #{{ end -}}#
   #{{ if .Config.lint -}}#
   lint:
-    container: golangci/golangci-lint:v1.54.1
     name: lint
     runs-on: #{{ .Config.runner.default }}#
     steps:
@@ -124,22 +123,18 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - name: Mark repo as safe directory
-      run: git config --global --add safe.directory /__w/pulumi-${{ env.PROVIDER }}/pulumi-${{ env.PROVIDER }}
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
-    - name: Install pulumictl
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
+    - name: disarm go:embed directives to enable lint
+      run: |
+        git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
+    - name: prepare upstream
+      continue-on-error: true
+      run: make upstream
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
       with:
-        repo: pulumi/pulumictl
-#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
-    - run: make lint_provider
+        version: v1.54.1
+        working-directory: provider
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: #{{ .Config.actionVersions.notifySlack }}#
