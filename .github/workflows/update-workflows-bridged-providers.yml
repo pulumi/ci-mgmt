@@ -50,6 +50,11 @@ jobs:
       - name: Copy files from ci-mgmt to pulumi-${{ matrix.provider }}
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ matrix.provider }}/repo/. pulumi-${{ matrix.provider }}/.
+      - name: Unshallow clone for tags
+        run: |
+          DIR="$PWD/pulumi-${{ matrix.provider }}"
+          cd "$DIR"
+          git fetch --prune --unshallow --tags
       - name: Install Go
         uses: actions/setup-go@v3
         with:
