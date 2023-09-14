@@ -26,10 +26,13 @@ builds:
   - darwin
   - windows
   - linux
+  #{{- if .Config.skipGoReleaserHooks }}#
+  #{{- else }}#
   hooks:
     post:
     - env GOOS={{ .Os }} GOARCH={{ .Arch }} go clean -cache
     - env GOOS={{ .Os }} GOARCH={{ .Arch }} go clean -modcache
+  #{{- end }}#
   #{{- if .Config.skipWindowsArmBuild }}#
   ignore:
   - goarch: arm64
