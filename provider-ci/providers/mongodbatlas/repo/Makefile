@@ -96,7 +96,7 @@ install_plugins:
 	pulumi plugin install resource azure 4.0.0
 	pulumi plugin install resource gcp 5.0.0
 
-lint_provider:
+lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins

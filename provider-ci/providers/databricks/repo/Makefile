@@ -96,7 +96,7 @@ install_plugins:
 	pulumi plugin install resource aws 5.18.0
 	pulumi plugin install resource time 0.0.13
 
-lint_provider:
+lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins

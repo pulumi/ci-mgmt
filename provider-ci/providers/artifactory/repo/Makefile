@@ -95,7 +95,7 @@ install_plugins:
 	pulumi plugin install resource random 4.3.1
 	pulumi plugin install resource time 0.0.15
 
-lint_provider:
+lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins
