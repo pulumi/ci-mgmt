@@ -130,10 +130,16 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
         #{{- end }}#
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: disarm go:embed directives to enable lint
       run: |
         git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
+    - name: Install go
+      uses: actions/setup-go@v4
+      with:
+        # The versions of golangci-lint and setup-go here cross-depend and need to update together.
+        go-version: 1.21
+        # Either this action or golangci-lint needs to disable the cache
+        cache: false
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:
