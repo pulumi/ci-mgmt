@@ -94,7 +94,7 @@ install_plugins:
 	[ -x "$(shell command -v pulumi 2>/dev/null)" ] || curl -fsSL https://get.pulumi.com | sh
 	pulumi plugin install resource aws 4.26.0
 
-lint_provider: provider
+lint_provider:
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins

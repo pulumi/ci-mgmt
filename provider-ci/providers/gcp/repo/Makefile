@@ -99,7 +99,7 @@ install_plugins:
 	pulumi plugin install resource http 0.0.1
 	pulumi plugin install resource time 0.0.15
 
-lint_provider: provider
+lint_provider:
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins

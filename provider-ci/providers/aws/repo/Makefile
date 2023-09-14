@@ -100,7 +100,7 @@ install_plugins:
 	pulumi plugin install resource random 4.8.2
 	pulumi plugin install resource github 5.14.0
 
-lint_provider: provider
+lint_provider:
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 provider: tfgen install_plugins
