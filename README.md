@@ -45,6 +45,16 @@ Common commands:
 - `make lint-providers`: Check the generated code for all providers.
 - `make lint-providers/aws/repo`: Check the generated code for a specific provider.
 
+### Adding generated workflows to your local provider repository
+
+Sometimes, you want those changes NOW rather than having to wait for a GitHub PR.
+This example command will generate workflows for pulumi-datadog, and place them in the specified `--out` directory.
+Adjust for your provider and filesystem.
+
+```
+./bin/provider-ci generate --name pulumi/pulumi-datadog --template bridged-provider --config ./providers/datadog/config.yaml --out ../../pulumi-dtadog
+```
+
 ## Adding a New Bridged Provider
 
 To add a new provider:
