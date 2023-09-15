@@ -10,3 +10,6 @@ plugins:
     version: "5.24.0"
 team: ecosystem
 javaGenVersion: "v0.9.3"
+actionVersions:
+   publishProviderSDKs: pulumi/pulumi-package-publisher@v0.0.11
+wheels: true
