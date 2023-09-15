@@ -96,7 +96,7 @@ function introducePythonWheels(): SourceMigration {
             };
             child.execSync("gofmt -w -r '" + edit + "' provider/resources.go", {cwd: ctx.dir});
             child.execSync("make tfgen build_python", {cwd: ctx.dir, stdio: 'inherit'});
-            child.execSync("rm -rf sdk/python/venv", {cwd: ctx.dir, stdio: 'inherit', shell: true});
+            child.execSync("rm -rf sdk/python/venv", {cwd: ctx.dir, stdio: 'inherit'});
             return {filesEdited: 1};
         },
     };
