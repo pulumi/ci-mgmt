@@ -1,5 +1,5 @@
 provider: tls
-major-version: 5
+major-version: 4
 makeTemplate: bridged
 # TODO: Enable this once our tls provider is updated with framework support
 # generate-nightly-test-workflow: true
