@@ -9,3 +9,6 @@ env:
 makeTemplate: bridged
 team: ecosystem
 javaGenVersion: "v0.9.5"
+runner:
+  publish: pulumi-ubuntu-8core
+  buildSdk: pulumi-ubuntu-8core
