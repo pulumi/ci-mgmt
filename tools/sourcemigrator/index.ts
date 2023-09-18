@@ -87,14 +87,21 @@ function introducePythonWheels(): SourceMigration {
     let sm: SourceMigration = {
         name: "introducePythonWheels",
         execute: (ctx: MigrateContext) => {
+            let candidatePaths = ["resource.go", "resources.go"]
+                                     .map(p => path.join(ctx.dir, "provider", p))
+                                     .filter(fs.existsSync);
+            if (candidatePaths.length == 0) {
+                return {filesEdited: 0};
+            }
+            let resourcesGo = candidatePaths[0];                         
             let usesPyProjectTOML = fileContains(path.join(ctx.dir, "Makefile"),
                                                  new RegExp("pyproject.toml"));
-            let alreadyApplied = fileContains(path.join(ctx.dir, "provider", "resources.go"),
-                                              new RegExp("PyProject.Enabled"));
+            let alreadyApplied = fileContains(resourcesGo,
+                                              new RegExp("PyProject.Enabled"));            
             if (alreadyApplied || !usesPyProjectTOML) {
                 return {filesEdited: 0};
             };
-            child.execSync("gofmt -w -r '" + edit + "' provider/resources.go", {cwd: ctx.dir});
+            child.execSync("gofmt -w -r '" + edit + "' " + resourcesGo, {cwd: ctx.dir});
             child.execSync("make tfgen build_python", {cwd: ctx.dir, stdio: 'inherit'});
             child.execSync("rm -rf sdk/python/venv", {cwd: ctx.dir, stdio: 'inherit'});
             return {filesEdited: 1};
