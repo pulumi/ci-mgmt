@@ -20,3 +20,7 @@ plugins:
     version: "4.4.1"
 team: ecosystem
 goBuildParallelism: 1
+runner:
+  publish: pulumi-ubuntu-8core
+  buildSdk: pulumi-ubuntu-8core
+javaGenVersion: "v0.9.5"
