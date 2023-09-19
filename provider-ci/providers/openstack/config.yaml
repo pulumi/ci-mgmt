@@ -11,4 +11,8 @@ env:
   OS_USER_DOMAIN_NAME: Default
   OS_PROJECT_DOMAIN_NAME: Default
 makeTemplate: bridged
+plugins:
+  - name: http
+    version: 0.0.1
 team: ecosystem
+javaGenVersion: "v0.9.5"

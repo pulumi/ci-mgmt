@@ -5,3 +5,6 @@ env:
 makeTemplate: bridged
 team: ecosystem
 javaGenVersion: "v0.9.3"
+plugins:
+  - name: local
+    version: "0.0.1"
