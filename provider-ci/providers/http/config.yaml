@@ -6,3 +6,4 @@ publishRegistry: false
 env:
   HTTP_TOKEN: ${{ secrets.HTTP_TOKEN }}
 team: ecosystem
+javaGenVersion: "v0.9.7"
