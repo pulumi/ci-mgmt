@@ -469,11 +469,11 @@ jobs:
 #{{- if .Config.extraTests }}#
 #{{ .Config.extraTests | toYaml | indent 2 }}#
 #{{ end }}#
-name: main
+name: #{{ .Config.providerDefaultBranch }}#
 on:
   push:
     branches:
-    - main
+    - #{{ .Config.providerDefaultBranch }}#
     paths-ignore:
     - "**.md"
     tags-ignore:

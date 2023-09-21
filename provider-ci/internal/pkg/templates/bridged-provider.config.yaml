@@ -3,7 +3,7 @@ javaGenVersion: v0.5.4
 parallel: 3
 timeout: 60
 lint: true
-provider-default-branch: master
+providerDefaultBranch: master
 fail-on-missing-mapping: true
 fail-on-extra-mapping: true
 publishRegistry: true
