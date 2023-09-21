@@ -50,7 +50,7 @@ jobs:
             ref: main
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
-        if: steps.upgrade-on-master.outcome != 'success'
+        if: steps.upgrade-on-main.outcome != 'success'
         uses: benc-uk/workflow-dispatch@v1.2.2
         with:
             workflow: upgrade-bridge.yml
