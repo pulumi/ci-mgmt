@@ -1,0 +1,43 @@
+# Performs a workflow_dispatch to run the upgrade-bridge workflow in a specified
+# provider.
+# Note that this workflow does not generate any files - workflows must already be generated and committed to this repo
+# when this workflow is run.
+name: Update bridge, single ecosystem provider
+on:
+  workflow_dispatch:
+    inputs:
+      automerge:
+        description: Mark created PRs for auto-merging?
+        required: true
+        type: boolean
+        default: false
+      provider:
+        description: The name of the provider to update - do not include the pulumi prefix in the name.
+        required: true
+        type: string
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+jobs:
+  update-bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulumi-${{ github.event.inputs.provider }} main
+        id: upgrade-on-main
+        uses: benc-uk/workflow-dispatch@v1.2.2
+        continue-on-error: true
+        with:
+          workflow: upgrade-bridge.yml
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          repo: pulumi/pulumi-${{ github.event.inputs.provider }}
+          ref: main
+      - name: pulumi-${{ github.event.inputs.provider }} master
+        id: upgrade-on-master
+        if: steps.upgrade-on-main.outcome == failure
+        uses: benc-uk/workflow-dispatch@v1.2.2
+        with:
+          workflow: upgrade-bridge.yml
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          repo: pulumi/pulumi-${{ github.event.inputs.provider }}
+          ref: master
+
