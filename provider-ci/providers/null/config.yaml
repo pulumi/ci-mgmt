@@ -1,6 +1,7 @@
 provider: "null"
 major-version: 0
 lint: false
+providerDefaultBranch: main
 makeTemplate: bridged
 publishRegistry: false
 env:

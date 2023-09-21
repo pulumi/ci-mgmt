@@ -3,7 +3,7 @@ major-version: 1
 env:
   SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
 lint: true
-provider-default-branch: main
+providerDefaultBranch: main
 makeTemplate: bridged
 plugins:
   - name: random 
