@@ -369,7 +369,6 @@ name: run-acceptance-tests
 on:
   pull_request:
     branches:
-    - master
     - main
     paths-ignore:
     - CHANGELOG.md
