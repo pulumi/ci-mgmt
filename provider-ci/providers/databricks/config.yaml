@@ -5,7 +5,7 @@ env:
   DATABRICKS_PASSWORD: ${{ secrets.DATABRICKS_PASSWORD}}
   DATABRICKS_ACCOUNT_ID: ${{ secrets.DATABRICKS_ACCOUNT_ID}}
   DATABRICKS_HOST: https://accounts.cloud.databricks.com
-provider-default-branch: main
+providerDefaultBranch: main
 makeTemplate: bridged
 plugins:
   - name: random 

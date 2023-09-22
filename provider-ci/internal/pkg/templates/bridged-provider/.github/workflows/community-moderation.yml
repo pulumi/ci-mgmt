@@ -42,7 +42,6 @@ name: warn-codegen
 on:
   pull_request_target:
     branches:
-    - main
-    - master
+    - #{{ .Config.providerDefaultBranch }}#
     types:
     - opened

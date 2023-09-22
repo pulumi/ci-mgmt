@@ -1,6 +1,7 @@
 provider: oci
 major-version: 1
 lint: false
+providerDefaultBranch: main
 parallel: 1
 timeout: 90
 env:

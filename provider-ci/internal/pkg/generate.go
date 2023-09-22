@@ -97,7 +97,11 @@ func GeneratePackage(opts GenerateOpts) error {
 			return err
 		}
 		outPath = filepath.Join(opts.OutDir, outPath)
-
+		// Sub in the correct Workflow name by repo default branch
+		if strings.Contains(inPath, "main.yml") {
+			branchName := fmt.Sprint(config["providerDefaultBranch"])
+			outPath = strings.ReplaceAll(outPath, "main", branchName)
+		}
 		tmpl, err := parseTemplate(templateFS, inPath)
 		if err != nil {
 			return fmt.Errorf("error parsing template %s: %w", inPath, err)

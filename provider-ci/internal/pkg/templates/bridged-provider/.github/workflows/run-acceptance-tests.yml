@@ -432,8 +432,7 @@ name: run-acceptance-tests
 on:
   pull_request:
     branches:
-    - master
-    - main
+    - #{{ .Config.providerDefaultBranch }}#
     paths-ignore:
     - CHANGELOG.md
   repository_dispatch:
