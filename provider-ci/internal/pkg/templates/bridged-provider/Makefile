@@ -66,8 +66,6 @@ build_nodejs:#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}#
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/ && \
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION)/g" ./bin/package.json
 
-#{{- if .Config.wheels }}#
-
 build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
 build_python:#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}#
 	rm -rf sdk/python/
@@ -82,20 +80,6 @@ build_python:#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}#
 		./venv/bin/python -m pip install build && \
 		cd ./bin && \
 		../venv/bin/python -m build .
-#{{- else }}#
-
-build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
-build_python:#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}#
-	$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
-	cd sdk/python/ && \
-		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
-		cp ../../README.md . && \
-		python3 setup.py clean --all 2>/dev/null && \
-		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
-		rm ./bin/setup.py.bak && rm ./bin/go.mod && \
-		cd ./bin && python3 setup.py build sdist
-#{{- end }}#
 
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}

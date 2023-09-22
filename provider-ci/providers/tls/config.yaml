@@ -8,7 +8,4 @@ plugins:
     version: "4.26.0"
 javaGenVersion: "v0.9.7"
 team: ecosystem
-actionVersions:
-   publishProviderSDKs: pulumi/pulumi-package-publisher@v0.0.11
-wheels: true
 
