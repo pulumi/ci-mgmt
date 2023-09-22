@@ -2,7 +2,7 @@
 
 env:
   PROVIDER: aiven
-  AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
+  AIVEN_PROJECT_NAME: ${{ shmecrets.AIVEN_PROJECT_NAME }}
   AIVEN_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
   DOTNETVERSION: |
       6.0.x
