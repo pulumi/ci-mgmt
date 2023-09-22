@@ -31,9 +31,6 @@ team: ecosystem
 goBuildParallelism: 2
 skipGoReleaserHooks: true
 javaGenVersion: v0.9.7
-wheels: true
-actionVersions:
-   publishProviderSDKs: pulumi/pulumi-package-publisher@v0.0.11
 runner:
   publish: pulumi-ubuntu-8core
   buildSdk: pulumi-ubuntu-8core
