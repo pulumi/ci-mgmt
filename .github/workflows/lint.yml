@@ -1,0 +1,17 @@
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'provider-ci/providers/**'
+jobs:
+  lint:
+    name: Run actionlint and shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.client_payload.pull_request.head.sha }}
+      - name: lint providers
+        run: cd provider-ci && make lint-providers
