@@ -52,21 +52,21 @@ jobs:
           path: pulumi-${{ inputs.provider_name }}
       - name: Delete existing workflows
         # Bridged providers completely replace workflow files from ci-mgmt currently.
-        if: inputs.bridged == 'true'
+        if: inputs.bridged
         run: rm pulumi-${{ inputs.provider_name }}/.github/workflows/*.yml
       - name: Delete existing workflows
         # Curiously, native providers do not wipe all the workflows currently. This is a bit suspect and needs revisiting.
-        if: inputs.bridged != 'true'
+        if: !inputs.bridged
         run: |
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
-        if: inputs.bridged == 'true'
+        if: inputs.bridged
         run: |
           cp -r ci-mgmt/provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
-        if: inputs.bridged != 'true'
+        if: !inputs.bridged
         run: |
           cp -r ci-mgmt/native-provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
       - name: Unshallow clone for tags
