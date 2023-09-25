@@ -50,6 +50,9 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
+      - name: Initialize submodule in pulumi-${{ inputs.provider_name }}
+        run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
+        continue-on-error: true
       - name: Delete existing workflows
         # Bridged providers completely replace workflow files from ci-mgmt currently.
         if: inputs.bridged
