@@ -39,7 +39,7 @@ jobs:
       max-parallel: 1
       matrix:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
-    uses: ./github/workflows/update-workflows.yml
+    uses: ./.github/workflows/update-workflows.yml
     secrets: inherit
     with:
       bridged: true
