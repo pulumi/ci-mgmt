@@ -5,6 +5,7 @@ on:
 env:
   # Ignore shell check error 1007
   SHELLCHECK_OPTS: "-e SC1007"
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 jobs:
   lint:
     name: Run actionlint and shellcheck
