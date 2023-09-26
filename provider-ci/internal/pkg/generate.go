@@ -29,8 +29,9 @@ type GenerateOpts struct {
 }
 
 type templateContext struct {
-	Repository string
-	Config     interface{}
+	Repository  string
+	ProjectName string // e.g.: pulumi-aws (this is the name of the repository)
+	Config      interface{}
 }
 
 func GeneratePackage(opts GenerateOpts) error {
@@ -78,9 +79,12 @@ func GeneratePackage(opts GenerateOpts) error {
 		}
 	}
 
+	projName := strings.TrimPrefix(opts.RepositoryName, "pulumi/")
+
 	ctx := templateContext{
-		Repository: opts.RepositoryName,
-		Config:     config,
+		Repository:  opts.RepositoryName,
+		ProjectName: projName,
+		Config:      config,
 	}
 
 	templateDir := filepath.Join("templates", opts.TemplateName)
