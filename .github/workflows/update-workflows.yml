@@ -50,6 +50,11 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
+      - name: Unshallow clone for tags
+        run: |
+          DIR="$PWD/pulumi-${{ inputs.provider_name }}"
+          cd "$DIR"
+          git fetch --prune --unshallow --tags
       - name: Initialize submodule in pulumi-${{ inputs.provider_name }}
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
@@ -61,9 +66,9 @@ jobs:
         # Curiously, native providers do not wipe all the workflows currently. This is a bit suspect and needs revisiting.
         if: ${{ inputs.bridged != true }}
         run: |
-          rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
-          rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
-          rm pulumi-${{ github.event.inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
+          rm pulumi-${{ inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
+          rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
+          rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
         if: inputs.bridged
         run: |
@@ -72,11 +77,6 @@ jobs:
         if: ${{ inputs.bridged != true }}
         run: |
           cp -r ci-mgmt/native-provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
-      - name: Unshallow clone for tags
-        run: |
-          DIR="$PWD/pulumi-${{ inputs.provider_name }}"
-          cd "$DIR"
-          git fetch --prune --unshallow --tags
       - name: Run source code migrations
         run: |
           DIR="$PWD/pulumi-${{ inputs.provider_name }}"
