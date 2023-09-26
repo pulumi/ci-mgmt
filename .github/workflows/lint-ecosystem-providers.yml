@@ -2,6 +2,9 @@ on:
   pull_request:
     branches:
       - master
+env:
+  # Ignore shell check error 1007
+  SHELLCHECK_OPTS: "-e SC1007"
 jobs:
   lint:
     name: Run actionlint and shellcheck
