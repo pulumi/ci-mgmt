@@ -2,8 +2,6 @@ on:
   pull_request:
     branches:
       - master
-    paths:
-      - 'provider-ci/providers/**'
 jobs:
   lint:
     name: Run actionlint and shellcheck
