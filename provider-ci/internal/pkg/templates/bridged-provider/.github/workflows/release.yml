@@ -119,33 +119,9 @@ jobs:
   #{{ if .Config.lint -}}#
   lint:
     name: lint
-    runs-on: #{{ .Config.runner.default }}#
-    steps:
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
-      with:
-        submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
-    - name: disarm go:embed directives to enable lint
-      run: |
-        git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
-    - name: prepare upstream
-      continue-on-error: true
-      run: make upstream
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: v1.54.1
-        working-directory: provider
-    - if: failure() && github.event_name == 'push'
-      name: Notify Slack
-      uses: #{{ .Config.actionVersions.notifySlack }}#
-      with:
-        author_name: Failure in linting provider
-        fields: repo,commit,author,action
-        status: ${{ job.status }}
+    uses: ./.github/workflows/lint.yml
+    secrets: inherit
+    with: {}
   #{{ end -}}#
   prerequisites:
     name: prerequisites
