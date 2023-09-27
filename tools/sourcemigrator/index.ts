@@ -110,6 +110,26 @@ function introducePythonWheels(): SourceMigration {
     return sm;
 }
 
+function addVenvToGitIgnore(): SourceMigration {
+    return {
+        name: "addVenvToGitIgnore",
+        execute: (ctx: MigrateContext) => {
+            let ign = path.join(ctx.dir, ".gitignore");
+            if (!fs.existsSync(ign)) {
+                fs.writeFileSync(ign, "sdk/python/venv\n");  
+                return {filesEdited: 1};
+            }
+            if (fileContains(ign, new RegExp("sdk/python/venv"))) {
+                return {filesEdited: 0};
+            }
+            let contents = String(fs.readFileSync(ign));
+            let upd = contents + "\n\nsdk/python/venv\n";
+            fs.writeFileSync(ign, upd);
+            return {filesEdited: 1};
+        }
+    };
+}
+
 function fileContains(f: string, pattern: RegExp): boolean {
     let contents = String(fs.readFileSync(f));
     return pattern.test(contents);
@@ -147,6 +167,7 @@ function allMigrations(): SourceMigration[] {
         updatePulumiCoreRefTo3x(),
         updateGo_1_21(),
         introducePythonWheels(),
+        addVenvToGitIgnore(),
     ];
 }
 
