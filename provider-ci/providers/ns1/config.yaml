@@ -4,3 +4,4 @@ env:
   NS1_APIKEY: ${{ secrets.NS1_APIKEY }}
 makeTemplate: bridged
 team: ecosystem
+javaGenVersion: "v0.9.7"
