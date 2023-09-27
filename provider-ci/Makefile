@@ -41,6 +41,12 @@ providers/%/repo: bin/provider-ci providers/%/config.yaml
 
 lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
 	@echo Linting $*
+	# Running actionlint in the context of a temporary .git repo so under
+	# providers/pulumi-xyz/repo so that it checks
+	# providers/pulumi-xyz/repo/.github/workflows/*.yml and correctly identifies their
+	# cross-references; there does not seem to be a direct way to do it. Without the temp .git
+	# directory it either starts checking ci-mgmt workflows itself or checks workflows
+	# file-by-file and incorrectly reports dangling cross-references.
 	cd providers/$*/repo &&	git init && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml && rm -rf .git
 	@scripts/shellcheck.sh providers/$*/repo
 
