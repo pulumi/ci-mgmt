@@ -41,7 +41,7 @@ providers/%/repo: bin/provider-ci providers/%/config.yaml
 
 lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
 	@echo Linting $*
-	$(ACTIONLINT) -config-file actionlint.yml providers/$*/repo/.github/workflows/*
+	cd providers/$*/repo &&	git init && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml && rm -rf .git
 	@scripts/shellcheck.sh providers/$*/repo
 
 LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
