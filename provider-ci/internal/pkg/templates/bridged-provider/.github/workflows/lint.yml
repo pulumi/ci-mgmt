@@ -28,6 +28,7 @@ jobs:
         # Either this action or golangci-lint needs to disable the cache
         cache: false
     - name: disarm go:embed directives to enable lint
+      continue-on-error: true # this fails if there are no go:embed directives
       run: |
         git grep -l 'go:embed' -- provider | xargs sed -i 's/go:embed/ goembed/g'
     - name: prepare upstream
