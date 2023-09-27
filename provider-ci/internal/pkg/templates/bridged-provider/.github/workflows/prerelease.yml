@@ -106,7 +106,6 @@ jobs:
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
-    with: {}
   #{{ end -}}#
   prerequisites:
     name: prerequisites

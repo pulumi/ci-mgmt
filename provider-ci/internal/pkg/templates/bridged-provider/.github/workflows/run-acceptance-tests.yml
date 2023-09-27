@@ -127,7 +127,6 @@ jobs:
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
-    with: {}
   #{{ end -}}#
   prerequisites:
     if: github.event_name == 'repository_dispatch' ||
