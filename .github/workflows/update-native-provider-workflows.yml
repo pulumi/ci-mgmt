@@ -33,7 +33,7 @@ jobs:
     with:
       bridged: false
       provider_name: ${{ matrix.provider }}
-      automerge: false
+      automerge: true
       caller_workflow: update-native-provider-workflows
-      
+
 
