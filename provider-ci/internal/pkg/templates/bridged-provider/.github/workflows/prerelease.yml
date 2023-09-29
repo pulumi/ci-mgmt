@@ -55,7 +55,7 @@ jobs:
     - name: Setup Gradle
       uses: #{{ .Config.actionVersions.setupGradle }}#
       with:
-        gradle-version: "7.6"
+        gradle-version: ${{ env.GRADLEVERSION }}
     - name: Download provider + tfgen binaries
       uses: #{{ .Config.actionVersions.downloadArtifact }}#
       with:
@@ -232,7 +232,7 @@ jobs:
     - name: Setup Gradle
       uses: #{{ .Config.actionVersions.setupGradle }}#
       with:
-        gradle-version: "7.6"
+        gradle-version: ${{ env.GRADLEVERSION }}
     - name: Download provider + tfgen binaries
       uses: #{{ .Config.actionVersions.downloadArtifact }}#
       with:

@@ -13,6 +13,9 @@ checkoutSubmodules: true
 # TODO: remove XrunUpstreamTools flag after work to add docs replacement strategies to resources.go is completed
 # Tracked in in https://github.com/pulumi/pulumi-aws/issues/2757
 XrunUpstreamTools: true
+nixpkgs:
+  - name: awscli2
+    version: latest
 plugins:
   - name: archive
     version: "0.0.1"
