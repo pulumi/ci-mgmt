@@ -20,7 +20,9 @@ jobs:
 #{{- end }}#
     - uses: #{{ .Config.actionVersions.slashCommand }}#
       with:
-        commands: run-acceptance-tests
+        commands: |
+          run-acceptance-tests
+          release
         issue-type: pull-request
         permission: write
         reaction-token: ${{ secrets.GITHUB_TOKEN }}
