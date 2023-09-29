@@ -68,6 +68,7 @@ export interface Blob {
 
 export interface GoreleaserConfig {
   name?: string;
+  project_name: string;
   builds: Build[];
   archives: Archive[];
   before?: Before;
@@ -87,6 +88,7 @@ interface GoReleaserOpts {
 
 export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
   name?: string;
+  project_name: string;
   before?: Before;
   builds: Build[];
   archives: Archive[];
@@ -116,6 +118,8 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     if (opts.providerVersion !== "") {
       ldflags.push(`-X ${opts.providerVersion}={{.Tag}}`);
     }
+
+    this.project_name = `pulumi-${opts.provider}`;
 
     if (!opts.skipCodegen) {
       if (opts.provider === "command") {
