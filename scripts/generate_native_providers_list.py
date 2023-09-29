@@ -3,7 +3,7 @@ import os
 import json
 
 
-excluded_from_auto_pr =["azure-native", "google-native", "kubernetes", "command"]
+excluded_from_auto_pr =["azure-native", "google-native", "command"]
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
