@@ -29,3 +29,4 @@ goBuildParallelism: 2
 javaGenVersion: "v0.8.0"
 runner:
   buildSdk: pulumi-ubuntu-8core
+  publish: pulumi-ubuntu-8core
