@@ -53,6 +53,8 @@ lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
 LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
 lint-providers: $(LINT_RULES)
 
+canary-providers: providers/aws/repo providers/docker/repo
+
 providers: $(PROVIDER_REPOS)
 ifeq ($(NAME), all)
 provider: providers
