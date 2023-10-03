@@ -69,10 +69,14 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
-      - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
+      - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         if: inputs.bridged
         run: |
-          cp -r ci-mgmt/provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
+          cd ci-mgmt/provider-ci && go run ./... generate \
+          	--name pulumi/pulumi-${{ inputs.provider_name }} \
+                --template bridged-provider \
+                --config providers/${{ inputs.provider_name }}/config.yaml \
+                --out ../../pulumi-${{ inputs.provider_name }}
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
         if: ${{ inputs.bridged != true }}
         run: |

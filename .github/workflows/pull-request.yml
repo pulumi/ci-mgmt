@@ -1,0 +1,42 @@
+on:
+  pull_request:
+    branches:
+      - master
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+jobs:
+  lint:
+    name: Run actionlint and shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Unshallow clone for tags
+        run: git fetch --prune --unshallow --tags
+      - name: Install pulumictl
+        uses: jaxxstorm/action-install-gh-release@v1.5.0
+        with:
+          repo: pulumi/pulumictl
+      - name: lint providers
+        run: cd provider-ci && make lint-providers
+  test:
+    name: Verify against testdata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Unshallow clone for tags
+        run: git fetch --prune --unshallow --tags
+      - name: Install pulumictl
+        uses: jaxxstorm/action-install-gh-release@v1.5.0
+        with:
+          repo: pulumi/pulumictl
+      - name: Checkout Scripts Repo
+        uses: actions/checkout@v3
+        with:
+          path: ci-scripts
+          repository: pulumi/scripts
+      - name: Validate that our test workflows match checked in workflows
+        run: cd provider-ci && make test-workflow-generation
+      - name: Check worktree clean
+        run: ./ci-scripts/ci/check-worktree-is-clean
