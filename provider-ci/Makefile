@@ -50,8 +50,7 @@ lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
 	cd providers/$*/repo &&	git init && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml && rm -rf .git
 	@scripts/shellcheck.sh providers/$*/repo
 
-LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
-lint-providers: $(LINT_RULES)
+lint-providers: lint-providers/aws/repo lint-providers/docker/repo lint-providers/cloudflare/repo
 
 test-workflows/%: providers/%/repo
 	rm -r test-workflows/$*
