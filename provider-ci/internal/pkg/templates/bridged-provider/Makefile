@@ -113,7 +113,7 @@ install_nodejs_sdk:
 
 install_plugins:	.pulumi/bin/pulumi
 	#{{- range .Config.plugins }}#
-	.pulumi/bin/pulumi plugin install resource #{{ .name }}# #{{ .version }}#
+	.pulumi/bin/pulumi plugin install #{{ or .kind "resource" }}# #{{ .name }}# #{{ .version }}#
 	#{{- end }}#
 
 lint_provider: provider
