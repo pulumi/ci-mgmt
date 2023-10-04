@@ -19,6 +19,11 @@ WORKING_DIR := $(shell pwd)
 #{{- if .Config.goBuildParallelism }}#
 PULUMI_PROVIDER_BUILD_PARALLELISM ?= -p #{{ .Config.goBuildParallelism }}#
 #{{- end }}#
+#{{- if .Config.pulumiConvert }}#
+PULUMI_CONVERT := 1
+#{{- else }}#
+PULUMI_CONVERT := 0
+#{{- end }}#
 
 development: install_plugins provider build_sdks install_sdks
 
@@ -106,10 +111,9 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins:
-	[ -x "$(shell command -v pulumi 2>/dev/null)" ] || curl -fsSL https://get.pulumi.com | sh
+install_plugins:	.pulumi/bin/pulumi
 	#{{- range .Config.plugins }}#
-	pulumi plugin install resource #{{ .name }}# #{{ .version }}#
+	.pulumi/bin/pulumi plugin install resource #{{ .name }}# #{{ .version }}#
 	#{{- end }}#
 
 lint_provider: provider
@@ -123,7 +127,7 @@ test:
 
 tfgen: install_plugins#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}##{{ if .Config.docsCmd }}# docs#{{ end }}#
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
-	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
+	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(VERSION) go generate cmd/$(PROVIDER)/main.go)
 
 #{{- if eq .Config.team "ecosystem" }}#
@@ -169,3 +173,11 @@ ci-mgmt: .ci-mgmt.yaml
 
 
 .PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt
+
+upgrade_pulumi:
+	gh release list --repo pulumi/pulumi --exclude-drafts --exclude-pre-releases --limit 1 | cut -f1 | sed 's/^v//' > .pulumi.version
+
+.pulumi/bin/pulumi: PULUMI_VERSION := $(shell cat .pulumi.version)
+.pulumi/bin/pulumi: HOME := $(WORKING_DIR)
+.pulumi/bin/pulumi: .pulumi.version
+	curl -fsSL https://get.pulumi.com | sh -s -- --version "$(PULUMI_VERSION)"
