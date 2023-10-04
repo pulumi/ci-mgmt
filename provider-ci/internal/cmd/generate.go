@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/pulumi/ci-mgmt/package-ci/internal/pkg"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg"
 	"github.com/spf13/cobra"
 )
 

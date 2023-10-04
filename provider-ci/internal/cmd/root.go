@@ -7,7 +7,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "package-ci",
+	Use:   "provider-ci",
 	Short: "Configure CI/CD for Pulumi packages",
 	Long:  `Configures GitHub Actions workflows and Makefile targets for a Pulumi package.`,
 }
