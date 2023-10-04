@@ -154,4 +154,17 @@ upstream.rebase:
 bin/pulumi-java-gen:
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}#
+# To make an immediately observable change to .ci-mgmt.yaml:
+#
+# - Edit .ci-mgmt.yaml
+# - Run make ci-mgmt to apply the change locally.
+#
+ci-mgmt: .ci-mgmt.yaml
+	go run github.com/pulumi/ci-mgmt/provider-ci@master generate \
+		--name pulumi/pulumi-$(PACK) \
+		--out . \
+		--template bridged-provider \
+		--config $<
+
+
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt

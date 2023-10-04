@@ -63,7 +63,7 @@ test-workflows/%: providers/%/repo
 # files for other bridged provider repositories should be ephemeral.
 test-workflow-generation: test-workflows/aws test-workflows/docker test-workflows/cloudflare
 
-providers: $(PROVIDER_REPOS)
+providers: $(PROVIDER_REPOS) test-workflow-generation
 ifeq ($(NAME), all)
 provider: providers
 else
