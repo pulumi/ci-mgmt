@@ -171,13 +171,9 @@ ci-mgmt: .ci-mgmt.yaml
 		--template bridged-provider \
 		--config $<
 
+.pulumi/bin/pulumi: PULUMI_VERSION := $(shell (cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 ) | awk -F' v' '{print $$2}')
+.pulumi/bin/pulumi: HOME := $(WORKING_DIR)
+.pulumi/bin/pulumi: provider/go.mod
+	curl -fsSL https://get.pulumi.com | sh -s -- --version "$(PULUMI_VERSION)"
 
 .PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt
-
-upgrade_pulumi:
-	gh release list --repo pulumi/pulumi --exclude-drafts --exclude-pre-releases --limit 1 | cut -f1 | sed 's/^v//' > .pulumi.version
-
-.pulumi/bin/pulumi: PULUMI_VERSION := $(shell cat .pulumi.version)
-.pulumi/bin/pulumi: HOME := $(WORKING_DIR)
-.pulumi/bin/pulumi: .pulumi.version
-	curl -fsSL https://get.pulumi.com | sh -s -- --version "$(PULUMI_VERSION)"
