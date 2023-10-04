@@ -1,6 +1,6 @@
 package main
 
-import "github.com/pulumi/ci-mgmt/package-ci/internal/cmd"
+import "github.com/pulumi/ci-mgmt/provider-ci/internal/cmd"
 
 func main() {
 	cmd.Execute()

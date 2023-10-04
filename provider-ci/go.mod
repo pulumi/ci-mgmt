@@ -1,4 +1,4 @@
-module github.com/pulumi/ci-mgmt/package-ci
+module github.com/pulumi/ci-mgmt/provider-ci
 
 go 1.21
 
