@@ -172,11 +172,16 @@ ci-mgmt: .ci-mgmt.yaml
 		--config $<
 
 .pulumi/bin/pulumi: HOME := $(WORKING_DIR)
-.pulumi/bin/pulumi: provider/go.mod
-	curl -fsSL https://get.pulumi.com | sh -s -- --version "$$( (cd provider && go list -m github.com/pulumi/pulumi/pkg/v3) | awk -F' v' '{print $$2}')"
+.pulumi/bin/pulumi: .pulumi/version
+	curl -fsSL https://get.pulumi.com | sh -s -- --version $(cat .pulumi/version)
 
-# This target is usually not needed, but it enables shellcheck to validate .pulumi/bin/pulumi target.
-provider/go.mod:
-	mkdir -p provider && cd provider && go mod init dummy && go get github.com/pulumi/pulumi/pkg
+# Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
+.pulumi/version:
+	@mkdir -p .pulumi
+	@if [ -d provider ]; then \
+		cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3; \
+	else \
+		echo "3.86.0"; \
+	fi | tee $@
 
 .PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt
