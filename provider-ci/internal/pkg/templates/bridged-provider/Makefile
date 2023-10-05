@@ -171,7 +171,7 @@ ci-mgmt: .ci-mgmt.yaml
 		--template bridged-provider \
 		--config $<
 
-.pulumi/bin/pulumi: PULUMI_VERSION := $(shell (cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 ) | awk -F' v' '{print $$2}')
+.pulumi/bin/pulumi: PULUMI_VERSION := $(shell ((mkdir -p provider && cd provider && go list -m github.com/pulumi/pulumi/pkg/v3 ) | awk -F' v' '{print $$2}') || echo "3.86.0")
 .pulumi/bin/pulumi: HOME := $(WORKING_DIR)
 .pulumi/bin/pulumi: provider/go.mod
 	curl -fsSL https://get.pulumi.com | sh -s -- --version "$(PULUMI_VERSION)"
