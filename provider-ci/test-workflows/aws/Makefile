@@ -95,7 +95,7 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins:	.pulumi/bin/pulumi
+install_plugins: .pulumi/bin/pulumi
 	.pulumi/bin/pulumi plugin install resource archive 0.0.1
 	.pulumi/bin/pulumi plugin install resource tls 4.10.0
 	.pulumi/bin/pulumi plugin install resource github 4.10.0

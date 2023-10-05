@@ -97,7 +97,7 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins:	.pulumi/bin/pulumi
+install_plugins: .pulumi/bin/pulumi
 	.pulumi/bin/pulumi plugin install resource aws 5.37.0
 
 lint_provider: provider
