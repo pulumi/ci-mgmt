@@ -133,8 +133,14 @@ jobs:
           title: "Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
-      - name: Set PR to auto-merge
-        if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge == 'true'
+      - name: "Set PR to auto-merge"
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
+         # Not all providers have auto-merge enabled, and we don't want to fail providers
+         # that don't have auto-merge enabled.
+         #
+         # After https://github.com/pulumi/home/issues/3140 is closed, we should remove
+         # `continue-on-error: true`.
+        continue-on-error: true
         run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-url }}"
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
