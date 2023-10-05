@@ -54,6 +54,7 @@ LINT_RULES := $(addprefix lint-, $(PROVIDER_REPOS))
 lint-providers: $(LINT_RULES)
 
 test-workflows/%: providers/%/repo
+	rm -r test-workflows/$*
 	cp -r providers/$*/repo test-workflows/$*
 
 # We check in a subset of provider workflows so template changes are visible in PR diffs.
