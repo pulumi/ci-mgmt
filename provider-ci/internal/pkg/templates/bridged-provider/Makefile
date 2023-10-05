@@ -111,7 +111,7 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins:	.pulumi/bin/pulumi
+install_plugins: .pulumi/bin/pulumi
 	#{{- range .Config.plugins }}#
 	.pulumi/bin/pulumi plugin install #{{ or .kind "resource" }}# #{{ .name }}# #{{ .version }}#
 	#{{- end }}#
