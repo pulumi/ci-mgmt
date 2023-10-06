@@ -13,6 +13,9 @@ JAVA_GEN_VERSION := v0.9.7
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
 PULUMI_CONVERT := 0
+PULUMI_HOME := $(WORKING_DIR)/.pulumi
+export PULUMI_HOME
+PULUMI := $(PULUMI_HOME)/bin/pulumi
 
 development: install_plugins provider build_sdks install_sdks
 
@@ -97,8 +100,8 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins: .pulumi/bin/pulumi
-	.pulumi/bin/pulumi plugin install resource aws 5.37.0
+install_plugins: $(PULUMI)
+	$(PULUMI) plugin install resource aws 5.37.0
 
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
@@ -141,7 +144,7 @@ ci-mgmt: .ci-mgmt.yaml
 		--template bridged-provider \
 		--config $<
 
-.pulumi/bin/pulumi: .pulumi/version
+$(PULUMI): .pulumi/version
 	curl -fsSL https://get.pulumi.com | HOME=$(WORKING_DIR) sh -s -- --version $(cat .pulumi/version)
 
 # Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.

@@ -24,6 +24,9 @@ PULUMI_CONVERT := 1
 #{{- else }}#
 PULUMI_CONVERT := 0
 #{{- end }}#
+PULUMI_HOME := $(WORKING_DIR)/.pulumi
+export PULUMI_HOME
+PULUMI := $(PULUMI_HOME)/bin/pulumi
 
 development: install_plugins provider build_sdks install_sdks
 
@@ -111,9 +114,9 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins: .pulumi/bin/pulumi
+install_plugins: $(PULUMI)
 	#{{- range .Config.plugins }}#
-	.pulumi/bin/pulumi plugin install #{{ or .kind "resource" }}# #{{ .name }}# #{{ .version }}#
+	$(PULUMI) plugin install #{{ or .kind "resource" }}# #{{ .name }}# #{{ .version }}#
 	#{{- end }}#
 
 lint_provider: provider
@@ -171,7 +174,7 @@ ci-mgmt: .ci-mgmt.yaml
 		--template bridged-provider \
 		--config $<
 
-.pulumi/bin/pulumi: .pulumi/version
+$(PULUMI): .pulumi/version
 	curl -fsSL https://get.pulumi.com | HOME=$(WORKING_DIR) sh -s -- --version $(cat .pulumi/version)
 
 # Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
