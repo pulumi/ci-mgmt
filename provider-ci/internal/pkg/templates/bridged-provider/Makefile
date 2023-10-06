@@ -178,6 +178,6 @@ ci-mgmt: .ci-mgmt.yaml
 # Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
 .pulumi/version:
 	@mkdir -p .pulumi
-	@cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee $@
+	@cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
 
 .PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt
