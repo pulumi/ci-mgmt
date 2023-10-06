@@ -12,3 +12,4 @@ remove-plugins: true
 pr-reviewers: pulumi/Providers,lukehoban
 
 #{{ end -}}#
+javaVersion: "#{{ .Config.javaGenVersion }}#"
