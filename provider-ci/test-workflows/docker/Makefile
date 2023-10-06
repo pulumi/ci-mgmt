@@ -109,8 +109,11 @@ provider: tfgen install_plugins test_provider
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
-test_provider:
-	cd provider && go test -short ./... -parallel $(TESTPARALLELISM)
+test_provider: tfgen
+	@echo ""
+	@echo "== test_provider ==================================================================="
+	@echo ""
+	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
 
 tfgen: install_plugins upstream docs
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
