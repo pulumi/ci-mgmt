@@ -125,6 +125,12 @@ provider: tfgen install_plugins
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
+test_provider:
+	@echo ""
+	@echo "== test_provider ==================================================================="
+	@echo ""
+	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
+
 tfgen: install_plugins#{{ if eq .Config.team "ecosystem" }}# upstream#{{ end }}##{{ if .Config.docsCmd }}# docs#{{ end }}#
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
 	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
@@ -179,4 +185,4 @@ ci-mgmt: .ci-mgmt.yaml
 	@mkdir -p .pulumi
 	@cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.docsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider test tfgen#{{ if eq .Config.team "ecosystem" }}# upstream upstream.finalize upstream.rebase#{{end}}# ci-mgmt test_provider
