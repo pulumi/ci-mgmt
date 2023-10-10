@@ -12,6 +12,8 @@ jobs:
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
       with:
         kind: bridge
+        email: bot@pulumi.com
+        username: pulumi-bot
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#7CFC00"
