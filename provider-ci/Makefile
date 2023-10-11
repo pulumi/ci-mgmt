@@ -30,6 +30,11 @@ test:
 format:
 	go fmt ./...
 
+providers/%/config.yaml: F=providers/$*/config.yaml
+providers/%/config.yaml:
+	mkdir -p $(dir $F)
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-$*/master/.ci-mgmt.yaml" > $F
+
 providers/%/repo: bin/provider-ci providers/%/config.yaml
 	@./bin/provider-ci generate \
 		--name pulumi/pulumi-$* \
