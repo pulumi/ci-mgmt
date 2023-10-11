@@ -1,6 +1,0 @@
-provider: kong
-major-version: 4
-docker: true
-makeTemplate: bridged
-team: ecosystem
-javaGenVersion: "v0.9.5"

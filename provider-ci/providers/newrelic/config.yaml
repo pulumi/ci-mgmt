@@ -1,9 +1,0 @@
-provider: newrelic
-major-version: 5
-env:
-  NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
-  NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-makeTemplate: bridged
-team: ecosystem
-extra-ld-flags:
-- -X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi

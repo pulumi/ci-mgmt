@@ -1,5 +1,0 @@
-provider: rabbitmq
-docker: true
-major-version: 3
-makeTemplate: bridged
-team: ecosystem

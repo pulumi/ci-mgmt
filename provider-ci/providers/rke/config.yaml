@@ -1,7 +1,0 @@
-provider: rke
-major-version: 3
-aws: true
-env:
-  AWS_REGION: us-west-2
-makeTemplate: bridged
-team: ecosystem
