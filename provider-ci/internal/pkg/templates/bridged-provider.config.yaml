@@ -57,6 +57,7 @@ extraTests:
 #     ...
 runner:
   default: ubuntu-latest
+  prerequisites: ubuntu-latest
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
 actionVersions:
