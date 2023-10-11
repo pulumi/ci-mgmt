@@ -1,9 +1,0 @@
-provider: equinix-metal
-major-version: 3
-lint: false
-env:
-  PACKET_AUTH_TOKEN: ${{ secrets.PACKET_AUTH_TOKEN }}
-upstream-provider-repo: terraform-provider-metal
-makeTemplate: bridged
-team: ecosystem
-javaGenVersion: "v0.9.5"
