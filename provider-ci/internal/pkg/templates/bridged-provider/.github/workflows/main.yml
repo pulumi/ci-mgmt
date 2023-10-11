@@ -107,7 +107,7 @@ jobs:
       COVERAGE_OUTPUT_DIR: ${{ secrets.COVERAGE_OUTPUT_DIR }}
     name: generate_coverage_data
     needs: prerequisites
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.runner.prerequisites }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#

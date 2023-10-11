@@ -109,7 +109,7 @@ jobs:
   #{{ end -}}#
   prerequisites:
     name: prerequisites
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.runner.prerequisites }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
