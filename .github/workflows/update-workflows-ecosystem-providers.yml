@@ -24,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: get-providers
-        run: echo "::set-output name=providers::$(python generate_providers_list.py --team ecosystem)'"
-        working-directory: scripts
+        run: echo "::set-output name=providers::$(cat providers.json)'"
+        working-directory: provider-ci/providers
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
 

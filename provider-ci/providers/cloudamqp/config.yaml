@@ -1,6 +1,0 @@
-provider: cloudamqp
-major-version: 3
-makeTemplate: bridged
-team: ecosystem
-env:
-  CLOUDAMQP_APIKEY: ${{ secrets.CLOUDAMQP_APIKEY }}

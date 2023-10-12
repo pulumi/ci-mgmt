@@ -1,9 +1,0 @@
-provider: mailgun
-major-version: 3
-env:
-  MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-makeTemplate: bridged
-plugins:
-  - name: aws 
-    version: "4.0.0"
-team: ecosystem

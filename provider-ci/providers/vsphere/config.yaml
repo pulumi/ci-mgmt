@@ -1,4 +1,0 @@
-provider: vsphere
-major-version: 4
-makeTemplate: bridged
-team: ecosystem

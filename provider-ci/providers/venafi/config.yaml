@@ -1,9 +1,0 @@
-provider: venafi
-major-version: 1
-env:
-  VENAFI_ZONE: ${{ secrets.VENAFI_ZONE }}
-  VENAFI_URL: ${{ secrets.VENAFI_URL }}
-  VENAFI_TPP_USER: ${{ secrets.VENAFI_TPP_USER }}
-  VENAFI_TPP_PASSWORD: ${{ secrets.VENAFI_TPP_PASSWORD }}
-makeTemplate: bridged
-team: ecosystem

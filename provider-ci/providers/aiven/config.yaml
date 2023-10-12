@@ -1,9 +1,0 @@
-provider: aiven
-major-version: 6
-lint: false
-env:
-  AIVEN_TOKEN: ${{ secrets.AIVEN_API_TOKEN }}
-  AIVEN_PROJECT_NAME: ${{ secrets.AIVEN_PROJECT_NAME }}
-makeTemplate: bridged
-team: ecosystem
-javaGenVersion: "v0.9.4"
