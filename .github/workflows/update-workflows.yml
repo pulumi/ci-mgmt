@@ -69,14 +69,6 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
-      - name: Migrate config.yaml from ci-mgmt to the host repo
-        if: inputs.bridged
-        run: |
-          if ! [ -f pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml ]; then
-          	cp ci-mgmt/provider-ci/providers/${{ inputs.provider_name }}/config.yaml pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml
-          else
-          	echo "No migration necessary"
-          fi
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         if: inputs.bridged
         run: |
