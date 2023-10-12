@@ -31,9 +31,10 @@ format:
 	go fmt ./...
 
 providers/%/config.yaml: F=providers/$*/config.yaml
+providers/%/config.yaml: B=$(shell gh repo view pulumi/pulumi-$* --json=defaultBranchRef --jq='.defaultBranchRef.name')
 providers/%/config.yaml:
 	mkdir -p $(dir $F)
-	curl "https://raw.githubusercontent.com/pulumi/pulumi-$*/master/.ci-mgmt.yaml" > $F
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-$*/$B/.ci-mgmt.yaml" > $F
 
 providers/%/repo: bin/provider-ci providers/%/config.yaml
 	@./bin/provider-ci generate \
@@ -44,7 +45,7 @@ providers/%/repo: bin/provider-ci providers/%/config.yaml
 	@touch ./providers/$*/repo
 	@echo "Generated providers/$*/repo"
 
-lint-providers/%/repo: $(ACTIONLINT) providers/%/repo
+lint-providers/%/repo: $(ACTIONLINT) providers/%/repo providers/%/config.yaml
 	@echo Linting $*
 	# Running actionlint in the context of a temporary .git repo so under
 	# providers/pulumi-xyz/repo so that it checks
