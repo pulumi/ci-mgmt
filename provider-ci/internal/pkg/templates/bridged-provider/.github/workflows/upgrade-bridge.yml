@@ -5,17 +5,17 @@ on:
   workflow_dispatch:
     inputs:
       target-bridge-version:
-        descripion: pulumi-terraform-bridge version or hash reference
+        description: pulumi-terraform-bridge version or hash reference
         required: false
         type: string
         default: "latest"
       pr-reviewers:
-        descripion: Reviewers to assign to the auto-opened pull request
+        description: Reviewers to assign to the auto-opened pull request
         required: false
         type: string
         default: ""
       pr-description:
-        descripion: Extra description to add to the auto-opened pull request
+        description: Extra description to add to the auto-opened pull request
         required: false
         type: string
         default: ""
