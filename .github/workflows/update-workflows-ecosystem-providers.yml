@@ -24,11 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: get-providers
-        run: echo "::set-output name=providers::$(cat providers.json)"
+        run: echo "providers=$(jq . providers.json --compact-output) >> $GITHUB_OUTPUT"
         working-directory: provider-ci
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
-
   deploy:
     needs: generate-providers-list
     strategy:
