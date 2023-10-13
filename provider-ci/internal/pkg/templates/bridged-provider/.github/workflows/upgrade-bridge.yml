@@ -9,6 +9,11 @@ on:
         required: false
         type: string
         default: "latest"
+      pr-reviewers:
+        descripion: Reviewers to assign to the auto-opened pull request
+        required: false
+        type: string
+        default: ""
       automerge:
         description: Mark created PR for auto-merging?
         required: false
@@ -30,6 +35,7 @@ jobs:
         username: pulumi-bot
         automerge: ${{ inputs.automerge }}
         target-bridge-version: ${{ inputs.target-bridge-version }}
+        pr-reviewers: ${{ inputs.pr-reviewers }}
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#7CFC00"
