@@ -29,8 +29,8 @@ jobs:
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
   deploy:
-    needs: generate-providers-list    strategy:
-
+    needs: generate-providers-list
+    strategy:
       fail-fast: false
       # GitHub recommends only issuing 1 API request per second, and never
       # concurrently.  For more information, see:
