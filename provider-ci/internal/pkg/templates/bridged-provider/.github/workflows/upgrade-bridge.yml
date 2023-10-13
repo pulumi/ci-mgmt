@@ -14,6 +14,11 @@ on:
         required: false
         type: string
         default: ""
+      pr-description:
+        descripion: Extra description to add to the auto-opened pull request
+        required: false
+        type: string
+        default: ""
       automerge:
         description: Mark created PR for auto-merging?
         required: false
@@ -36,6 +41,7 @@ jobs:
         automerge: ${{ inputs.automerge }}
         target-bridge-version: ${{ inputs.target-bridge-version }}
         pr-reviewers: ${{ inputs.pr-reviewers }}
+        pr-description: ${{ inputs.pr-description }}
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#7CFC00"
