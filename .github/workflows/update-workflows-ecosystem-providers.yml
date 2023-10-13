@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: get-providers
-        run: echo "providers=$(jq . providers.json --compact --output) >> $GITHUB_OUTPUT"
+        run: echo "providers=$(jq . providers.json --compact-output) >> $GITHUB_OUTPUT"
         working-directory: provider-ci
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
