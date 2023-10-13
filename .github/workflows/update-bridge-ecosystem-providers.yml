@@ -47,6 +47,7 @@ jobs:
             workflow: upgrade-bridge.yml
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 
             repo: pulumi/pulumi-${{ matrix.provider }}
+            inputs: '{ "automerge": true }'
             ref: main
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
@@ -57,6 +58,7 @@ jobs:
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 
             repo: pulumi/pulumi-${{ matrix.provider }}
             ref: master
+            inputs: '{ "automerge": true }'
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
