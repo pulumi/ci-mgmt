@@ -3,6 +3,8 @@
 name: Upgrade bridge
 on:
   workflow_dispatch:
+    types:
+      - upgrade-bridge
     inputs:
       target-bridge-version:
         description: pulumi-terraform-bridge version or hash reference
