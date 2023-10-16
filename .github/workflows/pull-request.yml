@@ -19,6 +19,11 @@ jobs:
           repo: pulumi/pulumictl
       - name: lint providers
         run: cd provider-ci && make lint-providers
+      - name: lint workflows
+        run: |
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color -shellcheck=""
+        shell: bash
   test:
     name: Verify against testdata
     runs-on: ubuntu-latest
