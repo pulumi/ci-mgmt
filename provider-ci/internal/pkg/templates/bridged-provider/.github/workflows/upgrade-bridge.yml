@@ -2,9 +2,10 @@
 
 name: Upgrade bridge
 on:
-  workflow_dispatch:
+  repository_dispatch:
     types:
       - upgrade-bridge
+  workflow_dispatch:
     inputs:
       target-bridge-version:
         description: pulumi-terraform-bridge version or hash reference
@@ -35,6 +36,7 @@ jobs:
     runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Call upgrade provider action
+      if: github.event_name == 'workflow_dispatch'
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
       with:
         kind: bridge
@@ -44,6 +46,17 @@ jobs:
         target-bridge-version: ${{ inputs.target-bridge-version }}
         pr-reviewers: ${{ inputs.pr-reviewers }}
         pr-description: ${{ inputs.pr-description }}
+    - name: Call upgrade provider action
+      if: github.event_name == 'repository_dispatch'
+      uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
+      with:
+        kind: bridge
+        email: bot@pulumi.com
+        username: pulumi-bot
+        automerge: ${{ github.event.client_payload.automerge }}
+        target-bridge-version: ${{ github.event.client_payload.target-bridge-version }}
+        pr-reviewers: ${{ github.event.client_payload.pr-reviewers }}
+        pr-description: ${{ github.event.client_payload.pr-description }}
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#7CFC00"
