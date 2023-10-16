@@ -103,7 +103,8 @@ jobs:
     name: prerequisites
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
-test:
+
+  test:
     name: test
     needs: build_sdk
     permissions:
