@@ -26,7 +26,6 @@ hybrid: true
 plugins:
   - name: aws
     version: "5.37.0"
-team: ecosystem
 actions:
   preTest:
     - name: Setup SSH key
