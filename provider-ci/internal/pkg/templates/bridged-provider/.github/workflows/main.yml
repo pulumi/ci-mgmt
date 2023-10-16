@@ -186,6 +186,20 @@ jobs:
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
         repo: pulumi/schema-tools
+    #{{- if .Config.gcp }}#
+    - name: Authenticate to Google Cloud
+      uses: #{{ .Config.actionVersions.googleAuth }}#
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
+      uses: #{{ .Config.actionVersions.setupGcloud }}#
+      with:
+        install_components: gke-gcloud-auth-plugin
+    #{{- end }}#
     - name: Build tfgen & provider binaries
       run: make provider
     - name: Unit-test provider code
