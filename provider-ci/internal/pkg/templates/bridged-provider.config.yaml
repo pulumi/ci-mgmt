@@ -81,6 +81,6 @@ actionVersions:
   prComment: thollander/actions-comment-pull-request@v2
   slashCommand: peter-evans/slash-command-dispatch@v2
   uploadArtifact: actions/upload-artifact@v2
-  upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.8
+  upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.9
   publishProviderSDKs: pulumi/pulumi-package-publisher@v0.0.12
   slackNotification: rtCamp/action-slack-notify@v2
