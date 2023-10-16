@@ -22,7 +22,7 @@ jobs:
       - name: lint workflows
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color -shellcheck=""
+          ./actionlint -color
         shell: bash
   test:
     name: Verify against testdata
