@@ -15,11 +15,9 @@ on:
         description: "Mark created PRs for auto-merging?"
         required: true
         type: boolean
-        default: false
       bridged:
         description: "Whether the provider is bridged or native"
         type: boolean
-        default: false
         required: true
 
 env:

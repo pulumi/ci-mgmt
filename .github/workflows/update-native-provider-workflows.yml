@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: get-providers
-        run: echo "::set-output name=providers::$(python generate_native_providers_list.py --for-auto-pr)'"
+        run: echo "providers=$(python generate_native_providers_list.py --for-auto-pr)'" >> "$GITHUB_OUTPUT"
         working-directory: scripts
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
