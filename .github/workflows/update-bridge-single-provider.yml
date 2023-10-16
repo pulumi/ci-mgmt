@@ -33,4 +33,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger workflow on pulumi-${{ github.event.inputs.provider_name }}
-        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ github.event.inputs.provider_name }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }} -f automerge=${{ github.events.inputs.automerge }}
+        run: gh workflow run update-bridge.yml -R pulumi/pulumi-${{ github.event.inputs.provider_name }} -f bridge_version=${{ github.event.inputs.bridge_version }} -f sdk_version=${{ github.event.inputs.sdk_version }} -f automerge=${{ github.event.inputs.automerge }}
