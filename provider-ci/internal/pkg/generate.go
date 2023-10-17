@@ -158,7 +158,7 @@ func collectSplices(templateDir string, tc templateContext) (map[string]string, 
 		if err := tmpl.Execute(&buf, tc); err != nil {
 			return fmt.Errorf("error rendering template %s: %w", path, err)
 		}
-		splices[strings.TrimSuffix(path, ".splice")] = buf.String()
+		splices[strings.TrimSuffix(filepath.Base(path), ".splice")] = buf.String()
 		return nil
 	})
 	if err != nil {
