@@ -133,7 +133,7 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: prerequisites
-#{{ .Splices.prerequisites }}
+#{{ .Splices.prerequisites }}#
 
   sentinel:
     name: sentinel

@@ -110,7 +110,7 @@ jobs:
 
   prerequisites:
     name: prerequisites
-#{{ .Splices.prerequisites }}
+#{{ .Splices.prerequisites }}#
 
   publish:
     name: publish

@@ -101,7 +101,7 @@ jobs:
 
   prerequisites:
     name: prerequisites
-#{{ .Splices.prerequisites }}
+#{{ .Splices.prerequisites }}#
 
   test:
     name: test
