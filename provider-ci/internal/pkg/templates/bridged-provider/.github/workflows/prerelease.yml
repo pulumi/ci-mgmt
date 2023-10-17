@@ -110,8 +110,8 @@ jobs:
 
   prerequisites:
     name: prerequisites
-    uses: ./.github/workflows/prerequisites.yml
-    secrets: inherit
+#{{ .Splices.prerequisites }}
+
   publish:
     name: publish
     #{{- if .Config.extraTests }}#
