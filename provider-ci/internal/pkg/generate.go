@@ -28,10 +28,15 @@ type GenerateOpts struct {
 	ConfigPath     string // .yaml file containing template config
 }
 
+// Data exposed to text/template that can be referenced in the template code.
 type templateContext struct {
 	Repository  string
 	ProjectName string // e.g.: pulumi-aws (this is the name of the repository)
 	Config      interface{}
+
+	// Adding a foo.splice file will generate a "foo" entry in this map with the value being the
+	// result of rendering foo.splice template.
+	Splices map[string]string
 }
 
 func GeneratePackage(opts GenerateOpts) error {
@@ -88,11 +93,20 @@ func GeneratePackage(opts GenerateOpts) error {
 	}
 
 	templateDir := filepath.Join("templates", opts.TemplateName)
+
+	ctx.Splices, err = collectSplices(templateDir, ctx)
+	if err != nil {
+		return err
+	}
+
 	err = fs.WalkDir(templateFS, templateDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if d.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(path, ".splice") {
 			return nil
 		}
 		inPath := path
@@ -122,6 +136,35 @@ func GeneratePackage(opts GenerateOpts) error {
 	}
 
 	return nil
+}
+
+func collectSplices(templateDir string, tc templateContext) (map[string]string, error) {
+	splices := map[string]string{}
+	err := fs.WalkDir(templateFS, templateDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(path, ".splice") {
+			return nil
+		}
+		tmpl, err := parseTemplate(templateFS, path)
+		if err != nil {
+			return fmt.Errorf("error parsing template %s: %w", path, err)
+		}
+		var buf bytes.Buffer
+		if err := tmpl.Execute(&buf, tc); err != nil {
+			return fmt.Errorf("error rendering template %s: %w", path, err)
+		}
+		splices[strings.TrimSuffix(path, ".splice")] = buf.String()
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return splices, nil
 }
 
 func ListTemplates() ([]string, error) {
