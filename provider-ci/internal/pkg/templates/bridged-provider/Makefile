@@ -147,8 +147,6 @@ endif
 	cd upstream-tools && yarn install --frozen-lockfile
 	# Apply all automated changes
 	cd upstream-tools && yarn --silent run apply
-	# Check for any pending replacements
-	cd upstream-tools && yarn --silent run check
 
 #{{- end }}#
 
