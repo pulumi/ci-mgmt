@@ -177,6 +177,14 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 	if err != nil {
 		return err
 	}
+
+	// Make shell scripts executable
+	if strings.HasSuffix(outPath, ".sh") {
+		err = os.Chmod(outPath, 0755)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
