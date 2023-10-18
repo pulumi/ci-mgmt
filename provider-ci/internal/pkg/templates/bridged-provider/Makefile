@@ -138,7 +138,7 @@ tfgen: install_plugins upstream#{{ if .Config.docsCmd }}# docs#{{ end }}#
 
 upstream:
 ifneq ("$(wildcard upstream)","")
-	@$(SHELL) ./scripts/upstream.sh "$@" apply
+	scripts/upstream.sh "$@" apply
 endif
 
 #{{- if .Config.XrunUpstreamTools }}#
@@ -151,10 +151,10 @@ endif
 #{{- end }}#
 
 upstream.finalize:
-	@$(SHELL) ./scripts/upstream.sh "$@" end_rebase
+	scripts/upstream.sh "$@" end_rebase
 
 upstream.rebase:
-	@$(SHELL) ./scripts/upstream.sh "$@" start_rebase
+	scripts/upstream.sh "$@" start_rebase
 
 bin/pulumi-java-gen:
 	$(shell pulumictl download-binary -n pulumi-language-java -v $(JAVA_GEN_VERSION) -r pulumi/pulumi-java)
