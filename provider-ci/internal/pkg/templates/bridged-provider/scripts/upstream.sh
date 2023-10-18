@@ -173,7 +173,7 @@ end_rebase() {
 
   rm patches/*.patch
   cd upstream
-  git format-patch local -o ../patches
+  git format-patch local -o ../patches --no-prefix --zero-commit --no-signature --no-stat
   rm ../rebase-in-progress
 }
 
