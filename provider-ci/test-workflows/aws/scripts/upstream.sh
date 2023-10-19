@@ -189,7 +189,7 @@ end_rebase() {
   cd upstream
   git format-patch local -o ../patches --no-prefix --zero-commit --no-signature --no-stat
   rm ../rebase-in-progress
-  git submodule update --force --init
+  apply "$1"
 }
 
 case $2 in
