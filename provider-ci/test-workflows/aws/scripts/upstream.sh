@@ -131,19 +131,6 @@ EOF
   fi
 }
 
-assert_rebase_not_unfinished() {
-  git_status=$(cd upstream && git status --verbose)
-  if [[ ${git_status} == *"rebase in progress"* ]]; then
-    cat <<EOF
-
-It looks like you have an unfinished rebase in './upstream'. Please resolve the
-rebase in './upstream' and then run 'make "$1"' again.
-
-EOF
-    exit 1
-  fi
-}
-
 # "$1" is the current make command being run.
 # It is used to make the error message more actionable.
 apply() {
@@ -176,10 +163,12 @@ EOF
 # "$1" is the current make command being run.
 # It is used to make the error message more actionable.
 end_rebase() {
-  assert_rebase_in_progress "$1"
-  assert_rebase_not_unfinished "$1"
+  assert_rebased "$1"
 
-  if [ -d .git/modules/upstream/rebase-merge ]; then
+  rebase_merge_dir=$(cd upstream && git rev-parse --git-path rebase-merge)
+  rebase_apply_dir=$(cd upstream && git rev-parse --git-path rebase-apply)
+
+  if [[ -d "${rebase_merge_dir}" || -d "${rebase_apply_dir}" ]]; then
     echo "rebase still in progress in './upstream'. Please resolve the rebase in"
     echo "'./upstream' and then run 'make \"$1\"' again."
     exit 1
@@ -188,7 +177,8 @@ end_rebase() {
   rm patches/*.patch
   cd upstream
   git format-patch local -o ../patches --no-prefix --zero-commit --no-signature --no-stat
-  rm ../rebase-in-progress
+  cd ..
+  rm rebase-in-progress
   apply "$1"
 }
 
