@@ -163,8 +163,8 @@ EOF
 # "$1" is the current make command being run.
 # It is used to make the error message more actionable.
 end_rebase() {
-  assert_rebased "$1"
-
+  assert_rebase_in_progress "$1"
+  # Use git to resolve the possible location of files indicating a rebase might be in progress.
   rebase_merge_dir=$(cd upstream && git rev-parse --git-path rebase-merge)
   rebase_apply_dir=$(cd upstream && git rev-parse --git-path rebase-apply)
 
