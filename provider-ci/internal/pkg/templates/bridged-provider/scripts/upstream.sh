@@ -168,7 +168,7 @@ end_rebase() {
   rebase_merge_dir=$(cd upstream && git rev-parse --git-path rebase-merge)
   rebase_apply_dir=$(cd upstream && git rev-parse --git-path rebase-apply)
 
-  if [[ -d "${rebase_merge_dir}" || -d "${rebase_apply_dir}" ]]; then
+  if [ -d "${rebase_merge_dir}" ] || [ -d "${rebase_apply_dir}" ]; then
     echo "rebase still in progress in './upstream'. Please resolve the rebase in"
     echo "'./upstream' and then run 'make \"$1\"' again."
     exit 1
