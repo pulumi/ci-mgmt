@@ -6,7 +6,7 @@ PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 ACTIONLINT_VERSION := 1.6.24
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
-all: ensure test format providers lint-providers
+all: ensure test format providers lint-providers lint
 
 gen: clean providers
 
@@ -24,7 +24,9 @@ clean:
 	rm -rf platform/examples/repo
 	rm -rf bin
 
-test:
+test: test-workflow-generation
+
+lint:
 	golangci-lint run
 
 format:
@@ -76,4 +78,4 @@ else
 provider: providers/$(NAME)/repo
 endif
 
-.PHONY: all gen ensure clean test format provider providers lint-providers
+.PHONY: all gen ensure clean test format provider providers lint-providers lint
