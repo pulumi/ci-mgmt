@@ -48,7 +48,7 @@ jobs:
     steps:
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
-      uses: pulumi/pulumi-upgrade-provider-action@t0yv0/add-target-pulumi-version
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.9
       with:
         kind: bridge
         email: bot@pulumi.com
@@ -60,14 +60,14 @@ jobs:
         pr-description: ${{ inputs.pr-description }}
     - name: Call upgrade provider action
       if: github.event_name == 'repository_dispatch'
-      uses: pulumi/pulumi-upgrade-provider-action@t0yv0/add-target-pulumi-version
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.9
       with:
         kind: bridge
         email: bot@pulumi.com
         username: pulumi-bot
         automerge: ${{ github.event.client_payload.automerge }}
-        target-bridge-version: ${{ github.event.client_payload.target-bridge-version }}
         target-pulumi-version: ${{ github.event.client_payload.target-pulumi-version }}
+        target-bridge-version: ${{ github.event.client_payload.target-bridge-version }}
         pr-reviewers: ${{ github.event.client_payload.pr-reviewers }}
         pr-description: ${{ github.event.client_payload.pr-description }}
     - env:
