@@ -159,21 +159,22 @@ jobs:
     secrets: inherit
   #{{ end -}}#
 
+  license_check:
+    name: License Check
+    uses: ./.github/workflows/license.yml
+    secrets: inherit
   prerequisites:
     name: prerequisites
 #{{ .Splices.prerequisites }}#
 
   publish:
     name: publish
-    #{{- if .Config.extraTests }}#
     needs:
       - test
+      - license_check
       #{{- range $action, $_ := .Config.extraTests }}#
       - #{{ $action }}#
-      #{{- end -}}#
-    #{{ else }}#
-    needs: test
-    #{{- end }}#
+      #{{- end }}#
     runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Checkout Repo
