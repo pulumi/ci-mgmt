@@ -18,7 +18,6 @@ assignees: ''
 - [ ] eks
 - [ ] google-native
 - [ ] kubernetes
-- [ ] kubernetes-operator
 
 ## Bridged Providers
 
@@ -50,7 +49,6 @@ assignees: ''
 - [ ] dnsimple
 - [ ] docker
 - [ ] ec
-- [ ] equinix-metal
 - [ ] external
 - [ ] f5bigip
 - [ ] fastly
