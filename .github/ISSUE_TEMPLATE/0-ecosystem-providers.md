@@ -18,7 +18,6 @@ assignees: ''
 - [ ] eks
 - [ ] google-native
 - [ ] kubernetes
-- [ ] kubernetes-operator
 
 ## Bridged Providers
 
