@@ -50,7 +50,6 @@ assignees: ''
 - [ ] dnsimple
 - [ ] docker
 - [ ] ec
-- [ ] equinix-metal
 - [ ] external
 - [ ] f5bigip
 - [ ] fastly
