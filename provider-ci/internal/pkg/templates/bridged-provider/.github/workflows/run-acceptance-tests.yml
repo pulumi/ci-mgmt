@@ -165,6 +165,7 @@ jobs:
       ! cancelled()
     needs:
     - test
+    - license_check
     #{{- if .Config.lint }}#
     - lint
     #{{- end }}#
@@ -323,6 +324,10 @@ jobs:
         - dotnet
         - go
         - java
+  license_check:
+    name: License Check
+    uses: ./.github/workflows/license.yml
+    secrets: inherit
 #{{- if .Config.extraTests }}#
 #{{ .Config.extraTests | toYaml | indent 2 }}#
 #{{ end }}#
