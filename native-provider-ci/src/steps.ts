@@ -957,7 +957,7 @@ export function ProviderWithPulumiUpgrade(provider: string): Step {
       "git add sdk/java*\n" +
       'git commit -m "Regenerating Java SDK based on updated modules" || echo "ignore commit failure, may be empty"\n' +
       "git add .\n" +
-      'git commit -m "Updated modules"\n' +
+      'git commit -m "Updated modules" || echo "ignore commit failure, may be empty"\n' +
       "git push origin update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
   };
 }
