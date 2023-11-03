@@ -77,6 +77,7 @@ jobs:
           github.com/golang,
           github.com/gorhill/cronexpr,
           github.com/jmespath/go-jmespath,
+          github.com/keybase/go-crypto,
           github.com/klauspost/compress,
           github.com/mattn/go-localereader,
           github.com/modern-go/reflect2,
