@@ -62,6 +62,7 @@ jobs:
             github.com/apache/thrift/lib/go/thrift,
             github.com/cloudflare/circl,
             github.com/golang,
+            github.com/gorhill/cronexpr,
             github.com/jmespath/go-jmespath,
             github.com/klauspost/compress,
             github.com/mattn/go-localereader,
