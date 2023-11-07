@@ -23,6 +23,7 @@ export const WorkflowOpts = z.object({
   providerVersion: z.string().default(""),
   skipCodegen: z.boolean().default(false),
   skipWindowsArmBuild: z.boolean().default(false),
+  pulumiCLIVersion: z.string().optional(),
 });
 type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 
@@ -457,7 +458,7 @@ export class BuildSdkJob implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
@@ -513,7 +514,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallSchemaChecker(opts.provider),
       steps.BuildK8sgen(opts.provider),
       steps.PrepareOpenAPIFile(opts.provider),
@@ -578,7 +579,7 @@ export class TestsJob implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
@@ -640,7 +641,7 @@ export class BuildTestClusterJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallNodeJS(),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
@@ -685,7 +686,7 @@ export class TeardownTestClusterJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallNodeJS(),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
@@ -746,7 +747,7 @@ export class PublishPrereleaseJob implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
@@ -775,7 +776,7 @@ export class PublishJob implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
@@ -949,7 +950,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.InstallDotNet(),
       steps.InstallNodeJS(),
       steps.InstallPython(),
@@ -977,7 +978,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.CheckoutTagsStep(opts.provider),
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.AzureLogin(opts.provider),
       steps.MakeClean(),

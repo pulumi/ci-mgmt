@@ -332,10 +332,12 @@ export function DispatchDocsBuildEvent(): Step {
   };
 }
 
-export function InstallPulumiCli(): Step {
+export function InstallPulumiCli(version?: string): Step {
+  const withBlock = version ? { "pulumi-version": version } : undefined;
   return {
     name: "Install Pulumi CLI",
     uses: action.installPulumiCli,
+    with: withBlock,
   };
 }
 
