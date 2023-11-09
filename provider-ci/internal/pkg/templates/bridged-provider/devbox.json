@@ -1,0 +1,22 @@
+{
+  "packages": [
+    #{{- range .Config.nixpkgs }}#
+      "#{{ .name }}#@#{{ .version }}#",
+    #{{- end }}#
+    "go@#{{ trimAll "x" .Config.env.GOVERSION }}#",
+    "nodejs@#{{ trimAll "x" .Config.env.NODEVERSION }}#",
+    "python3@#{{ trimAll "x" .Config.env.PYTHONVERSION }}#",
+    "dotnet-sdk@#{{ splitList "\n" .Config.env.DOTNETVERSION | first | trimAll "x"  }}#",
+    "gradle_7@#{{ trimAll "x" .Config.env.GRADLEVERSION }}#"
+  ],
+  "shell": {
+    "init_hook": [
+      "export PATH=\"$(pwd)/bin/:$PATH\""
+    ],
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ]
+    }
+  }
+}
