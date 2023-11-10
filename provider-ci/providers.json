@@ -62,6 +62,7 @@
     "sumologic",
     "tailscale",
     "tls",
+    "vault",
     "venafi",
     "vsphere",
     "wavefront"
