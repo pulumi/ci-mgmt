@@ -119,8 +119,10 @@ install_plugins: .pulumi/bin/pulumi
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
-provider: tfgen install_plugins
+provider_no_deps:
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)#{{if .Config.providerVersion}}# -X #{{ .Config.providerVersion }}#=$(VERSION)#{{end}}#" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
+
+provider: tfgen install_plugins provider_no_deps
 
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
