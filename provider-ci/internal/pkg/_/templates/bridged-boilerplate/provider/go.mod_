@@ -1,0 +1,14 @@
+module #{{ .Module }}#/provider
+
+go 1.19
+
+replace (
+	github.com/hashicorp/terraform-plugin-sdk/v2 => github.com/pulumi/terraform-plugin-sdk/v2 v2.0.0-20230327102345-3fa930f86570
+  #{{ .Config.upstreamModule }}# => ../upstream
+)
+
+require (
+	github.com/pulumi/pulumi-terraform-bridge/pf v0.12.0
+	github.com/pulumi/pulumi-terraform-bridge/v3 v3.50.2-0.20230615185508-bcbc40987dd5
+	#{{ .Config.upstreamModule }}# v0.0.0
+)

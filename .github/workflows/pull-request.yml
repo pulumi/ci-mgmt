@@ -17,6 +17,10 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.5.0
         with:
           repo: pulumi/pulumictl
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: stable
       - name: lint providers
         run: cd provider-ci && make lint-providers
       - name: lint workflows
@@ -41,6 +45,10 @@ jobs:
         with:
           path: ci-scripts
           repository: pulumi/scripts
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: stable
       - name: Validate that our test workflows match checked in workflows
         run: cd provider-ci && make test-workflow-generation
       - name: Check worktree clean

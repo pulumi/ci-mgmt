@@ -10,8 +10,9 @@ all: ensure test format providers lint-providers lint
 
 gen: clean providers
 
-bin/provider-ci: $(shell find internal -type f)
-	go build -o bin/provider-ci
+bin/%: $(shell find internal)
+	mkdir -p bin
+	go build -o bin ./cmd/$*
 
 $(ACTIONLINT):
 	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.6.24
@@ -45,7 +46,6 @@ providers/%/repo: bin/provider-ci providers/%/config.yaml
 		--template bridged-provider \
 		--config ./providers/$*/config.yaml
 	@touch ./providers/$*/repo
-	@echo "Generated providers/$*/repo"
 
 lint-providers/%/repo: $(ACTIONLINT) providers/%/repo providers/%/config.yaml
 	@echo Linting $*
@@ -61,7 +61,7 @@ lint-providers/%/repo: $(ACTIONLINT) providers/%/repo providers/%/config.yaml
 lint-providers: lint-providers/aws/repo lint-providers/docker/repo lint-providers/cloudflare/repo
 
 test-workflows/%: providers/%/repo
-	rm -r test-workflows/$*
+	rm -rf test-workflows/$*
 	cp -r providers/$*/repo test-workflows/$*
 
 # We check in a subset of provider workflows so template changes are visible in PR diffs.
