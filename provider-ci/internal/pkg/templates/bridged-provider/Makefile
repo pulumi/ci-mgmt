@@ -119,6 +119,9 @@ install_plugins: .pulumi/bin/pulumi
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
 
+# `make provider_no_deps` builds the provider binary directly, without ensuring that 
+# `cmd/pulumi-resource-#{{ .Config.provider }}#/schema.json` is valid and up to date. 
+# To create a release ready binary, you should use `make provider`.
 provider_no_deps:
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)#{{if .Config.providerVersion}}# -X #{{ .Config.providerVersion }}#=$(VERSION)#{{end}}#" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
 
