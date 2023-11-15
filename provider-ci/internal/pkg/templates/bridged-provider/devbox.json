@@ -3,6 +3,8 @@
     #{{- range .Config.nixpkgs }}#
       "#{{ .name }}#@#{{ .version }}#",
     #{{- end }}#
+    "yarn@latest",
+    "pulumictl@latest",
     "go@#{{ trimAll "x" .Config.env.GOVERSION }}#",
     "nodejs@#{{ trimAll "x" .Config.env.NODEVERSION }}#",
     "python3@#{{ trimAll "x" .Config.env.PYTHONVERSION }}#",
