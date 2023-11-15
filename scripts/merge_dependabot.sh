@@ -18,9 +18,9 @@ QUERY="author:app/dependabot created:<$(date -v-7d '+%Y-%m-%d')"
 
 combine() {
     provider="$1"
-    D="/tmp/pulumi-$provider"
+    D="$(mktemp -d)/pulumi-$provider"
     rm -rf "$D"
-    (cd /tmp && git clone "https://github.com/pulumi/pulumi-$provider.git" "$D")
+    gh repo clone "pulumi/pulumi-$provider" "$D"
     (cd "$D" && gh combine-prs \
                    --skip-pr-check \
                    --query "${QUERY}" \
