@@ -1,0 +1,18 @@
+{
+  "packages": [
+    "go@1.21",
+    "golangci-lint",
+    "nodejs@latest",
+    "pulumictl@latest",
+    "yarn@latest",
+    "dotnet-sdk@6.0."
+  ],
+  "shell": {
+    "init_hook": [],
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ]
+    }
+  }
+}

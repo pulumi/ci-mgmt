@@ -1,6 +1,8 @@
 {
   "packages": [
       "awscli2@latest",
+    "yarn@latest",
+    "pulumictl@latest",
     "go@1.21.",
     "nodejs@20.",
     "python3@3.9",
