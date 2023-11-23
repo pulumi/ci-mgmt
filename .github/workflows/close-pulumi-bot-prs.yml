@@ -1,0 +1,17 @@
+# This calls close_outdated_bridge_prs.py as part of a daily cron.
+#
+name: Close pulumi-bot PRs
+on:
+  schedule:
+  # 4 AM UTC ~ 9 PM PDT - specifically selected to avoid putting load on the CI system during working hours.
+  - cron: 0 4 * * *
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+jobs:
+  close-outdated-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./scripts/close_outdated_bridge_prs.py
