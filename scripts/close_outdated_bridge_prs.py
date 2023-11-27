@@ -54,6 +54,14 @@ def close_outdated(repo: str):
     #           "name": "Pulumi Bot"
     #         }
     #       },
+    #       "labels": [
+    #         {
+    #           "id": "LA_kwDODYna9c8AAAABbWB-nw",
+    #           "name": "needs-release/patch",
+    #           "description": "",
+    #           "color": "BFD4F2"
+    #         }
+    #       ],
     #       "number": 2204,
     #       "title": "Upgrade pulumi-terraform-bridge to v3.66.0"
     #     }
@@ -64,6 +72,9 @@ def close_outdated(repo: str):
             # auto-merge: we don't need to close
             # non-bot author: not our concern
             continue
+        if issue["labels"]:
+            continue
+
         issue_title = issue["title"]
         issue_number = issue["number"]
         cmd("gh", "pr", "close", str(issue_number), "--repo", repo, prefix=f"Closing \"{issue_title}\":\n\t")
