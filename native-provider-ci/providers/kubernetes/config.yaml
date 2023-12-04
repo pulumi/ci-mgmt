@@ -3,7 +3,6 @@ lint: true
 aws: true
 gcp: true
 major-version: 4
-pulumiCLIVersion: v3.89.0
 env:
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi
