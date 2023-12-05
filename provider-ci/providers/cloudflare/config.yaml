@@ -10,6 +10,7 @@ env:
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 javaGenVersion: "v0.9.3"
+use-upstream-version-check: true
 license:
   ignore:
     - github.com/oracle/terraform-provider-oci/shim

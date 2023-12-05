@@ -8,6 +8,7 @@ fail-on-missing-mapping: true
 fail-on-extra-mapping: true
 publishRegistry: true
 checkoutSubmodules: false
+use-upstream-version-check: false # TODO: this option should be removed once all providers are onboarded to upstream version checks.
 env:
   DOTNETVERSION: |
     6.0.x
