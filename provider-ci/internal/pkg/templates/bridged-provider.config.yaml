@@ -70,7 +70,7 @@ actionVersions:
 
   configureAwsCredentials: aws-actions/configure-aws-credentials@v1
   setupGcloud: google-github-actions/setup-gcloud@v0
-  googleAuth: google-github-actions/auth@v0
+  googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v2
   installGhRelease: jaxxstorm/action-install-gh-release@v1.5.0
   checkout: actions/checkout@v3
