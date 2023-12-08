@@ -574,7 +574,6 @@ export function CommentSchemaChangesOnPR(provider: string): Step {
     uses: action.prComment,
     with: {
       message:
-        "### Does the PR have any schema changes?\n\n" +
         "${{ env.SCHEMA_CHANGES }}\n",
       comment_tag: "schemaCheck",
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
