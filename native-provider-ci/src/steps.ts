@@ -573,8 +573,7 @@ export function CommentSchemaChangesOnPR(provider: string): Step {
     name: "Comment on PR with Details of Schema Check",
     uses: action.prComment,
     with: {
-      message:
-        "${{ env.SCHEMA_CHANGES }}\n",
+      message: "${{ env.SCHEMA_CHANGES }}\n",
       comment_tag: "schemaCheck",
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
     },
