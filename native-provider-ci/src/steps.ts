@@ -317,7 +317,7 @@ export function InstallSchemaChecker(provider: string): Step {
     name: "Install Schema Tools",
     uses: action.installGhRelease,
     with: {
-      repo: "mikhailshilkov/schema-tools",
+      repo: "pulumi/schema-tools",
     },
   };
 }
@@ -543,7 +543,7 @@ export function CheckSchemaChanges(provider: string): Step {
     name: "Check Schema is Valid",
     run:
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
-      "schema-tools compare ${{ env.PROVIDER }} master --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+      "schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
       "echo 'EOF' >> $GITHUB_ENV",
   };
 }
