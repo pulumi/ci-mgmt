@@ -72,7 +72,9 @@ def close_outdated(repo: str):
             # auto-merge: we don't need to close
             # non-bot author: not our concern
             continue
-        if issue["labels"]:
+        if "labels" in issue:
+            # if there are labels applied to the issue, assume a human added them and is working on it
+            # Eg. a "needs-release/<version>" label would indicate that a release is in process.
             continue
 
         issue_title = issue["title"]
