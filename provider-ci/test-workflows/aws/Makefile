@@ -143,8 +143,8 @@ upstream.finalize:
 upstream.rebase:
 	scripts/upstream.sh "$@" start_rebase
 
-bin/pulumi-java-gen: .pulumi/java-gen-version
-	pulumictl download-binary -n pulumi-language-java -v v$(shell cat .pulumi/java-gen-version) -r pulumi/pulumi-java
+bin/pulumi-java-gen: .pulumi-java-gen.version
+	pulumictl download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
 
 # To make an immediately observable change to .ci-mgmt.yaml:
 #
