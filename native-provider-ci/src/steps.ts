@@ -706,7 +706,7 @@ export function InstallKubectl(provider: string): Step {
     return {
       name: "Install Kubectl",
       run:
-        "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl\n" +
+        "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable-1.28.txt)/bin/linux/amd64/kubectl\n" +
         "chmod +x ./kubectl\n" +
         "sudo mv kubectl /usr/local/bin\n",
     };
