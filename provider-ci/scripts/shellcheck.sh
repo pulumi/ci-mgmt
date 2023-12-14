@@ -13,8 +13,9 @@ if command -v shellcheck >/dev/null 2>&1; then
     # We unset Make related variables so that we can check the Makefile's dry-run output without
     # Make thinking it's running recursively.
     (
+      touch "$PROVIDER_DIR"/.pulumi-java-gen.version
       unset MAKELEVEL MAKEFLAGS MFLAGS
-      make -f "$PROVIDER_DIR"/Makefile -n | shellcheck -s bash -
+      make -f Makefile -n -C "$PROVIDER_DIR" | shellcheck -s bash -
     )
   fi
 else
