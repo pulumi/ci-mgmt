@@ -1,3 +1,6 @@
+# WARNING: this file is only used as an example to test changes to workflow templates, specifically
+# by the test-workflow-generation Makefile target. It does NOT affect the configuration of the
+# actual provider. Edit .ci-mgmt.yml in pulumi/pulumi-aws to reconfigure the actual provider build.
 provider: aws
 lint: false
 major-version: 6
@@ -35,11 +38,6 @@ runner:
   publish: pulumi-ubuntu-8core
   buildSdk: pulumi-ubuntu-8core
 actions:
-  setupPulumi:
-    - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
-      with:
-        pulumi-version: v3.77.1
   preTest:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1

@@ -37,7 +37,9 @@ env:
 actions:
   setupPulumi:
     - name: Install Pulumi CLI
-      uses: pulumi/action-install-pulumi-cli@v2
+      uses: pulumi/actions@v4
+      with:
+        pulumi-version: "^3"
   setupGo:
     - name: Install Go
       uses: actions/setup-go@v4
