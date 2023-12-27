@@ -17,13 +17,13 @@ def cmd(*args: str, prefix="Exec: ") -> str:
                    encoding="utf-8").stdout
 
 def set_labels(repo: str):
+    def label(kind: str, desc: str):
+        cmd("gh", "label", "create", f"needs-release/{kind}",
+            "--repo", repo,
+            "--color", "#C5DEF5",
+            "--force", # Update if another color; don't fail if no change
+            "--description", f"When a PR with this label merges, it initiates a release of {desc}")
 
-    label = lambda kind, desc: cmd("gh", "label", "create", f"needs-release/{kind}",
-                     "--repo", repo,
-                     "--color", "#C5DEF5",
-                     "--force", # Update if another color; don't fail if no change
-                     "--description", f"When a PR with this label merges, it initiates a release of {desc}",
-                     )
     label("major", "vX+1.0.0")
     label("minor", "vX.Y+1.0")
     label("patch", "vX.Y.Z+1")
