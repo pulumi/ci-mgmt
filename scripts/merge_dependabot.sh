@@ -5,6 +5,8 @@
 # To guard against supply side attacks, this will only merge dependabot PRs that were
 # created before last week.
 
+set -e
+
 # Ensure iwahbe/gh-combine-prs is installed
 #
 # --force: Ensure up to date, don't error when already installed.

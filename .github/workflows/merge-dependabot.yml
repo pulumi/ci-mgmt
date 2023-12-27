@@ -14,4 +14,5 @@ jobs:
     steps:
       - name: Clone ci-mgmt
         uses: actions/checkout@v4
+      - run: gh auth setup-git
       - run: ./scripts/merge_dependabot.sh
