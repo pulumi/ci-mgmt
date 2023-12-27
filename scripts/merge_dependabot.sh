@@ -16,7 +16,7 @@ gh extension install iwahbe/gh-combine-prs --force
 #
 # author:app/dependabot restricts this to PRs authored by dependabot.
 # created:<$(date -v-7d '+%Y-%m-%d') restricts to PRs created before 7 days ago
-QUERY="author:app/dependabot created:<$(date -v-7d '+%Y-%m-%d')"
+QUERY="author:app/dependabot created:<$(date --date "7 days ago" '+%Y-%m-%d')"
 
 combine() {
     provider="$1"
