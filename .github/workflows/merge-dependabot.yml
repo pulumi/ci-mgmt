@@ -1,0 +1,17 @@
+name: merge-dependabot
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 4:00AM every 4 days.
+    - cron:  '0 4 01/4 * *'
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+
+jobs:
+  update_workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone ci-mgmt
+        uses: actions/checkout@v4
+      - run: ./scripts/merge_dependabot.sh
