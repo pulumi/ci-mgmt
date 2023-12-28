@@ -10,6 +10,7 @@ env:
 
 jobs:
   generate-providers-list:
+    name: "Generate Providers List"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +21,8 @@ jobs:
       providers: ${{ steps.get-providers.outputs.providers }}
 
   update_workflows:
+    name: "Combine and merge Dependabot PRs"
+    needs: generate-providers-list
     runs-on: ubuntu-latest
     steps:
       - name: Clone ci-mgmt
