@@ -13,7 +13,7 @@ jobs:
     name: "Generate Providers List"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
         working-directory: provider-ci
