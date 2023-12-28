@@ -1,4 +1,4 @@
-name: merge-dependabot
+name: Merge Dependabot PRs
 
 on:
   workflow_dispatch: {}
@@ -9,6 +9,16 @@ env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 
 jobs:
+  generate-providers-list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: get-providers
+        run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
+        working-directory: provider-ci
+    outputs:
+      providers: ${{ steps.get-providers.outputs.providers }}
+
   update_workflows:
     runs-on: ubuntu-latest
     steps:
@@ -17,4 +27,12 @@ jobs:
       - run: gh auth setup-git
       - run: git config --global user.email "bot@pulumi.com"
       - run: git config --global user.name "pulumi-bot"
-      - run: ./scripts/merge_dependabot.sh
+      - run: ./scripts/merge_dependabot.sh ${{ matrix.provider }}
+    strategy:
+      fail-fast: false
+      # GitHub recommends only issuing 1 API request per second, and never
+      # concurrently.  For more information, see:
+      # https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      max-parallel: 1
+      matrix:
+        provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
