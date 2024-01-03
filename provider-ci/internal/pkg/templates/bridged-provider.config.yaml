@@ -1,5 +1,6 @@
 major-version: 2
 #javaGenVersion: 0.0.0
+#upstreamProviderOrg: terraform-providers"
 parallel: 3
 timeout: 60
 lint: true

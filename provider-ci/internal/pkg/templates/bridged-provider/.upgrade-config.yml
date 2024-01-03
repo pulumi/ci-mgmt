@@ -6,6 +6,9 @@ upstream-provider-name: #{{ index .Config "upstream-provider-repo" }}#
 #{{- else }}#
 upstream-provider-name: terraform-provider-#{{ .Config.provider }}#
 #{{- end }}#
+#{{- if (index .Config "upstreamProviderOrg") }}#
+upstream-provider-org: #{{ .Config.upstreamProviderOrg }}#
+#{{- end }}#
 pulumi-infer-version: true
 remove-plugins: true
 pr-reviewers: iwahbe # Team: pulumi/Providers
