@@ -3,6 +3,7 @@
 # actual provider. Edit .ci-mgmt.yml in pulumi/pulumi-docker to reconfigure the actual provider build.
 provider: docker
 major-version: 4
+upstreamProviderOrg: kreuzwerker
 aws: true
 gcp: true
 gcpRegistry: true
