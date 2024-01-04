@@ -50,6 +50,7 @@ function defineResources(buildSdkJobName: string, provider: string) {
             pattern: `${branch}`,
             enforceAdmins: true,
             requiredPullRequestReviews: [{
+                pullRequestBypassers: ["pulumi-bot"],
                 requiredApprovingReviewCount: 1,
             }],
             requiredStatusChecks: [{
