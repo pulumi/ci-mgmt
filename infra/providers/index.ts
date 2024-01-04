@@ -1,4 +1,3 @@
-import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
@@ -49,6 +48,10 @@ function defineResources(buildSdkJobName: string, provider: string) {
         new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
             repositoryId: `pulumi-${provider}`,
             pattern: `${branch}`,
+            enforceAdmins: true,
+            requiredPullRequestReviews: [{
+                requiredApprovingReviewCount: 1,
+            }],
             requiredStatusChecks: [{
                 strict: false,
                 contexts: contexts,
