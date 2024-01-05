@@ -51,8 +51,9 @@ function defineResources(buildSdkJobName: string, provider: string) {
             enforceAdmins: true,
             requiredPullRequestReviews: [{
                 pullRequestBypassers: ["/pulumi-bot"],
-                // pulumi-bot sometimes needs to be able to merge without approval.
-                requiredApprovingReviewCount: undefined,
+                // pulumi-bot sometimes needs to be able to merge without
+                // approval, except for aws.
+                requiredApprovingReviewCount: provider === "aws"? 1 : undefined,
             }],
             requiredStatusChecks: [{
                 strict: false,
