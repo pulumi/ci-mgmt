@@ -1,10 +1,9 @@
-import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
 
 // grab all the providers from their directory listing
-const tfProviders = fs.readdirSync('../../provider-ci/providers/');
+const tfProviders = JSON.parse(fs.readFileSync('../../provider-ci/providers.json', 'utf-8'));
 const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
 function hasManagedBranchProtection(provider: string): boolean {
@@ -49,11 +48,19 @@ function defineResources(buildSdkJobName: string, provider: string) {
         new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
             repositoryId: `pulumi-${provider}`,
             pattern: `${branch}`,
+            enforceAdmins: true,
+            requiredPullRequestReviews: [{
+                pullRequestBypassers: ["/pulumi-bot"],
+                // pulumi-bot sometimes needs to be able to merge without
+                // approval, except for aws.
+                requiredApprovingReviewCount: provider === "aws"? 1 : undefined,
+            }],
             requiredStatusChecks: [{
                 strict: false,
                 contexts: contexts,
             }]
-        })
+        }, { deleteBeforeReplace: true },
+        )
     }
 }
 

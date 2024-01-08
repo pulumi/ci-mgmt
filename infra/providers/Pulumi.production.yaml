@@ -1,2 +1,4 @@
 config:
   github:owner: pulumi
+  github:token:
+    secure: AAABAMUQiUbxGVd2j7HAGrlit9H1g3JHJ8RSCb1KVb4lEVxMbHPV+3uXicz2AnuIwxl+L6LBgg13XA6EC/HJQyItCCXs9gBs/VenzyptkffFA7xqMAGRZbCt9Ab+S+wNDVAcPrqiqtqLLWJrT6yPBg/ax5je1TP1j/JxU/0=
