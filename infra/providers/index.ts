@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 
 // grab all the providers from their directory listing
-const tfProviders = fs.readdirSync('../../provider-ci/providers/');
+const tfProviders = JSON.parse(fs.readFileSync('../../provider-ci/providers.json', 'utf-8'));
 const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
 function hasManagedBranchProtection(provider: string): boolean {
@@ -59,7 +59,8 @@ function defineResources(buildSdkJobName: string, provider: string) {
                 strict: false,
                 contexts: contexts,
             }]
-        })
+        }, { deleteBeforeReplace: true },
+        )
     }
 }
 
