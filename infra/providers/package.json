@@ -1,11 +1,11 @@
 {
     "name": "pulumi-provider-repos",
     "devDependencies": {
-      "@types/node": "^18"
+        "@types/node": "^18"
     },
     "dependencies": {
-      "@pulumi/github": "^5.24.0",
-      "@pulumi/pulumi": "^3.100.0",
-      "yaml": "^2.2.2"
+        "@pulumi/github": "^5.24.0",
+        "@pulumi/pulumi": "^3.100.0",
+        "yaml": "^2.2.2"
     }
 }
