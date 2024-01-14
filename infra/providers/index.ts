@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 
 // grab all the providers from their directory listing
-const tfProviders = JSON.parse(fs.readFileSync('../../provider-ci/providers.json', 'utf-8'));
+const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
 const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
 
 function hasManagedBranchProtection(provider: string): boolean {
@@ -13,7 +13,7 @@ function hasManagedBranchProtection(provider: string): boolean {
 }
 
 function defineResources(buildSdkJobName: string, provider: string) {
-    const contexts: string[] = [
+    const requiredChecks: string[] = [
         "Update Changelog",
 
         "prerequisites",
@@ -50,22 +50,56 @@ function defineResources(buildSdkJobName: string, provider: string) {
             pattern: `${branch}`,
             enforceAdmins: true,
             requiredPullRequestReviews: [{
+                // pullRequestBypassers allows pulumi-bot to push directly to the
+                // protected branch, but it does not allow PRs from pulumi-bot to ignore
+                // requiredApprovingReviewCount.
                 pullRequestBypassers: ["/pulumi-bot"],
-                // pulumi-bot sometimes needs to be able to merge without
-                // approval, except for aws.
-                requiredApprovingReviewCount: provider === "aws"? 1 : undefined,
+                requiredApprovingReviewCount: 1,
             }],
             requiredStatusChecks: [{
                 strict: false,
-                contexts: contexts,
+                contexts: requiredChecks,
             }]
-        }, { deleteBeforeReplace: true },
-        )
+        }, {
+            deleteBeforeReplace: true,
+        })
+    }
+}
+
+function tfProviderProtection(provider: string) {
+    const requiredChecks: string[] = [
+        "Update Changelog",
+        // Sentinel is responsible for encapsulating CI checks.
+        "sentinel",
+    ];
+
+    // enable branchProtection
+    const branches: string[] = [
+        "master",
+        "main"
+    ]
+    for (let branch of branches) {
+        new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
+            repositoryId: `pulumi-${provider}`,
+            pattern: `${branch}`,
+            requiredStatusChecks: [{
+                strict: false,
+                contexts: requiredChecks,
+            }],
+            requiredPullRequestReviews: [{
+                // We want to make sure that pulumi-bot can auto-merge PRs, so we
+                // explicitly remove review requirements.
+                requiredApprovingReviewCount: 0,
+
+            }],
+        }, {
+            deleteBeforeReplace: true,
+        })
     }
 }
 
 for (let bridgedProvider of [...tfProviders].filter(hasManagedBranchProtection)) {
-    defineResources("build_sdk", bridgedProvider);
+    tfProviderProtection(bridgedProvider);
 }
 
 for (let nativeProvider of [...nativeProviders].filter(hasManagedBranchProtection)) {
