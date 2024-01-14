@@ -82,6 +82,7 @@ function tfProviderProtection(provider: string) {
         new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
             repositoryId: `pulumi-${provider}`,
             pattern: `${branch}`,
+            enforceAdmins: true,
             requiredStatusChecks: [{
                 strict: false,
                 contexts: requiredChecks,
