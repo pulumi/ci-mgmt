@@ -70,7 +70,7 @@ jobs:
       if: github.event_name == 'repository_dispatch'
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
       with:
-        kind: ${{ inputs.kind }}
+        kind: ${{ github.event.client_payload.kind || 'bridge' }}
         email: bot@pulumi.com
         username: pulumi-bot
         automerge: ${{ github.event.client_payload.automerge }}
