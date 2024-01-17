@@ -59,20 +59,11 @@ Adjust for your provider and filesystem.
 
 To add a new provider:
 
-1. Create a new directory and config file for the provider. From the root of the repository, run:
-
-   ```bash
-   # Change the value of PROVIDER_NAME below:
-   PROVIDER_NAME=foo && \
-      mkdir provider-ci/providers/${PROVIDER_NAME} && \
-      touch provider-ci/providers/${PROVIDER_NAME}/config.yaml
-   ```
-
-1. In the `config.yaml` you created, add the configuration to be applied to the generated GitHub Actions workflows for the provider:
+1. A new provider needs a top-level `.ci-mgmt.yaml` in its _own_ repository with the following basic configuration:
 
    ```yaml
    # Required values:
-   provider: foo
+   provider: foo # substitute the name of your provider, without the pulumi- prefix
    env: # A map of required configuration for any integration tests, etc.
      AN_OPTION: value
      ANOTHER_OPTION: true
@@ -84,28 +75,33 @@ To add a new provider:
    setup-script: testing/setup.sh # Path to a script that's used for testing bootstraps
    ```
 
-1. Generate the configuration:
+1. In _this_ repository (`ci-mgmt`), generate the configuration:
 
    ```bash
-   npm run gen-examples -- -n [provider]
+   cd provider-ci && make provider NAME=foo
    ```
 
-   The generated files will be writen to `providers/foo/repo/`.
+   `ci-mgmt` will read your provider's `.ci-mgmt.yaml` and generate the standard set of CI files from templates. 
+   The generated files will be writen to `provider-ci/providers/foo/repo/`.
+   These files will not be committed to Git.
 
-1. Copy the generated files in to the provider repository.
+1. Add your provider to `provider-ci/providers.json` in alphabetical order. This ensures your provider receives regular 
+   updates and maintenance.
 
-## Updating All Providers
+1. Commit the changes to `provider-ci/providers.json` and open a pull request.
 
-If the underlying code generation has changed and we need to deploy the workflows to all the providers:
+1. You may copy the generated files over to your repository. 
+   Alternately, to receive a pull request with your new config files, you may choose to run the 
+   [Update Workflows, Single Bridged Provider](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-single-bridged-provider.yml)
+   workflow run, using your provider name as the input. 
+   Another option is to wait for the nightly cronjob to send this pull request automatically.
 
-1. Compile the TypeScript to JavaScript, and generate the files:
+## Updating All Bridged Providers
 
-   ```bash
-   make
-   ```
-
-1. Commit the code, submit a PR, and merge.
-1. Run the "Update All Providers" GitHub Actions workflow manually in the GitHub UI. This will generate a PR to any providers whose files have changed.
+The [Update GH Workflows, ecosystem providers](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-ecosystem-providers.yml)
+Workflow runs on a nightly schedule.
+You may trigger this Workflow manually; however be aware that this causes a lot of GitHub Actions to run at the same
+time, which may cause rate limiting across the org. Plan ahead and do this at a low-traffic time.
 
 ## Updating GitHub workflow schema
 
