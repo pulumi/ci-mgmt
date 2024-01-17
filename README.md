@@ -74,27 +74,26 @@ To add a new provider:
    docker: true # Whether the provider's tests use Docker to run. If set to true, a file `testing/docker-compose.yml` must be present in the provider repository.
    setup-script: testing/setup.sh # Path to a script that's used for testing bootstraps
    ```
-
-1. In _this_ repository (`ci-mgmt`), generate the configuration:
-
-   ```bash
-   cd provider-ci && make provider NAME=foo
-   ```
-
-   `ci-mgmt` will read your provider's `.ci-mgmt.yaml` and generate the standard set of CI files from templates. 
-   The generated files will be writen to `provider-ci/providers/foo/repo/`.
-   These files will not be committed to Git.
+   `ci-mgmt` will read your provider's `.ci-mgmt.yaml` and generate the standard set of CI files from templates.
 
 1. Add your provider to `provider-ci/providers.json` in alphabetical order. This ensures your provider receives regular 
    updates and maintenance.
 
 1. Commit the changes to `provider-ci/providers.json` and open a pull request.
 
-1. You may copy the generated files over to your repository. 
-   Alternately, to receive a pull request with your new config files, you may choose to run the 
+1. To receive a pull request with your new config files, you can run the 
    [Update Workflows, Single Bridged Provider](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-single-bridged-provider.yml)
    workflow run, using your provider name as the input. 
    Another option is to wait for the nightly cronjob to send this pull request automatically.
+
+1. If you would like to manually generate the configuration for verification, you can do so in this repository.
+
+   ```bash
+   cd provider-ci && make provider NAME=foo
+   ```
+
+   The generated files will be writen to `provider-ci/providers/foo/repo/`.
+   These files will not be committed to Git.
 
 ## Updating All Bridged Providers
 
