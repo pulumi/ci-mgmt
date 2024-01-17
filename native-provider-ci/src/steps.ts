@@ -894,26 +894,7 @@ export function CodegenDuringSDKBuild(provider: string) {
   return {};
 }
 
-export function UpdatePulumi(provider: string): Step {
-  if (provider === "kubernetes") {
-    return {
-      name: "Update Pulumi/Pulumi",
-      id: "gomod",
-      run:
-        "git config --local user.email 'bot@pulumi.com'\n" +
-        "git config --local user.name 'pulumi-bot'\n" +
-        "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
-        "cd provider\n" +
-        "go get github.com/pulumi/pulumi/pkg/v3\n" +
-        "go get github.com/pulumi/pulumi/sdk/v3\n" +
-        "cd ../sdk\n" +
-        "go get github.com/pulumi/pulumi/sdk/v3\n" +
-        "cd ..\n" +
-        "make ensure\n" +
-        "git update-index -q --refresh\n" +
-        "if ! git diff-files --quiet; then \n\techo ::set-output name=changes::1 \nfi",
-    };
-  }
+export function UpdatePulumi(): Step {
   return {
     name: "Update Pulumi/Pulumi",
     id: "gomod",
@@ -921,16 +902,7 @@ export function UpdatePulumi(provider: string): Step {
       "git config --local user.email 'bot@pulumi.com'\n" +
       "git config --local user.name 'pulumi-bot'\n" +
       "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
-      "cd provider\n" +
-      "go get github.com/pulumi/pulumi/pkg/v3\n" +
-      "go get github.com/pulumi/pulumi/sdk/v3\n" +
-      "go mod download\n" +
-      "go mod tidy\n" +
-      "cd ../sdk\n" +
-      "go get github.com/pulumi/pulumi/sdk/v3\n" +
-      "go mod download\n" +
-      "go mod tidy\n" +
-      "cd ..\n" +
+      "for MODFILE in $(find . -name go.mod); do pushd $(dirname $MODFILE); go get github.com/pulumi/pulumi/pkg/v3 github.com/pulumi/pulumi/sdk/v3; go mod tidy; popd; done\n" +
       "git update-index -q --refresh\n" +
       "if ! git diff-files --quiet; then \n\techo ::set-output name=changes::1 \nfi",
   };
