@@ -339,10 +339,6 @@ jobs:
 name: run-acceptance-tests
 on:
   pull_request:
-    branches:
-    - #{{ .Config.providerDefaultBranch }}#
-    - v*
-    - feature*
     paths-ignore:
     - CHANGELOG.md
   repository_dispatch:
