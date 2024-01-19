@@ -86,14 +86,17 @@ To add a new provider:
    workflow run, using your provider name as the input. 
    Another option is to wait for the nightly cronjob to send this pull request automatically.
 
-1. If you would like to manually generate the configuration for verification, you can do so in this repository.
+1. If you would like to manually generate the configuration to get started right away, you can do so in your provider 
+   repository root:
 
    ```bash
-   cd provider-ci && make provider NAME=foo
+   go run github.com/pulumi/ci-mgmt/provider-ci@master generate \
+	--name pulumi/pulumi-$(PROVIDER_NAME) \
+	--out . \
+	--template bridged-provider \
+	--config .ci-mgmt.yaml
    ```
-
-   The generated files will be writen to `provider-ci/providers/foo/repo/`.
-   These files will not be committed to Git.
+   The generated files will be writen to your current directory.
 
 ## Updating All Bridged Providers
 
