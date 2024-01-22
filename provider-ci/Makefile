@@ -56,6 +56,10 @@ lint-providers/%/repo: $(ACTIONLINT) providers/%/repo providers/%/config.yaml
 	# directory it either starts checking ci-mgmt workflows itself or checks workflows
 	# file-by-file and incorrectly reports dangling cross-references.
 	cd providers/$*/repo &&	git init && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml && rm -rf .git
+	# Allow Makefile to reference go.mod.
+	mkdir -p providers/$*/repo/provider && touch providers/$*/repo/provider/go.mod
+	# Assume .pulumi/version exists
+	mkdir -p providers/$*/repo/.pulumi && touch providers/$*/repo/.pulumi/version
 	@scripts/shellcheck.sh providers/$*/repo
 
 lint-providers: lint-providers/aws/repo lint-providers/docker/repo lint-providers/cloudflare/repo
