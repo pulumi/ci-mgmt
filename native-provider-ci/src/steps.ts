@@ -44,7 +44,7 @@ export function CreateCommentsUrlStep(): Step {
   return {
     name: "Create URL to the run output",
     id: "vars",
-    run: "echo ::set-output name=run-url::https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+    run: "echo run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID >> \"$GITHUB_OUTPUT\"",
   };
 }
 
