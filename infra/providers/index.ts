@@ -1,6 +1,7 @@
 import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
+console.log(test)
 
 // grab all the providers from their directory listing
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
