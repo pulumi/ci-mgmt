@@ -44,7 +44,7 @@ export function CreateCommentsUrlStep(): Step {
   return {
     name: "Create URL to the run output",
     id: "vars",
-    run: "echo run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID >> \"$GITHUB_OUTPUT\"",
+    run: 'echo run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID >> "$GITHUB_OUTPUT"',
   };
 }
 
@@ -62,7 +62,7 @@ export function SetGitSubmoduleCommitHash(provider: string): Step {
   return {
     name: "Git submodule commit hash",
     id: "vars",
-    run: "echo commit-hash=$(git rev-parse HEAD) >> \"$GITHUB_OUTPUT\"",
+    run: 'echo commit-hash=$(git rev-parse HEAD) >> "$GITHUB_OUTPUT"',
     "working-directory": dir,
   };
 }
@@ -904,7 +904,7 @@ export function UpdatePulumi(): Step {
       "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
       "for MODFILE in $(find . -name go.mod); do pushd $(dirname $MODFILE); go get github.com/pulumi/pulumi/pkg/v3 github.com/pulumi/pulumi/sdk/v3; go mod tidy; popd; done\n" +
       "git update-index -q --refresh\n" +
-      "if ! git diff-files --quiet; then \n\techo changes=1 >> \"$GITHUB_OUTPUT\"\nfi",
+      'if ! git diff-files --quiet; then echo changes=1 >> "$GITHUB_OUTPUT"; fi',
   };
 }
 
