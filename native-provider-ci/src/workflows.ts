@@ -3,7 +3,7 @@ import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
 
-const pythonVersion = "3.x";
+const pythonVersion = "3.11";
 const goVersion = "1.21.x";
 const nodeVersion = "16.x";
 const dotnetVersion = "6.0.x\n3.1.301\n";
