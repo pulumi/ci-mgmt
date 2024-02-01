@@ -90,7 +90,7 @@ jobs:
         status: ${{ job.status }}
   build_sdks:
     needs: prerequisites
-    runs-on: pulumi-ubuntu-8core
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
@@ -177,7 +177,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
   test:
-    runs-on: pulumi-ubuntu-8core
+    runs-on: ubuntu-latest
     needs:
     - build_sdks
     strategy:
