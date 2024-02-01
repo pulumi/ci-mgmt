@@ -117,7 +117,7 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
   build_sdks:
     needs: prerequisites
-    runs-on: pulumi-ubuntu-8core
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
@@ -208,7 +208,7 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
   test:
-    runs-on: pulumi-ubuntu-8core
+    runs-on: ubuntu-latest
     needs:
     - build_sdks
     strategy:

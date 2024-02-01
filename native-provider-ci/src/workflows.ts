@@ -451,6 +451,8 @@ export class BuildSdkJob implements NormalJob {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
         "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
+    } else if (opts.provider === "command") {
+      this["runs-on"] = "ubuntu-latest";
     }
     this.name = name;
     this.steps = [
@@ -568,6 +570,8 @@ export class TestsJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "kubernetes") {
       this.needs = ["build_sdks", "build-test-cluster"];
+    } else if (opts.provider === "command") {
+      this["runs-on"] = "ubuntu-latest";
     }
     this.name = name;
     this.permissions = {
