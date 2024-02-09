@@ -67,6 +67,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -148,6 +149,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - env:
         GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -184,6 +186,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -261,6 +264,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -320,6 +324,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Add SDK version tag
       run: git tag "sdk/v$(pulumictl get version --language generic)" && git push origin
@@ -370,6 +375,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4

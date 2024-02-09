@@ -31,6 +31,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node
@@ -138,6 +139,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Configure AWS Credentials
@@ -210,6 +212,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node

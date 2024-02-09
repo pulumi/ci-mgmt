@@ -30,6 +30,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node
@@ -109,6 +110,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
     - env:
         GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -153,6 +155,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Configure AWS Credentials
@@ -213,6 +216,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
     - name: Add SDK version tag
       run: git tag "sdk/v$(pulumictl get version --language generic)" && git push origin
@@ -265,6 +269,7 @@ jobs:
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - name: Setup Node

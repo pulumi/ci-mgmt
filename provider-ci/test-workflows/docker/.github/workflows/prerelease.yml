@@ -68,6 +68,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -171,6 +172,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -248,6 +250,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
@@ -324,6 +327,7 @@ jobs:
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
+        tag: <no value>
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v4
