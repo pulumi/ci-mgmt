@@ -24,6 +24,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
+        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
@@ -127,6 +128,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
+        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
@@ -276,6 +278,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
+        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
