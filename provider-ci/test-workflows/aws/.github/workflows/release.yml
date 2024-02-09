@@ -54,7 +54,7 @@ jobs:
             sdk/go.sum
         go-version: 1.21.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - env:
@@ -169,7 +169,7 @@ jobs:
             sdk/go.sum
         go-version: 1.21.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -178,7 +178,7 @@ jobs:
         pulumi-version: ^3
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/schema-tools
     - name: Clear GitHub Actions Ubuntu runner disk space
@@ -258,7 +258,7 @@ jobs:
             sdk/go.sum
         go-version: 1.21.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -319,7 +319,7 @@ jobs:
       with:
         submodules: true
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - name: Add SDK version tag
@@ -371,7 +371,7 @@ jobs:
             sdk/go.sum
         go-version: 1.21.x
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.5.0
+      uses: jaxxstorm/action-install-gh-release@v1.10.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
