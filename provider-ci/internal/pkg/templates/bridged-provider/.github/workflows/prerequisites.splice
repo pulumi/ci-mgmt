@@ -17,6 +17,7 @@
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
+        tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
 #{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
     - if: github.event_name == 'pull_request'

@@ -78,6 +78,7 @@ actionVersions:
   goReleaser: goreleaser/goreleaser-action@v2
   installGhRelease: jaxxstorm/action-install-gh-release@v1.10.0
   checkout: actions/checkout@v4
+  pulumictlTag: v0.0.46
   cleanupArtifact: c-hive/gha-remove-artifacts@v1
   createOrUpdateComment: peter-evans/create-or-update-comment@v1
   downloadArtifact: actions/download-artifact@v2
