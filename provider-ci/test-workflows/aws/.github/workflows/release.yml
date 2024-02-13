@@ -60,7 +60,7 @@ jobs:
         tag: v0.0.46
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: ^3
     - name: Setup Node
@@ -178,7 +178,7 @@ jobs:
         tag: v0.0.46
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: ^3
     - if: github.event_name == 'pull_request'
@@ -268,7 +268,7 @@ jobs:
         tag: v0.0.46
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: ^3
     - name: Configure AWS Credentials
@@ -384,7 +384,7 @@ jobs:
         tag: v0.0.46
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: ^3
     - name: Setup Node

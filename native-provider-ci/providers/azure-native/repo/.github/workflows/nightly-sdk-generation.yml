@@ -56,7 +56,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}

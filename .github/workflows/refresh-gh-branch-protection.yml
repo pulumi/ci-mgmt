@@ -15,7 +15,7 @@ jobs:
           node-version: 18.x
       - run: npm install
         working-directory: infra/providers
-      - uses: pulumi/actions@v4
+      - uses: pulumi/actions@v5
         with:
           command: refresh
           stack-name: pulumi/production

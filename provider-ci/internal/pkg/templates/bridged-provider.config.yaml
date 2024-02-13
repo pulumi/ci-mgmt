@@ -40,7 +40,7 @@ env:
 actions:
   setupPulumi:
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: "^3"
   setupGo:
