@@ -58,7 +58,7 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         cache-dependency-path: |
             sdk/go.sum
@@ -175,7 +175,7 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         cache-dependency-path: |
             sdk/go.sum
@@ -313,7 +313,7 @@ jobs:
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         cache-dependency-path: |
             sdk/go.sum
@@ -428,7 +428,7 @@ jobs:
               submodules: true
           - name: Make upstream
             run: make upstream
-          - uses: actions/setup-go@v4
+          - uses: actions/setup-go@v5
             with:
               cache-dependency-path: provider/go.sum
               go-version-file: provider/go.mod

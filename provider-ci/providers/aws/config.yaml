@@ -79,7 +79,7 @@ extraTests:
         submodules: true
     - name: Make upstream
       run: make upstream
-    - uses: actions/setup-go@v4
+    - uses: actions/setup-go@v5
       with:
        go-version-file: 'provider/go.mod'
        cache-dependency-path: 'provider/go.sum'
