@@ -4,7 +4,7 @@ export const setupGo = "actions/setup-go@v5";
 export const setupDotNet = "actions/setup-dotnet@v3";
 export const setupJava = "actions/setup-java@v3";
 export const setupGradle = "gradle/gradle-build-action@v3";
-export const setupNode = "actions/setup-node@v2";
+export const setupNode = "actions/setup-node@v4";
 export const setupPython = "actions/setup-python@v2";
 
 // Cloud Auth

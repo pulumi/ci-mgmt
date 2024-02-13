@@ -163,7 +163,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
@@ -256,7 +256,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
@@ -440,7 +440,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
@@ -594,7 +594,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
@@ -655,7 +655,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org

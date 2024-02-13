@@ -70,7 +70,7 @@ actionVersions:
   setupDotNet: actions/setup-dotnet@v3
   setupJava: actions/setup-java@v3
   setupGradle: gradle/gradle-build-action@v3
-  setupNode: actions/setup-node@v2
+  setupNode: actions/setup-node@v4
   setupPython: actions/setup-python@v2
 
   configureAwsCredentials: aws-actions/configure-aws-credentials@v1
