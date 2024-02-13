@@ -43,11 +43,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         lfs: true
     - name: Install Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 1.21.x
     - name: Install pulumictl
@@ -55,7 +55,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}
@@ -74,7 +74,7 @@ jobs:
     - name: Test usage of results.json
       run: cat provider/pkg/arm2pulumi/internal/test/results.json
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-west-2

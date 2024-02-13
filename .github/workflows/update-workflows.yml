@@ -28,23 +28,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: stable
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
       - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@v1.5.0
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
         with:
           repo: pulumi/pulumictl
       - name: Clone ci-mgmt
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ci-mgmt
       - name: Clone pulumi-${{ inputs.provider_name }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}

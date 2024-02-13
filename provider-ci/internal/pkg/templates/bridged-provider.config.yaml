@@ -40,12 +40,12 @@ env:
 actions:
   setupPulumi:
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v4
+      uses: pulumi/actions@v5
       with:
         pulumi-version: "^3"
   setupGo:
     - name: Install Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: 1.21.x
         cache-dependency-path: |
@@ -67,13 +67,13 @@ runner:
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
 actionVersions:
-  setupDotNet: actions/setup-dotnet@v3
-  setupJava: actions/setup-java@v3
+  setupDotNet: actions/setup-dotnet@v4
+  setupJava: actions/setup-java@v4
   setupGradle: gradle/gradle-build-action@v3
-  setupNode: actions/setup-node@v2
-  setupPython: actions/setup-python@v2
+  setupNode: actions/setup-node@v4
+  setupPython: actions/setup-python@v5
 
-  configureAwsCredentials: aws-actions/configure-aws-credentials@v1
+  configureAwsCredentials: aws-actions/configure-aws-credentials@v4
   setupGcloud: google-github-actions/setup-gcloud@v0
   googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v2
@@ -82,12 +82,12 @@ actionVersions:
   pulumictlTag: v0.0.46
   cleanupArtifact: c-hive/gha-remove-artifacts@v1
   createOrUpdateComment: peter-evans/create-or-update-comment@v1
-  downloadArtifact: actions/download-artifact@v2
+  downloadArtifact: actions/download-artifact@v4
   notifySlack: 8398a7/action-slack@v3
   pathsFilter: dorny/paths-filter@v2
   prComment: thollander/actions-comment-pull-request@v2
   slashCommand: peter-evans/slash-command-dispatch@v2
-  uploadArtifact: actions/upload-artifact@v2
+  uploadArtifact: actions/upload-artifact@v4
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.11
   slackNotification: rtCamp/action-slack-notify@v2
 publish:
