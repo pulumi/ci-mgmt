@@ -75,7 +75,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         cache: gradle
         distribution: temurin
@@ -385,7 +385,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         cache: gradle
         distribution: temurin

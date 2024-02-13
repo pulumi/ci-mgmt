@@ -176,7 +176,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
@@ -269,7 +269,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
@@ -519,7 +519,7 @@ jobs:
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin

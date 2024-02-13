@@ -68,7 +68,7 @@ runner:
   # buildSdk: ubuntu-latest
 actionVersions:
   setupDotNet: actions/setup-dotnet@v4
-  setupJava: actions/setup-java@v3
+  setupJava: actions/setup-java@v4
   setupGradle: gradle/gradle-build-action@v3
   setupNode: actions/setup-node@v4
   setupPython: actions/setup-python@v5
