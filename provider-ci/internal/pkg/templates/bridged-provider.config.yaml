@@ -82,7 +82,7 @@ actionVersions:
   pulumictlTag: v0.0.46
   cleanupArtifact: c-hive/gha-remove-artifacts@v1
   createOrUpdateComment: peter-evans/create-or-update-comment@v1
-  downloadArtifact: actions/download-artifact@v2
+  downloadArtifact: actions/download-artifact@v4
   notifySlack: 8398a7/action-slack@v3
   pathsFilter: dorny/paths-filter@v2
   prComment: thollander/actions-comment-pull-request@v2
