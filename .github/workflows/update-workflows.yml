@@ -40,11 +40,11 @@ jobs:
         with:
           repo: pulumi/pulumictl
       - name: Clone ci-mgmt
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ci-mgmt
       - name: Clone pulumi-${{ inputs.provider_name }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
