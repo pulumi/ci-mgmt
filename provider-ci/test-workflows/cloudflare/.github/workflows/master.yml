@@ -141,7 +141,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
         aws-region: us-west-2
@@ -303,7 +303,7 @@ jobs:
       with:
         pulumi-version: ^3
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2

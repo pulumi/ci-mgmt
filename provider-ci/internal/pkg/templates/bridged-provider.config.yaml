@@ -73,7 +73,7 @@ actionVersions:
   setupNode: actions/setup-node@v4
   setupPython: actions/setup-python@v5
 
-  configureAwsCredentials: aws-actions/configure-aws-credentials@v1
+  configureAwsCredentials: aws-actions/configure-aws-credentials@v4
   setupGcloud: google-github-actions/setup-gcloud@v0
   googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v2
