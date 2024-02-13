@@ -71,7 +71,7 @@ actionVersions:
   setupJava: actions/setup-java@v3
   setupGradle: gradle/gradle-build-action@v3
   setupNode: actions/setup-node@v4
-  setupPython: actions/setup-python@v2
+  setupPython: actions/setup-python@v5
 
   configureAwsCredentials: aws-actions/configure-aws-credentials@v1
   setupGcloud: google-github-actions/setup-gcloud@v0
