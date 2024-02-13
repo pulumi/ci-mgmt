@@ -87,7 +87,7 @@ actionVersions:
   pathsFilter: dorny/paths-filter@v2
   prComment: thollander/actions-comment-pull-request@v2
   slashCommand: peter-evans/slash-command-dispatch@v2
-  uploadArtifact: actions/upload-artifact@v2
+  uploadArtifact: actions/upload-artifact@v4
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.11
   slackNotification: rtCamp/action-slack-notify@v2
 publish:
