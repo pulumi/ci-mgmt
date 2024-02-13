@@ -67,7 +67,7 @@ runner:
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
 actionVersions:
-  setupDotNet: actions/setup-dotnet@v3
+  setupDotNet: actions/setup-dotnet@v4
   setupJava: actions/setup-java@v3
   setupGradle: gradle/gradle-build-action@v3
   setupNode: actions/setup-node@v4
