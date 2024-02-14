@@ -61,6 +61,8 @@ extraTests:
 #   your_test_name:
 #     name: My Test
 #     ...
+# Run e2e tests using the examples and test suite in the pulumi/examples repo.
+testPulumiExamples: false
 runner:
   default: ubuntu-latest
   prerequisites: ubuntu-latest
