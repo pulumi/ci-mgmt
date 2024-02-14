@@ -91,5 +91,5 @@ actionVersions:
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.11
   slackNotification: rtCamp/action-slack-notify@v2
 publish:
-  publisherAction: pulumi/pulumi-package-publisher@v0.0.13
+  publisherAction: pulumi/pulumi-package-publisher@v0.0.14
   sdk: all
