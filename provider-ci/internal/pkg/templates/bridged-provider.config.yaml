@@ -77,7 +77,7 @@ actionVersions:
   setupGcloud: google-github-actions/setup-gcloud@v0
   googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v2
-  installGhRelease: jaxxstorm/action-install-gh-release@v1.10.0
+  installGhRelease: jaxxstorm/action-install-gh-release@v1.11.0
   checkout: actions/checkout@v4
   pulumictlTag: v0.0.46
   cleanupArtifact: c-hive/gha-remove-artifacts@v1

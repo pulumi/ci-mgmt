@@ -17,7 +17,7 @@ export const googleAuth = "google-github-actions/auth@v0";
 // Tools
 export const goReleaser = "goreleaser/goreleaser-action@v2";
 export const gradleBuildAction = "gradle/gradle-build-action@v3";
-export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.10.0";
+export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.11.0";
 export const installPulumiCli = "pulumi/actions@v5";
 export const codecov = "codecov/codecov-action@v4";
 
