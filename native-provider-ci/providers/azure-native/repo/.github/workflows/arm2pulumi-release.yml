@@ -69,7 +69,7 @@ jobs:
       run: echo "GORELEASER_CURRENT_TAG=v${{ github.event.inputs.message }}" >>
         $GITHUB_ENV
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v2
+      uses: goreleaser/goreleaser-action@v5
       with:
         args: -p 1 -f .goreleaser.arm2pulumi.yml release --rm-dist --timeout 60m0s
         version: latest

@@ -545,7 +545,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: golangci-lint provider pkg
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: ${{ env.GOLANGCI_LINT_VERSION }}
         args: -c ../../.golangci.yml --timeout ${{ env.GOLANGCI_LINT_TIMEOUT }}
