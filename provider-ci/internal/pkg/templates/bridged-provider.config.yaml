@@ -74,7 +74,7 @@ actionVersions:
   setupPython: actions/setup-python@v5
 
   configureAwsCredentials: aws-actions/configure-aws-credentials@v4
-  setupGcloud: google-github-actions/setup-gcloud@v0
+  setupGcloud: google-github-actions/setup-gcloud@v2
   googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v2
   installGhRelease: jaxxstorm/action-install-gh-release@v1.11.0
