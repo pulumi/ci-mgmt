@@ -1,5 +1,5 @@
 // Languages
-export const goLint = "golangci/golangci-lint-action@v3";
+export const goLint = "golangci/golangci-lint-action@v4";
 export const setupGo = "actions/setup-go@v5";
 export const setupDotNet = "actions/setup-dotnet@v4";
 export const setupJava = "actions/setup-java@v4";
@@ -11,11 +11,11 @@ export const setupPython = "actions/setup-python@v5";
 export const azureLogin = "azure/login@v1";
 export const configureAwsCredentials =
   "aws-actions/configure-aws-credentials@v4";
-export const setupGcloud = "google-github-actions/setup-gcloud@v0";
+export const setupGcloud = "google-github-actions/setup-gcloud@v2";
 export const googleAuth = "google-github-actions/auth@v0";
 
 // Tools
-export const goReleaser = "goreleaser/goreleaser-action@v2";
+export const goReleaser = "goreleaser/goreleaser-action@v5";
 export const gradleBuildAction = "gradle/gradle-build-action@v3";
 export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.11.0";
 export const installPulumiCli = "pulumi/actions@v5";

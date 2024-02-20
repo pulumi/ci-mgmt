@@ -366,7 +366,7 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@v0
+      uses: google-github-actions/setup-gcloud@v2
       with:
         install_components: gke-gcloud-auth-plugin
     - name: Install Kubectl
@@ -448,7 +448,7 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@v0
+      uses: google-github-actions/setup-gcloud@v2
       with:
         install_components: gke-gcloud-auth-plugin
     - name: Install Kubectl
@@ -512,7 +512,7 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@v0
+      uses: google-github-actions/setup-gcloud@v2
       with:
         install_components: gke-gcloud-auth-plugin
     - name: Install Kubectl
@@ -545,7 +545,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: golangci-lint provider pkg
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: ${{ env.GOLANGCI_LINT_VERSION }}
         args: -c ../../.golangci.yml --timeout ${{ env.GOLANGCI_LINT_TIMEOUT }}
