@@ -144,6 +144,13 @@ jobs:
       #{{- end }}#
     runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        swap-storage: false
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
 #{{- if .Config.checkoutSubmodules }}#
