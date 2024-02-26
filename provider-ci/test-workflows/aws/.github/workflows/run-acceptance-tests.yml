@@ -316,8 +316,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: pulumi/examples
-        # TODO,tkappler change to master when merged
-        ref: tkappler/separate-tests-by-provider
         path: p-examples
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
