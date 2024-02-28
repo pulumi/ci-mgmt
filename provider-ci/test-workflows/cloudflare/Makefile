@@ -30,28 +30,32 @@ install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_j
 only_build: build
 
 build_dotnet: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
+build_dotnet: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_dotnet: upstream
 	pulumictl get version --language dotnet
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/
+	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "$(DOTNET_VERSION)" >version.txt && \
 		dotnet build /p:Version=$(DOTNET_VERSION)
 
+build_go: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_go: upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
+	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
 
 build_java: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
+build_java: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_java: bin/pulumi-java-gen upstream
-	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+	PATH=${PWD}/.pulumi/bin:$$PATH $(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
 	cd sdk/java/ && \
 		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		gradle --console=plain build
 
 build_nodejs: VERSION := $(shell pulumictl get version --language javascript)
+build_nodejs: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_nodejs: upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
+	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
 	cd sdk/nodejs/ && \
 		printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		yarn install && \
@@ -60,9 +64,10 @@ build_nodejs: upstream
 		sed -i.bak -e "s/\$${VERSION}/$(VERSION)/g" ./bin/package.json
 
 build_python: PYPI_VERSION := $(shell pulumictl get version --language python)
+build_python: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_python: upstream
 	rm -rf sdk/python/
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
+	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -93,6 +98,7 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
+install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: .pulumi/bin/pulumi
 	.pulumi/bin/pulumi plugin install resource gcp 5.0.0
 	.pulumi/bin/pulumi plugin install resource tls 4.0.0
@@ -122,6 +128,7 @@ test_provider:
 	@echo ""
 	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
 
+tfgen: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 tfgen: install_plugins upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "-X $(PROJECT)/$(VERSION_PATH)=$(VERSION)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
 	PATH=${PWD}/.pulumi/bin:$$PATH PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
