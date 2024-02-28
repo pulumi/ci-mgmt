@@ -131,6 +131,7 @@ provider_no_deps:
 
 provider: tfgen provider_no_deps
 
+test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 
