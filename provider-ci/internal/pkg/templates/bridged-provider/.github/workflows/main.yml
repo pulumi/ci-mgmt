@@ -111,6 +111,11 @@ jobs:
     needs: prerequisites
     runs-on: #{{ .Config.runner.default }}#
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        swap-storage: false
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
 #{{- if .Config.checkoutSubmodules }}#
