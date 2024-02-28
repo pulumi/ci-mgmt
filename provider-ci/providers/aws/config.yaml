@@ -53,7 +53,7 @@ actions:
 
   preBuild:
     - name: Clear GitHub Actions Ubuntu runner disk space
-      uses: jlumbroso/free-disk-space@main
+      uses: jlumbroso/free-disk-spacev@v1
       with:
         tool-cache: false
         dotnet: false
