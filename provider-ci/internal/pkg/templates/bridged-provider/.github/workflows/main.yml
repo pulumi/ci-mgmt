@@ -112,7 +112,7 @@ jobs:
     runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-spacev@v1
+      uses: jlumbroso/free-disk-space@v1
       with:
         tool-cache: false
         swap-storage: false
@@ -187,7 +187,7 @@ jobs:
     runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
     - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-spacev@v1
+      uses: jlumbroso/free-disk-space@v1
       with:
         # this might remove tools that are actually needed,
         # if set to "true" but frees about 6 GB
