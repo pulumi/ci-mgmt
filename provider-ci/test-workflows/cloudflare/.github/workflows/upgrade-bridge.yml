@@ -53,7 +53,7 @@ jobs:
     steps:
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
-      uses: pulumi/pulumi-upgrade-provider-action@v0.0.11
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.12
       with:
         kind: ${{ inputs.kind }}
         email: bot@pulumi.com
@@ -66,7 +66,7 @@ jobs:
         pr-description: ${{ inputs.pr-description }}
     - name: Call upgrade provider action
       if: github.event_name == 'repository_dispatch'
-      uses: pulumi/pulumi-upgrade-provider-action@v0.0.11
+      uses: pulumi/pulumi-upgrade-provider-action@v0.0.12
       with:
         kind: ${{ github.event.client_payload.kind || 'bridge' }}
         email: bot@pulumi.com
