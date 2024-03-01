@@ -90,7 +90,7 @@ actionVersions:
   prComment: thollander/actions-comment-pull-request@v2
   slashCommand: peter-evans/slash-command-dispatch@v2
   uploadArtifact: actions/upload-artifact@v4
-  upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.11
+  upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.12
   slackNotification: rtCamp/action-slack-notify@v2
 publish:
   publisherAction: pulumi/pulumi-package-publisher@v0.0.14
