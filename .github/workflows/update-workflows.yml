@@ -48,6 +48,7 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
       - name: Unshallow clone for tags
         run: |
           DIR="$PWD/pulumi-${{ inputs.provider_name }}"
