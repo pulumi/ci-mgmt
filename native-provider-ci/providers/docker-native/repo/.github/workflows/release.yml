@@ -33,6 +33,20 @@ env:
   JAVAVERSION: "11"
   AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
+  ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
+  ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
+  ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  AZURE_LOCATION: westus
+  DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
+  GOOGLE_PROJECT: pulumi-ci-gcp-provider
+  GOOGLE_PROJECT_NUMBER: 895284651812
+  GOOGLE_REGION: us-central1
+  GOOGLE_ZONE: us-central1-a
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
 jobs:
   prerequisites:
     runs-on: ubuntu-latest
@@ -54,14 +68,14 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@v5
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
     - name: Build codegen binaries
@@ -149,7 +163,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -243,7 +257,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -310,6 +324,18 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+    - name: Setup gcloud auth
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        install_components: gke-gcloud-auth-plugin
     - name: Install gotestfmt
       uses: GoTestTools/gotestfmt-action@v2
       with:
@@ -343,7 +369,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -362,7 +388,7 @@ jobs:
       run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)"
         >> $GITHUB_ENV
     - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v2
+      uses: goreleaser/goreleaser-action@v5
       with:
         args: -p 3 release --rm-dist --timeout 60m0s
         version: latest
@@ -394,7 +420,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -472,7 +498,7 @@ jobs:
       with:
         go-version: ${{ env.GOVERSION }}
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
@@ -513,7 +539,7 @@ jobs:
       with:
         lfs: true
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Add SDK version tag
@@ -525,7 +551,7 @@ jobs:
     needs: tag_sdk
     steps:
     - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.10.0
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/pulumictl
     - name: Dispatch Event
