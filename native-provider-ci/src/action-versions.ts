@@ -40,3 +40,4 @@ export const githubScript = "actions/github-script@v6";
 export const upgradeProviderAction =
   "pulumi/pulumi-upgrade-provider-action@v0.0.5";
 export const slackNotification = "rtCamp/action-slack-notify@v2";
+export const freeDiskSpace = "jlumbroso/free-disk-space@v1";
