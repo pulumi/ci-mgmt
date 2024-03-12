@@ -1190,3 +1190,18 @@ export function Codecov(): Step {
     },
   };
 }
+
+export function FreeDiskSpace(): Step {
+  return {
+    name: "Clear GitHub Actions Ubuntu runner disk space",
+    uses: action.freeDiskSpace,
+    with: {
+      "tool-cache": false,
+      dotnet: false,
+      android: true,
+      haskell: true,
+      "swap-storage": true,
+      "large-packages": false,
+    },
+  };
+}

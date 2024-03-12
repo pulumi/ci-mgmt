@@ -751,12 +751,13 @@ export class PublishPrereleaseJob implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
+      steps.FreeDiskSpace(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
-        `-p ${opts.parallel} -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout ${opts.timeout}m0s`
+        `-p ${opts.parallel} -f .goreleaser.prerelease.yml --clean --skip=validate --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
     ];
@@ -780,12 +781,13 @@ export class PublishJob implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
+      steps.FreeDiskSpace(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
-        `-p ${opts.parallel} release --rm-dist --timeout ${opts.timeout}m0s`
+        `-p ${opts.parallel} release --clean --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
     ];
@@ -887,7 +889,7 @@ export class Cf2PulumiRelease implements NormalJob {
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
     steps.RunGoReleaserWithArgs(
-      "-p 1 -f .goreleaser.cf2pulumi.yml release --rm-dist --timeout 60m0s"
+      "-p 1 -f .goreleaser.cf2pulumi.yml release --clean --timeout 60m0s"
     ),
     steps.ChocolateyPackageDeployment(),
   ];
@@ -908,7 +910,7 @@ export class Arm2PulumiRelease implements NormalJob {
     steps.InstallGo(goVersion),
     steps.SetVersionIfAvailable(),
     steps.RunGoReleaserWithArgs(
-      "-p 1 -f .goreleaser.arm2pulumi.yml release --rm-dist --timeout 60m0s"
+      "-p 1 -f .goreleaser.arm2pulumi.yml release --clean --timeout 60m0s"
     ),
   ];
   name: string;
