@@ -41,3 +41,4 @@ export const upgradeProviderAction =
   "pulumi/pulumi-upgrade-provider-action@v0.0.5";
 export const slackNotification = "rtCamp/action-slack-notify@v2";
 export const freeDiskSpace = "jlumbroso/free-disk-space@v1";
+export const createKindCluster = "helm/kind-action@v1";

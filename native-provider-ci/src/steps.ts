@@ -482,11 +482,13 @@ export function SetPackageVersionToEnv(): Step {
   };
 }
 
-export function RunTests(provider: string): Step {
+export function RunTests(provider: string, name: string): Step {
   if (provider === "kubernetes") {
+    const shortMode = name === "run-acceptance-tests" ? " -short" : "";
+    const testCmd = `cd tests/sdk/\${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4${shortMode} ./...`;
     return {
       name: "Run tests",
-      run: "cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4 ./...",
+      run: testCmd,
     };
   }
   return {
@@ -832,8 +834,8 @@ export function UnTarProviderBinaries(provider: string, job: string): Step {
   };
 }
 
-export function MakeKubeDir(provider: string): Step {
-  if (provider === "kubernetes") {
+export function MakeKubeDir(provider: string, name: string): Step {
+  if (provider === "kubernetes" && name !== "run-acceptance-tests") {
     return {
       name: "Make Kube Directory",
       run: 'mkdir -p "~/.kube/"',
@@ -842,8 +844,8 @@ export function MakeKubeDir(provider: string): Step {
   return {};
 }
 
-export function DownloadKubeconfig(provider: string): Step {
-  if (provider === "kubernetes") {
+export function DownloadKubeconfig(provider: string, name: string): Step {
+  if (provider === "kubernetes" && name !== "run-acceptance-tests") {
     return {
       name: "Download Kubeconfig",
       uses: action.downloadArtifact,
@@ -1204,4 +1206,19 @@ export function FreeDiskSpace(): Step {
       "large-packages": false,
     },
   };
+}
+
+export function CreateKindCluster(provider: string, name: string): Step {
+  if (provider === "kubernetes" && name === "run-acceptance-tests") {
+    return {
+      name: "Setup KinD cluster",
+      uses: action.createKindCluster,
+      with: {
+        cluster_name: "kind-integration-tests-${{ matrix.language }}",
+        node_image: "kindest/node:v1.29.2",
+      },
+    };
+  }
+
+  return {};
 }

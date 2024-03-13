@@ -139,28 +139,16 @@ export function RunAcceptanceTestsWorkflow(
       build_sdks: new BuildSdkJob("build_sdks", opts, false)
         .addDispatchConditional(true)
         .addRunsOn(opts.provider),
-      test: new TestsJob("test", opts).addDispatchConditional(true),
+      test: new TestsJob(name, "test", opts).addDispatchConditional(true),
       sentinel: new EmptyJob("sentinel")
         .addConditional(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
         .addStep(steps.EchoSuccessStep())
-        .addNeeds(calculateSentinelNeeds(opts.lint, opts.provider)),
+        .addNeeds(calculateSentinelNeeds(name, opts.lint, opts.provider)),
     },
   };
   if (opts.provider === "kubernetes") {
-    workflow.jobs = Object.assign(workflow.jobs, {
-      "build-test-cluster": new BuildTestClusterJob(
-        "build-test-cluster",
-        opts
-      ).addDispatchConditional(true),
-    });
-    workflow.jobs = Object.assign(workflow.jobs, {
-      "destroy-test-cluster": new TeardownTestClusterJob(
-        "teardown-test-cluster",
-        opts
-      ).addDispatchConditional(true),
-    });
     workflow.jobs = Object.assign(workflow.jobs, {
       lint: new LintKubernetesJob("lint").addDispatchConditional(true),
     });
@@ -175,6 +163,7 @@ export function RunAcceptanceTestsWorkflow(
 }
 
 function calculateSentinelNeeds(
+  workflowName: string,
   requiresLint: boolean,
   provider: string
 ): string[] {
@@ -184,7 +173,7 @@ function calculateSentinelNeeds(
     needs.push("lint");
   }
 
-  if (provider === "kubernetes") {
+  if (provider === "kubernetes" && workflowName !== "run-acceptance-tests") {
     needs.push("destroy-test-cluster");
   }
 
@@ -212,7 +201,7 @@ export function BuildWorkflow(
       build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
         opts.provider
       ),
-      test: new TestsJob("test", opts),
+      test: new TestsJob(name, "test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
@@ -254,7 +243,7 @@ export function PrereleaseWorkflow(
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts, true),
-      test: new TestsJob("test", opts),
+      test: new TestsJob(name, "test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
@@ -290,7 +279,7 @@ export function ReleaseWorkflow(
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts, true),
-      test: new TestsJob("test", opts),
+      test: new TestsJob(name, "test", opts),
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
@@ -567,13 +556,24 @@ export class TestsJob implements NormalJob {
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string, opts: WorkflowOpts) {
-    if (opts.provider === "kubernetes") {
+  constructor(workflowName: string, jobName: string, opts: WorkflowOpts) {
+    if (
+      opts.provider === "kubernetes" &&
+      workflowName !== "run-acceptance-tests"
+    ) {
       this.needs = ["build_sdks", "build-test-cluster"];
     } else if (opts.provider === "command") {
       this["runs-on"] = "ubuntu-latest";
     }
-    this.name = name;
+
+    if (
+      opts.provider === "kubernetes" &&
+      workflowName === "run-acceptance-tests"
+    ) {
+      this.strategy["fail-fast"] = false;
+    }
+
+    this.name = jobName;
     this.permissions = {
       contents: "read",
       "id-token": "write",
@@ -590,9 +590,9 @@ export class TestsJob implements NormalJob {
       steps.InstallPython(),
       steps.InstallJava(),
       steps.InstallGradle("7.6"),
-      steps.DownloadProviderBinaries(opts.provider, name),
-      steps.UnTarProviderBinaries(opts.provider, name),
-      steps.RestoreBinaryPerms(opts.provider, name),
+      steps.DownloadProviderBinaries(opts.provider, jobName),
+      steps.UnTarProviderBinaries(opts.provider, jobName),
+      steps.RestoreBinaryPerms(opts.provider, jobName),
       steps.DownloadSDKs(),
       steps.UnzipSDKs(),
       steps.UpdatePath(),
@@ -600,18 +600,19 @@ export class TestsJob implements NormalJob {
       steps.SetNugetSource(),
       steps.InstallPythonDeps(),
       steps.InstallSDKDeps(),
-      steps.MakeKubeDir(opts.provider),
-      steps.DownloadKubeconfig(opts.provider),
+      steps.MakeKubeDir(opts.provider, workflowName),
+      steps.DownloadKubeconfig(opts.provider, workflowName),
       steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
       steps.InstallandConfigureHelm(opts.provider),
       steps.SetupGotestfmt(),
-      steps.RunTests(opts.provider),
+      steps.CreateKindCluster(opts.provider, workflowName),
+      steps.RunTests(opts.provider, workflowName),
       steps.NotifySlack("Failure in SDK tests"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
-    Object.assign(this, { name });
+    Object.assign(this, { name: jobName });
   }
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
@@ -700,7 +701,7 @@ export class TeardownTestClusterJob implements NormalJob {
       steps.DestroyTestCluster(opts.provider),
       steps.DeleteArtifact(opts.provider),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
-    Object.assign(this, { name });
+    Object.assign(this, { name: name });
   }
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
