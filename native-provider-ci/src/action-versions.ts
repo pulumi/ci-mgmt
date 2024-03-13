@@ -40,5 +40,5 @@ export const githubScript = "actions/github-script@v6";
 export const upgradeProviderAction =
   "pulumi/pulumi-upgrade-provider-action@v0.0.5";
 export const slackNotification = "rtCamp/action-slack-notify@v2";
-export const freeDiskSpace = "jlumbroso/free-disk-space@v1";
+export const freeDiskSpace = "jlumbroso/free-disk-space@v1.3.1"; // action does not support major version pinning, so we need to pin to exact version
 export const createKindCluster = "helm/kind-action@v1";
