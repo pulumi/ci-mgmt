@@ -1193,7 +1193,12 @@ export function Codecov(): Step {
   };
 }
 
-export function FreeDiskSpace(): Step {
+export function FreeDiskSpace(runner: string): Step {
+  if (!runner.includes("ubuntu")) {
+    // This step is only relevant for the Ubuntu runner.
+    return {};
+  }
+
   return {
     name: "Clear GitHub Actions Ubuntu runner disk space",
     uses: action.freeDiskSpace,
