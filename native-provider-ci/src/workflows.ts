@@ -752,7 +752,7 @@ export class PublishPrereleaseJob implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
-      steps.FreeDiskSpace(),
+      steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
@@ -761,7 +761,7 @@ export class PublishPrereleaseJob implements NormalJob {
         `-p ${opts.parallel} -f .goreleaser.prerelease.yml --clean --skip=validate --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
-    ];
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
 }
@@ -782,7 +782,7 @@ export class PublishJob implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
-      steps.FreeDiskSpace(),
+      steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
@@ -791,7 +791,7 @@ export class PublishJob implements NormalJob {
         `-p ${opts.parallel} release --clean --timeout ${opts.timeout}m0s`
       ),
       steps.NotifySlack("Failure in publishing binaries"),
-    ];
+    ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
   }
 }
 
