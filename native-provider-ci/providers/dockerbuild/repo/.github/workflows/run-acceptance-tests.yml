@@ -45,6 +45,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   AZURE_LOCATION: westus
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+  GOLANGCI_LINT_TIMEOUT: 10m
   GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
   GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
   GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
