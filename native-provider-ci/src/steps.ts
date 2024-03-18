@@ -880,7 +880,7 @@ export function GolangciLint(): Step {
     with: {
       version: "${{ env.GOLANGCI_LINT_VERSION }}",
       args: "-c ../../.golangci.yml --timeout ${{ env.GOLANGCI_LINT_TIMEOUT }}",
-      "working-directory": "provider/pkg",
+      "working-directory": "provider",
     },
   };
 }
