@@ -1,4 +1,4 @@
-provider: docker-native
+provider: dockerbuild
 lint: true
 major-version: 0
 provider-default-branch: main
