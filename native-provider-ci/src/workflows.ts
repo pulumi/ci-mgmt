@@ -148,10 +148,12 @@ export function RunAcceptanceTestsWorkflow(
         .addNeeds(calculateSentinelNeeds(name, opts.lint, opts.provider)),
     },
   };
-  if (opts.provider === "kubernetes") {
+  if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintKubernetesJob("lint").addDispatchConditional(true),
+      lint: new LintJob("lint").addDispatchConditional(true),
     });
+  }
+  if (opts.provider === "kubernetes") {
     workflow.on = Object.assign(workflow.on, {
       pull_request: {
         branches: ["master", "main", "v4"],
@@ -207,6 +209,11 @@ export function BuildWorkflow(
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
+  if (opts.lint) {
+    workflow.jobs = Object.assign(workflow.jobs, {
+      lint: new LintJob("lint").addDispatchConditional(true),
+    });
+  }
   if (opts.provider === "kubernetes") {
     workflow.jobs = Object.assign(workflow.jobs, {
       "build-test-cluster": new BuildTestClusterJob("build-test-cluster", opts),
@@ -216,9 +223,6 @@ export function BuildWorkflow(
         "teardown-test-cluster",
         opts
       ),
-    });
-    workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintKubernetesJob("lint").addDispatchConditional(true),
     });
   }
   return workflow;
@@ -713,7 +717,7 @@ export class TeardownTestClusterJob implements NormalJob {
   }
 }
 
-export class LintKubernetesJob implements NormalJob {
+export class LintJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   steps = [steps.CheckoutRepoStep(), steps.InstallGo(), steps.GolangciLint()];
   name: string;
