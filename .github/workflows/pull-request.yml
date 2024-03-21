@@ -55,6 +55,7 @@ jobs:
       bridged: true
       provider_name: xyz
       automerge: false
+      downstream_test: true
       caller_workflow: "update-workflows-single-bridged-provider"
 
   downstream:
