@@ -429,3 +429,6 @@ on:
     - v*
     - sdk/*
     - "**"
+#{{- if .Config.testMasterAndReleaseWorkflows }}#
+  pull_request:
+#{{ end }}#

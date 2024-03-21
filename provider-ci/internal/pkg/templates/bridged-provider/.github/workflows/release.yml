@@ -405,3 +405,6 @@ on:
     tags:
     - v*.*.*
     - "!v*.*.*-**"
+#{{- if .Config.testMasterAndReleaseWorkflows }}#
+  pull_request:
+#{{ end }}#
