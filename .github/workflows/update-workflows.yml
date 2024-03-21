@@ -23,6 +23,10 @@ on:
         description: "Whether the upgrade is a downstream test"
         type: boolean
         default: false
+      skip_closing_prs:
+        description: "Whether to skip closing PRs"
+        type: boolean
+        default: false
 
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -91,6 +95,7 @@ jobs:
           npx ts-node index.ts "$DIR"
       - name: Close obsolete PRs started by this workflow
         uses: actions/github-script@v6
+        if: ${{ !inputs.skip_closing_prs }}
         with:
           github-token: ${{ secrets.PULUMI_BOT_TOKEN }}
           script: |

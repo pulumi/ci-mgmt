@@ -59,6 +59,7 @@ jobs:
       provider_name: xyz
       automerge: false
       downstream_test: true
+      skip_closing_prs: true
       caller_workflow: "update-workflows-single-bridged-provider"
 
   downstream:
