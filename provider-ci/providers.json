@@ -65,6 +65,5 @@
     "vault",
     "venafi",
     "vsphere",
-    "wavefront",
-    "xyz"
+    "wavefront"
 ]
