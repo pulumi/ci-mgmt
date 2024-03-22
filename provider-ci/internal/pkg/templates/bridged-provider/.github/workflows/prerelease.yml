@@ -347,3 +347,6 @@ on:
   push:
     tags:
     - v*.*.*-**
+#{{- if .Config.testMasterAndReleaseWorkflows }}#
+  pull_request:
+#{{ end }}#
