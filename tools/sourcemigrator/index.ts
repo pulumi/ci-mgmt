@@ -26,129 +26,25 @@ interface MigrateResult {
     filesEdited: Number;
 }
 
-function updateExamplesFromCore31DotNet6(): SourceMigration {
-    let pattern = new RegExp("[<]TargetFramework[>]netcoreapp3.1[<][/]TargetFramework[>]");
-    let replacement = "<TargetFramework>net6.0</TargetFramework>"
-    let sm: SourceMigration = {
-        name: "updateExamplesFromCore31DotNet6",
-        execute: (ctx: MigrateContext) => {
-            let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
-            let filesEdited = String(stdout).split("\n")
-                .filter(x => x.endsWith(".csproj"))
-                .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
-            return {filesEdited: filesEdited};
-        },
-    };
-    return sm;
-}
+// function fileContains(f: string, pattern: RegExp): boolean {
+//     let contents = String(fs.readFileSync(f));
+//     return pattern.test(contents);
+// }
 
-function updatePulumiCoreRefTo3x(): SourceMigration {
-    let pattern = new RegExp('["][@]pulumi[/]pulumi["][:]\\s+["][^]2[.]0[.]0"');
-    let replacement = '"@pulumi/pulumi": "^3.0.0"';
-    let sm: SourceMigration = {
-        name: "updatePulumiCoreRefTo3x",
-        execute: (ctx: MigrateContext) => {
-            let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
-            let filesEdited = String(stdout).split("\n")
-                .filter(x => x.endsWith("package.json"))
-                .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
-            return {filesEdited: filesEdited};
-        },
-    };
-    return sm;
-}
-
-function updateGo_1_21(): SourceMigration {
-    let pattern = new RegExp('^go \\d+[.]\\d+$', 'm');
-    let replacement = "go 1.21";
-    let sm: SourceMigration = {
-        name: "updateGo_1_21",
-        execute: (ctx: MigrateContext) => {
-            let stdout = child.execSync("git ls-files -- '**/go.mod'", {cwd: ctx.dir});
-            let filesEdited = String(stdout).split("\n")
-                .filter(x => x.endsWith("go.mod"))
-                .filter(x => !fileContains(path.join(ctx.dir, x), new RegExp("Exclude[ ]this[ ]directory")))
-                .filter(x => {
-                    let f = path.join(ctx.dir, x);
-                    let replaced = replaceInFile(f, pattern, replacement);
-                    if (replaced) {
-                        child.execSync("go mod tidy", {cwd: path.dirname(f)});
-                    }
-                    return replaced;
-                }).length;
-            return {filesEdited: filesEdited};
-        },
-    };
-    return sm;
-}
-
-function introducePythonWheels(): SourceMigration {
-    let edit = '&tfbridge.PythonInfo{x} -> (func () *tfbridge.PythonInfo { i := &tfbridge.PythonInfo{x}; i.PyProject.Enabled = true; return i })()';
-    let sm: SourceMigration = {
-        name: "introducePythonWheels",
-        execute: (ctx: MigrateContext) => {
-            let candidatePaths = ["resource.go", "resources.go"]
-                                     .map(p => path.join(ctx.dir, "provider", p))
-                                     .filter(fs.existsSync);
-            if (candidatePaths.length == 0) {
-                return {filesEdited: 0};
-            }
-            let resourcesGo = candidatePaths[0];                         
-            let usesPyProjectTOML = fileContains(path.join(ctx.dir, "Makefile"),
-                                                 new RegExp("pyproject.toml"));
-            let alreadyApplied = fileContains(resourcesGo,
-                                              new RegExp("PyProject.Enabled"));            
-            if (alreadyApplied || !usesPyProjectTOML) {
-                return {filesEdited: 0};
-            };
-            child.execSync("gofmt -w -r '" + edit + "' " + resourcesGo, {cwd: ctx.dir});
-            child.execSync("make tfgen build_python", {cwd: ctx.dir, stdio: 'inherit'});
-            child.execSync("rm -rf sdk/python/venv", {cwd: ctx.dir, stdio: 'inherit'});
-            return {filesEdited: 1};
-        },
-    };
-    return sm;
-}
-
-function addVenvToGitIgnore(): SourceMigration {
-    return {
-        name: "addVenvToGitIgnore",
-        execute: (ctx: MigrateContext) => {
-            let ign = path.join(ctx.dir, ".gitignore");
-            if (!fs.existsSync(ign)) {
-                fs.writeFileSync(ign, "sdk/python/venv\n");  
-                return {filesEdited: 1};
-            }
-            if (fileContains(ign, new RegExp("sdk/python/venv"))) {
-                return {filesEdited: 0};
-            }
-            let contents = String(fs.readFileSync(ign));
-            let upd = contents + "\n\nsdk/python/venv\n";
-            fs.writeFileSync(ign, upd);
-            return {filesEdited: 1};
-        }
-    };
-}
-
-function fileContains(f: string, pattern: RegExp): boolean {
-    let contents = String(fs.readFileSync(f));
-    return pattern.test(contents);
-}
-
-function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
-    let contents = String(fs.readFileSync(f));
-    if (pattern.test(contents)) {
-        let updatedContents = contents.replace(pattern, replacement)
-        if (updatedContents != contents) {
-            fs.writeFileSync(f, updatedContents);
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-}
+// function replaceInFile(f: string, pattern: RegExp, replacement: string): boolean {
+//     let contents = String(fs.readFileSync(f));
+//     if (pattern.test(contents)) {
+//         let updatedContents = contents.replace(pattern, replacement)
+//         if (updatedContents != contents) {
+//             fs.writeFileSync(f, updatedContents);
+//             return true;
+//         } else {
+//             return false;
+//         }
+//     } else {
+//         return false;
+//     }
+// }
 
 function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
     migrations.forEach(m => {
@@ -163,11 +59,6 @@ function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
 
 function allMigrations(): SourceMigration[] {
     return [
-        updateExamplesFromCore31DotNet6(),
-        updatePulumiCoreRefTo3x(),
-        updateGo_1_21(),
-        introducePythonWheels(),
-        addVenvToGitIgnore(),
     ];
 }
 
