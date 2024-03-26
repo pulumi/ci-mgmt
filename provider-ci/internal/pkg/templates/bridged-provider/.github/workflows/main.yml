@@ -11,6 +11,14 @@ jobs:
   build_sdk:
     name: build_sdk
     needs: prerequisites
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    steps:
+    - name: Checkout Repo
+      uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
 #{{ .Splices.build_sdk }}#
   generate_coverage_data:
     continue-on-error: true
