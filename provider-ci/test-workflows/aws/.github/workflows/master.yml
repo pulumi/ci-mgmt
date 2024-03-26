@@ -294,11 +294,11 @@ jobs:
         message: >+
           ### Is README.md missing any configuration options?
 
-          ${{ env.MISSING_CONFIG }}
+          ${{ env.MISSING_CONFIG || 'No missing config!' }}
 
 
-          Please add a description for each of these options to `README.md`.
-          Details about them can be found in either the upstream docs or `schema.json`.
+          ${{ env.MISSING_CONFIG && 'Please add a description for each of these options to `README.md`.' }}
+          ${{ env.MISSING_CONFIG && 'Details about them can be found in either the upstream docs or `schema.json`.' }}
 
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
