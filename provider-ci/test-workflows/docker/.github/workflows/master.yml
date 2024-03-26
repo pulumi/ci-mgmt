@@ -143,6 +143,7 @@ jobs:
         - dotnet
         - go
         - java
+
   generate_coverage_data:
     continue-on-error: true
     env:
