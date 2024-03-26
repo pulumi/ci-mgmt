@@ -26,6 +26,24 @@ interface MigrateResult {
     filesEdited: Number;
 }
 
+// Example migration (no longer in use):
+//
+// function updateExamplesFromCore31DotNet6(): SourceMigration {
+//     let pattern = new RegExp("[<]TargetFramework[>]netcoreapp3.1[<][/]TargetFramework[>]");
+//     let replacement = "<TargetFramework>net6.0</TargetFramework>"
+//     let sm: SourceMigration = {
+//         name: "updateExamplesFromCore31DotNet6",
+//         execute: (ctx: MigrateContext) => {
+//             let stdout = child.execSync("git ls-files examples", {cwd: ctx.dir});
+//             let filesEdited = String(stdout).split("\n")
+//                 .filter(x => x.endsWith(".csproj"))
+//                 .filter(x => replaceInFile(path.join(ctx.dir, x), pattern, replacement)).length;
+//             return {filesEdited: filesEdited};
+//         },
+//     };
+//     return sm;
+// }
+
 // function fileContains(f: string, pattern: RegExp): boolean {
 //     let contents = String(fs.readFileSync(f));
 //     return pattern.test(contents);
