@@ -252,7 +252,7 @@ jobs:
       name: Check Configuration section
       run: |
         sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
-        jq -r '.config.variables | keys[]' < provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> keys.txt
+        jq -r '.config | select(.variables) | .variables | keys[]' < provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> keys.txt
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         {
           echo "MISSING_CONFIG<<$EOF";
