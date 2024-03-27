@@ -183,7 +183,7 @@ jobs:
     - name: Generate schema
       run: make tfgen_no_deps
     - name: Build provider binary
-      run: make_provider_no_deps
+      run: make provider_no_deps
     - name: Unit-test provider code
       run: make test_provider
     - if: github.event_name == 'pull_request'
