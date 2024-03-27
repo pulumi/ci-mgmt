@@ -129,7 +129,7 @@ jobs:
           committer: Pulumi Bot <bot@pulumi.com>
           commit-message: "[internal] Update GitHub Actions workflow files"
           labels: "impact/no-changelog-required"
-          title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] '}}Update GitHub Actions workflows."
+          title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
       - name: "Set PR to auto-merge"
