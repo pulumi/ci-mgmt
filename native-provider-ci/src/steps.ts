@@ -547,6 +547,9 @@ export function CheckSchemaChanges(provider: string): Step {
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
       "schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
       "echo 'EOF' >> $GITHUB_ENV",
+    env: {
+      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
+    },
   };
 }
 
