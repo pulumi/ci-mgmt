@@ -168,6 +168,8 @@ jobs:
         ref: deca2c5c6015ad7aaea6f572a1c2b198ca323592
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
+    - name: Prepare upstream code
+      run: make upstream
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -188,8 +190,14 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
-    - name: Build tfgen & provider binaries
-      run: make provider
+    - name: Build schema generator binary
+      run: make tfgen_build_only
+    - name: Install plugins
+      run: make install_plugins
+    - name: Generate schema
+      run: make tfgen_no_deps
+    - name: Build provider binary
+      run: make provider_no_deps
     - name: Unit-test provider code
       run: make test_provider
     - if: github.event_name == 'pull_request'
