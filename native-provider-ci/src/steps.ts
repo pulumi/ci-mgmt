@@ -344,8 +344,8 @@ export function InstallPulumiCli(version?: string): Step {
 export function RunDockerComposeStep(required?: boolean): Step {
   if (required) {
     return {
-      name: "Run docker-compose",
-      run: "docker-compose -f testing/docker-compose.yml up --build -d",
+      name: "Run docker compose",
+      run: "docker compose -f testing/docker-compose.yml up --build -d",
     };
   }
   return {};
