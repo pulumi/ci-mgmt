@@ -249,8 +249,8 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     #{{- if .Config.docker }}#
-    - name: Run docker-compose
-      run: docker-compose -f testing/docker-compose.yml up --build -d
+    - name: Run docker compose
+      run: docker compose -f testing/docker-compose.yml up --build -d
     #{{- end }}#
     #{{- if .Config.aws }}#
     - name: Configure AWS Credentials
