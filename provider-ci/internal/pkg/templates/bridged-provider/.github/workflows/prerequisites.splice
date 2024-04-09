@@ -77,6 +77,7 @@
 
           Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
 
+#{{- if .Config.enableConfigurationCheck }}#
     - if: github.event_name == 'pull_request'
       name: Check Configuration section
       run: |
@@ -103,6 +104,7 @@
 
           ${{ env.MISSING_CONFIG && 'Please add a description for each of these options to `README.md`.' }}
           ${{ env.MISSING_CONFIG && 'Details about them can be found in either the upstream docs or `schema.json`.' }}
+#{{- end }}#
 
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
