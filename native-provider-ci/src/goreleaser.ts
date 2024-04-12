@@ -84,6 +84,15 @@ interface GoReleaserOpts {
   "major-version": number;
   providerVersion: string;
   skipCodegen: boolean;
+
+  /**
+   * Whether or not to enable changelog generation on the GitHub release.
+   * This will set some default filters on what commits to exclude from the
+   * changelog
+   *
+   * @default false
+   */
+  enableChangelog: boolean;
 }
 
 export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
@@ -187,9 +196,25 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     this.snapshot = {
       name_template: "{{ .Tag }}-SNAPSHOT",
     };
-    this.changelog = {
-      skip: true,
-    };
+    if (opts.enableChangelog) {
+      this.changelog = {
+        filters: {
+          exclude: [
+            "Merge branch",
+            "Merge pull request",
+            "\\Winternal\\W",
+            "\\Wci\\W",
+            "\\Wchore\\W",
+          ],
+        },
+        sort: "asc",
+        use: "git",
+      };
+    } else {
+      this.changelog = {
+        skip: true,
+      };
+    }
     this.release = {
       disable: true,
     };
@@ -210,9 +235,6 @@ export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
     super(opts);
     this.release = {
       disable: false,
-    };
-    this.changelog = {
-      skip: true,
     };
   }
 }
