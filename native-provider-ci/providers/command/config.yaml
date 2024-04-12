@@ -1,7 +1,7 @@
 provider: command
 major-version: 0
 aws: true
-has-gen-binary: false
+hasGenBinary: false
 env:
   AWS_REGION: us-west-2
   PULUMI_API: "https://api.pulumi-staging.io"
