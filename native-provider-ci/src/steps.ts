@@ -816,10 +816,10 @@ export function MakeKubernetesProvider(provider: string): Step {
   return {};
 }
 
-export function TarProviderBinaries(): Step {
+export function TarProviderBinaries(hasGenBinary: boolean): Step {
   return {
     name: "Tar provider binaries",
-    run: "tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-gen-${{ env.PROVIDER}}",
+    run: "tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin/ pulumi-resource-${{ env.PROVIDER }}"+ (hasGenBinary ? " pulumi-gen-${{ env.PROVIDER}}" : ""),
   };
 }
 

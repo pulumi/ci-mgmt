@@ -9,6 +9,7 @@ const nodeVersion = "16.x";
 const dotnetVersion = "6.0.x\n3.1.301\n";
 const javaVersion = "11";
 
+type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 export const WorkflowOpts = z.object({
   provider: z.string(),
   env: z.record(z.any()).optional(),
@@ -24,8 +25,8 @@ export const WorkflowOpts = z.object({
   skipCodegen: z.boolean().default(false),
   skipWindowsArmBuild: z.boolean().default(false),
   pulumiCLIVersion: z.string().optional(),
+  hasGenBinary: z.boolean().default(true),
 });
-type WorkflowOpts = z.infer<typeof WorkflowOpts>;
 
 const env = (opts: WorkflowOpts) =>
   Object.assign(
@@ -524,7 +525,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.BuildProvider(opts.provider),
       steps.CheckCleanWorkTree(),
       steps.Porcelain(),
-      steps.TarProviderBinaries(),
+      steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
       steps.TestProviderLibrary(),
       steps.Codecov(),
