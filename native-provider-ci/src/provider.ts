@@ -11,6 +11,7 @@ const Config = z.object({
   "provider-default-branch": z.string().default("master"),
   "golangci-timeout": z.string().default("20m"),
   "major-version": z.number().default(0),
+  enableChangelog: z.boolean().default(false),
   customLdFlag: z.string().default(""),
   skipWindowsArmBuild: z.boolean().default(false),
 });
