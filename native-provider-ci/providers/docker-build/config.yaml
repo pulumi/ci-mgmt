@@ -1,4 +1,4 @@
-provider: dockerbuild
+provider: docker-build
 major-version: 0
 provider-default-branch: main
 aws: true
