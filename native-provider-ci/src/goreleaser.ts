@@ -196,25 +196,9 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     this.snapshot = {
       name_template: "{{ .Tag }}-SNAPSHOT",
     };
-    if (opts.enableChangelog) {
-      this.changelog = {
-        filters: {
-          exclude: [
-            "Merge branch",
-            "Merge pull request",
-            "\\Winternal\\W",
-            "\\Wci\\W",
-            "\\Wchore\\W",
-          ],
-        },
-        sort: "asc",
-        use: "git",
-      };
-    } else {
-      this.changelog = {
-        skip: true,
-      };
-    }
+    this.changelog = {
+      skip: true,
+    };
     this.release = {
       disable: true,
     };
@@ -233,6 +217,21 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
 export class PulumiGoreleaserConfig extends PulumiGoreleaserPreConfig {
   constructor(opts: GoReleaserOpts) {
     super(opts);
+    if (opts.enableChangelog) {
+      this.changelog = {
+        filters: {
+          exclude: [
+            "Merge branch",
+            "Merge pull request",
+            "\\Winternal\\W",
+            "\\Wci\\W",
+            "\\Wchore\\W",
+          ],
+        },
+        sort: "asc",
+        use: "git",
+      };
+    }
     this.release = {
       disable: false,
     };
