@@ -66,6 +66,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -163,6 +164,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -258,6 +260,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -349,6 +352,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Clear GitHub Actions Ubuntu runner disk space
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
@@ -409,6 +413,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -487,6 +492,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: Install pulumictl
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -532,6 +538,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GOVERSION }}
+        cache-dependency-path: "**/*.sum"
     - name: golangci-lint provider pkg
       uses: golangci/golangci-lint-action@v4
       with:

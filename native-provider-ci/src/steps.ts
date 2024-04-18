@@ -220,6 +220,7 @@ export function InstallGo(version?: string): Step {
     uses: action.setupGo,
     with: {
       "go-version": version || "${{ env.GOVERSION }}",
+      "cache-dependency-path": "**/*.sum",
     },
   };
 }
