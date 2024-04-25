@@ -75,8 +75,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
@@ -161,8 +159,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Unshallow clone for PR merge bases
-      run: git fetch --prune --unshallow --tags
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:
@@ -192,8 +188,6 @@ jobs:
         path: ci-scripts
         repository: pulumi/scripts
         ref: #{{ .Config.pulumiScriptsRef }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#

@@ -133,8 +133,6 @@ jobs:
       with:
         repository: pulumi/examples
         path: p-examples
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#

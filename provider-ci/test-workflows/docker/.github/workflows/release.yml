@@ -60,8 +60,6 @@ jobs:
         path: ci-scripts
         repository: pulumi/scripts
         ref: deca2c5c6015ad7aaea6f572a1c2b198ca323592
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -194,8 +192,6 @@ jobs:
         path: ci-scripts
         repository: pulumi/scripts
         ref: deca2c5c6015ad7aaea6f572a1c2b198ca323592
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Prepare upstream code
       run: make upstream
     - name: Install Go
@@ -312,8 +308,6 @@ jobs:
         swap-storage: false
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -399,8 +393,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Unshallow clone for PR merge bases
-      run: git fetch --prune --unshallow --tags
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:
@@ -426,8 +418,6 @@ jobs:
         path: ci-scripts
         repository: pulumi/scripts
         ref: deca2c5c6015ad7aaea6f572a1c2b198ca323592
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
