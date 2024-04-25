@@ -51,6 +51,9 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:

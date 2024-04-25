@@ -78,10 +78,12 @@ jobs:
         role-external-id: upload-pulumi-release
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
-    - name: Set PreRelease Version
-      run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> "$GITHUB_ENV"
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Run GoReleaser
       uses: #{{ .Config.actionVersions.goReleaser }}#
+      env:
+        GORELEASER_CURRENT_TAG: v${{ steps.version.outputs.version }}
       with:
         args: -p #{{ .Config.parallel }}# -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout
           #{{ .Config.timeout }}#m0s
