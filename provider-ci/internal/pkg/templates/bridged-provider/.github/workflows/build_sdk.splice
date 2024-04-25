@@ -4,7 +4,7 @@
         path: ci-scripts
         repository: pulumi/scripts
         ref: #{{ .Config.pulumiScriptsRef }}#
-    - run: mv ci-scripts ../ci-scripts # actions/checkout#197
+    - run: echo "ci-scripts" >> .git/info/exclude # actions/checkout#197
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
@@ -64,7 +64,7 @@
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ../ci-scripts/ci/check-worktree-is-clean
+      run: ./ci-scripts/ci/check-worktree-is-clean
     - name: Compress SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
     - name: Upload artifacts
