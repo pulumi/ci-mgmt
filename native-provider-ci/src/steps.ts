@@ -130,18 +130,20 @@ export function CheckoutRepoStepAtPR(): Step {
   };
 }
 
-export function CheckoutScriptsRepoStep(): Step {
-  return {
-    name: "Checkout Scripts Repo",
-    uses: action.checkout,
-    with: {
-      path: "ci-scripts",
-      repository: "pulumi/scripts",
+export function CheckoutScriptsRepoSteps(): Step[] {
+  return [
+    {
+      name: "Checkout Scripts Repo",
+      uses: action.checkout,
+      with: {
+        path: "ci-scripts",
+        repository: "pulumi/scripts",
+      },
     },
-    env: {
-      GITHUB_WORKSPACE: "${{ runner.temp }}",
+    {
+      run: "mv ci-scripts ../ci-scripts", // actions/checkout#197
     },
-  };
+  ];
 }
 
 export function CheckoutTagsStep(skipProvider?: string): Step {
@@ -468,7 +470,7 @@ export function ZipSDKsStep(): Step {
 export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
-    run: "${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean",
+    run: "../ci-scripts/ci/check-worktree-is-clean",
   };
 }
 
@@ -1056,7 +1058,7 @@ export function InstallTwine(): Step {
 export function RunPublishSDK(): Step {
   return {
     name: "Publish SDKs",
-    run: "${{ runner.temp }}/ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
+    run: "../ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
     env: {
       NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
       // See https://github.com/pulumi/scripts/pull/138/files

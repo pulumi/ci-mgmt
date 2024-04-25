@@ -86,8 +86,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-      env:
-        GITHUB_WORKSPACE: ${{ runner.temp }}
+    - run: mv ci-scripts ../ci-scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -139,7 +138,7 @@ jobs:
     - name: Build Provider
       run: make provider
     - name: Check worktree clean
-      run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
+      run: ../ci-scripts/ci/check-worktree-is-clean
     - run: git status --porcelain
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
@@ -189,8 +188,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-      env:
-        GITHUB_WORKSPACE: ${{ runner.temp }}
+    - run: mv ci-scripts ../ci-scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -243,7 +241,7 @@ jobs:
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
+      run: ../ci-scripts/ci/check-worktree-is-clean
     - run: git status --porcelain
     - name: Tar SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
@@ -290,8 +288,7 @@ jobs:
       with:
         path: ci-scripts
         repository: pulumi/scripts
-      env:
-        GITHUB_WORKSPACE: ${{ runner.temp }}
+    - run: mv ci-scripts ../ci-scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

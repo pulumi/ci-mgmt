@@ -44,14 +44,13 @@ jobs:
         with:
           path: ci-scripts
           repository: pulumi/scripts
-        env:
-          GITHUB_WORKSPACE: ${{ runner.temp }}
+      - run: mv ci-scripts ../ci-scripts # actions/checkout#197
       - name: Validate native-providers
         run: cd native-provider-ci && make all
       - name: Validate that our test workflows match checked in workflows
         run: cd provider-ci && make test-workflow-generation
       - name: Check worktree clean
-        run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
+        run: ../ci-scripts/ci/check-worktree-is-clean
 
   deploy:
     uses: ./.github/workflows/update-workflows.yml
