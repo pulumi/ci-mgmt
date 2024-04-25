@@ -121,6 +121,9 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
         #{{- end }}#
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:

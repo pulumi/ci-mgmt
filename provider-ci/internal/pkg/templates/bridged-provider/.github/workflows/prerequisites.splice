@@ -6,6 +6,9 @@
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Cache examples generation
       uses: actions/cache@v4
       with:

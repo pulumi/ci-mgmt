@@ -106,9 +106,6 @@ jobs:
       run: make install_plugins
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Set PACKAGE_VERSION to Env
-      run: echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >>
-        "$GITHUB_ENV"
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
@@ -167,6 +164,9 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Cache examples generation
       uses: actions/cache@v4
       with:
@@ -368,9 +368,11 @@ jobs:
       with:
         tag: v0.0.46
         repo: pulumi/pulumictl
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Add SDK version tag
-      run: git tag "sdk/v$(pulumictl get version --language generic)" && git push origin
-        "sdk/v$(pulumictl get version --language generic)"
+      run: git tag "sdk/v${{ steps.version.outputs.version }}" && git push origin
+        "sdk/v${{ steps.version.outputs.version }}"
 
   clean_up_release_labels:
     name: Clean up release labels
@@ -399,6 +401,9 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:

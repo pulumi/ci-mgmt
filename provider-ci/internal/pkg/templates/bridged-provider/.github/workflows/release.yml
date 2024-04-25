@@ -144,9 +144,11 @@ jobs:
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Add SDK version tag
-      run: git tag "sdk/v$(pulumictl get version --language generic)" && git push origin
-        "sdk/v$(pulumictl get version --language generic)"
+      run: git tag "sdk/v${{ steps.version.outputs.version }}" && git push origin
+        "sdk/v${{ steps.version.outputs.version }}"
 
   clean_up_release_labels:
     name: Clean up release labels
@@ -182,6 +184,9 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:

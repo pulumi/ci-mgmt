@@ -120,9 +120,6 @@ jobs:
       run: make install_plugins
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Set PACKAGE_VERSION to Env
-      run: echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >>
-        "$GITHUB_ENV"
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
@@ -166,6 +163,9 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Cache examples generation
       uses: actions/cache@v4
       with:
@@ -366,6 +366,9 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
