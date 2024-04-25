@@ -135,7 +135,7 @@ export function CheckoutScriptsRepoStep(): Step {
     name: "Checkout Scripts Repo",
     uses: action.checkout,
     with: {
-      path: "ci-scripts",
+      path: "../ci-scripts",
       repository: "pulumi/scripts",
     },
   };
@@ -465,7 +465,7 @@ export function ZipSDKsStep(): Step {
 export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
-    run: "./ci-scripts/ci/check-worktree-is-clean",
+    run: "../ci-scripts/ci/check-worktree-is-clean",
   };
 }
 
@@ -1053,7 +1053,7 @@ export function InstallTwine(): Step {
 export function RunPublishSDK(): Step {
   return {
     name: "Publish SDKs",
-    run: "./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
+    run: "../ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}",
     env: {
       NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}",
       // See https://github.com/pulumi/scripts/pull/138/files

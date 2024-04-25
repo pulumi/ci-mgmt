@@ -43,7 +43,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ci-scripts
+        path: ../ci-scripts
         repository: pulumi/scripts
         ref: deca2c5c6015ad7aaea6f572a1c2b198ca323592
     - name: Unshallow clone for tags
@@ -113,7 +113,7 @@ jobs:
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      run: ../ci-scripts/ci/check-worktree-is-clean
     - name: Compress SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
     - name: Upload artifacts
