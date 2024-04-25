@@ -1,7 +1,7 @@
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
         ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
@@ -63,7 +63,7 @@
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ../ci-scripts/ci/check-worktree-is-clean
+      run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
     - name: Compress SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
     - name: Upload artifacts

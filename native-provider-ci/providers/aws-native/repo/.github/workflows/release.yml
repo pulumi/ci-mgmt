@@ -45,7 +45,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
@@ -100,7 +100,7 @@ jobs:
     - name: Build Provider
       run: make provider
     - name: Check worktree clean
-      run: ../ci-scripts/ci/check-worktree-is-clean
+      run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
     - run: git status --porcelain
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
@@ -145,7 +145,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
@@ -201,7 +201,7 @@ jobs:
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ../ci-scripts/ci/check-worktree-is-clean
+      run: ${{ runner.temp }}/ci-scripts/ci/check-worktree-is-clean
     - run: git status --porcelain
     - name: Tar SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
@@ -242,7 +242,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
@@ -395,7 +395,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
@@ -450,7 +450,8 @@ jobs:
     - name: Install Twine
       run: python -m pip install pip twine
     - name: Publish SDKs
-      run: ../ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
+      run: ${{ runner.temp }}/ci-scripts/ci/publish-tfgen-package ${{ github.workspace
+        }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         PYPI_PUBLISH_ARTIFACTS: all
@@ -474,7 +475,7 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ../ci-scripts
+        path: ${{ runner.temp }}/ci-scripts
         repository: pulumi/scripts
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags

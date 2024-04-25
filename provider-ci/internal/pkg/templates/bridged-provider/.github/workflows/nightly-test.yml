@@ -35,12 +35,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
