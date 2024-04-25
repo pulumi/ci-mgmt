@@ -12,12 +12,6 @@
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Prepare upstream code

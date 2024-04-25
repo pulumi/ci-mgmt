@@ -451,7 +451,7 @@ export class BuildSdkJob implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.CheckoutScriptsRepoStep(),
+      ...steps.CheckoutScriptsRepoSteps(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -507,7 +507,7 @@ export class PrerequisitesJob implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.CheckoutScriptsRepoStep(),
+      ...steps.CheckoutScriptsRepoSteps(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -585,7 +585,7 @@ export class TestsJob implements NormalJob {
     };
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.CheckoutScriptsRepoStep(),
+      ...steps.CheckoutScriptsRepoSteps(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -811,7 +811,7 @@ export class PublishSDKJob implements NormalJob {
     Object.assign(this, { name });
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.CheckoutScriptsRepoStep(),
+      ...steps.CheckoutScriptsRepoSteps(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -844,7 +844,7 @@ export class PublishJavaSDKJob implements NormalJob {
     Object.assign(this, { name });
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.CheckoutScriptsRepoStep(),
+      ...steps.CheckoutScriptsRepoSteps(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
