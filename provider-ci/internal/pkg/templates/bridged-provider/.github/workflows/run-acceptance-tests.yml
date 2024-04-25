@@ -121,12 +121,6 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
         #{{- end }}#
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
       uses: #{{ .Config.actionVersions.checkout }}#

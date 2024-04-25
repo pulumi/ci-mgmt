@@ -130,15 +130,20 @@ export function CheckoutRepoStepAtPR(): Step {
   };
 }
 
-export function CheckoutScriptsRepoStep(): Step {
-  return {
-    name: "Checkout Scripts Repo",
-    uses: action.checkout,
-    with: {
-      path: "ci-scripts",
-      repository: "pulumi/scripts",
+export function CheckoutScriptsRepoSteps(): Step[] {
+  return [
+    {
+      name: "Checkout Scripts Repo",
+      uses: action.checkout,
+      with: {
+        path: "ci-scripts",
+        repository: "pulumi/scripts",
+      },
     },
-  };
+    {
+      run: 'echo "ci-scripts" >> .git/info/exclude', // actions/checkout#197
+    },
+  ];
 }
 
 export function CheckoutTagsStep(skipProvider?: string): Step {
