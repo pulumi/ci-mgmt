@@ -26,6 +26,7 @@ export const WorkflowOpts = z.object({
   skipWindowsArmBuild: z.boolean().default(false),
   pulumiCLIVersion: z.string().optional(),
   hasGenBinary: z.boolean().default(true),
+  defaultBranch: z.string().default("master"),
 });
 
 const env = (opts: WorkflowOpts) =>
@@ -970,7 +971,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.UpdatePulumi(),
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
-      steps.CreateUpdatePulumiPR(),
+      steps.CreateUpdatePulumiPR(opts.defaultBranch),
       // steps.SetPRAutoMerge(opts.provider),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
@@ -1003,7 +1004,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.MakeLocalGenerate(),
       steps.SetGitSubmoduleCommitHash(opts.provider),
       steps.CommitAutomatedSDKUpdates(opts.provider),
-      steps.PullRequestSdkGeneration(opts.provider),
+      steps.PullRequestSdkGeneration(opts.provider, opts.defaultBranch),
       // steps.SetPRAutoMerge(opts.provider),
       steps.NotifySlack("Failure during automated SDK generation"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
