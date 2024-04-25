@@ -135,8 +135,11 @@ export function CheckoutScriptsRepoStep(): Step {
     name: "Checkout Scripts Repo",
     uses: action.checkout,
     with: {
-      path: "${{ runner.temp }}/ci-scripts",
+      path: "ci-scripts",
       repository: "pulumi/scripts",
+    },
+    env: {
+      GITHUB_WORKSPACE: "${{ runner.temp }}",
     },
   };
 }

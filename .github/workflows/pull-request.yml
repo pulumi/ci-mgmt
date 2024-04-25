@@ -42,8 +42,10 @@ jobs:
       - name: Checkout Scripts Repo
         uses: actions/checkout@v4
         with:
-          path: ${{ runner.temp }}/ci-scripts
+          path: ci-scripts
           repository: pulumi/scripts
+        env:
+          GITHUB_WORKSPACE: ${{ runner.temp }}
       - name: Validate native-providers
         run: cd native-provider-ci && make all
       - name: Validate that our test workflows match checked in workflows

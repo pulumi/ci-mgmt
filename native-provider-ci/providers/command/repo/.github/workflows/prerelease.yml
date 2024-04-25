@@ -45,8 +45,10 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -109,8 +111,10 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -202,8 +206,10 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -364,8 +370,10 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -444,8 +452,10 @@ jobs:
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

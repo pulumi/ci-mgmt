@@ -1,9 +1,11 @@
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
-        path: ${{ runner.temp }}/ci-scripts
+        path: ci-scripts
         repository: pulumi/scripts
         ref: #{{ .Config.pulumiScriptsRef }}#
+      env:
+        GITHUB_WORKSPACE: ${{ runner.temp }}
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
