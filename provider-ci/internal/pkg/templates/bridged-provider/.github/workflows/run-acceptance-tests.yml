@@ -124,12 +124,6 @@ jobs:
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
       uses: #{{ .Config.actionVersions.checkout }}#

@@ -15,12 +15,6 @@
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
     - name: Prepare upstream code
       run: make upstream
     - name: Install Go

@@ -8,7 +8,7 @@ import { providersDir } from "../cmd/generate-providers";
 
 const Config = z.object({
   provider: z.string(),
-  "provider-default-branch": z.string().default("master"),
+  defaultBranch: z.string().default("master"),
   "golangci-timeout": z.string().default("20m"),
   "major-version": z.number().default(0),
   enableChangelog: z.boolean().default(false),

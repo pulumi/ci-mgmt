@@ -130,15 +130,20 @@ export function CheckoutRepoStepAtPR(): Step {
   };
 }
 
-export function CheckoutScriptsRepoStep(): Step {
-  return {
-    name: "Checkout Scripts Repo",
-    uses: action.checkout,
-    with: {
-      path: "ci-scripts",
-      repository: "pulumi/scripts",
+export function CheckoutScriptsRepoSteps(): Step[] {
+  return [
+    {
+      name: "Checkout Scripts Repo",
+      uses: action.checkout,
+      with: {
+        path: "ci-scripts",
+        repository: "pulumi/scripts",
+      },
     },
-  };
+    {
+      run: 'echo "ci-scripts" >> .git/info/exclude', // actions/checkout#197
+    },
+  ];
 }
 
 export function CheckoutTagsStep(skipProvider?: string): Step {
@@ -509,7 +514,10 @@ export function CommitEmptySDK(): Step {
   };
 }
 
-export function PullRequestSdkGeneration(provider: string): Step {
+export function PullRequestSdkGeneration(
+  provider: string,
+  branch: string
+): Step {
   let dir;
   if (provider === "azure-native") {
     dir = "azure-rest-api-specs";
@@ -522,7 +530,7 @@ export function PullRequestSdkGeneration(provider: string): Step {
     id: "create-pr",
     uses: action.pullRequest,
     with: {
-      destination_branch: "master",
+      destination_branch: branch,
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
       pr_body: "*Automated PR*",
       pr_title: `Automated SDK generation @ ${dir} \${{ steps.vars.outputs.commit-hash }}`,
@@ -942,7 +950,7 @@ export function ProviderWithPulumiUpgrade(provider: string): Step {
   };
 }
 
-export function CreateUpdatePulumiPR(): Step {
+export function CreateUpdatePulumiPR(branch: string): Step {
   return {
     name: "Create PR",
     id: "create-pr",
@@ -951,7 +959,7 @@ export function CreateUpdatePulumiPR(): Step {
     with: {
       source_branch:
         "update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
-      destination_branch: "master",
+      destination_branch: branch,
       pr_title: "Automated Pulumi/Pulumi upgrade",
       github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },

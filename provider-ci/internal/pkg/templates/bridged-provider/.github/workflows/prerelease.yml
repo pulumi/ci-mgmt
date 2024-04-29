@@ -130,12 +130,6 @@ jobs:
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
