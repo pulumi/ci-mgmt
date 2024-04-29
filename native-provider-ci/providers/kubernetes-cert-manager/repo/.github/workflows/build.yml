@@ -55,6 +55,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -148,6 +152,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -239,6 +247,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -331,6 +343,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -387,6 +403,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Checkout Scripts Repo
       uses: actions/checkout@v4
       with:
@@ -467,6 +487,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

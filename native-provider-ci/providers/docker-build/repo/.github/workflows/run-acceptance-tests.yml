@@ -81,6 +81,10 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -177,6 +181,10 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -271,6 +279,10 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
+    - name: Set Provider Version
+      uses: pulumi/provider-version-action@v1
+      with:
+        set-env: PROVIDER_VERSION
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

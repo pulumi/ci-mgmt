@@ -20,6 +20,7 @@ export const gradleBuildAction = "gradle/gradle-build-action@v3";
 export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.11.0";
 export const installPulumiCli = "pulumi/actions@v5";
 export const codecov = "codecov/codecov-action@v4";
+export const providerVersion = "pulumi/provider-version-action@v1";
 
 // GHA Utilities
 export const addAndCommit = "EndBug/add-and-commit@v7";

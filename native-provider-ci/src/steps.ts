@@ -13,6 +13,16 @@ export function CheckoutRepoStep(): Step {
   };
 }
 
+export function SetProviderVersionStep(): Step {
+  return {
+    name: "Set Provider Version",
+    uses: action.providerVersion,
+    with: {
+      "set-env": "PROVIDER_VERSION",
+    },
+  };
+}
+
 export function CommandDispatchStep(providerName: string): Step {
   return {
     uses: action.slashCommand,

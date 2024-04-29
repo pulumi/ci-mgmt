@@ -452,6 +452,7 @@ export class BuildSdkJob implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -507,6 +508,7 @@ export class PrerequisitesJob implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -584,6 +586,7 @@ export class TestsJob implements NormalJob {
     };
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -753,6 +756,7 @@ export class PublishPrereleaseJob implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
@@ -783,6 +787,7 @@ export class PublishJob implements NormalJob {
     }
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
@@ -809,6 +814,7 @@ export class PublishSDKJob implements NormalJob {
     Object.assign(this, { name });
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       ...steps.CheckoutScriptsRepoSteps(), // Required for RunPublishSDK
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
@@ -842,6 +848,7 @@ export class PublishJavaSDKJob implements NormalJob {
     Object.assign(this, { name });
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -861,6 +868,7 @@ export class TagSDKJob implements NormalJob {
   needs = "publish_sdk";
   steps = [
     steps.CheckoutRepoStep(),
+    steps.SetProviderVersionStep(),
     steps.InstallPulumiCtl(),
     steps.TagSDKTag(),
   ];
@@ -888,6 +896,7 @@ export class Cf2PulumiRelease implements NormalJob {
   "runs-on" = "macos-11";
   steps = [
     steps.CheckoutRepoStep(),
+    steps.SetProviderVersionStep(),
     steps.CheckoutTagsStep(),
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
@@ -908,6 +917,7 @@ export class Arm2PulumiRelease implements NormalJob {
   "runs-on" = "macos-11";
   steps = [
     steps.CheckoutRepoStep(),
+    steps.SetProviderVersionStep(),
     steps.CheckoutTagsStep(),
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
@@ -957,6 +967,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
@@ -984,6 +995,7 @@ export class NightlySdkGeneration implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
       // Pass the provider here as an option so that it can be skipped if not needed
       steps.CheckoutTagsStep(opts.provider),
       steps.InstallGo(goVersion),
