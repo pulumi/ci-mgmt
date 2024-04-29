@@ -1,13 +1,6 @@
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-    - name: Checkout Scripts Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-        ref: #{{ .Config.pulumiScriptsRef }}#
-    - run: echo "ci-scripts" >> .git/info/exclude # actions/checkout#197
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Cache examples generation
       uses: actions/cache@v4
@@ -62,7 +55,7 @@
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      uses: pulumi/git-status-check-action@v1
     - name: Compress SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
     - name: Upload artifacts
