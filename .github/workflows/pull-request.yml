@@ -39,18 +39,12 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.11.0
         with:
           repo: pulumi/pulumictl
-      - name: Checkout Scripts Repo
-        uses: actions/checkout@v4
-        with:
-          path: ci-scripts
-          repository: pulumi/scripts
-      - run: echo "ci-scripts" >> .git/info/exclude # actions/checkout#197
       - name: Validate native-providers
         run: cd native-provider-ci && make all
       - name: Validate that our test workflows match checked in workflows
         run: cd provider-ci && make test-workflow-generation
       - name: Check worktree clean
-        run: ./ci-scripts/ci/check-worktree-is-clean
+        uses: pulumi/git-status-check-action@v1
 
   deploy:
     uses: ./.github/workflows/update-workflows.yml
