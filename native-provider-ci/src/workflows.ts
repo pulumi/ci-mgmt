@@ -82,29 +82,19 @@ export function RunAcceptanceTestsWorkflow(
       PR_COMMIT_SHA: "${{ github.event.client_payload.pull_request.head.sha }}",
     },
     jobs: {
-      "comment-notification": new EmptyJob("comment-notification")
-        .addConditional("github.event_name == 'repository_dispatch'")
-        .addStep(steps.CreateCommentsUrlStep())
-        .addStep(steps.UpdatePRWithResultsStep()),
-      prerequisites: new PrerequisitesJob(
-        "prerequisites",
-        opts
-      ).addDispatchConditional(true),
-      build_sdks: new BuildSdkJob("build_sdks", opts, false)
-        .addDispatchConditional(true)
-        .addRunsOn(opts.provider),
-      test: new TestsJob(name, "test", opts).addDispatchConditional(true),
+      prerequisites: new PrerequisitesJob("prerequisites", opts),
+      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
+        opts.provider
+      ),
+      test: new TestsJob(name, "test", opts),
       sentinel: new EmptyJob("sentinel")
-        .addConditional(
-          "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
-        )
         .addStep(steps.EchoSuccessStep())
         .addNeeds(calculateSentinelNeeds(name, opts.lint, opts.provider)),
     },
   };
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintJob("lint").addDispatchConditional(true),
+      lint: new LintJob("lint"),
     });
   }
   if (opts.provider === "kubernetes") {
@@ -165,7 +155,7 @@ export function BuildWorkflow(
   };
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintJob("lint").addDispatchConditional(true),
+      lint: new LintJob("lint"),
     });
   }
   if (opts.provider === "kubernetes") {
@@ -430,17 +420,6 @@ export class BuildSdkJob implements NormalJob {
     Object.assign(this, { name });
   }
 
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
-      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
-      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
-  }
-
   addRunsOn(provider: string) {
     if (provider === "azure-native") {
       this["runs-on"] =
@@ -485,17 +464,6 @@ export class PrerequisitesJob implements NormalJob {
       steps.NotifySlack("Failure in building provider prerequisites"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
-  }
-
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
-      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
-      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
   }
 }
 
@@ -572,17 +540,6 @@ export class TestsJob implements NormalJob {
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name: jobName });
   }
-
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
-      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
-      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
-  }
 }
 
 export class BuildTestClusterJob implements NormalJob {
@@ -617,17 +574,6 @@ export class BuildTestClusterJob implements NormalJob {
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
   }
-
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
-      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
-      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
-  }
 }
 
 export class TeardownTestClusterJob implements NormalJob {
@@ -641,8 +587,6 @@ export class TeardownTestClusterJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     this.needs = ["build-test-cluster", "test"];
-    this.if =
-      "${{ always() }} && github.event.pull_request.head.repo.full_name == github.repository";
     this.permissions = {
       contents: "read",
       "id-token": "write",
@@ -661,14 +605,6 @@ export class TeardownTestClusterJob implements NormalJob {
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name: name });
   }
-
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
-      this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
-  }
 }
 
 export class LintJob implements NormalJob {
@@ -680,19 +616,6 @@ export class LintJob implements NormalJob {
   constructor(name: string) {
     this.name = name;
     Object.assign(this, { name });
-  }
-
-  addDispatchConditional(isWorkflowDispatch: boolean) {
-    if (isWorkflowDispatch) {
-      this.if =
-        "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository";
-
-      this.steps = this.steps.filter(
-        (step: Step) => step.name !== "Checkout Repo"
-      );
-      this.steps.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
   }
 }
 

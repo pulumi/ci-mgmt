@@ -21,7 +21,6 @@ jobs:
     - uses: #{{ .Config.actionVersions.slashCommand }}#
       with:
         commands: |
-          run-acceptance-tests
           release
         issue-type: pull-request
         permission: write

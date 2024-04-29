@@ -38,8 +38,6 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build_sdk:
-    if: github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     name: build_sdk
     needs: prerequisites
     runs-on: pulumi-ubuntu-8core
@@ -147,24 +145,7 @@ jobs:
         - go
         - java
 
-  comment-notification:
-    if: github.event_name == 'repository_dispatch'
-    name: comment-notification
-    runs-on: ubuntu-latest
-    steps:
-    - id: run-url
-      name: Create URL to the run output
-      run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
-    - name: Update with Result
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
-        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
   prerequisites:
-    if: github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     name: prerequisites
     runs-on: ubuntu-latest
     steps:
@@ -315,9 +296,7 @@ jobs:
     # We have succeeded when no dependent workflow has failed and the job was
     # not cancelled.
     #
-    if: (github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository) &&
-      ! cancelled()
+    if: ! cancelled()
     needs:
     - test
     - license_check
@@ -331,8 +310,6 @@ jobs:
       run: echo "🎉🎈🎉🎈🎉"
 
   test:
-    if: github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     name: test
     needs: build_sdk
     permissions:
@@ -495,6 +472,3 @@ on:
   pull_request:
     paths-ignore:
     - CHANGELOG.md
-  repository_dispatch:
-    types:
-    - run-acceptance-tests-command
