@@ -37,14 +37,6 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
   const githubWorkflowsDir = path.join(path.join(".github", "workflows"));
   const files = [
     {
-      path: path.join(githubWorkflowsDir, "command-dispatch.yml"),
-      data: wf.CommandDispatchWorkflow("command-dispatch", config),
-    },
-    {
-      path: path.join(githubWorkflowsDir, "pull-request.yml"),
-      data: wf.PullRequestWorkflow("pull-request", config),
-    },
-    {
       path: path.join(githubWorkflowsDir, "run-acceptance-tests.yml"),
       data: wf.RunAcceptanceTestsWorkflow("run-acceptance-tests", config),
     },

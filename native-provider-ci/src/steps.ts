@@ -13,33 +13,6 @@ export function CheckoutRepoStep(): Step {
   };
 }
 
-export function CommandDispatchStep(providerName: string): Step {
-  return {
-    uses: action.slashCommand,
-    with: {
-      token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-      "reaction-token": "${{ secrets.GITHUB_TOKEN }}",
-      commands: "run-acceptance-tests",
-      permission: "write",
-      "issue-type": "pull-request",
-      repository: `pulumi/pulumi-${providerName}`,
-    },
-  };
-}
-
-export function CommentPRWithSlashCommandStep(): Step {
-  return {
-    name: "Comment PR",
-    uses: action.prComment,
-    with: {
-      message:
-        "PR is now waiting for a maintainer to run the acceptance tests.\n" +
-        "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
-    },
-  };
-}
-
 export function CreateCommentsUrlStep(): Step {
   return {
     name: "Create URL to the run output",

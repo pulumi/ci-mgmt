@@ -60,54 +60,6 @@ const env = (opts: WorkflowOpts) =>
 
 // This section represents GHA files, sub-jobs are in a section below
 
-// Creates command-dispatch.yml
-export function CommandDispatchWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
-  return {
-    name: name,
-
-    on: {
-      issue_comment: {
-        types: ["created", "edited"],
-      },
-    },
-    env: env(opts),
-
-    jobs: {
-      "command-dispatch-for-testing": new EmptyJob(
-        "command-dispatch-for-testing"
-      )
-        .addConditional("${{ github.event.issue.pull_request }}")
-        .addStep(steps.CheckoutRepoStep())
-        .addStep(steps.CommandDispatchStep(`${opts.provider}`)),
-    },
-  };
-}
-
-// Creates pull-request.yml
-export function PullRequestWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
-  return {
-    name: name,
-    on: {
-      pull_request_target: {},
-    },
-    env: env(opts),
-    jobs: {
-      "comment-on-pr": new EmptyJob("comment-on-pr")
-        .addConditional(
-          "github.event.pull_request.head.repo.full_name != github.repository"
-        )
-        .addStep(steps.CheckoutRepoStep())
-        .addStep(steps.CommentPRWithSlashCommandStep()),
-    },
-  };
-}
-
 // Creates run-acceptance-tests.yml
 export function RunAcceptanceTestsWorkflow(
   name: string,
