@@ -296,7 +296,7 @@ jobs:
     # We have succeeded when no dependent workflow has failed and the job was
     # not cancelled.
     #
-    if: ! cancelled()
+    if: "! cancelled()"
     needs:
     - test
     - license_check
