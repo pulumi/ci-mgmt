@@ -73,12 +73,6 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -132,7 +126,7 @@ jobs:
         number: ${{ github.event.issue.number }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      uses: pulumi/git-status-check-action@v1
     - run: git status --porcelain
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
@@ -177,12 +171,6 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -233,7 +221,7 @@ jobs:
     - name: Generate SDK
       run: make ${{ matrix.language }}_sdk
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      uses: pulumi/git-status-check-action@v1
     - run: git status --porcelain
     - name: Tar SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
@@ -275,12 +263,6 @@ jobs:
       with:
         lfs: true
         ref: ${{ env.PR_COMMIT_SHA }}
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

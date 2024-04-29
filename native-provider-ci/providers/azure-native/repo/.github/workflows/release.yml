@@ -48,12 +48,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -107,7 +101,7 @@ jobs:
     - name: Build Provider
       run: make provider
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      uses: pulumi/git-status-check-action@v1
     - run: git status --porcelain
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
@@ -149,12 +143,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -215,7 +203,7 @@ jobs:
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      run: ./ci-scripts/ci/check-worktree-is-clean
+      uses: pulumi/git-status-check-action@v1
     - run: git status --porcelain
     - name: Tar SDK folder
       run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
@@ -253,12 +241,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go
@@ -478,12 +460,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         lfs: true
-    - name: Checkout Scripts Repo
-      uses: actions/checkout@v4
-      with:
-        path: ci-scripts
-        repository: pulumi/scripts
-    - run: echo "ci-scripts" >> .git/info/exclude
     - name: Unshallow clone for tags
       run: git fetch --prune --unshallow --tags
     - name: Install Go

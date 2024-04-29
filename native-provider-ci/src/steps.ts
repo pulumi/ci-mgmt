@@ -470,7 +470,7 @@ export function ZipSDKsStep(): Step {
 export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
-    run: "./ci-scripts/ci/check-worktree-is-clean",
+    uses: action.gitStatusCheck,
   };
 }
 

@@ -26,6 +26,7 @@ export const addAndCommit = "EndBug/add-and-commit@v7";
 export const addLabel = "actions-ecosystem/action-add-labels@v1.1.0";
 export const autoMerge = "peter-evans/enable-pull-request-automerge@v1";
 export const checkout = "actions/checkout@v4";
+export const gitStatusCheck = "pulumi/git-status-check-action@v1";
 export const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
 export const createOrUpdateComment = "peter-evans/create-or-update-comment@v1";
 export const deleteArtifact = "geekyeggo/delete-artifact@v1";
