@@ -35,8 +35,9 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#

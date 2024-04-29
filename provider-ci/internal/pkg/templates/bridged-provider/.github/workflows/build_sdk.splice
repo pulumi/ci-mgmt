@@ -1,3 +1,6 @@
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Checkout Scripts Repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
@@ -5,8 +8,6 @@
         repository: pulumi/scripts
         ref: #{{ .Config.pulumiScriptsRef }}#
     - run: echo "ci-scripts" >> .git/info/exclude # actions/checkout#197
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Cache examples generation
       uses: actions/cache@v4
@@ -58,9 +59,6 @@
       run: make install_plugins
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Set PACKAGE_VERSION to Env
-      run: echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >>
-        "$GITHUB_ENV"
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean

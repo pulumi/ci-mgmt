@@ -6,14 +6,15 @@
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
     - name: Cache examples generation
       uses: actions/cache@v4
       with:
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Prepare upstream code
       run: make upstream
     - name: Install Go

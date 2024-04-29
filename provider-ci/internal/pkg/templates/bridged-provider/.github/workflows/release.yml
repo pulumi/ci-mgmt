@@ -75,8 +75,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
@@ -94,10 +92,12 @@ jobs:
         role-external-id: upload-pulumi-release
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
-    - name: Set PreRelease Version
-      run: echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> "$GITHUB_ENV"
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Run GoReleaser
       uses: #{{ .Config.actionVersions.goReleaser }}#
+      env:
+        GORELEASER_CURRENT_TAG: v${{ steps.version.outputs.version }}
       with:
         args: -p #{{ .Config.parallel }}# release --rm-dist --timeout #{{ .Config.timeout }}#m0s
         version: latest
@@ -144,9 +144,11 @@ jobs:
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Add SDK version tag
-      run: git tag "sdk/v$(pulumictl get version --language generic)" && git push origin
-        "sdk/v$(pulumictl get version --language generic)"
+      run: git tag "sdk/v${{ steps.version.outputs.version }}" && git push origin
+        "sdk/v${{ steps.version.outputs.version }}"
 
   clean_up_release_labels:
     name: Clean up release labels
@@ -159,8 +161,6 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Unshallow clone for PR merge bases
-      run: git fetch --prune --unshallow --tags
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:
@@ -184,8 +184,9 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
+    - uses: pulumi/provider-version-action@v1
+      with:
+        set-env: 'PROVIDER_VERSION'
 #{{ .Config.actions.setupGo | toYaml | indent 4 }}#
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#

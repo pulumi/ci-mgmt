@@ -15,9 +15,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
     #{{- end }}#
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
-      shell: bash
     - name: Install upgrade-provider
       run: go install github.com/pulumi/upgrade-provider@main
       shell: bash
