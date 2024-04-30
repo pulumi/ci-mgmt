@@ -147,10 +147,13 @@ jobs:
     needs: publish
     runs-on: #{{ .Config.runner.default }}#
     steps:
+    - id: version
+      uses: pulumi/provider-version-action@v1
     - name: Publish SDKs
       uses: #{{ .Config.publish.publisherAction }}#
       with:
         sdk: #{{ .Config.publish.sdk }}#
+        version: ${{ steps.version.outputs.version }}
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#FF0000"
