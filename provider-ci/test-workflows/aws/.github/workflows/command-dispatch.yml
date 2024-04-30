@@ -42,7 +42,6 @@ jobs:
     - uses: peter-evans/slash-command-dispatch@v2
       with:
         commands: |
-          run-acceptance-tests
           release
         issue-type: pull-request
         permission: write
