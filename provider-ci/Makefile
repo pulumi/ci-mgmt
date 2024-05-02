@@ -39,7 +39,7 @@ providers/%/config.yaml:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-$*/$B/.ci-mgmt.yaml" > $F
 
 providers/%/repo: bin/provider-ci providers/%/config.yaml
-	@./bin/provider-ci generate \
+	./bin/provider-ci generate \
 		--name pulumi/pulumi-$* \
 		--out ./providers/$*/repo \
 		--template bridged-provider \

@@ -149,9 +149,20 @@ jobs:
         repo: pulumi/pulumictl
     - id: version
       uses: pulumi/provider-version-action@v1
+#{{- if .Config.publish.goSdk.usePush }}#
+    - uses: pulumi/publish-go-sdk-action@v1
+      with:
+        repository: #{{ .Config.publish.goSdk.repository }}#
+        base-ref: #{{ .Config.publish.goSdk.baseRef }}#
+        source: #{{ .Config.publish.goSdk.source }}#
+        path: #{{ .Config.publish.goSdk.path }}#
+        version: ${{ steps.version.outputs.version }}
+        additive: #{{ .Config.publish.goSdk.additive }}#
+#{{- else }}#
     - name: Add SDK version tag
       run: git tag "sdk/v${{ steps.version.outputs.version }}" && git push origin
         "sdk/v${{ steps.version.outputs.version }}"
+#{{- end }}#
 
   clean_up_release_labels:
     name: Clean up release labels
