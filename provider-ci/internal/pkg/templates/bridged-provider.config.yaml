@@ -95,3 +95,12 @@ actionVersions:
 publish:
   publisherAction: pulumi/pulumi-package-publisher@v0.0.15
   sdk: all
+  goSdk:
+    # Set to `true` to use the below configuration to push a new commit somewhere else.
+    usePush: false
+    # By default we'll push back to its own repository as a standalone, tagged commit.
+    repository: ${{ github.repository }}
+    baseRef: ${{ github.sha }}
+    source: sdk
+    path: sdk
+    additive: false
