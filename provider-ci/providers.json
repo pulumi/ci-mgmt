@@ -29,6 +29,7 @@
     "gitlab",
     "hcloud",
     "http",
+    "ise",
     "kafka",
     "keycloak",
     "kong",
