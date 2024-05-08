@@ -94,7 +94,9 @@
       name: Check for missing config
       run: |
         if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
-        echo "${{ env.MISSING_CONFIG }}"
+        cat <<EOF
+        ${{ env.MISSING_CONFIG }}
+        EOF
         echo 'Please add a description for each of these options to `README.md`.'
         echo 'Details about them can be found in either the upstream docs or `schema.json`.'
         exit 1
