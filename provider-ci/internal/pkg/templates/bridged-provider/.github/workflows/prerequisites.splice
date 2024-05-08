@@ -91,19 +91,14 @@
         } >> "$GITHUB_ENV"
 
     - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-      name: Comment on PR with Details of Configuration check
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        comment_tag: configurationCheck
-        message: >+
-          ### Is README.md missing any configuration options?
-
-          ${{ env.MISSING_CONFIG || 'No missing config!' }}
-
-
-          ${{ env.MISSING_CONFIG && 'Please add a description for each of these options to `README.md`.' }}
-          ${{ env.MISSING_CONFIG && 'Details about them can be found in either the upstream docs or `schema.json`.' }}
+      name: Check for missing config
+      run: |
+        if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
+        echo "${{ env.MISSING_CONFIG }}"
+        echo 'Please add a description for each of these options to `README.md`.'
+        echo 'Details about them can be found in either the upstream docs or `schema.json`.'
+        exit 1
+        fi
 #{{- end }}#
 
     - name: Tar provider binaries
