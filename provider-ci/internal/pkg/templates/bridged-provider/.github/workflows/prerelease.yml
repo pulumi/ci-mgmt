@@ -116,6 +116,43 @@ jobs:
       if: failure()
       name: Send Publish Failure To Slack
       uses: #{{ .Config.actionVersions.slackNotification }}#
+#{{- if .Config.publish.goSdk.usePush }}#
+  publish_go_sdk:
+    name: publish_go_sdk
+    needs: publish_sdk
+    runs-on: #{{ .Config.runner.default }}#
+    steps:
+    - name: Checkout Repo
+      uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
+    - name: Install pulumictl
+      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      with:
+        tag: #{{ .Config.actionVersions.pulumictlTag }}#
+        repo: pulumi/pulumictl
+    - id: version
+      uses: pulumi/provider-version-action@v1
+    - name: Download Go SDK
+      uses: actions/download-artifact@v4
+      with:
+        name: go-sdk.tar.gz
+        path: ${{ github.workspace }}/sdk/
+    - name: Uncompress Go SDK
+      run: tar -zxf ${{ github.workspace }}/sdk/go.tar.gz -C
+        ${{ github.workspace }}/sdk/go
+      shell: bash
+    - uses: pulumi/publish-go-sdk-action@v1
+      with:
+        repository: #{{ .Config.publish.goSdk.repository }}#
+        base-ref: #{{ .Config.publish.goSdk.baseRef }}#
+        source: #{{ .Config.publish.goSdk.source }}#
+        path: #{{ .Config.publish.goSdk.path }}#
+        version: ${{ steps.version.outputs.version }}
+        additive: #{{ .Config.publish.goSdk.additive }}#
+#{{- end }}#
   test:
     name: test
     needs: build_sdk
