@@ -91,16 +91,16 @@ jobs:
       run: echo commit-hash=$(git rev-parse HEAD) >> "$GITHUB_OUTPUT"
       working-directory: aws-cloudformation-user-guide
     - name: Commit changes
-      run: >
+      run: >-
         git add sdk
 
         git commit -m "Regenerating SDKs based on aws-cloudformation-user-guide @ ${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"
 
         git add .
 
-        git commit -m "Regenerating based on aws-cloudformation-user-guide @ ${{ steps.vars.outputs.commit-hash }}"
+        git commit -m "Regenerating based on aws-cloudformation-user-guide @ ${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"
 
-        git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }} || echo "ignore commit failure, may be empty"
+        git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}
     - name: Create PR
       id: create-pr
       uses: repo-sync/pull-request@v2.6.2

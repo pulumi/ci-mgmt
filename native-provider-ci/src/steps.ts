@@ -102,9 +102,8 @@ export function CommitAutomatedSDKUpdates(provider: string): Step {
       "git add sdk\n" +
       `git commit -m "Regenerating SDKs based on ${dir} @ \${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"\n` +
       "git add .\n" +
-      `git commit -m "Regenerating based on ${dir} @ \${{ steps.vars.outputs.commit-hash }}"\n` +
-      "git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}" +
-      ` || echo "ignore commit failure, may be empty"\n`,
+      `git commit -m "Regenerating based on ${dir} @ \${{ steps.vars.outputs.commit-hash }}" || echo "ignore commit failure, may be empty"\n` +
+      "git push origin generate-sdk/${{ github.run_id }}-${{ github.run_number }}",
   };
 }
 
