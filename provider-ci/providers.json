@@ -37,6 +37,7 @@
     "linode",
     "local",
     "mailgun",
+    "meraki",
     "minio",
     "mongodbatlas",
     "mysql",
