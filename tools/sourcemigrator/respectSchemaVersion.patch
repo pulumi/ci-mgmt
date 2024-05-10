@@ -1,0 +1,91 @@
+@@
+// JS: Respect schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.JavaScriptInfo{
+     ...,
++    RespectSchemaVersion: true,
+ }
+
+@@
+// JS: Don't duplicate schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.JavaScriptInfo{
+     ...,
+     RespectSchemaVersion: true,
+-    RespectSchemaVersion: true,
+ }
+
+@@
+// Py: Respect schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.PythonInfo{
++    RespectSchemaVersion: true,
+     ...,
+ }
+
+@@
+// Py: Don't duplicate schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.PythonInfo{
+     RespectSchemaVersion: true,
+-    RespectSchemaVersion: true,
+     ...,
+ }
+
+@@
+// Go: Respect schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.GolangInfo{
+     ...,
++    RespectSchemaVersion: true,
+ }
+
+@@
+// Go: Don't duplicate schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.GolangInfo{
+     ...,
+     RespectSchemaVersion: true,
+-    RespectSchemaVersion: true,
+ }
+
+@@
+// CSharp: Respect schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.CSharpInfo{
++    RespectSchemaVersion: true,
+     ...,
+ }
+
+@@
+// CSharp: Don't duplicate schema version
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.CSharpInfo{
+     RespectSchemaVersion: true,
+-    RespectSchemaVersion: true,
+     ...,
+ }
