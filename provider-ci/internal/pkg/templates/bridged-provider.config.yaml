@@ -97,11 +97,16 @@ publish:
   sdk: all
   goSdk:
     # Set to `true` to use the below configuration to push a new commit somewhere else.
-    usePush: false
+    usePush: true
     # By default we'll push back to its own repository as a standalone, tagged commit.
     repository: ${{ github.repository }}
     baseRef: ${{ github.sha }}
     source: sdk
     path: sdk
     additive: false
-worktreeAllowedChanges: ''
+worktreeAllowedChanges: |-
+  sdk/**/pulumi-plugin.json
+  sdk/dotnet/Pulumi.*.csproj
+  sdk/go/*/internal/pulumiUtilities.go
+  sdk/nodejs/package.json
+  sdk/python/pyproject.toml
