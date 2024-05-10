@@ -77,7 +77,7 @@ function respectSchemaVersion(): SourceMigration {
         shell.exec(`gofumpt -w ./provider/resources.go`);
         // Check if we've made changes
         const gitStatus = shell.exec(`git status --porcelain`).stdout;
-        if (gitStatus.trim() !== "") {
+        if (gitStatus.includes("provider/resources.go")) {
           shell.exec(`make tfgen build`);
         }
       } finally {
