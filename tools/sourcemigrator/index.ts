@@ -61,6 +61,17 @@ interface MigrateContext {
 //     }
 // }
 
+function checkError(res: shell.ShellString): shell.ShellString {
+  if (res.code !== 0) {
+    throw new Error(`Command failed: ${res.stderr}`);
+  }
+  return res;
+}
+
+function run(command: string): shell.ShellString {
+  return checkError(shell.exec(command));
+}
+
 function respectSchemaVersion(): SourceMigration {
   return {
     name: "Respect Schema Version",
@@ -69,16 +80,17 @@ function respectSchemaVersion(): SourceMigration {
       shell.pushd(context.dir);
       try {
         // Apply patch
-        shell.exec(
+        run(
           `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
         );
         // Format the code - twice to ensure that the code is formatted correctly
-        shell.exec(`gofumpt -w ./provider/resources.go`);
-        shell.exec(`gofumpt -w ./provider/resources.go`);
+        run(`go install mvdan.cc/gofumpt@latest`);
+        run(`gofumpt -w ./provider/resources.go`);
+        run(`gofumpt -w ./provider/resources.go`);
         // Check if we've made changes
-        const gitStatus = shell.exec(`git status --porcelain`).stdout;
+        const gitStatus = run(`git status --porcelain`).stdout;
         if (gitStatus.includes("provider/resources.go")) {
-          shell.exec(`make tfgen build`);
+          run(`make tfgen build`);
         }
       } finally {
         shell.popd();
