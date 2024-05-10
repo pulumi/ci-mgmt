@@ -98,6 +98,7 @@ jobs:
       uses: #{{ .Config.actionVersions.goReleaser }}#
       env:
         GORELEASER_CURRENT_TAG: v${{ steps.version.outputs.version }}
+        PROVIDER_VERSION: ${{ steps.version.outputs.version }}
       with:
         args: -p #{{ .Config.parallel }}# release --rm-dist --timeout #{{ .Config.timeout }}#m0s
         version: latest
