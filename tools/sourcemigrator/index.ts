@@ -9,21 +9,18 @@
 //
 // Source code migrations should be very specifically targeted and idempotent.
 
-import * as child from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as child from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as shell from "shelljs";
 
 interface SourceMigration {
-    name: string;
-    execute: (context: MigrateContext) => MigrateResult;
+  name: string;
+  execute: (context: MigrateContext) => Promise<any>;
 }
 
 interface MigrateContext {
-    dir: string;
-}
-
-interface MigrateResult {
-    filesEdited: Number;
+  dir: string;
 }
 
 // Example migration (no longer in use):
@@ -64,29 +61,65 @@ interface MigrateResult {
 //     }
 // }
 
-function runMigrations(context: MigrateContext, migrations: SourceMigration[]) {
-    migrations.forEach(m => {
-        let result = m.execute(context);
-        if (result.filesEdited == 0) {
-            console.log(m.name, "no-op - source code already up to date");
-        } else {
-            console.log(m.name, result.filesEdited + " file(s) edited");
+function checkError(res: shell.ShellString): shell.ShellString {
+  if (res.code !== 0) {
+    throw new Error(`Command failed: ${res.stderr}`);
+  }
+  return res;
+}
+
+function run(command: string): shell.ShellString {
+  return checkError(shell.exec(command));
+}
+
+function respectSchemaVersion(): SourceMigration {
+  return {
+    name: "Respect Schema Version",
+    async execute(context) {
+      const patchPath = fs.realpathSync("respectSchemaVersion.patch");
+      shell.pushd(context.dir);
+      try {
+        // Apply patch
+        run(
+          `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
+        );
+        // Format the code - twice to ensure that the code is formatted correctly
+        run(`go install mvdan.cc/gofumpt@latest`);
+        run(`gofumpt -w ./provider/resources.go`);
+        run(`gofumpt -w ./provider/resources.go`);
+        // Check if we've made changes
+        const gitStatus = run(`git status --porcelain`).stdout;
+        if (gitStatus.includes("provider/resources.go")) {
+          run(`make tfgen build`);
         }
-    });
+      } finally {
+        shell.popd();
+      }
+    },
+  };
+}
+
+async function runMigrations(
+  context: MigrateContext,
+  migrations: SourceMigration[]
+) {
+  for (let m of migrations) {
+    console.log("Running migration", m.name);
+    await m.execute(context);
+  }
 }
 
 function allMigrations(): SourceMigration[] {
-    return [
-    ];
+  return [respectSchemaVersion()];
 }
 
-function main() {
-    let dir = process.argv[2];
-    if (dir === undefined) {
-        console.log("Usage: npx ts-node index.ts DIR");
-        return
-    }
-    runMigrations({dir: dir}, allMigrations());
+async function main() {
+  let dir = process.argv[2];
+  if (dir === undefined) {
+    console.log("Usage: npx ts-node index.ts DIR");
+    return;
+  }
+  await runMigrations({ dir: dir }, allMigrations());
 }
 
-main();
+main().catch((e) => console.error(e));

@@ -153,6 +153,11 @@ jobs:
         path: #{{ .Config.publish.goSdk.path }}#
         version: ${{ steps.version.outputs.version }}
         additive: #{{ .Config.publish.goSdk.additive }}#
+        # Avoid including other language SDKs & artifacts in the commit
+        files: |
+          go.*
+          go/**
+          !*.tar.gz
 #{{- end }}#
   test:
     name: test
