@@ -74,28 +74,32 @@ To add a new provider:
    docker: true # Whether the provider's tests use Docker to run. If set to true, a file `testing/docker-compose.yml` must be present in the provider repository.
    setup-script: testing/setup.sh # Path to a script that's used for testing bootstraps
    ```
+
    `ci-mgmt` will read your provider's `.ci-mgmt.yaml` and generate the standard set of CI files from templates.
 
-1. Add your provider to `provider-ci/providers.json` in alphabetical order. This ensures your provider receives regular 
+1. Add your provider to `provider-ci/providers.json` in alphabetical order. This ensures your provider receives regular
    updates and maintenance.
 
-1. Commit the changes to `provider-ci/providers.json` and open a pull request.
+1. Add your provider to `.github/ISSUE_TEMPLATE/0-ecosystem-providers.md` to ensure manual rollouts track your provider.
 
-1. To receive a pull request with your new config files, you can run the 
+1. Commit the changes and open a pull request.
+
+1. To receive a pull request with your new config files, you can run the
    [Update Workflows, Single Bridged Provider](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-single-bridged-provider.yml)
-   workflow run, using your provider name as the input. 
+   workflow run, using your provider name as the input.
    Another option is to wait for the nightly cronjob to send this pull request automatically.
 
-1. If you would like to manually generate the configuration to get started right away, you can do so in your provider 
+1. If you would like to manually generate the configuration to get started right away, you can do so in your provider
    repository root:
 
    ```bash
    go run github.com/pulumi/ci-mgmt/provider-ci@master generate \
-	--name pulumi/pulumi-$(PROVIDER_NAME) \
-	--out . \
-	--template bridged-provider \
-	--config .ci-mgmt.yaml
+      --name pulumi/pulumi-$(PROVIDER_NAME) \
+      --out . \
+      --template bridged-provider \
+      --config .ci-mgmt.yaml
    ```
+
    The generated files will be writen to your current directory.
 
 ## Updating All Bridged Providers
