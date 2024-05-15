@@ -15,6 +15,7 @@ export function CheckoutRepoStep(): Step {
 
 export function SetProviderVersionStep(): Step {
   return {
+    id: "version",
     name: "Set Provider Version",
     uses: action.providerVersion,
     with: {
@@ -481,6 +482,14 @@ export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
     uses: action.gitStatusCheck,
+    with: {
+      "allowed-changes": `\
+sdk/**/pulumi-plugin.json
+sdk/dotnet/Pulumi.*.csproj
+sdk/go/*/internal/pulumiUtilities.go
+sdk/nodejs/package.json
+sdk/python/pyproject.toml`,
+    },
   };
 }
 
@@ -1027,6 +1036,25 @@ export function TagSDKTag(): Step {
   return {
     name: "Add SDK version tag",
     run: "git tag sdk/v$(pulumictl get version --language generic) && git push origin sdk/v$(pulumictl get version --language generic)",
+  };
+}
+
+export function PublishGoSdk(): Step {
+  return {
+    name: "Publish Go SDK",
+    uses: "pulumi/publish-go-sdk-action@v1",
+    with: {
+      repository: "${{ github.repository }}",
+      "base-ref": "${{ github.sha }}",
+      source: "sdk",
+      path: "sdk",
+      version: "${{ steps.version.outputs.version }}",
+      additive: false,
+      files: `\
+go.*
+go/**
+!*.tar.gz`,
+    },
   };
 }
 

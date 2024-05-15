@@ -289,7 +289,7 @@ export function ReleaseWorkflow(
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
-      tag_sdk: new TagSDKJob("tag_sdk"),
+      pubish_go_sdk: new PublishGoSdkJob(),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
   };
@@ -878,6 +878,19 @@ export class TagSDKJob implements NormalJob {
     this.name = name;
     Object.assign(this, { name });
   }
+}
+
+export class PublishGoSdkJob implements NormalJob {
+  "runs-on" = "ubuntu-latest";
+  name = "publish-go-sdk";
+  needs = "publish-sdk";
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.SetProviderVersionStep(),
+    steps.DownloadSpecificSDKStep("go"),
+    steps.UnzipSpecificSDKStep("go"),
+    steps.PublishGoSdk(),
+  ];
 }
 
 export class DocsBuildDispatchJob implements NormalJob {
