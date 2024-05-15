@@ -27,6 +27,10 @@ on:
         description: "Whether to skip closing PRs"
         type: boolean
         default: false
+    outputs:
+      pull_request_created:
+        value: ${{ jobs.update_workflows.outputs.pull_request_created }}
+        description: "Whether a PR was created"
 
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
@@ -146,3 +150,5 @@ jobs:
       # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
+    outputs:
+      pull_request_created: ${{ steps.create-pr.outputs.pull-request-operation == 'created' }}

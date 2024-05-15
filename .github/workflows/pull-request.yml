@@ -62,6 +62,7 @@ jobs:
     timeout-minutes: 240
     runs-on: ubuntu-latest
     needs: deploy
+    if: needs.deploy.outputs.pull_request_created == 'true'
     env:
       GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
     strategy:
