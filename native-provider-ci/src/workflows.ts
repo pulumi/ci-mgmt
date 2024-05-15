@@ -763,7 +763,6 @@ export class PublishPrereleaseJob implements NormalJob {
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
-      steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
         `-p ${opts.parallel} -f .goreleaser.prerelease.yml --clean --skip=validate --timeout ${opts.timeout}m0s`
       ),
@@ -794,7 +793,6 @@ export class PublishJob implements NormalJob {
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
       steps.ConfigureAwsCredentialsForPublish(),
-      steps.SetPreReleaseVersion(),
       steps.RunGoReleaserWithArgs(
         `-p ${opts.parallel} release --clean --timeout ${opts.timeout}m0s`
       ),
@@ -934,7 +932,6 @@ export class Arm2PulumiRelease implements NormalJob {
     steps.CheckoutTagsStep(),
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
-    steps.SetVersionIfAvailable(),
     steps.RunGoReleaserWithArgs(
       "-p 1 -f .goreleaser.arm2pulumi.yml release --clean --timeout 60m0s"
     ),

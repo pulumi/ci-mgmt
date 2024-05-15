@@ -1006,25 +1006,13 @@ export function SetPRAutoMerge(provider?: string): Step {
   };
 }
 
-export function SetPreReleaseVersion(): Step {
-  return {
-    name: "Set PreRelease Version",
-    run: `echo "GORELEASER_CURRENT_TAG=v$(pulumictl get version --language generic)" >> $GITHUB_ENV`,
-  };
-}
-
-export function SetVersionIfAvailable(): Step {
-  return {
-    name: "Set Version if Parameter available",
-    if: "github.event.inputs.version != ''",
-    run: `echo "GORELEASER_CURRENT_TAG=v\${{ github.event.inputs.message }}" >> $GITHUB_ENV`,
-  };
-}
-
 export function RunGoReleaserWithArgs(args?: string): Step {
   return {
     name: "Run GoReleaser",
     uses: action.goReleaser,
+    env: {
+      GORELEASER_CURRENT_TAG: "v${{ steps.version.outputs.version }}",
+    },
     with: {
       args: `${args}`,
       version: "latest",
