@@ -57,11 +57,6 @@ jobs:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
-      - name: Unshallow clone for tags
-        run: |
-          DIR="$PWD/pulumi-${{ inputs.provider_name }}"
-          cd "$DIR"
-          git fetch --prune --unshallow --tags
       - name: Initialize submodule in pulumi-${{ inputs.provider_name }}
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
