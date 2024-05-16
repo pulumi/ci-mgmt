@@ -53,8 +53,6 @@ jobs:
       uses: pulumi/provider-version-action@v1
       with:
         set-env: PROVIDER_VERSION
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -160,8 +158,6 @@ jobs:
       uses: pulumi/provider-version-action@v1
       with:
         set-env: PROVIDER_VERSION
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -264,8 +260,6 @@ jobs:
       uses: pulumi/provider-version-action@v1
       with:
         set-env: PROVIDER_VERSION
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -373,8 +367,6 @@ jobs:
       uses: pulumi/provider-version-action@v1
       with:
         set-env: PROVIDER_VERSION
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -439,8 +431,6 @@ jobs:
         path: ci-scripts
         repository: pulumi/scripts
     - run: echo "ci-scripts" >> .git/info/exclude
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
@@ -518,8 +508,6 @@ jobs:
       uses: pulumi/provider-version-action@v1
       with:
         set-env: PROVIDER_VERSION
-    - name: Unshallow clone for tags
-      run: git fetch --prune --unshallow --tags
     - name: Install Go
       uses: actions/setup-go@v5
       with:
