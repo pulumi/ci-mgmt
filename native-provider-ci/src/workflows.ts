@@ -453,7 +453,6 @@ export class BuildSdkJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
@@ -509,7 +508,6 @@ export class PrerequisitesJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
@@ -587,7 +585,6 @@ export class TestsJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
@@ -757,7 +754,6 @@ export class PublishPrereleaseJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
@@ -787,7 +783,6 @@ export class PublishJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
@@ -814,7 +809,6 @@ export class PublishSDKJob implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
       ...steps.CheckoutScriptsRepoSteps(), // Required for RunPublishSDK
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
@@ -847,7 +841,6 @@ export class PublishJavaSDKJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(),
@@ -908,7 +901,6 @@ export class Cf2PulumiRelease implements NormalJob {
   steps = [
     steps.CheckoutRepoStep(),
     steps.SetProviderVersionStep(),
-    steps.CheckoutTagsStep(),
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
     steps.RunGoReleaserWithArgs(
@@ -929,7 +921,6 @@ export class Arm2PulumiRelease implements NormalJob {
   steps = [
     steps.CheckoutRepoStep(),
     steps.SetProviderVersionStep(),
-    steps.CheckoutTagsStep(),
     steps.InstallPulumiCtl(),
     steps.InstallGo(goVersion),
     steps.RunGoReleaserWithArgs(
@@ -978,7 +969,6 @@ export class WeeklyPulumiUpdate implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
-      steps.CheckoutTagsStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),
@@ -1007,7 +997,6 @@ export class NightlySdkGeneration implements NormalJob {
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
       // Pass the provider here as an option so that it can be skipped if not needed
-      steps.CheckoutTagsStep(opts.provider),
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion),

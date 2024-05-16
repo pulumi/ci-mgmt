@@ -157,17 +157,6 @@ export function CheckoutScriptsRepoSteps(): Step[] {
   ];
 }
 
-export function CheckoutTagsStep(skipProvider?: string): Step {
-  // If a provider is not passed at all then this step will not be skipped.
-  if (skipProvider === "azure-native") {
-    return {};
-  }
-  return {
-    name: "Unshallow clone for tags",
-    run: "git fetch --prune --unshallow --tags",
-  };
-}
-
 export function GoogleAuth(requiresGcp?: boolean): Step {
   if (requiresGcp) {
     return {
