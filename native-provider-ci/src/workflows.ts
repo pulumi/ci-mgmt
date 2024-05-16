@@ -253,6 +253,7 @@ export function PrereleaseWorkflow(
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
+      pubish_go_sdk: new PublishGoSdkJob(),
     },
   };
   if (opts.provider === "kubernetes") {
