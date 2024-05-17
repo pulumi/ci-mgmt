@@ -324,7 +324,6 @@ export function InstallSchemaChecker(provider: string): Step {
     uses: action.installGhRelease,
     with: {
       repo: "pulumi/schema-tools",
-      tag: "master",
     },
   };
 }

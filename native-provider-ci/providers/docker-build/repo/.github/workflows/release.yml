@@ -77,7 +77,6 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
-        tag: master
     - name: Build codegen binaries
       run: make codegen
     - name: Build Schema

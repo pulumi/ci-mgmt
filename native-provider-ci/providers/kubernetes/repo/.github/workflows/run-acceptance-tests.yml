@@ -94,7 +94,6 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
-        tag: master
     - name: Build K8sgen
       run: make k8sgen
     - name: Prepare OpenAPI file

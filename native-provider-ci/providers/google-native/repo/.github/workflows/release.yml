@@ -69,7 +69,6 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
-        tag: master
     - name: Initialize submodules
       run: make init_submodules
     - name: Build codegen binaries
