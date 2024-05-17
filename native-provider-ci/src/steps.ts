@@ -324,6 +324,7 @@ export function InstallSchemaChecker(provider: string): Step {
     uses: action.installGhRelease,
     with: {
       repo: "pulumi/schema-tools",
+      tag: "master",
     },
   };
 }
@@ -553,12 +554,10 @@ export function CheckSchemaChanges(provider: string): Step {
     if: "github.event_name == 'pull_request'",
     name: "Check Schema is Valid",
     run:
+      "git show ${{ github.event.repository.default_branch }}:provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{ runner.temp }}/schema.json;\n" +
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
-      "schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+      "schema-tools compare -p ${{ env.PROVIDER }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json -r file:${{ runner.temp }}/schema.json;\n" +
       "echo 'EOF' >> $GITHUB_ENV",
-    env: {
-      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
-    },
   };
 }
 
