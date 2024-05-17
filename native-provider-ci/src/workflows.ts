@@ -253,7 +253,7 @@ export function PrereleaseWorkflow(
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
-      pubish_go_sdk: new PublishGoSdkJob(),
+      publish_go_sdk: new PublishGoSdkJob(),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -290,7 +290,7 @@ export function ReleaseWorkflow(
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
-      pubish_go_sdk: new PublishGoSdkJob(),
+      publish_go_sdk: new PublishGoSdkJob(),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
   };
@@ -869,7 +869,7 @@ export class PublishGoSdkJob implements NormalJob {
 
 export class DocsBuildDispatchJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  needs = "tag_sdk";
+  needs = "publish_go_sdk";
   steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()];
   name: string;
 

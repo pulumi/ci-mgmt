@@ -18,8 +18,14 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.11.0
         with:
           repo: pulumi/pulumictl
+      - name: Install actionlint
+        uses: jaxxstorm/action-install-gh-release@v1.11.0
+        with:
+          repo: rhysd/actionlint
       - name: lint providers
         run: cd provider-ci && make lint-providers
+      - name: lint native providers
+        run: cd native-provider-ci && make lint
       - name: lint workflows
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
