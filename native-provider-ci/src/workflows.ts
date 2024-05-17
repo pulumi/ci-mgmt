@@ -869,7 +869,7 @@ export class PublishGoSdkJob implements NormalJob {
 
 export class DocsBuildDispatchJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  needs = "tag_sdk";
+  needs = "pubish_go_sdk";
   steps = [steps.InstallPulumiCtl(), steps.DispatchDocsBuildEvent()];
   name: string;
 
