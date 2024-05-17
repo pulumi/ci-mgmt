@@ -28,3 +28,6 @@ endif
 discovery:
 	npm run discovery
 	npm run format
+
+lint:
+	find providers -type f -name '*.yml' -not -name ".goreleaser.*" | xargs actionlint -ignore SC2086:info -ignore SC2129:style -ignore SC2046:warning -ignore "unexpected key" -ignore SC2044:warning -ignore "always evaluated to true" -ignore SC2088:
