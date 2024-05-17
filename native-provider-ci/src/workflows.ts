@@ -849,33 +849,15 @@ export class PublishJavaSDKJob implements NormalJob {
       steps.InstallGradle("7.6"),
       steps.DownloadSpecificSDKStep("java"),
       steps.UnzipSpecificSDKStep("java"),
-      steps.SetPackageVersionToEnv(),
       steps.RunPublishJavaSDK(),
     ];
-  }
-}
-
-export class TagSDKJob implements NormalJob {
-  "runs-on" = "ubuntu-latest";
-  needs = "publish_sdk";
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.SetProviderVersionStep(),
-    steps.InstallPulumiCtl(),
-    steps.TagSDKTag(),
-  ];
-  name: string;
-
-  constructor(name: string) {
-    this.name = name;
-    Object.assign(this, { name });
   }
 }
 
 export class PublishGoSdkJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   name = "publish-go-sdk";
-  needs = "publish-sdk";
+  needs = "publish_sdk";
   steps = [
     steps.CheckoutRepoStep(),
     steps.SetProviderVersionStep(),

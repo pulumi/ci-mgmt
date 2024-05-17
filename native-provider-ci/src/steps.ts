@@ -488,14 +488,6 @@ export function SetNugetSource(): Step {
   };
 }
 
-export function SetPackageVersionToEnv(): Step {
-  return {
-    // This is required for the Java Provider Build + Publish Steps
-    name: "Set PACKAGE_VERSION to Env",
-    run: 'echo "PACKAGE_VERSION=$(pulumictl get version --language generic)" >> $GITHUB_ENV',
-  };
-}
-
 export function RunTests(provider: string, name: string): Step {
   if (provider === "kubernetes") {
     const shortMode = name === "run-acceptance-tests" ? " -short" : "";
@@ -1009,13 +1001,6 @@ export function RunGoReleaserWithArgs(args?: string): Step {
   };
 }
 
-export function TagSDKTag(): Step {
-  return {
-    name: "Add SDK version tag",
-    run: "git tag sdk/v$(pulumictl get version --language generic) && git push origin sdk/v$(pulumictl get version --language generic)",
-  };
-}
-
 export function PublishGoSdk(): Step {
   return {
     name: "Publish Go SDK",
@@ -1090,6 +1075,9 @@ export function RunPublishJavaSDK(): Step {
   return {
     name: "Publish Java SDK",
     uses: action.gradleBuildAction,
+    env: {
+      PACKAGE_VERSION: "${{ env.PROVIDER_VERSION }}",
+    },
     with: {
       arguments: "publishToSonatype closeAndReleaseSonatypeStagingRepository",
       "build-root-directory": "./sdk/java",
@@ -1107,9 +1095,10 @@ export function Porcelain(): Step {
 export function ChocolateyPackageDeployment(): Step {
   return {
     name: "Chocolatey Package Deployment",
-    run:
-      "CURRENT_TAG=v$(pulumictl get version --language generic -o)\n" +
-      "pulumictl create choco-deploy -a cf2pulumi ${CURRENT_TAG}",
+    env: {
+      CURRENT_TAG: "${{ env.PROVIDER_VERSION }}",
+    },
+    run: "pulumictl create choco-deploy -a cf2pulumi ${CURRENT_TAG}",
   };
 }
 
