@@ -87,9 +87,10 @@ jobs:
     - if: github.event_name == 'pull_request'
       name: Check Schema is Valid
       run: >-
-        git show ${{ github.event.repository.default_branch
-        }}:provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{
-        runner.temp }}/schema.json;
+        git show -m -p -- :provider/cmd/pulumi-resource-${{ env.PROVIDER
+        }}/schema.json | git apply -3 --reverse --allow-empty && git reset .;
+
+        cp provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{ runner.temp }}/schema.json && git checkout .;
 
         echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV
 

@@ -553,7 +553,8 @@ export function CheckSchemaChanges(provider: string): Step {
     if: "github.event_name == 'pull_request'",
     name: "Check Schema is Valid",
     run:
-      "git show ${{ github.event.repository.default_branch }}:provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{ runner.temp }}/schema.json;\n" +
+      "git show -m -p -- :provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json | git apply -3 --reverse --allow-empty && git reset .;\n" +
+      "cp provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{ runner.temp }}/schema.json && git checkout .;\n" +
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
       "schema-tools compare -p ${{ env.PROVIDER }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json -r file:${{ runner.temp }}/schema.json;\n" +
       "echo 'EOF' >> $GITHUB_ENV",
