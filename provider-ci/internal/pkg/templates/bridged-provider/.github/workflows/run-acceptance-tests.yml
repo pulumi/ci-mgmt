@@ -14,16 +14,9 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     name: build_sdk
     needs: prerequisites
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
-    steps:
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        ref: ${{ env.PR_COMMIT_SHA }}
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
-        #{{- end }}#
-#{{ .Splices.build_sdk }}#
+    uses: ./.github/workflows/build_sdk.yml
+    secrets: inherit
+
   comment-notification:
     if: github.event_name == 'repository_dispatch'
     name: comment-notification
