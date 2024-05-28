@@ -919,6 +919,8 @@ export function UpdatePulumi(): Step {
       "git config --local user.name 'pulumi-bot'\n" +
       "git checkout -b update-pulumi/${{ github.run_id }}-${{ github.run_number }}\n" +
       "for MODFILE in $(find . -name go.mod); do pushd $(dirname $MODFILE); go get github.com/pulumi/pulumi/pkg/v3 github.com/pulumi/pulumi/sdk/v3; go mod tidy; popd; done\n" +
+      // Fetch latest release version of Pulumi, remove the leading 'v' and store it to the `.pulumi.version` file.
+      "gh repo view pulumi/pulumi --json latestRelease --jq .latestRelease.tagName | sed 's/^v//' > .pulumi.version\n" +
       "git update-index -q --refresh\n" +
       'if ! git diff-files --quiet; then echo changes=1 >> "$GITHUB_OUTPUT"; fi',
   };
