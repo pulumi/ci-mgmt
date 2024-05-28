@@ -12,7 +12,6 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,7 +24,7 @@ type GenerateOpts struct {
 	RepositoryName string // e.g.: pulumi/pulumi-aws
 	OutDir         string
 	TemplateName   string // path inside templates, e.g.: bridged-provider
-	ConfigPath     string // .yaml file containing template config
+	Config         Config // .yaml file containing template config
 }
 
 // Data exposed to text/template that can be referenced in the template code.
@@ -53,36 +52,7 @@ func GeneratePackage(opts GenerateOpts) error {
 		return fmt.Errorf("template %s not found", opts.TemplateName)
 	}
 
-	var config map[string]interface{}
-
-	configBytes, err := templateFS.ReadFile(filepath.Join("templates", opts.TemplateName+".config.yaml"))
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return fmt.Errorf("error reading embedded config file for template %s: %w", opts.TemplateName, err)
-		}
-	} else {
-		err = yaml.Unmarshal(configBytes, &config)
-		if err != nil {
-			return fmt.Errorf("error parsing embedded config file for template %s: %w", opts.TemplateName, err)
-		}
-	}
-
-	if opts.ConfigPath != "" {
-		localConfigBytes, err := os.ReadFile(opts.ConfigPath)
-		if err != nil {
-			return fmt.Errorf("error reading config file %s: %w", opts.ConfigPath, err)
-		}
-
-		var localConfig map[string]interface{}
-		err = yaml.Unmarshal(localConfigBytes, &localConfig)
-		if err != nil {
-			return err
-		}
-		err = mergo.Merge(&config, &localConfig, mergo.WithOverride)
-		if err != nil {
-			return err
-		}
-	}
+	config := opts.Config
 
 	projName := strings.TrimPrefix(opts.RepositoryName, "pulumi/")
 
@@ -94,6 +64,7 @@ func GeneratePackage(opts GenerateOpts) error {
 
 	templateDir := filepath.Join("templates", opts.TemplateName)
 
+	var err error
 	ctx.Splices, err = collectSplices(templateDir, ctx)
 	if err != nil {
 		return err
