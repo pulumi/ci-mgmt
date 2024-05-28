@@ -87,6 +87,10 @@ jobs:
   prerequisites:
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
+    with:
+      default_branch: ${{ github.event.repository.default_branch }}
+      is_pr: ${{ github.event_name == 'pull_request' }}
+      is_automated: ${{ github.actor == 'dependabot[bot]' }}
 
   publish:
     name: publish

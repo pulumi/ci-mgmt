@@ -2,6 +2,13 @@ name: "Prerequisites"
 
 on:
   workflow_call:
+    inputs:
+      is_pr:
+        type: boolean
+      is_automated:
+        type: boolean
+      default_branch:
+        type: string
 
 jobs:
   prerequisites:
@@ -37,7 +44,7 @@ jobs:
       uses: pulumi/actions@v5
       with:
         pulumi-version: "^3"
-    - if: github.event_name == 'pull_request'
+    - if: inputs.is_pr
       name: Install Schema Tools
       uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
@@ -52,16 +59,16 @@ jobs:
       run: make provider_no_deps
     - name: Unit-test provider code
       run: make test_provider
-    - if: github.event_name == 'pull_request'
+    - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         {
           echo "SCHEMA_CHANGES<<$EOF";
-          schema-tools compare -p cloudflare -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-cloudflare/schema.json;
+          schema-tools compare -p cloudflare -o ${{ inputs.default_branch }} -n --local-path=provider/cmd/pulumi-resource-cloudflare/schema.json;
           echo "$EOF";
         } >> "$GITHUB_ENV"
-    - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+    - if: inputs.is_pr && inputs.is_automated == false
       name: Comment on PR with Details of Schema Check
       uses: thollander/actions-comment-pull-request@v2
       with:
@@ -83,7 +90,7 @@ jobs:
         name: cloudflare-provider.tar.gz
         path: ${{ github.workspace }}/bin/provider.tar.gz
         retention-days: 30
-    - if: failure() && github.event_name == 'push'
+    - if: failure() && inputs.is_pr
       name: Notify Slack
       uses: 8398a7/action-slack@v3
       with:
