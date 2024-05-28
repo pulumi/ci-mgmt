@@ -1,3 +1,11 @@
+name: "Prerequisites"
+
+on:
+  workflow_call:
+
+jobs:
+  prerequisites:
+    name: prerequisites
     runs-on: #{{ .Config.runner.prerequisites }}#
     steps:
     - name: Checkout Repo

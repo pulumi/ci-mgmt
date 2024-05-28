@@ -44,8 +44,8 @@ jobs:
     uses: ./.github/workflows/license.yml
     secrets: inherit
   prerequisites:
-    name: prerequisites
-#{{ .Splices.prerequisites }}#
+    uses: ./.github/workflows/prerequisites.yml
+    secrets: inherit
 
   publish:
     name: publish

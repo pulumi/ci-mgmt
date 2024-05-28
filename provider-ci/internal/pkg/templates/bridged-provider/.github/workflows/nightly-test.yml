@@ -17,8 +17,8 @@ jobs:
 #{{- end }}#
 #{{ .Splices.build_sdk }}#
   prerequisites:
-    name: prerequisites
-#{{ .Splices.prerequisites }}#
+    uses: ./.github/workflows/prerequisites.yml
+    secrets: inherit
 
   test:
     name: test
