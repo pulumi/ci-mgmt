@@ -18,9 +18,9 @@
     - name: Prepare upstream code
       run: make upstream
     - name: Install Go
-      uses: actions/setup-go@v5
+      uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: 1.21.x
+        go-version: #{{ .Config.toolVersions.go }}#
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum

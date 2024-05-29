@@ -8,7 +8,12 @@ jobs:
     name: Check for upstream provider upgrades
     runs-on: #{{ .Config.runner.default }}#
     steps:
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
         #{{- if .Config.checkoutSubmodules }}#

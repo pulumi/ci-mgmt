@@ -1,7 +1,12 @@
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Cache examples generation
       uses: actions/cache@v4
       with:

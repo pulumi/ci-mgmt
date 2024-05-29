@@ -130,7 +130,12 @@ jobs:
       with:
         repository: pulumi/examples
         path: p-examples
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:

@@ -75,7 +75,12 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -216,7 +221,12 @@ jobs:
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:

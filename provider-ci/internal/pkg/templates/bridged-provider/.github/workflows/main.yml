@@ -45,7 +45,12 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
         aws-region: us-west-2
         aws-secret-access-key: ${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -108,7 +113,12 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -201,7 +211,12 @@ jobs:
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: #{{ .Config.toolVersions.go }}#
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Install pulumictl
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
