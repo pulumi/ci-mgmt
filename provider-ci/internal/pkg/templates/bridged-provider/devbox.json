@@ -5,11 +5,11 @@
     #{{- end }}#
     "yarn@latest",
     "pulumictl@latest",
-    "go@#{{ trimAll "x" .Config.env.GOVERSION }}#",
-    "nodejs@#{{ trimAll "x" .Config.env.NODEVERSION }}#",
-    "python3@#{{ trimAll "x" .Config.env.PYTHONVERSION }}#",
-    "dotnet-sdk@#{{ splitList "\n" .Config.env.DOTNETVERSION | first | trimAll "x"  }}#",
-    "gradle_7@#{{ trimAll "x" .Config.env.GRADLEVERSION }}#",
+    "go@#{{ trimAll "x" .Config.toolVersions.go }}#",
+    "nodejs@#{{ trimAll "x" .Config.toolVersions.node }}#",
+    "python3@#{{ trimAll "x" .Config.toolVersions.python }}#",
+    "dotnet-sdk@#{{ trimAll "x" .Config.toolVersions.dotnet }}#",
+    "gradle_7@#{{ trimAll "x" .Config.toolVersions.gradle }}#",
     "curl@8"
   ],
   "shell": {

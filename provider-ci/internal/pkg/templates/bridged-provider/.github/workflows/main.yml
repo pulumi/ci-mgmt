@@ -48,7 +48,7 @@ jobs:
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -116,7 +116,7 @@ jobs:
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -214,7 +214,7 @@ jobs:
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -226,26 +226,26 @@ jobs:
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:
-        node-version: ${{ env.NODEVERSION }}
+        node-version: "#{{ .Config.toolVersions.node }}#"
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: #{{ .Config.actionVersions.setupDotNet }}#
       with:
-        dotnet-version: ${{ env.DOTNETVERSION }}
+        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
     - name: Setup Python
       uses: #{{ .Config.actionVersions.setupPython }}#
       with:
-        python-version: ${{ env.PYTHONVERSION }}
+        python-version: "#{{ .Config.toolVersions.python }}#"
     - name: Setup Java
       uses: #{{ .Config.actionVersions.setupJava }}#
       with:
         cache: gradle
         distribution: temurin
-        java-version: ${{ env.JAVAVERSION }}
+        java-version: "#{{ .Config.toolVersions.java }}#"
     - name: Setup Gradle
       uses: #{{ .Config.actionVersions.setupGradle }}#
       with:
-        gradle-version: ${{ env.GRADLEVERSION }}
+        gradle-version: "#{{ .Config.toolVersions.gradle }}#"
     - name: Download provider + tfgen binaries
       uses: #{{ .Config.actionVersions.downloadArtifact }}#
       with:

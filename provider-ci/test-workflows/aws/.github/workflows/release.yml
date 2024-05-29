@@ -3,15 +3,8 @@
 env:
   PROVIDER: aws
   AWS_REGION: us-west-2
-  DOTNETVERSION: |
-      6.0.x
-      3.1.301
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GOVERSION: 1.21.x
-  GRADLEVERSION: "7.6"
-  JAVAVERSION: "11"
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NODEVERSION: 20.x
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -23,7 +16,6 @@ env:
   PULUMI_MISSING_DOCS_ERROR: true
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   PYPI_USERNAME: __token__
-  PYTHONVERSION: 3.11.8
   SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
   SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
   SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
@@ -46,7 +38,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.x
+        go-version: "1.21.x"
         cache-dependency-path: |
           sdk/go.sum
     - name: Cache examples generation
@@ -67,26 +59,26 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ env.NODEVERSION }}
+        node-version: "20.x"
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNETVERSION }}
+        dotnet-version: "6.0.x"
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ env.PYTHONVERSION }}
+        python-version: "3.11.8"
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         cache: gradle
         distribution: temurin
-        java-version: ${{ env.JAVAVERSION }}
+        java-version: "11"
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:
-        gradle-version: ${{ env.GRADLEVERSION }}
+        gradle-version: "7.6"
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v4
       with:
@@ -179,7 +171,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.x
+        go-version: "1.21.x"
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum
@@ -278,7 +270,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.x
+        go-version: "1.21.x"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -414,7 +406,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.x
+        go-version: "1.21.x"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -429,26 +421,26 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ env.NODEVERSION }}
+        node-version: "20.x"
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ env.DOTNETVERSION }}
+        dotnet-version: "6.0.x"
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ env.PYTHONVERSION }}
+        python-version: "3.11.8"
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         cache: gradle
         distribution: temurin
-        java-version: ${{ env.JAVAVERSION }}
+        java-version: "11"
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v3
       with:
-        gradle-version: ${{ env.GRADLEVERSION }}
+        gradle-version: "7.6"
     - name: Download provider + tfgen binaries
       uses: actions/download-artifact@v4
       with:

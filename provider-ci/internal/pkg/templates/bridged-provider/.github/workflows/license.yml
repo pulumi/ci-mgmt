@@ -24,7 +24,7 @@ jobs:
       with:
         cache-dependency-path: |
             sdk/go.sum
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
     - run: make upstream
     - uses: pulumi/license-check-action@main
       with:

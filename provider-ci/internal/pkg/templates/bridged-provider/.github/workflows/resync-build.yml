@@ -31,7 +31,7 @@ jobs:
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           sdk/go.sum
     - name: Install pulumictl
@@ -43,16 +43,16 @@ jobs:
     - name: Setup DotNet
       uses: #{{ .Config.actionVersions.setupDotNet }}#
       with:
-        dotnet-version: ${{ env.DOTNETVERSION }}
+        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:
-        node-version: ${{ env.NODEVERSION }}
+        node-version: "#{{ .Config.toolVersions.node }}#"
         registry-url: https://registry.npmjs.org
     - name: Setup Python
       uses: #{{ .Config.actionVersions.setupPython }}#
       with:
-        python-version: ${{ env.PYTHONVERSION }}
+        python-version: "#{{ .Config.toolVersions.python }}#"
     - name: Sync with ci-mgmt
       run: cp -r "ci-mgmt/provider-ci/providers/$PROVIDER/repo/." .
     - name: Remove ci-mgmt directory

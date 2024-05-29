@@ -11,15 +11,14 @@ publishRegistry: true
 checkoutSubmodules: false
 testMasterAndReleaseWorkflows: false
 toolVersions:
+  dotnet: "6.0.x"
   go: "1.21.x"
+  java: "11"
+  gradle: "7.6"
+  node: "20.x"
+  python: "3.11.8"
 env:
-  DOTNETVERSION: |
-    6.0.x
-    3.1.301
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  JAVAVERSION: "11"
-  GRADLEVERSION: "7.6"
-  NODEVERSION: 20.x
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
@@ -29,7 +28,6 @@ env:
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  PYTHONVERSION: "3.11.8"
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}

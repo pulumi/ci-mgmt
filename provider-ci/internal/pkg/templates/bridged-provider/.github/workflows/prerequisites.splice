@@ -20,7 +20,7 @@
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
-        go-version: #{{ .Config.toolVersions.go }}#
+        go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum
