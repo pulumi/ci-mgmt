@@ -29,7 +29,10 @@
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
-#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
+    - name: Install Pulumi CLI
+      uses: #{{ .Config.actionVersions.setupPulumi }}#
+      with:
+        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
       uses: #{{ .Config.actionVersions.installGhRelease }}#

@@ -141,7 +141,10 @@ jobs:
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
-#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
+    - name: Install Pulumi CLI
+      uses: #{{ .Config.actionVersions.setupPulumi }}#
+      with:
+        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:
