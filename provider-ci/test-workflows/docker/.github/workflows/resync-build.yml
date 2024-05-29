@@ -110,11 +110,11 @@ jobs:
         body: This pull request was generated automatically by the resync-build workflow
           in this repository.
         branch: pulumi-bot/resync-${{ github.run_id}}
-        commit-message: Resync build for pulumi-${{ env.PROVIDER }}
+        commit-message: Resync build for pulumi-docker
         committer: pulumi-bot <bot@pulumi.com>
         labels: impact/no-changelog-required
         team-reviewers: platform-integrations
-        title: Fix up build for pulumi-${{ env.PROVIDER }}
+        title: Fix up build for pulumi-docker
         token: ${{ secrets.PULUMI_BOT_TOKEN }}
 name: Resync build
 on:
