@@ -567,12 +567,11 @@ export function CheckSchemaChanges(provider: string): Step {
     if: "github.event_name == 'pull_request'",
     name: "Check Schema is Valid",
     run:
+      "git show -m -p -- :provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json | git apply -3 --reverse --allow-empty && git reset .;\n" +
+      "cp provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > ${{ runner.temp }}/schema.json && git checkout .;\n" +
       "echo 'SCHEMA_CHANGES<<EOF' >> $GITHUB_ENV\n" +
-      "schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json >> $GITHUB_ENV\n" +
+      "schema-tools compare -p ${{ env.PROVIDER }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json -r file:${{ runner.temp }}/schema.json;\n" +
       "echo 'EOF' >> $GITHUB_ENV",
-    env: {
-      GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
-    },
   };
 }
 
