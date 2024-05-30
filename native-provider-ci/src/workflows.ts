@@ -146,7 +146,7 @@ export function RunAcceptanceTestsWorkflow(
         .addConditional(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
-        .addStep(steps.EchoSuccessStep())
+        .addStep(steps.SentinelStep())
         .addNeeds(calculateSentinelNeeds(name, opts.lint, opts.provider)),
     },
   };

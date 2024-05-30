@@ -115,6 +115,20 @@ export function EchoSuccessStep(): Step {
   };
 }
 
+export function SentinelStep(): Step {
+  return {
+    name: "Mark workflow as successful",
+    uses: action.githubStatusAction,
+    with: {
+      authToken: "${{ secrets.GITHUB_TOKEN }}",
+      context: "Sentinel",
+      state: "success",
+      description: "Sentinel checks passed",
+      sha: "${{ github.event.pull_request.head.sha || github.sha }}",
+    },
+  };
+}
+
 export function UpdatePRWithResultsStep(): Step {
   return {
     name: "Update with Result",

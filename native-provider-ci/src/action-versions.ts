@@ -44,3 +44,5 @@ export const upgradeProviderAction =
 export const slackNotification = "rtCamp/action-slack-notify@v2";
 export const freeDiskSpace = "jlumbroso/free-disk-space@v1.3.1"; // action does not support major version pinning, so we need to pin to exact version
 export const createKindCluster = "helm/kind-action@v1";
+export const githubStatusAction =
+  "guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76";
