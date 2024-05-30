@@ -91,7 +91,32 @@ function tfProviderProtection(provider: string) {
         }],
     }, {
         deleteBeforeReplace: true,
+        // Aliases can be removed once `pulumi up` has gone through.
+        //
+        // I (@iwahbe) will clean up in a subsequent PR.
+        aliases: [{name: branchAlias(provider)}],
     })
+}
+
+function branchAlias(provider: string): string {
+    const main = [
+        "archive",
+        "artifactory",
+        "confluentcloud",
+        "databricks",
+        "external",
+        "http",
+        "local",
+        "null",
+        "oci",
+        "slack",
+        "tls",
+    ];
+
+    if (main.includes(provider)) {
+        return `${provider}-main-branchprotection`;
+    }
+    return `${provider}-master-branchprotection`;
 }
 
 for (let bridgedProvider of tfProviders) {
