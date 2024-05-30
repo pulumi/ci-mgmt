@@ -15,29 +15,7 @@ function hasManagedBranchProtection(provider: string): boolean {
 function defineResources(buildSdkJobName: string, provider: string) {
     const requiredChecks: string[] = [
         "Update Changelog",
-
-        "prerequisites",
-
-        // Currently lint and lint-sdk are not universally present accross providers
-        // due to drift, and making them required checks makes PRs unmerge-able for example on pulumi/command.
-        //
-        // TODO figure out in this codebase which providers have them and require accordingly.
-        //
-        // "lint",
-        // "lint-sdk",
-
-        buildSdkJobName + " (dotnet)",
-        buildSdkJobName + " (go)",
-        buildSdkJobName + " (java)",
-        buildSdkJobName + " (nodejs)",
-        buildSdkJobName + " (python)",
-        "test (dotnet)",
-        "test (go)",
-        "test (java)",
-        "test (nodejs)",
-        "test (python)",
-
-        "sentinel",
+        "Sentinel",
     ];
     // enable branchProtection
     const branches: string[] = [
@@ -70,7 +48,7 @@ function tfProviderProtection(provider: string) {
     const requiredChecks: string[] = [
         "Update Changelog",
         // Sentinel is responsible for encapsulating CI checks.
-        "sentinel",
+        "Sentinel",
     ];
 
     // enable branchProtection
