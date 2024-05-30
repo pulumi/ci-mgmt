@@ -59,9 +59,7 @@ function nativeProviderProtection(buildSdkJobName: string, provider: string) {
         }]
     }, {
         deleteBeforeReplace: true,
-        // TODO: Delete after pulumi up has happened.
-        aliases: [{name: branchAlias(provider)}],
-    })
+    });
 }
 
 function tfProviderProtection(provider: string) {
@@ -88,18 +86,7 @@ function tfProviderProtection(provider: string) {
         }],
     }, {
         deleteBeforeReplace: true,
-    })
-}
-
-function branchAlias(provider: string): string {
-    const main = [
-        "docker-build",
-    ];
-
-    if (main.includes(provider)) {
-        return `${provider}-main-branchprotection`;
-    }
-    return `${provider}-master-branchprotection`;
+    });
 }
 
 for (let bridgedProvider of tfProviders) {
