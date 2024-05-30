@@ -39,31 +39,29 @@ function nativeProviderProtection(buildSdkJobName: string, provider: string) {
 
         "sentinel",
     ];
-    // enable branchProtection
-    const branches: string[] = [
-        "master",
-        "main"
-    ]
-    for (let branch of branches) {
-        new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
-            repositoryId: `pulumi-${provider}`,
-            pattern: `${branch}`,
-            enforceAdmins: true,
-            requiredPullRequestReviews: [{
-                // pullRequestBypassers allows pulumi-bot to push directly to the
-                // protected branch, but it does not allow PRs from pulumi-bot to ignore
-                // requiredApprovingReviewCount.
-                pullRequestBypassers: ["/pulumi-bot"],
-                requiredApprovingReviewCount: 1,
-            }],
-            requiredStatusChecks: [{
-                strict: false,
-                contexts: requiredChecks,
-            }]
-        }, {
-            deleteBeforeReplace: true,
-        })
-    }
+
+    const repo = `pulumi-${provider}`;
+
+    new github.BranchProtection(`${provider}-default`, {
+        repositoryId: repo,
+        pattern: github.BranchDefault.get(provider, repo).branch,
+        enforceAdmins: true,
+        requiredPullRequestReviews: [{
+            // pullRequestBypassers allows pulumi-bot to push directly to the
+            // protected branch, but it does not allow PRs from pulumi-bot to ignore
+            // requiredApprovingReviewCount.
+            pullRequestBypassers: ["/pulumi-bot"],
+            requiredApprovingReviewCount: 1,
+        }],
+        requiredStatusChecks: [{
+            strict: false,
+            contexts: requiredChecks,
+        }]
+    }, {
+        deleteBeforeReplace: true,
+        // TODO: Delete after pulumi up has happened.
+        aliases: [{name: branchAlias(provider)}],
+    })
 }
 
 function tfProviderProtection(provider: string) {
@@ -95,17 +93,7 @@ function tfProviderProtection(provider: string) {
 
 function branchAlias(provider: string): string {
     const main = [
-        "archive",
-        "artifactory",
-        "confluentcloud",
-        "databricks",
-        "external",
-        "http",
-        "local",
-        "null",
-        "oci",
-        "slack",
-        "tls",
+        "docker-build",
     ];
 
     if (main.includes(provider)) {
