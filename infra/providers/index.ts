@@ -1,3 +1,4 @@
+import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
@@ -38,6 +39,8 @@ function nativeProviderProtection(buildSdkJobName: string, provider: string) {
     }, {
         deleteBeforeReplace: true,
     });
+
+    new ProviderLabels(provider);
 }
 
 function tfProviderProtection(provider: string) {
@@ -65,6 +68,35 @@ function tfProviderProtection(provider: string) {
     }, {
         deleteBeforeReplace: true,
     });
+
+    new ProviderLabels(provider);
+}
+
+
+// ProviderLabels applies the labels that all providers should have.
+class ProviderLabels extends pulumi.ComponentResource {
+    constructor(name: string, opts?: pulumi.ComponentResourceOptions) {
+        super("pkg:provider:Labels", name, {}, opts);
+
+        this.labels(`pulumi-${name}`, [
+            {name: "blocked", color: "b60205", description: "The issue cannot be resolved without 3rd party action."},
+            {name: "awaiting-upstream", color: "f9d0c4", description: "The issue cannot be resolved without action in another repository (which may or may not be owned by Pulumi)."},
+        ]);
+    }
+
+    private labels(repo: string, labels: (Omit<Omit<github.IssueLabelArgs, "repository">, "name"> & { name: string })[]) {
+        for (const label of labels) {
+            new github.IssueLabel(`${repo}-${label.name}`, {
+                repository: repo,
+                ...label,
+            }, {
+                parent: this,
+                // Recreating labels will drop them from any issues they are attached
+                // to. To avoid this, we protect our labels.
+                protect: true,
+            })
+        }
+    }
 }
 
 for (let bridgedProvider of tfProviders) {
