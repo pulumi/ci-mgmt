@@ -87,14 +87,9 @@ function tfProviderProtection(provider: string) {
             // We want to make sure that pulumi-bot can auto-merge PRs, so we
             // explicitly remove review requirements.
             requiredApprovingReviewCount: 0,
-
         }],
     }, {
         deleteBeforeReplace: true,
-        // Aliases can be removed once `pulumi up` has gone through.
-        //
-        // I (@iwahbe) will clean up in a subsequent PR.
-        aliases: [{name: branchAlias(provider)}],
     })
 }
 
