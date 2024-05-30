@@ -12,7 +12,7 @@ function hasManagedBranchProtection(provider: string): boolean {
     return !provider.includes("azure-native");
 }
 
-function defineResources(buildSdkJobName: string, provider: string) {
+function nativeProviderProtection(buildSdkJobName: string, provider: string) {
     const requiredChecks: string[] = [
         "Update Changelog",
 
@@ -73,36 +73,56 @@ function tfProviderProtection(provider: string) {
         "sentinel",
     ];
 
-    // enable branchProtection
-    const branches: string[] = [
-        "master",
-        "main"
-    ]
-    for (let branch of branches) {
-        new github.BranchProtection(`${provider}-${branch}-branchprotection`, {
-            repositoryId: `pulumi-${provider}`,
-            pattern: `${branch}`,
-            enforceAdmins: true,
-            requiredStatusChecks: [{
-                strict: false,
-                contexts: requiredChecks,
-            }],
-            requiredPullRequestReviews: [{
-                // We want to make sure that pulumi-bot can auto-merge PRs, so we
-                // explicitly remove review requirements.
-                requiredApprovingReviewCount: 0,
+    const repo = `pulumi-${provider}`;
 
-            }],
-        }, {
-            deleteBeforeReplace: true,
-        })
-    }
+    new github.BranchProtection(`${provider}-default`, {
+        repositoryId: repo,
+        pattern: github.BranchDefault.get(provider, repo).branch,
+        enforceAdmins: true,
+        requiredStatusChecks: [{
+            strict: false,
+            contexts: requiredChecks,
+        }],
+        requiredPullRequestReviews: [{
+            // We want to make sure that pulumi-bot can auto-merge PRs, so we
+            // explicitly remove review requirements.
+            requiredApprovingReviewCount: 0,
+
+        }],
+    }, {
+        deleteBeforeReplace: true,
+        // Aliases can be removed once `pulumi up` has gone through.
+        //
+        // I (@iwahbe) will clean up in a subsequent PR.
+        aliases: [{name: branchAlias(provider)}],
+    })
 }
 
-for (let bridgedProvider of [...tfProviders].filter(hasManagedBranchProtection)) {
+function branchAlias(provider: string): string {
+    const main = [
+        "archive",
+        "artifactory",
+        "confluentcloud",
+        "databricks",
+        "external",
+        "http",
+        "local",
+        "null",
+        "oci",
+        "slack",
+        "tls",
+    ];
+
+    if (main.includes(provider)) {
+        return `${provider}-main-branchprotection`;
+    }
+    return `${provider}-master-branchprotection`;
+}
+
+for (let bridgedProvider of tfProviders) {
     tfProviderProtection(bridgedProvider);
 }
 
 for (let nativeProvider of [...nativeProviders].filter(hasManagedBranchProtection)) {
-    defineResources("build_sdks", nativeProvider);
+    nativeProviderProtection("build_sdks", nativeProvider);
 }
