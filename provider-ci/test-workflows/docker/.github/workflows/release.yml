@@ -144,16 +144,19 @@ jobs:
     needs: tag_sdk
     runs-on: ubuntu-latest
     steps:
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.11.0
+    - name: Dispatch Metadata build
+      uses: peter-evans/repository-dispatch@v3
       with:
-        tag: v0.0.46
-        repo: pulumi/pulumictl
     - env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-      name: Dispatch Event
-      run: pulumictl create docs-build pulumi-docker
-        "${GITHUB_REF#refs/tags/}"
+        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        repository: pulumi/pulumi-${{ env.PROVIDER }}
+        event-type: resource-provider
+        client-payload: |-
+          {
+            "project": pulumi-${{ env.PROVIDER }},
+            "shortname": ${{ env.PROVIDER }},
+            "ref": ${{ env.GITHUB_REF_NAME }}
+          }
   lint:
     name: lint
     uses: ./.github/workflows/lint.yml
