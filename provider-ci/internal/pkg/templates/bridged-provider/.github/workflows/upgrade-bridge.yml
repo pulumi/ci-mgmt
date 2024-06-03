@@ -49,6 +49,11 @@ on:
         required: false
         type: boolean
         default: false
+      release-patch:
+        description: Release a patch version of the provider
+        required: false
+        type: boolean
+        default: false
 env:
   GH_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
