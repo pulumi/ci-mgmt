@@ -16,15 +16,29 @@ body:
     validations:
       required: true
   - type: textarea
-    id: reproducible
+    id: sample-program
     attributes:
-      label: Sample program and log output
+      label: Sample program
       description: |
-        Please provide us with a minimal, self-contained Pulumi program that reproduces this behavior so that
-        we can investigate on our end. Without a functional reproduction, we will not be able to prioritize this bug.
-        If relevant, please also provide us with the output of 
+        <details><summary>Provide a reproducible sample program</summary>
+        If this is a bug you encountered while running a Pulumi command, please provide us with a minimal, 
+        self-contained Pulumi program that reproduces this behavior so that we can investigate on our end. 
+        Without a functional reproduction, we will not be able to prioritize this bug.
+        **Note:** If the program output is more than a few lines, please send us a Gist or a link to a file.
+        </details>
+    validations:
+      required: true
+  - type: textarea
+    id: log-output
+    attributes:
+      label: Log output
+      description: |
+        <details><summary>How to Submit Logs</summary>
+        If this is something that is dependent on your environment, please also provide us with the output of
         `pulumi up --logtostderr --logflow -v=10` from the root of your project.
-        **Note:** If the program and/or log output is more than a few lines, please send us a Gist or a link to a file.
+        We may also ask you to supply us with debug output following [these steps](https://www.pulumi.com/docs/using-pulumi/pulumi-packages/debugging-provider-packages/).
+        **Note:** If the log output is more than a few lines, please send us a Gist or a link to a file.
+        </details>
     validations:
       required: true
   - type: textarea
