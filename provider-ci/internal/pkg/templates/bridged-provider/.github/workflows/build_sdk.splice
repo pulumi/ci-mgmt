@@ -1,7 +1,12 @@
     - uses: pulumi/provider-version-action@v1
       with:
         set-env: 'PROVIDER_VERSION'
-#{{ .Config.actions.setupGo | toYaml | indent 4 }}#
+    - name: Install Go
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: "#{{ .Config.toolVersions.go }}#"
+        cache-dependency-path: |
+          sdk/go.sum
     - name: Cache examples generation
       uses: actions/cache@v4
       with:
@@ -13,41 +18,44 @@
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
-#{{ .Config.actions.setupPulumi | toYaml | indent 4 }}#
+    - name: Install Pulumi CLI
+      uses: #{{ .Config.actionVersions.setupPulumi }}#
+      with:
+        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
     - name: Setup Node
       uses: #{{ .Config.actionVersions.setupNode }}#
       with:
-        node-version: ${{ env.NODEVERSION }}
+        node-version: "#{{ .Config.toolVersions.node }}#"
         registry-url: https://registry.npmjs.org
     - name: Setup DotNet
       uses: #{{ .Config.actionVersions.setupDotNet }}#
       with:
-        dotnet-version: ${{ env.DOTNETVERSION }}
+        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
     - name: Setup Python
       uses: #{{ .Config.actionVersions.setupPython }}#
       with:
-        python-version: ${{ env.PYTHONVERSION }}
+        python-version: "#{{ .Config.toolVersions.python }}#"
     - name: Setup Java
       uses: #{{ .Config.actionVersions.setupJava }}#
       with:
         cache: gradle
         distribution: temurin
-        java-version: ${{ env.JAVAVERSION }}
+        java-version: "#{{ .Config.toolVersions.java }}#"
     - name: Setup Gradle
       uses: #{{ .Config.actionVersions.setupGradle }}#
       with:
-        gradle-version: ${{ env.GRADLEVERSION }}
+        gradle-version: "#{{ .Config.toolVersions.gradle }}#"
     - name: Download provider + tfgen binaries
       uses: #{{ .Config.actionVersions.downloadArtifact }}#
       with:
-        name: ${{ env.PROVIDER }}-provider.tar.gz
+        name: #{{ .Config.provider }}#-provider.tar.gz
         path: ${{ github.workspace }}/bin
     - name: Untar provider binaries
       run: >-
         tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
         github.workspace}}/bin
 
-        find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \;
+        find ${{ github.workspace }} -name "pulumi-*-#{{ .Config.provider }}#" -print -exec chmod +x {} \;
     - name: Install plugins
       run: make install_plugins
     - name: Update path
