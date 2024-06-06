@@ -109,6 +109,10 @@ jobs:
       with:
         sdk: #{{ .Config.publish.sdk }}#
         version: ${{ steps.version.outputs.version }}
+        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
+        java-version: "#{{ .Config.toolVersions.java }}#"
+        node-version: "#{{ .Config.toolVersions.node }}#"
+        python-version: "#{{ .Config.toolVersions.python }}#"
     - env:
         SLACK_CHANNEL: provider-upgrade-publish-status
         SLACK_COLOR: "#FF0000"
