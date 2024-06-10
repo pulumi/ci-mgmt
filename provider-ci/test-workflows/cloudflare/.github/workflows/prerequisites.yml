@@ -5,10 +5,13 @@ on:
     inputs:
       is_pr:
         type: boolean
+        required: true
       is_automated:
         type: boolean
+        required: true
       default_branch:
         type: string
+        required: true
 
 jobs:
   prerequisites:
