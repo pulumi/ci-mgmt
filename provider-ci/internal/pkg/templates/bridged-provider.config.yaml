@@ -10,6 +10,10 @@ fail-on-extra-mapping: true
 publishRegistry: true
 checkoutSubmodules: false
 testMasterAndReleaseWorkflows: false
+# Set to true to clear disk space before running prerequisites workflow.
+freeDiskSpaceBeforeBuild: false
+# Set to true to clear disk space before running test jobs.
+freeDiskSpaceBeforeTest: false
 toolVersions:
   dotnet: "6.0.x"
   go: "1.21.x"
