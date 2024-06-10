@@ -43,27 +43,10 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
     - name: Prepare upstream code
       run: make upstream
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
       with:
-        go-version: "#{{ .Config.toolVersions.go }}#"
-        cache-dependency-path: |
-          provider/*.sum
-          upstream/*.sum
-    - name: Install pulumictl
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
-      with:
-        tag: #{{ .Config.actionVersions.pulumictlTag }}#
-        repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.setupPulumi }}#
-      with:
-        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
-    - if: inputs.is_pr
-      name: Install Schema Tools
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
-      with:
-        repo: pulumi/schema-tools
+        tools: go, pulumictl, pulumicli, schema-tools
 #{{- if .Config.actions.preBuild }}#
 #{{ .Config.actions.preBuild | toYaml | indent 4 }}#
 #{{- end }}#

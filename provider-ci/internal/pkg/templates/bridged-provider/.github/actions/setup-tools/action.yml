@@ -1,0 +1,80 @@
+name: Setup tools
+description: Installs Go, Pulumi, pulumictl, schema-tools, Node.JS, Python, dotnet and Java.
+
+inputs:
+  tools:
+    description: |
+      Comma separated list of tools to install. The default of "all" installs all tools. Available tools are:
+        go
+        pulumicli
+        pulumictl
+        schema-tools
+        node
+        python
+        dotnet
+        java
+    default: all
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Go
+      if: inputs.tools == 'all' || contains(inputs.tools, 'go')
+      uses: #{{ .Config.actionVersions.setupGo }}#
+      with:
+        go-version: "#{{ .Config.toolVersions.go }}#"
+        cache-dependency-path: |
+          provider/*.sum
+          upstream/*.sum
+
+    - name: Install pulumictl
+      if: inputs.tools == 'all' || contains(inputs.tools, 'pulumictl')
+      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      with:
+        tag: #{{ .Config.actionVersions.pulumictlTag }}#
+        repo: pulumi/pulumictl
+
+    - name: Install Pulumi CLI
+      if: inputs.tools == 'all' || contains(inputs.tools, 'pulumicli')
+      uses: #{{ .Config.actionVersions.setupPulumi }}#
+      with:
+        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
+
+    - name: Install Schema Tools
+      if: inputs.tools == 'all' || contains(inputs.tools, 'schema-tools')
+      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      with:
+        repo: pulumi/schema-tools
+
+    - name: Setup Node
+      if: inputs.tools == 'all' || contains(inputs.tools, 'node')
+      uses: #{{ .Config.actionVersions.setupNode }}#
+      with:
+        node-version: #{{ .Config.toolVersions.node }}#
+        registry-url: https://registry.npmjs.org
+
+    - name: Setup DotNet
+      if: inputs.tools == 'all' || contains(inputs.tools, 'dotnet')
+      uses: #{{ .Config.actionVersions.setupDotNet }}#
+      with:
+        dotnet-version: #{{ .Config.toolVersions.dotnet }}#
+
+    - name: Setup Python
+      if: inputs.tools == 'all' || contains(inputs.tools, 'python')
+      uses: #{{ .Config.actionVersions.setupPython }}#
+      with:
+        python-version: #{{ .Config.toolVersions.python }}#
+
+    - name: Setup Java
+      if: inputs.tools == 'all' || contains(inputs.tools, 'java')
+      uses: #{{ .Config.actionVersions.setupJava }}#
+      with:
+        cache: gradle
+        distribution: temurin
+        java-version: #{{ .Config.toolVersions.java }}#
+
+    - name: Setup Gradle
+      if: inputs.tools == 'all' || contains(inputs.tools, 'java')
+      uses: #{{ .Config.actionVersions.setupGradle }}#
+      with:
+        gradle-version: #{{ .Config.toolVersions.gradle }}#
