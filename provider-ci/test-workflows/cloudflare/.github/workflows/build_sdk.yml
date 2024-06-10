@@ -36,26 +36,26 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: <no value>
+          node-version: 20.x
           registry-url: https://registry.npmjs.org
       - name: Setup DotNet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version:         null
+          dotnet-version: 6.0.x
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: <no value>
+          python-version: 3.11.8
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           cache: gradle
           distribution: temurin
-          java-version: <no value>
+          java-version: 11
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          gradle-version: <no value>
+          gradle-version: 7.6
       - name: Download provider + tfgen binaries
         uses: actions/download-artifact@v4
         with:

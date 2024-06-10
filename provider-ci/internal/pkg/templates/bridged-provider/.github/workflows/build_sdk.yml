@@ -40,26 +40,26 @@ jobs:
       - name: Setup Node
         uses: #{{ .Config.actionVersions.setupNode }}#
         with:
-          node-version: #{{ .Config.env.NODEVERSION }}#
+          node-version: #{{ .Config.toolVersions.node }}#
           registry-url: https://registry.npmjs.org
       - name: Setup DotNet
         uses: #{{ .Config.actionVersions.setupDotNet }}#
         with:
-          dotnet-version: #{{ .Config.env.DOTNETVERSION | toYaml | indent 8 }}#
+          dotnet-version: #{{ .Config.toolVersions.dotnet }}#
       - name: Setup Python
         uses: #{{ .Config.actionVersions.setupPython }}#
         with:
-          python-version: #{{ .Config.env.PYTHONVERSION }}#
+          python-version: #{{ .Config.toolVersions.python }}#
       - name: Setup Java
         uses: #{{ .Config.actionVersions.setupJava }}#
         with:
           cache: gradle
           distribution: temurin
-          java-version: #{{ .Config.env.JAVAVERSION }}#
+          java-version: #{{ .Config.toolVersions.java }}#
       - name: Setup Gradle
         uses: #{{ .Config.actionVersions.setupGradle }}#
         with:
-          gradle-version: #{{ .Config.env.GRADLEVERSION }}#
+          gradle-version: #{{ .Config.toolVersions.gradle }}#
       - name: Download provider + tfgen binaries
         uses: #{{ .Config.actionVersions.downloadArtifact }}#
         with:
