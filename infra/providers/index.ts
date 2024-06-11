@@ -1,3 +1,4 @@
+import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
 import * as fs from 'fs';
 
@@ -38,6 +39,8 @@ function nativeProviderProtection(buildSdkJobName: string, provider: string) {
     }, {
         deleteBeforeReplace: true,
     });
+
+    new ProviderLabels(provider);
 }
 
 function tfProviderProtection(provider: string) {
@@ -65,6 +68,45 @@ function tfProviderProtection(provider: string) {
     }, {
         deleteBeforeReplace: true,
     });
+
+    new BridgedProviderLabels(provider);
+}
+
+
+// ProviderLabels applies the labels that all providers should have.
+//
+// Labels that should apply to all repositories in the Pulumi org are managed in
+// team-management, not in ci-mgmt.
+class ProviderLabels extends pulumi.ComponentResource {
+    constructor(name: string, opts?: pulumi.ComponentResourceOptions) {
+        super("pkg:provider:Labels", name, {}, opts);
+    }
+
+    protected labels(repo: string, labels: (Omit<Omit<github.IssueLabelArgs, "repository">, "name"> & { name: string })[]) {
+        for (const label of labels) {
+            new github.IssueLabel(`${repo}-${label.name}`, {
+                repository: repo,
+                ...label,
+            }, {
+                parent: this,
+                // Recreating labels will drop them from any issues they are attached
+                // to. To avoid this, we protect our labels.
+                protect: true,
+            })
+        }
+    }
+}
+
+class BridgedProviderLabels extends ProviderLabels {
+    constructor(name: string, opts?: pulumi.ComponentResourceOptions) {
+        super(name, opts);
+
+        this.labels(`pulumi-${name}`, [
+            {name: "needs-release/patch", color: "C5DEF5a", description: "When a PR with this label merges, it initiates a release of vX.Y.Z+1"},
+            {name: "needs-release/minor", color: "C5DEF5a", description: "When a PR with this label merges, it initiates a release of vX.Y+1.0"},
+            {name: "needs-release/major", color: "C5DEF5a", description: "When a PR with this label merges, it initiates a release of vX+1.0.0"},
+        ]);
+    }
 }
 
 for (let bridgedProvider of tfProviders) {
