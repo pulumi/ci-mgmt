@@ -32,16 +32,18 @@ jobs:
     needs: tag_sdk
     runs-on: ubuntu-latest
     steps:
-    - name: Install pulumictl
-      uses: jaxxstorm/action-install-gh-release@v1.11.0
-      with:
-        tag: v0.0.46
-        repo: pulumi/pulumictl
-    - env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-      name: Dispatch Event
-      run: pulumictl create docs-build pulumi-aws
-        "${GITHUB_REF#refs/tags/}"
+      - name: Dispatch Metadata build
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          repository: pulumi/registry
+          event-type: resource-provider
+          client-payload: |-
+            {
+              "project": "${{ github.repository }}",
+              "project-shortname": "aws",
+              "ref": "${{ github.ref_name }}"
+            }
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml
