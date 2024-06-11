@@ -1,3 +1,21 @@
+name: "Prerequisites"
+
+on:
+  workflow_call:
+    inputs:
+      is_pr:
+        type: boolean
+        required: true
+      is_automated:
+        type: boolean
+        required: true
+      default_branch:
+        type: string
+        required: true
+
+jobs:
+  prerequisites:
+    name: prerequisites
     runs-on: #{{ .Config.runner.prerequisites }}#
     steps:
     - name: Checkout Repo
@@ -33,7 +51,7 @@
       uses: #{{ .Config.actionVersions.setupPulumi }}#
       with:
         pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
-    - if: github.event_name == 'pull_request'
+    - if: inputs.is_pr
       name: Install Schema Tools
       uses: #{{ .Config.actionVersions.installGhRelease }}#
       with:
@@ -51,16 +69,16 @@
       run: make provider_no_deps
     - name: Unit-test provider code
       run: make test_provider
-    - if: github.event_name == 'pull_request'
+    - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         {
           echo "SCHEMA_CHANGES<<$EOF";
-          schema-tools compare -p #{{ .Config.provider }}# -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema.json;
+          schema-tools compare -p #{{ .Config.provider }}# -o ${{ inputs.default_branch }} -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema.json;
           echo "$EOF";
         } >> "$GITHUB_ENV"
-    - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+    - if: inputs.is_pr && inputs.is_automated == false
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.actionVersions.prComment }}#
       with:
@@ -73,7 +91,7 @@
           Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
 
 #{{- if .Config.enableConfigurationCheck }}#
-    - if: github.event_name == 'pull_request'
+    - if: inputs.is_pr
       name: Check Configuration section
       run: |
         sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
@@ -85,7 +103,7 @@
           echo "$EOF";
         } >> "$GITHUB_ENV"
 
-    - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+    - if: inputs.is_pr && inputs.is_automated == false
       name: Check for missing config
       run: |
         if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
@@ -108,7 +126,7 @@
         name: #{{ .Config.provider }}#-provider.tar.gz
         path: ${{ github.workspace }}/bin/provider.tar.gz
         retention-days: 30
-    - if: failure() && github.event_name == 'push'
+    - if: failure() && inputs.is_pr
       name: Notify Slack
       uses: #{{ .Config.actionVersions.notifySlack }}#
       with:

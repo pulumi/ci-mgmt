@@ -1,0 +1,101 @@
+name: "Build SDK"
+
+on:
+  workflow_call: {}
+
+jobs:
+  build_sdk:
+    name: build_sdk
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    strategy:
+      fail-fast: true
+      matrix:
+        language:
+        - nodejs
+        - python
+        - dotnet
+        - go
+        - java
+    steps:
+      - name: Checkout Repo
+        uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+        with:
+          submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
+      - uses: pulumi/provider-version-action@v1
+        with:
+          set-env: 'PROVIDER_VERSION'
+      - name: Cache examples generation
+        uses: actions/cache@v4
+        with:
+          path: |
+            .pulumi/examples-cache
+          key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+      - name: Install pulumictl
+        uses: #{{ .Config.actionVersions.installGhRelease }}#
+        with:
+          tag: #{{ .Config.actionVersions.pulumictlTag }}#
+          repo: pulumi/pulumictl
+      - name: Setup Node
+        uses: #{{ .Config.actionVersions.setupNode }}#
+        with:
+          node-version: #{{ .Config.toolVersions.node }}#
+          registry-url: https://registry.npmjs.org
+      - name: Setup DotNet
+        uses: #{{ .Config.actionVersions.setupDotNet }}#
+        with:
+          dotnet-version: #{{ .Config.toolVersions.dotnet }}#
+      - name: Setup Python
+        uses: #{{ .Config.actionVersions.setupPython }}#
+        with:
+          python-version: #{{ .Config.toolVersions.python }}#
+      - name: Setup Java
+        uses: #{{ .Config.actionVersions.setupJava }}#
+        with:
+          cache: gradle
+          distribution: temurin
+          java-version: #{{ .Config.toolVersions.java }}#
+      - name: Setup Gradle
+        uses: #{{ .Config.actionVersions.setupGradle }}#
+        with:
+          gradle-version: #{{ .Config.toolVersions.gradle }}#
+      - name: Download provider + tfgen binaries
+        uses: #{{ .Config.actionVersions.downloadArtifact }}#
+        with:
+          name: #{{ .Config.provider }}#-provider.tar.gz
+          path: ${{ github.workspace }}/bin
+      - name: Untar provider binaries
+        run: >-
+          tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
+          github.workspace}}/bin
+
+          find ${{ github.workspace }} -name "pulumi-*-#{{ .Config.provider }}#" -print -exec chmod +x {} \;
+      - name: Install plugins
+        run: make install_plugins
+      - name: Update path
+        run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+      - name: Build SDK
+        run: make build_${{ matrix.language }}
+      - name: Check worktree clean
+        uses: pulumi/git-status-check-action@v1
+#{{- if .Config.worktreeAllowedChanges }}#
+        with:
+          allowed-changes: |
+#{{ .Config.worktreeAllowedChanges | indent 12 }}#
+#{{- end }}#
+      - name: Compress SDK folder
+        run: tar -zcf sdk/${{ matrix.language }}.tar.gz -C sdk/${{ matrix.language }} .
+      - name: Upload artifacts
+        uses: #{{ .Config.actionVersions.uploadArtifact }}#
+        with:
+          name: ${{ matrix.language  }}-sdk.tar.gz
+          path: ${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz
+          retention-days: 30
+      - if: failure() && github.event_name == 'push'
+        name: Notify Slack
+        uses: #{{ .Config.actionVersions.notifySlack }}#
+        with:
+          author_name: Failure in building ${{ matrix.language }} sdk
+          fields: repo,commit,author,action
+          status: ${{ job.status }}

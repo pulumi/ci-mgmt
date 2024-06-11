@@ -6,15 +6,9 @@ jobs:
   build_sdk:
     name: build_sdk
     needs: prerequisites
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
-    steps:
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
-      with:
-        submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
-#{{ .Splices.build_sdk }}#
+    uses: ./.github/workflows/build_sdk.yml
+    secrets: inherit
+
   #{{ if .Config.publishRegistry -}}#
   create_docs_build:
     name: create_docs_build
@@ -44,8 +38,12 @@ jobs:
     uses: ./.github/workflows/license.yml
     secrets: inherit
   prerequisites:
-    name: prerequisites
-#{{ .Splices.prerequisites }}#
+    uses: ./.github/workflows/prerequisites.yml
+    secrets: inherit
+    with:
+      default_branch: ${{ github.event.repository.default_branch }}
+      is_pr: ${{ github.event_name == 'pull_request' }}
+      is_automated: ${{ github.actor == 'dependabot[bot]' }}
 
   publish:
     name: publish
