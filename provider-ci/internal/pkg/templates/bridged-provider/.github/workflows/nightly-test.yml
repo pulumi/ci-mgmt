@@ -26,6 +26,14 @@ jobs:
       id-token: write
     runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
+#{{- if .Config.freeDiskSpaceBeforeTest }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+      with:
+        tool-cache: false
+        swap-storage: false
+#{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
 #{{- if .Config.checkoutSubmodules }}#
