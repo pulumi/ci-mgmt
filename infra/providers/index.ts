@@ -105,6 +105,7 @@ class BridgedProviderLabels extends ProviderLabels {
             {name: "needs-release/patch", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX.Y.Z+1"},
             {name: "needs-release/minor", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX.Y+1.0"},
             {name: "needs-release/major", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX+1.0.0"},
+            {name: "awaiting/bridge", color: "F9D0C4", description: "The issue cannot be resolved without action in pulumi-terraform-bridge."},
         ]);
     }
 }
