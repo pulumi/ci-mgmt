@@ -20,7 +20,7 @@ toolVersions:
   java: "11"
   gradle: "7.6"
   node: "20.x"
-  pulumi: "^3"
+  pulumi: "dev"
   python: "3.11.8"
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
