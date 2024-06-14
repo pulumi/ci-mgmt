@@ -13,6 +13,9 @@ on:
         type: string
         required: true
 
+env:
+#{{ .Config.env | toYaml | indent 2 }}#
+
 jobs:
   prerequisites:
     name: prerequisites
