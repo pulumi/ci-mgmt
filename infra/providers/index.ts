@@ -72,14 +72,26 @@ function tfProviderProtection(provider: string) {
     new BridgedProviderLabels(provider);
 }
 
+const color = {
+    awaiting: "F9D0C4",
+    needsRelease: "C5DEF5",
+};
+
 
 // ProviderLabels applies the labels that all providers should have.
 //
 // Labels that should apply to all repositories in the Pulumi org are managed in
 // team-management, not in ci-mgmt.
 class ProviderLabels extends pulumi.ComponentResource {
+
     constructor(name: string, opts?: pulumi.ComponentResourceOptions) {
         super("pkg:provider:Labels", name, {}, opts);
+
+        this.labels(`pulumi-${name}`, [
+            {name: "awaiting/codegen", color: color.awaiting, description: "Blocked on a missing bug or feature in SDK generation"},
+            {name: "awaiting/core", color: color.awaiting, description: "Blocked on a missing bug or feature in pulumi/pulumi (except codegen)"},
+
+        ]);
     }
 
     protected labels(repo: string, labels: (Omit<Omit<github.IssueLabelArgs, "repository">, "name"> & { name: string })[]) {
@@ -98,14 +110,15 @@ class ProviderLabels extends pulumi.ComponentResource {
 }
 
 class BridgedProviderLabels extends ProviderLabels {
+
     constructor(name: string, opts?: pulumi.ComponentResourceOptions) {
         super(name, opts);
 
         this.labels(`pulumi-${name}`, [
-            {name: "needs-release/patch", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX.Y.Z+1"},
-            {name: "needs-release/minor", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX.Y+1.0"},
-            {name: "needs-release/major", color: "C5DEF5", description: "When a PR with this label merges, it initiates a release of vX+1.0.0"},
-            {name: "awaiting/bridge", color: "F9D0C4", description: "The issue cannot be resolved without action in pulumi-terraform-bridge."},
+            {name: "needs-release/patch", color: color.needsRelease, description: "When a PR with this label merges, it initiates a release of vX.Y.Z+1"},
+            {name: "needs-release/minor", color: color.needsRelease, description: "When a PR with this label merges, it initiates a release of vX.Y+1.0"},
+            {name: "needs-release/major", color: color.needsRelease, description: "When a PR with this label merges, it initiates a release of vX+1.0.0"},
+            {name: "awaiting/bridge", color: color.awaiting, description: "The issue cannot be resolved without action in pulumi-terraform-bridge."},
         ]);
     }
 }
