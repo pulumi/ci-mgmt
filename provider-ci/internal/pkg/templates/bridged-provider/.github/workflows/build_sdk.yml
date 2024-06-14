@@ -3,6 +3,9 @@ name: "Build SDK"
 on:
   workflow_call: {}
 
+env:
+#{{ .Config.env | toYaml | indent 2 }}#
+
 jobs:
   build_sdk:
     name: build_sdk
