@@ -1017,15 +1017,15 @@ export function RunGoReleaserWithArgs(args?: string): Step {
   };
 }
 
-export function PublishGoSdk(): Step {
+export function PublishGoSdk(sdkModuleDir: string): Step {
   return {
     name: "Publish Go SDK",
     uses: "pulumi/publish-go-sdk-action@v1",
     with: {
       repository: "${{ github.repository }}",
       "base-ref": "${{ github.sha }}",
-      source: "sdk",
-      path: "sdk",
+      source: sdkModuleDir,
+      path: sdkModuleDir,
       version: "${{ steps.version.outputs.version }}",
       additive: false,
       files: `\

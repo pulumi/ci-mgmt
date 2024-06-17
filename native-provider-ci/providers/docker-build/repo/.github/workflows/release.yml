@@ -585,8 +585,8 @@ jobs:
       with:
         repository: ${{ github.repository }}
         base-ref: ${{ github.sha }}
-        source: sdk
-        path: sdk
+        source: sdk/go/dockerbuild
+        path: sdk/go/dockerbuild
         version: ${{ steps.version.outputs.version }}
         additive: false
         files: |-
