@@ -103,3 +103,10 @@ worktreeAllowedChanges: |-
   sdk/go/**/pulumiUtilities.go
   sdk/nodejs/package.json
   sdk/python/pyproject.toml
+
+# Set a path for each language example to enable the test
+# releaseVerification:
+  # nodejs: examples/simple-nodejs
+  # python: examples/simple-python
+  # dotnet: examples/simple-dotnet
+  # go: exampels/simple-go
