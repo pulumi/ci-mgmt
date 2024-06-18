@@ -22,6 +22,7 @@ export const WorkflowOpts = z.object({
   parallel: z.number().default(3),
   timeout: z.number().default(60),
   providerVersion: z.string().default(""),
+  sdkModuleDir: z.string().default("sdk"),
   skipCodegen: z.boolean().default(false),
   skipWindowsArmBuild: z.boolean().default(false),
   pulumiCLIVersion: z.string().optional(),
@@ -253,7 +254,7 @@ export function PrereleaseWorkflow(
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
-      publish_go_sdk: new PublishGoSdkJob(),
+      publish_go_sdk: new PublishGoSdkJob(opts),
     },
   };
   if (opts.provider === "kubernetes") {
@@ -290,7 +291,7 @@ export function ReleaseWorkflow(
       publish: new PublishJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdks"),
       publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
-      publish_go_sdk: new PublishGoSdkJob(),
+      publish_go_sdk: new PublishGoSdkJob(opts),
       dispatch_docs_build: new DocsBuildDispatchJob("dispatch_docs_build"),
     },
   };
@@ -858,13 +859,17 @@ export class PublishGoSdkJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
   name = "publish-go-sdk";
   needs = "publish_sdk";
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.SetProviderVersionStep(),
-    steps.DownloadSpecificSDKStep("go"),
-    steps.UnzipSpecificSDKStep("go"),
-    steps.PublishGoSdk(),
-  ];
+  steps: NormalJob["steps"];
+
+  constructor(opts: WorkflowOpts) {
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.SetProviderVersionStep(),
+      steps.DownloadSpecificSDKStep("go"),
+      steps.UnzipSpecificSDKStep("go"),
+      steps.PublishGoSdk(opts.sdkModuleDir),
+    ];
+  }
 }
 
 export class DocsBuildDispatchJob implements NormalJob {
