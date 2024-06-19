@@ -86,7 +86,7 @@ actionVersions:
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.12
   slackNotification: rtCamp/action-slack-notify@v2
 publish:
-  publisherAction: pulumi/pulumi-package-publisher@v0.0.17
+  publisherAction: pulumi/pulumi-package-publisher@v0.0.18
   sdk: all
   goSdk:
     # Set to `true` to use the below configuration to push a new commit somewhere else.
