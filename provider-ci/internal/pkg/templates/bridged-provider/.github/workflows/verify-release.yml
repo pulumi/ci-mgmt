@@ -29,6 +29,16 @@ env:
 jobs:
   verify-release:
     name: verify-release
+#{{- if not .Config.releaseVerification }}#
+    # We don't have any release verification configurations, so we never run this workflow.
+    # Configure your .ci-mgmt.yaml files to include the release verification configurations e.g.
+    # releaseVerification:
+    #   nodejs: path/to/nodejs/project
+    #   python: path/to/python/project
+    #   dotnet: path/to/dotnet/project
+    #   go: path/to/go/project
+    if: false
+#{{- end }}#
     strategy:
       matrix:
 #{{- if .Config.releaseVerification }}#
@@ -55,8 +65,6 @@ jobs:
           directory: #{{ .Config.releaseVerification.nodejs }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.providerVersion }}
-#{{- else }}#
-      - run: echo "::warning file=.ci-mgmt.yaml,title=Node.js release verification missing::Add the key releaseVerification.nodejs to .ci-mgmt.yaml pointing to the directory containing a Pulumi nodejs project to preview."
 #{{- end }}#
 #{{- if .Config.releaseVerification.python }}#
       - name: Verify python release
@@ -66,8 +74,6 @@ jobs:
           directory: #{{ .Config.releaseVerification.python }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.providerVersion }}
-#{{- else }}#
-      - run: echo "::warning file=.ci-mgmt.yaml,title=Python release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi python project to preview."
 #{{- end }}#
 #{{- if .Config.releaseVerification.dotnet }}#
       - name: Verify dotnet release
@@ -77,8 +83,6 @@ jobs:
           directory: #{{ .Config.releaseVerification.dotnet }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.providerVersion }}
-#{{- else }}#
-      - run: echo "::warning file=.ci-mgmt.yaml,title=Dotnet release verification missing::Add the key releaseVerification.dotnet to .ci-mgmt.yaml pointing to the directory containing a Pulumi dotnet project to preview."
 #{{- end }}#
 #{{- if .Config.releaseVerification.go }}#
       - name: Verify go release
@@ -88,6 +92,4 @@ jobs:
           directory: #{{ .Config.releaseVerification.go }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.providerVersion }}
-#{{- else }}#
-      - run: echo "::warning file=.ci-mgmt.yaml,title=Go release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi go project to preview."
 #{{- end }}#
