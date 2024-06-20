@@ -4,11 +4,21 @@ env:
   IS_PRERELEASE: true
 #{{ .Config.env | toYaml | indent 2 }}#
 jobs:
+  prerequisites:
+    uses: ./.github/workflows/prerequisites.yml
+    secrets: inherit
+    with:
+      default_branch: ${{ github.event.repository.default_branch }}
+      is_pr: ${{ github.event_name == 'pull_request' }}
+      is_automated: ${{ github.actor == 'dependabot[bot]' }}
+
   build_sdk:
     name: build_sdk
     needs: prerequisites
     uses: ./.github/workflows/build_sdk.yml
     secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
 
   #{{ if .Config.lint -}}#
   lint:
@@ -21,17 +31,11 @@ jobs:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
-  prerequisites:
-    uses: ./.github/workflows/prerequisites.yml
-    secrets: inherit
-    with:
-      default_branch: ${{ github.event.repository.default_branch }}
-      is_pr: ${{ github.event_name == 'pull_request' }}
-      is_automated: ${{ github.actor == 'dependabot[bot]' }}
 
   publish:
     name: publish
     needs:
+      - prerequisites
       - test
       - license_check
       #{{- range $action, $_ := .Config.extraTests }}#
@@ -77,13 +81,11 @@ jobs:
         role-external-id: upload-pulumi-release
         role-session-name: #{{ .Config.provider }}#@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
-    - id: version
-      uses: pulumi/provider-version-action@v1
     - name: Run GoReleaser
       uses: #{{ .Config.actionVersions.goReleaser }}#
       env:
-        GORELEASER_CURRENT_TAG: v${{ steps.version.outputs.version }}
-        PROVIDER_VERSION: ${{ steps.version.outputs.version }}
+        GORELEASER_CURRENT_TAG: v${{ needs.prerequisites.outputs.version }}
+        PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
       with:
         args: -p #{{ .Config.parallel }}# -f .goreleaser.prerelease.yml --rm-dist --skip-validate --timeout
           #{{ .Config.timeout }}#m0s
@@ -97,16 +99,16 @@ jobs:
         status: ${{ job.status }}
   publish_sdk:
     name: publish_sdk
-    needs: publish
+    needs: 
+      - prerequisites
+      - publish
     runs-on: #{{ .Config.runner.default }}#
     steps:
-    - id: version
-      uses: pulumi/provider-version-action@v1
     - name: Publish SDKs
       uses: #{{ .Config.publish.publisherAction }}#
       with:
         sdk: #{{ .Config.publish.sdk }}#
-        version: ${{ steps.version.outputs.version }}
+        version: ${{ needs.prerequisites.outputs.version }}
         dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
         java-version: "#{{ .Config.toolVersions.java }}#"
         node-version: "#{{ .Config.toolVersions.node }}#"
@@ -125,7 +127,9 @@ jobs:
 #{{- if .Config.publish.goSdk.usePush }}#
   publish_go_sdk:
     name: publish_go_sdk
-    needs: publish_sdk
+    needs: 
+      - prerequisites
+      - publish_sdk
     runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: Checkout Repo
@@ -139,8 +143,6 @@ jobs:
       with:
         tag: #{{ .Config.actionVersions.pulumictlTag }}#
         repo: pulumi/pulumictl
-    - id: version
-      uses: pulumi/provider-version-action@v1
     - name: Download Go SDK
       uses: actions/download-artifact@v4
       with:
@@ -156,7 +158,7 @@ jobs:
         base-ref: #{{ .Config.publish.goSdk.baseRef }}#
         source: #{{ .Config.publish.goSdk.source }}#
         path: #{{ .Config.publish.goSdk.path }}#
-        version: ${{ steps.version.outputs.version }}
+        version: ${{ needs.prerequisites.outputs.version }}
         additive: #{{ .Config.publish.goSdk.additive }}#
         # Avoid including other language SDKs & artifacts in the commit
         files: |
@@ -166,11 +168,15 @@ jobs:
 #{{- end }}#
   test:
     name: test
-    needs: build_sdk
+    needs: 
+      - prerequisites
+      - build_sdk
     permissions:
       contents: read
       id-token: write
     runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    env:
+      PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
 #{{- if .Config.freeDiskSpaceBeforeTest }}#
     # Run as first step so we don't delete things that have just been installed
@@ -186,9 +192,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - uses: pulumi/provider-version-action@v1
-      with:
-        set-env: 'PROVIDER_VERSION'
     - name: Install Go
       uses: #{{ .Config.actionVersions.setupGo }}#
       with:
