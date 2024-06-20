@@ -7,21 +7,32 @@ on:
         description: "The version of the provider to verify"
         required: true
         type: string
+      enableMacRunner:
+        description: "Enable the MacOS runner in addition to Linux and Windows. Defaults to 'false'."
+        required: false
+        type: boolean
   workflow_call:
     inputs:
       providerVersion:
-        type: string
+        description: "The version of the provider to verify"
         required: true
+        type: string
+      enableMacosRunner:
+        description: "Enable the macos-latest runner in addition to ubuntu-latest and windows-latest. Defaults to 'false'."
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   verify-release:
     name: verify-release
     strategy:
       matrix:
-        runner:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+        # We always run on Linux and Windows, and optionally on MacOS. This is because MacOS runners have limited availability.
+        # Expression expands to ["ubuntu-latest","windows-latest"] or ["ubuntu-latest","windows-latest","macos-latest"]
+        # GitHub expressions don't have 'if' statements, so we use a ternary operator to conditionally include the MacOS runner suffix.
+        # See the docs for a similar example to this: https://docs.github.com/en/actions/learn-github-actions/expressions#fromjson
+        runner: ${{ fromJSON(format('["ubuntu-latest","windows-latest"{0}]', github.event.inputs.enableMacRunner == 'true' && ',"macos-latest"' || '')) }}
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout Repo
