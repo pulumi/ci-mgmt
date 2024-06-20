@@ -23,6 +23,9 @@ on:
         type: boolean
         default: false
 
+env:
+#{{ .Config.env | toYaml | indent 2 }}#
+
 jobs:
   verify-release:
     name: verify-release
