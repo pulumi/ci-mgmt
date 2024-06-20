@@ -44,10 +44,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup tools
         uses: ./.github/actions/setup-tools
-      - id: version
-        uses: pulumi/provider-version-action@v1
-        with:
-          set-env: 'PROVIDER_VERSION'
 #{{- if .Config.releaseVerification.nodejs }}#
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@v1
@@ -55,7 +51,7 @@ jobs:
           runtime: nodejs
           directory: #{{ .Config.releaseVerification.nodejs }}#
           provider: #{{ .Config.provider }}#
-          providerVersion: ${{ inputs.version }}
+          providerVersion: ${{ inputs.providerVersion }}
 #{{- else }}#
       - run: echo "::warning file=.ci-mgmt.yaml,title=Node.js release verification missing::Add the key releaseVerification.nodejs to .ci-mgmt.yaml pointing to the directory containing a Pulumi nodejs project to preview."
 #{{- end }}#
@@ -66,7 +62,7 @@ jobs:
           runtime: python
           directory: #{{ .Config.releaseVerification.python }}#
           provider: #{{ .Config.provider }}#
-          providerVersion: ${{ inputs.version }}
+          providerVersion: ${{ inputs.providerVersion }}
 #{{- else }}#
       - run: echo "::warning file=.ci-mgmt.yaml,title=Python release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi python project to preview."
 #{{- end }}#
@@ -77,7 +73,7 @@ jobs:
           runtime: dotnet
           directory: #{{ .Config.releaseVerification.dotnet }}#
           provider: #{{ .Config.provider }}#
-          providerVersion: ${{ inputs.version }}
+          providerVersion: ${{ inputs.providerVersion }}
 #{{- else }}#
       - run: echo "::warning file=.ci-mgmt.yaml,title=Dotnet release verification missing::Add the key releaseVerification.dotnet to .ci-mgmt.yaml pointing to the directory containing a Pulumi dotnet project to preview."
 #{{- end }}#
@@ -88,7 +84,7 @@ jobs:
           runtime: go
           directory: #{{ .Config.releaseVerification.go }}#
           provider: #{{ .Config.provider }}#
-          providerVersion: ${{ inputs.version }}
+          providerVersion: ${{ inputs.providerVersion }}
 #{{- else }}#
       - run: echo "::warning file=.ci-mgmt.yaml,title=Go release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi go project to preview."
 #{{- end }}#

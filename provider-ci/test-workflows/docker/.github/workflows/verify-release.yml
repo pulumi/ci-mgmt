@@ -36,10 +36,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup tools
         uses: ./.github/actions/setup-tools
-      - id: version
-        uses: pulumi/provider-version-action@v1
-        with:
-          set-env: 'PROVIDER_VERSION'
       - run: echo "::warning file=.ci-mgmt.yaml,title=Node.js release verification missing::Add the key releaseVerification.nodejs to .ci-mgmt.yaml pointing to the directory containing a Pulumi nodejs project to preview."
       - run: echo "::warning file=.ci-mgmt.yaml,title=Python release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi python project to preview."
       - run: echo "::warning file=.ci-mgmt.yaml,title=Dotnet release verification missing::Add the key releaseVerification.dotnet to .ci-mgmt.yaml pointing to the directory containing a Pulumi dotnet project to preview."
