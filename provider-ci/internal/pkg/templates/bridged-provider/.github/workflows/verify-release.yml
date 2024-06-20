@@ -28,16 +28,20 @@ jobs:
     name: verify-release
     strategy:
       matrix:
+#{{- if .Config.releaseVerification }}#
         # We always run on Linux and Windows, and optionally on MacOS. This is because MacOS runners have limited availability.
         # Expression expands to ["ubuntu-latest","windows-latest"] or ["ubuntu-latest","windows-latest","macos-latest"]
         # GitHub expressions don't have 'if' statements, so we use a ternary operator to conditionally include the MacOS runner suffix.
         # See the docs for a similar example to this: https://docs.github.com/en/actions/learn-github-actions/expressions#fromjson
         runner: ${{ fromJSON(format('["ubuntu-latest","windows-latest"{0}]', github.event.inputs.enableMacRunner == 'true' && ',"macos-latest"' || '')) }}
+#{{- else }}#
+        # We don't have any release verification configurations, so we only run on Linux to print warnings to help users configure the release verification.
+        runner: ["ubuntu-latest"]
+#{{- end }}#
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-#{{- if .Config.releaseVerification }}#
       - name: Setup tools
         uses: ./.github/actions/setup-tools
       - id: version
@@ -52,7 +56,9 @@ jobs:
           directory: #{{ .Config.releaseVerification.nodejs }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.version }}
-#{{ end }}#
+#{{- else }}#
+      - run: echo "::warning file=.ci-mgmt.yaml,title=Node.js release verification missing::Add the key releaseVerification.nodejs to .ci-mgmt.yaml pointing to the directory containing a Pulumi nodejs project to preview."
+#{{- end }}#
 #{{- if .Config.releaseVerification.python }}#
       - name: Verify python release
         uses: pulumi/verify-provider-release@v1
@@ -61,7 +67,9 @@ jobs:
           directory: #{{ .Config.releaseVerification.python }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.version }}
-#{{ end }}#
+#{{- else }}#
+      - run: echo "::warning file=.ci-mgmt.yaml,title=Python release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi python project to preview."
+#{{- end }}#
 #{{- if .Config.releaseVerification.dotnet }}#
       - name: Verify dotnet release
         uses: pulumi/verify-provider-release@v1
@@ -70,7 +78,9 @@ jobs:
           directory: #{{ .Config.releaseVerification.dotnet }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.version }}
-#{{ end }}#
+#{{- else }}#
+      - run: echo "::warning file=.ci-mgmt.yaml,title=Dotnet release verification missing::Add the key releaseVerification.dotnet to .ci-mgmt.yaml pointing to the directory containing a Pulumi dotnet project to preview."
+#{{- end }}#
 #{{- if .Config.releaseVerification.go }}#
       - name: Verify go release
         uses: pulumi/verify-provider-release@v1
@@ -79,5 +89,6 @@ jobs:
           directory: #{{ .Config.releaseVerification.go }}#
           provider: #{{ .Config.provider }}#
           providerVersion: ${{ inputs.version }}
-#{{ end }}#
-#{{ end }}#
+#{{- else }}#
+      - run: echo "::warning file=.ci-mgmt.yaml,title=Go release verification missing::Add the key releaseVerification.python to .ci-mgmt.yaml pointing to the directory containing a Pulumi go project to preview."
+#{{- end }}#
