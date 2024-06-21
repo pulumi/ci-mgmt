@@ -1,0 +1,95 @@
+name: "Verify Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      providerVersion:
+        description: "The version of the provider to verify"
+        required: true
+        type: string
+      enableMacRunner:
+        description: "Enable the MacOS runner in addition to Linux and Windows. Defaults to 'false'."
+        required: false
+        type: boolean
+  workflow_call:
+    inputs:
+      providerVersion:
+        description: "The version of the provider to verify"
+        required: true
+        type: string
+      enableMacosRunner:
+        description: "Enable the macos-latest runner in addition to ubuntu-latest and windows-latest. Defaults to 'false'."
+        required: false
+        type: boolean
+        default: false
+
+env:
+#{{ .Config.env | toYaml | indent 2 }}#
+
+jobs:
+  verify-release:
+    name: verify-release
+#{{- if not .Config.releaseVerification }}#
+    # We don't have any release verification configurations, so we never run this workflow.
+    # Configure your .ci-mgmt.yaml files to include the release verification configurations e.g.
+    # releaseVerification:
+    #   nodejs: path/to/nodejs/project
+    #   python: path/to/python/project
+    #   dotnet: path/to/dotnet/project
+    #   go: path/to/go/project
+    if: false
+#{{- end }}#
+    strategy:
+      matrix:
+#{{- if .Config.releaseVerification }}#
+        # We always run on Linux and Windows, and optionally on MacOS. This is because MacOS runners have limited availability.
+        # Expression expands to ["ubuntu-latest","windows-latest"] or ["ubuntu-latest","windows-latest","macos-latest"]
+        # GitHub expressions don't have 'if' statements, so we use a ternary operator to conditionally include the MacOS runner suffix.
+        # See the docs for a similar example to this: https://docs.github.com/en/actions/learn-github-actions/expressions#fromjson
+        runner: ${{ fromJSON(format('["ubuntu-latest","windows-latest"{0}]', github.event.inputs.enableMacRunner == 'true' && ',"macos-latest"' || '')) }}
+#{{- else }}#
+        # We don't have any release verification configurations, so we only run on Linux to print warnings to help users configure the release verification.
+        runner: ["ubuntu-latest"]
+#{{- end }}#
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+#{{- if .Config.releaseVerification.nodejs }}#
+      - name: Verify nodejs release
+        uses: pulumi/verify-provider-release@v1
+        with:
+          runtime: nodejs
+          directory: #{{ .Config.releaseVerification.nodejs }}#
+          provider: #{{ .Config.provider }}#
+          providerVersion: ${{ inputs.providerVersion }}
+#{{- end }}#
+#{{- if .Config.releaseVerification.python }}#
+      - name: Verify python release
+        uses: pulumi/verify-provider-release@v1
+        with:
+          runtime: python
+          directory: #{{ .Config.releaseVerification.python }}#
+          provider: #{{ .Config.provider }}#
+          providerVersion: ${{ inputs.providerVersion }}
+#{{- end }}#
+#{{- if .Config.releaseVerification.dotnet }}#
+      - name: Verify dotnet release
+        uses: pulumi/verify-provider-release@v1
+        with:
+          runtime: dotnet
+          directory: #{{ .Config.releaseVerification.dotnet }}#
+          provider: #{{ .Config.provider }}#
+          providerVersion: ${{ inputs.providerVersion }}
+#{{- end }}#
+#{{- if .Config.releaseVerification.go }}#
+      - name: Verify go release
+        uses: pulumi/verify-provider-release@v1
+        with:
+          runtime: go
+          directory: #{{ .Config.releaseVerification.go }}#
+          provider: #{{ .Config.provider }}#
+          providerVersion: ${{ inputs.providerVersion }}
+#{{- end }}#
