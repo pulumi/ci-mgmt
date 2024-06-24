@@ -56,9 +56,14 @@ func GeneratePackage(opts GenerateOpts) error {
 // Each directory is rendered into the same output directory.
 // Care should be taken to ensure that the template files do not conflict with each other.
 func getTemplateDirs(templateName string) ([]string, error) {
+	// Available templates:
+	// - provider: the main template for any provider repository
+	// - bridged-provider: a template for a provider repository that uses tf-bridge & follows the boilerplate structure.
+	// - dev-container: a dev-container setup for any pulumi related project.
 	switch templateName {
 	case "bridged-provider":
-		return []string{"provider", "bridged-provider", "dev-container"}, nil
+		// Render more specific templates last to allow them to override more general templates.
+		return []string{"provider", "dev-container", "bridged-provider"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
