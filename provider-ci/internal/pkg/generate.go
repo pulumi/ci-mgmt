@@ -74,8 +74,8 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 	// .name is opts.packageName
 	// .config is the unmarshalled YAML content of opts.configPath
 
-	if !HasTemplate(opts.TemplateName) {
-		return fmt.Errorf("template %s not found", opts.TemplateName)
+	if !HasTemplate(template) {
+		return fmt.Errorf("template %s not found", template)
 	}
 
 	config := opts.Config
@@ -88,7 +88,7 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 		Config:      config,
 	}
 
-	templateDir := filepath.Join("templates", opts.TemplateName)
+	templateDir := filepath.Join("templates", template)
 
 	var err error
 	ctx.Splices, err = collectSplices(templateDir, ctx)
