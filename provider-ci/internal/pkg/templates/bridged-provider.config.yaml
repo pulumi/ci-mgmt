@@ -78,7 +78,6 @@ actionVersions:
   cleanupArtifact: c-hive/gha-remove-artifacts@v1
   createOrUpdateComment: peter-evans/create-or-update-comment@v1
   downloadArtifact: actions/download-artifact@v4
-  notifySlack: 8398a7/action-slack@v3
   pathsFilter: dorny/paths-filter@v2
   prComment: thollander/actions-comment-pull-request@v2
   slashCommand: peter-evans/slash-command-dispatch@v2
