@@ -39,6 +39,32 @@ type templateContext struct {
 }
 
 func GeneratePackage(opts GenerateOpts) error {
+	templateDirs, err := getTemplateDirs(opts.TemplateName)
+	if err != nil {
+		return fmt.Errorf("error getting template directories: %w", err)
+	}
+	for _, templateDir := range templateDirs {
+		err = renderTemplateDir(templateDir, opts)
+		if err != nil {
+			return fmt.Errorf("error rendering template %s: %w", templateDir, err)
+		}
+	}
+	return nil
+}
+
+// getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
+// Each directory is rendered into the same output directory.
+// Care should be taken to ensure that the template files do not conflict with each other.
+func getTemplateDirs(templateName string) ([]string, error) {
+	switch templateName {
+	case "bridged-provider":
+		return []string{"bridged-provider"}, nil
+	default:
+		return nil, fmt.Errorf("unknown template: %s", templateName)
+	}
+}
+
+func renderTemplateDir(template string, opts GenerateOpts) error {
 	// Template context is global and loaded from the file at opts.configPath
 	// The embedded filesystem templateFS should contain a subdirectory with the name of opts.templateName
 	// For each file in the subdirectory, apply templating and write to opts.outDir with the same relative path
