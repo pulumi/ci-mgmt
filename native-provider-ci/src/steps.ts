@@ -352,6 +352,18 @@ export function DispatchDocsBuildEvent(): Step {
   };
 }
 
+export function SetPulumiCliVersion(): Step {
+  return {
+    name: "Set Pulumi CLI Version",
+    run:
+      "if [ -s .pulumi.version ]; then\n" +
+      '  echo "PULUMI_CLI_VERSION=$(cat .pulumi.version)" >> $GITHUB_ENV\n' +
+      "else\n" +
+      '  echo "PULUMI_CLI_VERSION=^3" >> $GITHUB_ENV\n' +
+      "fi",
+  };
+}
+
 export function InstallPulumiCli(version?: string): Step {
   const withBlock = version ? { "pulumi-version": version } : undefined;
   return {
