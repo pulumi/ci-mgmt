@@ -58,7 +58,7 @@ func GeneratePackage(opts GenerateOpts) error {
 func getTemplateDirs(templateName string) ([]string, error) {
 	switch templateName {
 	case "bridged-provider":
-		return []string{"bridged-provider"}, nil
+		return []string{"bridged-provider", "dev-container"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
