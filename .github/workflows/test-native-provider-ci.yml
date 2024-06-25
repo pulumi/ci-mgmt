@@ -1,0 +1,23 @@
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - native-provider-ci/**
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    name: Test native providers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Validate native-providers
+        run: cd native-provider-ci && make all
+      - name: Check worktree clean
+        uses: pulumi/git-status-check-action@v1

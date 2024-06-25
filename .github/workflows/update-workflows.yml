@@ -51,6 +51,9 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.11.0
         with:
           repo: pulumi/pulumictl
+          tag: v0.0.46
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@v4
         with:
