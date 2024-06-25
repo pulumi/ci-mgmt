@@ -1,4 +1,5 @@
 provider: kubernetes-cert-manager
+pulumiVersionFile: .pulumi.version
 major-version: 0
 env:
   AWS_REGION: us-west-2

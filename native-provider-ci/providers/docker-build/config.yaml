@@ -2,6 +2,7 @@ provider: docker-build
 major-version: 0
 defaultBranch: main
 providerVersion: github.com/pulumi/pulumi-docker-build/provider.Version
+pulumiVersionFile: .pulumi.version
 aws: true
 gcp: true
 sdkModuleDir: sdk/go/dockerbuild

@@ -26,6 +26,7 @@ export const WorkflowOpts = z.object({
   skipCodegen: z.boolean().default(false),
   skipWindowsArmBuild: z.boolean().default(false),
   pulumiCLIVersion: z.string().optional(),
+  pulumiVersionFile: z.string().optional(),
   hasGenBinary: z.boolean().default(true),
   defaultBranch: z.string().default("master"),
 });
@@ -457,7 +458,7 @@ export class BuildSdkJob implements NormalJob {
       steps.SetProviderVersionStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
@@ -512,7 +513,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.SetProviderVersionStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallSchemaChecker(opts.provider),
       steps.BuildK8sgen(opts.provider),
       steps.PrepareOpenAPIFile(opts.provider),
@@ -589,7 +590,7 @@ export class TestsJob implements NormalJob {
       steps.SetProviderVersionStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallNodeJS(),
       steps.InstallDotNet(),
       steps.InstallPython(),
@@ -652,7 +653,7 @@ export class BuildTestClusterJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallNodeJS(),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
@@ -697,7 +698,7 @@ export class TeardownTestClusterJob implements NormalJob {
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.InstallGo(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallNodeJS(),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
@@ -759,7 +760,7 @@ export class PublishPrereleaseJob implements NormalJob {
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.RunGoReleaserWithArgs(
         `-p ${opts.parallel} -f .goreleaser.prerelease.yml --clean --skip=validate --timeout ${opts.timeout}m0s`
@@ -788,7 +789,7 @@ export class PublishJob implements NormalJob {
       steps.InstallGo(),
       steps.FreeDiskSpace(this["runs-on"]),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.ConfigureAwsCredentialsForPublish(),
       steps.RunGoReleaserWithArgs(
         `-p ${opts.parallel} release --clean --timeout ${opts.timeout}m0s`
@@ -959,7 +960,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.SetProviderVersionStep(),
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.InstallDotNet(),
       steps.InstallNodeJS(),
       steps.InstallPython(),
@@ -987,7 +988,7 @@ export class NightlySdkGeneration implements NormalJob {
       // Pass the provider here as an option so that it can be skipped if not needed
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
-      steps.InstallPulumiCli(opts.pulumiCLIVersion),
+      steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.AzureLogin(opts.provider),
       steps.MakeClean(),
