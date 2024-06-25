@@ -1,19 +1,55 @@
+# major version of the current provider - used in make files and goreleaser
+# This should always be set by all providers as this is key to.
 major-version: 2
+
+# If set, javaGenVersion ensures a specific javaGen version is used during upgrades.
 #javaGenVersion: 0.0.0
-#upstreamProviderOrg: terraform-providers"
+
+# upstreamProviderOrg is optional and used in the bridge upgrade config.
+#upstreamProviderOrg: terraform-providers
+
+# parallel sets goreleaser's -p argument
 parallel: 3
+
+# timeout sets goreleaser's timeout during any kind of release
 timeout: 60
+
+# lint includes an extra lint job in workflows if enabled (default). Can be set explicit to false.
+# This is false in around 8 provider repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code
 lint: true
+
+# providerDefaultBranch is used to customise the default branch when needed
+# Currently set in around 17 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerDefaultBranch%3A%22&type=code
 providerDefaultBranch: master
+
+# Sets PULUMI_MISSING_MAPPING_ERROR and PULUMI_EXTRA_MAPPING_ERROR in resync-build
+# Used in alicloud only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-missing-mapping%3A%22&type=code
 fail-on-missing-mapping: true
+# Not used: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-extra-mapping%3A%22&type=code
 fail-on-extra-mapping: true
+
+# publishRegistry decides if create_docs_build happens during release
+# This can be overridden to false to not publish updates.
+# This is disabled in 5 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publishRegistry%3A%22&type=code
 publishRegistry: true
+
+# checkoutSubmodules is used for all checkouts during CI
+# Only 3 providers use submodules: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22checkoutSubmodules%3A%22&type=code
 checkoutSubmodules: false
+
+# testMasterAndReleaseWorkflows runs the master and release workflows on every pull request.
+# This option is currently never set to true: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testMasterAndReleaseWorkflows%3A%22&type=code
 testMasterAndReleaseWorkflows: false
+
 # Set to true to clear disk space before running prerequisites workflow.
+# This is used for larger providers which sometimes run out of disk space during builds.
 freeDiskSpaceBeforeBuild: false
+
 # Set to true to clear disk space before running test jobs.
 freeDiskSpaceBeforeTest: false
+
+# Used for centrally managing tool versions.
+# This is not currently overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22toolVersions%22&type=code
 toolVersions:
   dotnet: "6.0.x"
   go: "1.21.x"
@@ -22,6 +58,10 @@ toolVersions:
   node: "20.x"
   pulumi: "dev"
   python: "3.11.8"
+
+# env contains an assortment of properties for different purposes.
+# Additional entries are added by individual providers for different reasons.
+# All jobs currently get the same env for all steps but values might only be used for very specific purposes.
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -40,6 +80,10 @@ env:
   SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TF_APPEND_USER_AGENT: pulumi
+
+# actions can contain preBuild and preTest additional steps to be spliced into workflows.
+# The use of these hooks vary.
+# Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
 actions: {}
   # preBuild:
   #  - Your action here
@@ -52,13 +96,20 @@ extraTests:
 #   your_test_name:
 #     name: My Test
 #     ...
+
 # Run e2e tests using the examples and test suite in the pulumi/examples repo.
 testPulumiExamples: false
+
+# runner defines the runs-on property for various stages of the build
+# These are not overridden by any providers
 runner:
   default: ubuntu-latest
   prerequisites: ubuntu-latest
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
+
+# actionVersions should be used wherever we use external actions to make upgrading easier.
+# These should never be overridden by individual providers.
 actionVersions:
   setupGo: actions/setup-go@v5
   setupDotNet: actions/setup-dotnet@v4
@@ -84,9 +135,16 @@ actionVersions:
   uploadArtifact: actions/upload-artifact@v4
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.12
   slackNotification: rtCamp/action-slack-notify@v2
+
+# publish contains multiple properties relating to the publish jobs.
 publish:
+  # publisherAction is the version of the pulumi-package-publisher action to use.
+  # This should be pinned to just the major version once v1 is released.
   publisherAction: pulumi/pulumi-package-publisher@v0.0.18
+  # passed to the sdk input of pulumi-package-publisher
+  # This is overridden in pulumi-local to disable python
   sdk: all
+  # goSdk is no longer needed as is not overridden in specific providers.
   goSdk:
     # Set to `true` to use the below configuration to push a new commit somewhere else.
     usePush: true
@@ -96,6 +154,9 @@ publish:
     source: sdk
     path: sdk
     additive: false
+
+# worktreeAllowedChanges defines which files we expect to find changes in when building in CI with a different version number
+# This could be in-lined as is not needed to be overridden.
 worktreeAllowedChanges: |-
   sdk/**/pulumi-plugin.json
   sdk/dotnet/Pulumi.*.csproj
