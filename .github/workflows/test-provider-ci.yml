@@ -2,49 +2,31 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - provider-ci/**
+
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  lint:
-    name: Run actionlint and shellcheck
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@v1.11.0
-        with:
-          repo: pulumi/pulumictl
-      - name: Install actionlint
-        uses: jaxxstorm/action-install-gh-release@v1.11.0
-        with:
-          repo: rhysd/actionlint
-      - name: lint providers
-        run: cd provider-ci && make lint-providers
-      - name: lint native providers
-        run: cd native-provider-ci && make lint
-      - name: lint workflows
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
-        shell: bash
   test:
     name: Verify against testdata
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@v1.11.0
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
         with:
-          repo: pulumi/pulumictl
-      - name: Validate native-providers
-        run: cd native-provider-ci && make all
-      - name: Validate that our test workflows match checked in workflows
-        run: cd provider-ci && make test-workflow-generation
+          working-directory: provider-ci
+      - name: Configure git
+        # Set the default branch to silence the warnings about the default branch name changing
+        # The branch doesn't matter here because it's only used for a temp repo for actionlint
+        run: git config --global init.defaultBranch master
+      - name: Build & test
+        run: cd provider-ci && make all
       - name: Check worktree clean
         uses: pulumi/git-status-check-action@v1
 
