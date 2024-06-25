@@ -41,16 +41,17 @@ test-providers: test-provider/aws test-provider/docker test-provider/cloudflare
 
 # 1. Delete all files except the .ci-mgmt.yaml file and run the provider-ci generate command.
 # 2. Copy the generated provider repository to a temporary git repo and run actionlint on it.
+test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
-	cd test-providers/$* && \
+	cd test-providers/$(PROVIDER_NAME) && \
 		find . -type f ! -name '.ci-mgmt.yaml' -delete && \
-		../../bin/provider-ci generate --name pulumi/pulumi-$*
-	rm -rf bin/test-provider/$*/repo
-	mkdir -p bin/test-provider/$*/repo
-	cp -r test-providers/$* bin/test-provider/$*/repo
-	cd bin/test-provider/$*/repo &&	git init
-	cd bin/test-provider/$*/repo &&	../../../../$(ACTIONLINT) -config-file ../../../../actionlint.yml
-	rm -rf bin/test-provider/$*/repo/.git
+		../../bin/provider-ci generate --name pulumi/pulumi-$(PROVIDER_NAME)
+	rm -rf bin/test-provider/$(PROVIDER_NAME)/repo
+	mkdir -p bin/test-provider/$(PROVIDER_NAME)/repo
+	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider/$(PROVIDER_NAME)/repo
+	cd bin/test-provider/$(PROVIDER_NAME)/repo &&	git init
+	cd bin/test-provider/$(PROVIDER_NAME)/repo &&	../../../../$(ACTIONLINT) -config-file ../../../../actionlint.yml
+	rm -rf bin/test-provider/$(PROVIDER_NAME)/repo/.git
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
