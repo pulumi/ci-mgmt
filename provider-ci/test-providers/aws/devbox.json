@@ -1,6 +1,5 @@
 {
   "packages": [
-      "awscli2@latest",
     "yarn@latest",
     "pulumictl@latest",
     "go@1.21.",

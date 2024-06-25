@@ -6,6 +6,7 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE_ARN }}
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -45,7 +46,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: pulumi-ubuntu-8core
+    runs-on: ubuntu-latest
     env:
       PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
@@ -137,7 +138,7 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         role-duration-seconds: 3600
-        role-session-name: ${{ env.PROVIDER }}@githubActions
+        role-session-name: aws@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
     - name: Make upstream
       run: make upstream

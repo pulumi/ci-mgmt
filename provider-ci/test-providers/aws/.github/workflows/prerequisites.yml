@@ -23,6 +23,7 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE_ARN }}
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -71,15 +72,6 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         tools: go, pulumictl, pulumicli, schema-tools
-    - name: Clear GitHub Actions Ubuntu runner disk space
-      uses: jlumbroso/free-disk-spacev@v1
-      with:
-        android: true
-        dotnet: false
-        haskell: true
-        large-packages: false
-        swap-storage: true
-        tool-cache: false
     - name: Build schema generator binary
       run: make tfgen_build_only
     - name: Install plugins

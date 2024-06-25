@@ -10,7 +10,7 @@ PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN := pulumi-java-gen
 TESTPARALLELISM := 10
 WORKING_DIR := $(shell pwd)
-PULUMI_CONVERT := 0
+PULUMI_CONVERT := 1
 PULUMI_MISSING_DOCS_ERROR := true
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
@@ -115,7 +115,8 @@ install_nodejs_sdk:
 install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 install_plugins: .pulumi/bin/pulumi
-	.pulumi/bin/pulumi plugin install resource aws 5.37.0
+	.pulumi/bin/pulumi plugin install converter terraform 1.0.16
+	.pulumi/bin/pulumi plugin install resource aws 6.8.0
 
 lint_provider: provider
 	cd provider && golangci-lint run -c ../.golangci.yml
