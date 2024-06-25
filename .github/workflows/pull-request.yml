@@ -23,7 +23,7 @@ jobs:
         with:
           repo: rhysd/actionlint
       - name: lint providers
-        run: cd provider-ci && make lint-providers
+        run: cd provider-ci && make test-providers
       - name: lint native providers
         run: cd native-provider-ci && make lint
       - name: lint workflows
@@ -44,7 +44,7 @@ jobs:
       - name: Validate native-providers
         run: cd native-provider-ci && make all
       - name: Validate that our test workflows match checked in workflows
-        run: cd provider-ci && make test-workflow-generation
+        run: cd provider-ci && make test-providers
       - name: Check worktree clean
         uses: pulumi/git-status-check-action@v1
 
