@@ -2,8 +2,6 @@ on:
   pull_request:
     branches:
       - master
-    paths:
-      - provider-ci/**
 
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
