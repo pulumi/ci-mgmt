@@ -1081,7 +1081,7 @@ export function UnzipSpecificSDKStep(name: string): Step {
 export function InstallTwine(): Step {
   return {
     name: "Install Twine",
-    run: "python -m pip install pip twine",
+    run: "python -m pip install twine==5.0.0",
   };
 }
 
