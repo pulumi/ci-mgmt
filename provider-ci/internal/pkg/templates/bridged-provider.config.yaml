@@ -1,12 +1,23 @@
+# provider is the name of the provider without the pulumi-prefix e.g. "aws"
+# This MUST be set in every provider
+#provider: xyz
+
 # major version of the current provider - used in make files and goreleaser
 # This should always be set by all providers as this is key to.
 major-version: 2
+
+# The path to the Go code location to set the version for the provider.
+#providerVersion: github.com/org/terraform-provider-xyz/version.ProviderVersion
 
 # If set, javaGenVersion ensures a specific javaGen version is used during upgrades.
 #javaGenVersion: 0.0.0
 
 # upstreamProviderOrg is optional and used in the bridge upgrade config.
 #upstreamProviderOrg: terraform-providers
+
+# upstream-provider-repo is used in the bridge upgrade config.
+# Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
+#upstream-provider-repo: terraform-provider-xyz
 
 # parallel sets goreleaser's -p argument
 parallel: 3
@@ -170,3 +181,59 @@ worktreeAllowedChanges: |-
   # python: examples/simple-python
   # dotnet: examples/simple-dotnet
   # go: exampels/simple-go
+
+# Go releaser: skip the post cleaning steps
+#skipGoReleaserHooks: false
+
+# Go releaser: add ignore for arm64 windows.
+#skipWindowsArmBuild: false
+
+# List of extra flags used only in goreleaser.
+# Only used by newrelic: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extra-ld-flags%22&type=code
+#extra-ld-flags:
+# - "-X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi"
+
+# Sets PULUMI_PROVIDER_BUILD_PARALLELISM in the makefile
+# Used in 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22goBuildParallelism%22&type=code
+#goBuildParallelism: 1
+
+# Sets PULUMI_CONVERT to 1 if truthy
+# Is set to "1" in 74 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22pulumiConvert%22&type=code
+#pulumiConvert
+
+# Adds a "docs" target in the makefile
+# Used only in pulumi-docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docsCmd%3A%22&type=code
+#docsCmd: "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
+
+# List of pulumi plugins to install in the "install_plugins" makefile target
+#plugins:
+# - name: random
+#   version: "4.16.1"
+
+# Adds extra steps for AWS's upstream make target
+#XrunUpstreamTools
+
+# This is the aws provider
+#aws: true
+
+# This is the docker provider
+#docker
+
+# This is the gcp provider
+#gcp
+
+# Enable logging into the GCP registry during the test CI job
+#gcpRegistry
+
+# Execute a scipt during the test CI job
+# Used in 3 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22setup-script%3A%22&type=code
+#setup-script: testing/setup.sh
+
+# Set to true to include the nightly-test workflow
+#generate-nightly-test-workflow
+
+# List of objects with `name` and `version` properties for the devbox packages.
+# Unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22nixpkgs%3A%22&type=code
+#nixpkgs:
+# - name: foo
+#   version: 1.2.3
