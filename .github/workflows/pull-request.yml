@@ -41,6 +41,9 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.11.0
         with:
           repo: pulumi/pulumictl
+      - name: Configure git
+        # Set the default branch to silence the warnings about the default branch name changing
+        run: git config --global init.defaultBranch master
       - name: Validate native-providers
         run: cd native-provider-ci && make all
       - name: Validate that our test workflows match checked in workflows
