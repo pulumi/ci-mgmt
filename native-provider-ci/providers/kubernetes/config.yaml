@@ -2,6 +2,7 @@ provider: kubernetes
 lint: true
 aws: true
 gcp: true
+pulumiVersionFile: .pulumi.version
 major-version: 4
 env:
   AWS_REGION: us-west-2

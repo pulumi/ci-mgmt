@@ -352,8 +352,19 @@ export function DispatchDocsBuildEvent(): Step {
   };
 }
 
-export function InstallPulumiCli(version?: string): Step {
-  const withBlock = version ? { "pulumi-version": version } : undefined;
+export function InstallPulumiCli(version?: string, versionFile?: string): Step {
+  if (version && versionFile) {
+    throw new Error(
+      'only one of "version" or "versionFile" can be provided, not both'
+    );
+  }
+  let withBlock: { [key: string]: string } | undefined = undefined;
+  if (version) {
+    withBlock = { "pulumi-version": version };
+  }
+  if (versionFile) {
+    withBlock = { "pulumi-version-file": versionFile };
+  }
   return {
     name: "Install Pulumi CLI",
     uses: action.installPulumiCli,
