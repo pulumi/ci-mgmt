@@ -21,6 +21,10 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.11.0
         with:
           repo: pulumi/pulumictl
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: provider-ci
       - name: Configure git
         # Set the default branch to silence the warnings about the default branch name changing
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
