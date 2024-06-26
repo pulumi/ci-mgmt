@@ -139,7 +139,6 @@ actionVersions:
   googleAuth: google-github-actions/auth@v2
   goReleaser: goreleaser/goreleaser-action@v5
   checkout: actions/checkout@v4
-  createOrUpdateComment: peter-evans/create-or-update-comment@v1
   downloadArtifact: actions/download-artifact@v4
   pathsFilter: dorny/paths-filter@v2
   prComment: thollander/actions-comment-pull-request@v2
