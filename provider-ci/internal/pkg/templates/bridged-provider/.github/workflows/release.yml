@@ -125,7 +125,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-#{{- if .Config.publish.goSdk.usePush }}#
     - name: Download Go SDK
       uses: actions/download-artifact@v4
       with:
@@ -137,22 +136,17 @@ jobs:
       shell: bash
     - uses: pulumi/publish-go-sdk-action@v1
       with:
-        repository: #{{ .Config.publish.goSdk.repository }}#
-        base-ref: #{{ .Config.publish.goSdk.baseRef }}#
-        source: #{{ .Config.publish.goSdk.source }}#
-        path: #{{ .Config.publish.goSdk.path }}#
+        repository: ${{ github.repository }}
+        base-ref: ${{ github.sha }}
+        source: sdk
+        path: sdk
         version: ${{ needs.prerequisites.outputs.version }}
-        additive: #{{ .Config.publish.goSdk.additive }}#
+        additive: false
         # Avoid including other language SDKs & artifacts in the commit
         files: |
           go.*
           go/**
           !*.tar.gz
-#{{- else }}#
-    - name: Add SDK version tag
-      run: git tag "sdk/v${{ needs.prerequisites.outputs.version }}" && git push origin
-        "sdk/v${{ needs.prerequisites.outputs.version }}"
-#{{- end }}#
 
   clean_up_release_labels:
     name: Clean up release labels
