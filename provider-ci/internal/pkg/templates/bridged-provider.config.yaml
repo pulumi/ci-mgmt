@@ -1,19 +1,76 @@
+# provider is the name of the provider without the pulumi-prefix e.g. "aws"
+# This MUST be set in every provider
+#provider: xyz
+
+# major version of the current provider - used in make files and goreleaser
+# This should always be set by all providers as this is key to go module paths.
 major-version: 2
+
+# List of pulumi plugins to install in the "install_plugins" makefile target. Will include at least the terraform plugin
+# Should be set for all bridged providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22plugins%3A%22&type=code
+#plugins:
+# - name: terraform
+#   version: "1.0.16"
+#   kind: converter
+
+# The path to the Go code location to set the version for the provider.
+# Only set for 3 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerVersion%3A%22&type=code
+#providerVersion: github.com/org/terraform-provider-xyz/version.ProviderVersion
+
+# If set, javaGenVersion ensures a specific javaGen version is used during upgrades.
+# Set for 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22javaGenVersion%3A%22&type=code
 #javaGenVersion: 0.0.0
-#upstreamProviderOrg: terraform-providers"
+
+# upstreamProviderOrg is optional and used in the bridge upgrade config.
+# Only set for 4 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstreamProviderOrg%3A%22&type=code
+#upstreamProviderOrg: terraform-providers
+
+# upstream-provider-repo is used in the bridge upgrade config.
+# Only set for 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
+#upstream-provider-repo: terraform-provider-xyz
+
+# parallel sets goreleaser's -p argument
 parallel: 3
+
+# timeout sets goreleaser's timeout during any kind of release
 timeout: 60
+
+# lint includes an extra lint job in workflows if enabled (default). Can be set explicit to false.
+# This is false in around 8 provider repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code
 lint: true
+
+# providerDefaultBranch is used to customise the default branch when needed
+# Currently set in around 17 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerDefaultBranch%3A%22&type=code
 providerDefaultBranch: master
+
+# Sets PULUMI_MISSING_MAPPING_ERROR and PULUMI_EXTRA_MAPPING_ERROR in resync-build
+# Used in alicloud only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-missing-mapping%3A%22&type=code
 fail-on-missing-mapping: true
+# Not used: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-extra-mapping%3A%22&type=code
 fail-on-extra-mapping: true
+
+# publishRegistry decides if create_docs_build happens during release
+# This can be overridden to false to not publish updates.
+# This is disabled in 5 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publishRegistry%3A%22&type=code
 publishRegistry: true
+
+# checkoutSubmodules is used for all checkouts during CI
+# Only 3 providers use submodules: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22checkoutSubmodules%3A%22&type=code
 checkoutSubmodules: false
+
+# testMasterAndReleaseWorkflows runs the master and release workflows on every pull request.
+# This option is currently never set to true: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testMasterAndReleaseWorkflows%3A%22&type=code
 testMasterAndReleaseWorkflows: false
+
 # Set to true to clear disk space before running prerequisites workflow.
+# This is used for larger providers which sometimes run out of disk space during builds.
 freeDiskSpaceBeforeBuild: false
+
 # Set to true to clear disk space before running test jobs.
 freeDiskSpaceBeforeTest: false
+
+# Used for centrally managing tool versions.
+# This is not currently overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22toolVersions%22&type=code
 toolVersions:
   dotnet: "6.0.x"
   go: "1.21.x"
@@ -22,6 +79,10 @@ toolVersions:
   node: "20.x"
   pulumi: "dev"
   python: "3.11.8"
+
+# env contains an assortment of properties for different purposes.
+# Additional entries are added by individual providers for different reasons.
+# All jobs currently get the same env for all steps but values might only be used for very specific purposes.
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -40,6 +101,10 @@ env:
   SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TF_APPEND_USER_AGENT: pulumi
+
+# actions can contain preBuild and preTest additional steps to be spliced into workflows.
+# The use of these hooks vary - quite a few just build upstream and run provider tests.
+# Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
 actions: {}
   # preBuild:
   #  - Your action here
@@ -48,17 +113,26 @@ actions: {}
 
 # Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
 # `prerelease.yml` and `release.yml`.
+# Only used for aws: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
 extraTests:
 #   your_test_name:
 #     name: My Test
 #     ...
+
 # Run e2e tests using the examples and test suite in the pulumi/examples repo.
+# This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
+
+# runner defines the runs-on property for various stages of the build
+# These are not overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22runner%3A%22&type=code
 runner:
   default: ubuntu-latest
   prerequisites: ubuntu-latest
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
+
+# actionVersions should be used wherever we use external actions to make upgrading easier.
+# These are never overridden by providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actionVersions%3A%22&type=code
 actionVersions:
   setupGo: actions/setup-go@v5
   setupDotNet: actions/setup-dotnet@v4
@@ -84,9 +158,17 @@ actionVersions:
   uploadArtifact: actions/upload-artifact@v4
   upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.12
   slackNotification: rtCamp/action-slack-notify@v2
+
+# publish contains multiple properties relating to the publish jobs.
+# Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code
 publish:
+  # publisherAction is the version of the pulumi-package-publisher action to use.
+  # This should be pinned to just the major version once v1 is released.
   publisherAction: pulumi/pulumi-package-publisher@v0.0.18
+  # passed to the sdk input of pulumi-package-publisher
+  # This is overridden in pulumi-local to disable python
   sdk: all
+  # goSdk is no longer needed as is not overridden in specific providers.
   goSdk:
     # Set to `true` to use the below configuration to push a new commit somewhere else.
     usePush: true
@@ -96,6 +178,9 @@ publish:
     source: sdk
     path: sdk
     additive: false
+
+# worktreeAllowedChanges defines which files we expect to find changes in when building in CI with a different version number
+# This could be in-lined as is not needed to be overridden: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22worktreeAllowedChanges%3A%22&type=code
 worktreeAllowedChanges: |-
   sdk/**/pulumi-plugin.json
   sdk/dotnet/Pulumi.*.csproj
@@ -109,3 +194,61 @@ worktreeAllowedChanges: |-
   # python: examples/simple-python
   # dotnet: examples/simple-dotnet
   # go: exampels/simple-go
+
+# Go releaser: skip the post cleaning steps
+# Only used for gcp: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22skipGoReleaserHooks%3A%22&type=code
+#skipGoReleaserHooks: false
+
+# Go releaser: add ignore for arm64 windows.
+# Only used for minio: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22skipWindowsArmBuild%3A%22&type=code
+#skipWindowsArmBuild: false
+
+# List of extra flags used only in goreleaser.
+# Only used by newrelic: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extra-ld-flags%22&type=code
+#extra-ld-flags:
+# - "-X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi"
+
+# Sets PULUMI_PROVIDER_BUILD_PARALLELISM in the makefile
+# Used in 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22goBuildParallelism%22&type=code
+#goBuildParallelism: 1
+
+# Sets PULUMI_CONVERT to 1 if truthy
+# Is set to "1" in 74 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22pulumiConvert%22&type=code
+#pulumiConvert: false
+
+# Adds a "docs" target in the makefile
+# Used only in pulumi-docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docsCmd%3A%22&type=code
+#docsCmd: "cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./"
+
+# Adds extra steps for AWS's upstream make target
+#XrunUpstreamTools
+
+# Configure AWS credentials before running tests in CI job
+# Used in 4 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22aws%3A%22&type=code
+#aws: false
+
+# Run testing/docker-compose.yml up before running tests in CI job
+# Used in 9 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docker%3A%22&type=code
+#docker: false
+
+# Authenticate with GCP before running tests in CI job
+# Used in gcp and docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22gcp%3A%22&type=code
+#gcp: false
+
+# Enable logging into the GCP registry before running tests in CI job
+# Only used for docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22gcpRegistry%3A%22&type=code
+#gcpRegistry: false
+
+# Execute a script before running tests in CI job
+# Used in 3 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22setup-script%3A%22&type=code
+#setup-script: testing/setup.sh
+
+# Set to true to include the nightly-test workflow
+# Used in 11  providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22generate-nightly-test-workflow%3A%22&type=code
+#generate-nightly-test-workflow: false
+
+# List of objects with `name` and `version` properties for the devbox packages.
+# Unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22nixpkgs%3A%22&type=code
+#nixpkgs:
+# - name: foo
+#   version: 1.2.3
