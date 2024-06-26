@@ -448,7 +448,7 @@ export class BuildSdkJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts, tag: boolean) {
     if (opts.provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
+        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
     } else if (opts.provider === "command") {
       this["runs-on"] = "ubuntu-latest";
     }
@@ -494,7 +494,7 @@ export class BuildSdkJob implements NormalJob {
   addRunsOn(provider: string) {
     if (provider === "azure-native") {
       this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-11' || 'ubuntu-latest' }}";
+        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
     }
     return this;
   }
@@ -751,7 +751,7 @@ export class PublishPrereleaseJob implements NormalJob {
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
     if (opts.provider === "azure-native" || opts.provider === "aws-native") {
-      this["runs-on"] = "macos-11";
+      this["runs-on"] = "macos-latest";
     }
     this.name = name;
     this.steps = [
@@ -781,7 +781,7 @@ export class PublishJob implements NormalJob {
     this.name = name;
     Object.assign(this, { name });
     if (opts.provider === "azure-native" || opts.provider === "aws-native") {
-      this["runs-on"] = "macos-11";
+      this["runs-on"] = "macos-latest";
     }
     this.steps = [
       steps.CheckoutRepoStep(),
@@ -886,7 +886,7 @@ export class DocsBuildDispatchJob implements NormalJob {
 }
 
 export class Cf2PulumiRelease implements NormalJob {
-  "runs-on" = "macos-11";
+  "runs-on" = "macos-latest";
   steps = [
     steps.CheckoutRepoStep(),
     steps.SetProviderVersionStep(),
@@ -906,7 +906,7 @@ export class Cf2PulumiRelease implements NormalJob {
 }
 
 export class Arm2PulumiRelease implements NormalJob {
-  "runs-on" = "macos-11";
+  "runs-on" = "macos-latest";
   steps = [
     steps.CheckoutRepoStep(),
     steps.SetProviderVersionStep(),
