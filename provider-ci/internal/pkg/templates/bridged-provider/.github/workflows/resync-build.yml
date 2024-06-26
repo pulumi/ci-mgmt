@@ -23,34 +23,10 @@ jobs:
     - id: run-url
       name: Create URL to the run output
       run:  echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
       with:
-        go-version: "#{{ .Config.toolVersions.go }}#"
-        cache-dependency-path: |
-          sdk/go.sum
-    - name: Install pulumictl
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
-      with:
-        tag: #{{ .Config.actionVersions.pulumictlTag }}#
-        repo: pulumi/pulumictl
-    - name: Install Pulumi CLI
-      uses: #{{ .Config.actionVersions.setupPulumi }}#
-      with:
-        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
-    - name: Setup DotNet
-      uses: #{{ .Config.actionVersions.setupDotNet }}#
-      with:
-        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
-    - name: Setup Node
-      uses: #{{ .Config.actionVersions.setupNode }}#
-      with:
-        node-version: "#{{ .Config.toolVersions.node }}#"
-        registry-url: https://registry.npmjs.org
-    - name: Setup Python
-      uses: #{{ .Config.actionVersions.setupPython }}#
-      with:
-        python-version: "#{{ .Config.toolVersions.python }}#"
+        tools: pulumictl, pulumicli, go, node, dotnet, python
     - name: Sync with ci-mgmt
       run: cp -r "ci-mgmt/provider-ci/providers/$PROVIDER/repo/." .
     - name: Remove ci-mgmt directory
