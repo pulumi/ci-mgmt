@@ -123,17 +123,6 @@ jobs:
         java-version: "#{{ .Config.toolVersions.java }}#"
         node-version: "#{{ .Config.toolVersions.node }}#"
         python-version: "#{{ .Config.toolVersions.python }}#"
-    - env:
-        SLACK_CHANNEL: provider-upgrade-publish-status
-        SLACK_COLOR: "#FF0000"
-        SLACK_ICON_EMOJI: ":taco:"
-        SLACK_MESSAGE: "Publish failed :x:"
-        SLACK_TITLE: ${{ github.event.repository.name }} upgrade result
-        SLACK_USERNAME: provider-bot
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-      if: failure()
-      name: Send Publish Failure To Slack
-      uses: #{{ .Config.actionVersions.slackNotification }}#
   publish_go_sdk:
     name: publish_go_sdk
     needs:
