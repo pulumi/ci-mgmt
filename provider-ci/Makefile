@@ -46,12 +46,11 @@ test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
 		find . -type f ! -name '.ci-mgmt.yaml' -delete && \
 		../../bin/provider-ci generate --name pulumi/pulumi-$(PROVIDER_NAME)
-	rm -rf bin/test-provider/$(PROVIDER_NAME)/repo
-	mkdir -p bin/test-provider/$(PROVIDER_NAME)/repo
-	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider/$(PROVIDER_NAME)/repo
-	cd bin/test-provider/$(PROVIDER_NAME)/repo &&	git init
-	cd bin/test-provider/$(PROVIDER_NAME)/repo &&	../../../../$(ACTIONLINT) -config-file ../../../../actionlint.yml
-	rm -rf bin/test-provider/$(PROVIDER_NAME)/repo/.git
+	mkdir -p bin/test-provider
+	rm -rf bin/test-provider/$(PROVIDER_NAME)
+	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
+	cd bin/test-provider/$(PROVIDER_NAME) && git init
+	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
