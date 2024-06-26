@@ -957,7 +957,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.SetProviderVersionStep(),
+      // Do not calculate version here since we only want version embedded during releases.
       steps.InstallGo(),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
@@ -984,7 +984,7 @@ export class NightlySdkGeneration implements NormalJob {
     this.name = name;
     this.steps = [
       steps.CheckoutRepoStep(),
-      steps.SetProviderVersionStep(),
+      // Do not calculate version here since we only want version embedded during releases.
       // Pass the provider here as an option so that it can be skipped if not needed
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
