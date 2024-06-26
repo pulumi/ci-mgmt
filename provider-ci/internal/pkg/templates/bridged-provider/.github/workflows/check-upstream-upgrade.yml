@@ -8,18 +8,16 @@ jobs:
     name: Check for upstream provider upgrades
     runs-on: #{{ .Config.runner.default }}#
     steps:
-    - name: Install Go
-      uses: #{{ .Config.actionVersions.setupGo }}#
-      with:
-        go-version: "#{{ .Config.toolVersions.go }}#"
-        cache-dependency-path: |
-          sdk/go.sum
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
         #{{- if .Config.checkoutSubmodules }}#
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
     #{{- end }}#
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: go
     - name: Install upgrade-provider
       run: go install github.com/pulumi/upgrade-provider@main
       shell: bash

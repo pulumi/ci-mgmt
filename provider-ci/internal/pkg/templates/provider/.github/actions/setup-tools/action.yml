@@ -20,54 +20,55 @@ runs:
   steps:
     - name: Install Go
       if: inputs.tools == 'all' || contains(inputs.tools, 'go')
-      uses: #{{ .Config.actionVersions.setupGo }}#
+      uses: actions/setup-go@v5
       with:
         go-version: "#{{ .Config.toolVersions.go }}#"
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum
+          sdk/*.sum
 
     - name: Install pulumictl
       if: inputs.tools == 'all' || contains(inputs.tools, 'pulumictl')
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
-        tag: #{{ .Config.actionVersions.pulumictlTag }}#
+        tag: v0.0.46
         repo: pulumi/pulumictl
 
     - name: Install Pulumi CLI
       if: inputs.tools == 'all' || contains(inputs.tools, 'pulumicli')
-      uses: #{{ .Config.actionVersions.setupPulumi }}#
+      uses: pulumi/actions@v5
       with:
         pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
 
     - name: Install Schema Tools
       if: inputs.tools == 'all' || contains(inputs.tools, 'schema-tools')
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
+      uses: jaxxstorm/action-install-gh-release@v1.11.0
       with:
         repo: pulumi/schema-tools
 
     - name: Setup Node
       if: inputs.tools == 'all' || contains(inputs.tools, 'node')
-      uses: #{{ .Config.actionVersions.setupNode }}#
+      uses: actions/setup-node@v4
       with:
         node-version: #{{ .Config.toolVersions.node }}#
         registry-url: https://registry.npmjs.org
 
     - name: Setup DotNet
       if: inputs.tools == 'all' || contains(inputs.tools, 'dotnet')
-      uses: #{{ .Config.actionVersions.setupDotNet }}#
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: #{{ .Config.toolVersions.dotnet }}#
 
     - name: Setup Python
       if: inputs.tools == 'all' || contains(inputs.tools, 'python')
-      uses: #{{ .Config.actionVersions.setupPython }}#
+      uses: actions/setup-python@v5
       with:
         python-version: #{{ .Config.toolVersions.python }}#
 
     - name: Setup Java
       if: inputs.tools == 'all' || contains(inputs.tools, 'java')
-      uses: #{{ .Config.actionVersions.setupJava }}#
+      uses: actions/setup-java@v4
       with:
         cache: gradle
         distribution: temurin
@@ -75,6 +76,6 @@ runs:
 
     - name: Setup Gradle
       if: inputs.tools == 'all' || contains(inputs.tools, 'java')
-      uses: #{{ .Config.actionVersions.setupGradle }}#
+      uses: gradle/gradle-build-action@v3
       with:
         gradle-version: #{{ .Config.toolVersions.gradle }}#

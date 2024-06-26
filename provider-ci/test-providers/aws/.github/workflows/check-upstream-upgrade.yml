@@ -8,16 +8,14 @@ jobs:
     name: Check for upstream provider upgrades
     runs-on: ubuntu-latest
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: "1.21.x"
-        cache-dependency-path: |
-          sdk/go.sum
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
         submodules: true
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: go
     - name: Install upgrade-provider
       run: go install github.com/pulumi/upgrade-provider@main
       shell: bash
