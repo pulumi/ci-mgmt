@@ -136,11 +136,6 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - name: Install pulumictl
-      uses: #{{ .Config.actionVersions.installGhRelease }}#
-      with:
-        tag: #{{ .Config.actionVersions.pulumictlTag }}#
-        repo: pulumi/pulumictl
 #{{- if .Config.publish.goSdk.usePush }}#
     - name: Download Go SDK
       uses: actions/download-artifact@v4
