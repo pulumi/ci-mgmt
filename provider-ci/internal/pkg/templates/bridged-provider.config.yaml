@@ -153,16 +153,6 @@ publish:
   # passed to the sdk input of pulumi-package-publisher
   # This is overridden in pulumi-local to disable python
   sdk: all
-  # goSdk is no longer needed as is not overridden in specific providers.
-  goSdk:
-    # Set to `true` to use the below configuration to push a new commit somewhere else.
-    usePush: true
-    # By default we'll push back to its own repository as a standalone, tagged commit.
-    repository: ${{ github.repository }}
-    baseRef: ${{ github.sha }}
-    source: sdk
-    path: sdk
-    additive: false
 
 # Set a path for each language example to enable the test
 # releaseVerification:
