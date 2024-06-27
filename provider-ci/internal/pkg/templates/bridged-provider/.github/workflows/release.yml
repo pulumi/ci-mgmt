@@ -103,15 +103,21 @@ jobs:
       - publish
     runs-on: #{{ .Config.runner.default }}#
     steps:
+    - name: Checkout Repo
+      uses: #{{ .Config.actionVersions.checkout }}#
+#{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+#{{- end }}#
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: pulumicli, pulumictl, go, node, dotnet, python, java
     - name: Publish SDKs
       uses: #{{ .Config.publish.publisherAction }}#
       with:
         sdk: #{{ .Config.publish.sdk }}#
         version: ${{ needs.prerequisites.outputs.version }}
-        dotnet-version: "#{{ .Config.toolVersions.dotnet }}#"
-        java-version: "#{{ .Config.toolVersions.java }}#"
-        node-version: "#{{ .Config.toolVersions.node }}#"
-        python-version: "#{{ .Config.toolVersions.python }}#"
   publish_go_sdk:
     name: publish_go_sdk
     needs:

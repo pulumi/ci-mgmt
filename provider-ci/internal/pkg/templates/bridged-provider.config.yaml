@@ -160,7 +160,7 @@ actionVersions:
 publish:
   # publisherAction is the version of the pulumi-package-publisher action to use.
   # This should be pinned to just the major version once v1 is released.
-  publisherAction: pulumi/pulumi-package-publisher@v0.0.18
+  publisherAction: pulumi/pulumi-package-publisher@v0.0.19
   # passed to the sdk input of pulumi-package-publisher
   # This is overridden in pulumi-local to disable python
   sdk: all
