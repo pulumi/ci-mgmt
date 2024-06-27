@@ -94,24 +94,12 @@ jobs:
       with:
         sdk: #{{ .Config.publish.sdk }}#
         version: ${{ inputs.version }}
-
-  publish_go_sdk:
-    name: publish_go_sdk
-    needs: publish_sdk
-    if: inputs.skipGoSdk == false
-    runs-on: #{{ .Config.runner.default }}#
-    steps:
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
-      with:
-        submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:
         language: go
     - uses: pulumi/publish-go-sdk-action@v1
+      if: inputs.skipGoSdk == false
       with:
         repository: ${{ github.repository }}
         base-ref: ${{ github.sha }}
@@ -128,9 +116,9 @@ jobs:
 #{{- if .Config.publishRegistry }}#
   create_docs_build:
     name: create_docs_build
-    needs: publish_go_sdk
+    needs: publish_sdk
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
-    if: ${{ !cancelled() && inputs.isPrerelease == false }}
+    if: inputs.isPrerelease == false
     runs-on: #{{ .Config.runner.default }}#
     steps:
       - name: Dispatch Metadata build
@@ -150,11 +138,11 @@ jobs:
   clean_up_release_labels:
     name: Clean up release labels
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
-    if: ${{ !cancelled() && inputs.isPrerelease == false }}
+    if: inputs.isPrerelease == false
     #{{ if .Config.publishRegistry -}}#
     needs: create_docs_build
     #{{ else }}#
-    needs: publish_go_sdk
+    needs: publish_sdk
     #{{- end }}#
     runs-on: #{{ .Config.runner.default }}#
     steps:
@@ -169,14 +157,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  verify-release:
-    name: verify-release
-    needs:
-      - publish
-      - publish_sdk
-      - publish_go_sdk
-    # Force this to run so it's not skipped if publish_go_sdk was skipped
-    if: ${{ !cancelled() }}
+  verify_release:
+    name: verify_release
+    needs: publish_sdk
     uses: ./.github/workflows/verify-release.yml
     secrets: inherit
     with:
