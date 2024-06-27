@@ -108,10 +108,12 @@ jobs:
       - publish
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumicli, go, node, dotnet, python, java
+        tools: pulumicli, pulumictl, go, node, dotnet, python, java
     - name: Publish SDKs
       uses: pulumi/pulumi-package-publisher@v0.0.19
       with:
