@@ -212,6 +212,7 @@ jobs:
 #{{ end }}#
 name: #{{ .Config.providerDefaultBranch }}#
 on:
+  workflow_dispatch: {}
   push:
     branches:
     - #{{ .Config.providerDefaultBranch }}#

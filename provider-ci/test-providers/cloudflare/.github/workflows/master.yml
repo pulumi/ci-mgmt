@@ -170,6 +170,7 @@ jobs:
         - java
 name: master
 on:
+  workflow_dispatch: {}
   push:
     branches:
     - master
