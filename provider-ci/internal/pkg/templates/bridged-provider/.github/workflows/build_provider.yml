@@ -1,0 +1,92 @@
+name: "Build Provider"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  build_provider:
+    name: Build ${{ matrix.platform.os }}-${{ matrix.platform.arch }}
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    strategy:
+      fail-fast: true
+      matrix:
+        platform:
+          - os: linux
+            arch: amd64
+          - os: linux
+            arch: arm64
+          - os: darwin
+            arch: amd64
+          - os: darwin
+            arch: arm64
+          - os: windows
+            arch: amd64
+    steps:
+      #{{- if .Config.freeDiskSpaceBeforeBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+        with:
+          tool-cache: false
+          swap-storage: false
+      #{{- end }}#
+      - name: Checkout Repo
+        uses: #{{ .Config.actionVersions.checkout }}#
+        #{{- if .Config.checkoutSubmodules }}#
+        with:
+          submodules: #{{ .Config.checkoutSubmodules }}#
+      #{{- end }}#
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        with:
+          tools: go
+      - name: Prepare for build
+        shell: bash
+        # This installs plugins and prepares upstream
+        # TODO: Can we just run `make upstream` here?
+        run: make tfgen
+      - name: Go build
+        shell: bash
+        working-directory: provider
+        env:
+          GOOS: ${{ matrix.platform.os }}
+          GOARCH: ${{ matrix.platform.arch }}
+          #{{- if ge (index .Config "major-version") 2 }}#
+          PROVIDER_PATH: provider/v#{{ index .Config "major-version" }}#
+          #{{- else }}#
+          PROVIDER_PATH: provider
+          #{{- end }}#
+        # YAML `>` will join consecutive lines with a space
+        run: >
+          go build
+          #{{- if .Config.goBuildParallelism }}#
+          -p #{{ .Config.goBuildParallelism }}#
+          #{{- end }}#
+          -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-#{{ .Config.provider }}#
+          -ldflags "
+            -X github.com/#{{ .Repository }}#/${{ env.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}
+            #{{- if .Config.providerVersion }}#
+            -X #{{ .Config.providerVersion }}#=v${{ inputs.version }}
+            #{{- end }}#
+            #{{- range (index .Config "extra-ld-flags") }}#
+            #{{ . }}#
+            #{{- end }}#
+            "
+          ./cmd/pulumi-resource-#{{ .Config.provider }}#
+      - name: Package provider binary
+        shell: bash
+        working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}
+        run: >
+          tar --gzip -cf bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          README.md LICENCE
+          -C bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }} pulumi-resource-#{{ .Config.provider }}#
+      - name: Upload artifacts
+        uses: #{{ .Config.actionVersions.uploadArtifact }}#
+        with:
+          name: ${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          path: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          retention-days: 30
