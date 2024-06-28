@@ -1,0 +1,56 @@
+name: Build provider dist binary
+description: Downloads the provider and tfgen binaries to `bin/`.
+
+inputs:
+  version:
+    required: true
+    description: Version of the provider being built.
+  os:
+    required: true
+    description: The GOOS to build. Supported values are "linux", "darwin" or "windows"
+  arch:
+    required: true
+    description: The GOARCH to build. Supported values are "amd64" or "arm64"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare for build
+      shell: bash
+      # This installs plugins and prepares upstream
+      run: make tfgen
+    - name: Go build
+      shell: bash
+      working-directory: provider
+      env:
+        GOOS: ${{ inputs.os }}
+        GOARCH: ${{ inputs.arch }}
+        #{{- if ge (index .Config "major-version") 2 }}#
+        PROVIDER_PATH: provider/v#{{ index .Config "major-version" }}#
+        #{{- else }}#
+        PROVIDER_PATH: provider
+        #{{- end }}#
+      # YAML `>` will join consecutive lines with a space
+      run: >
+        go build
+         #{{- if .Config.goBuildParallelism }}#
+        -p #{{ .Config.goBuildParallelism }}#
+        #{{- end }}#
+        -o ${{ github.workspace }}/bin/${{ inputs.os }}-${{ inputs.arc }}/pulumi-resource-#{{ .Config.provider }}#
+        -ldflags "
+          -X github.com/#{{ .Repository }}#/${{ env.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}
+          #{{- if .Config.providerVersion }}#
+          -X #{{ .Config.providerVersion }}#=v${{ inputs.version }}
+          #{{- end }}#
+          #{{- range (index .Config "extra-ld-flags") }}#
+          #{{ . }}#
+          #{{- end }}#
+          "
+        ./cmd/pulumi-resource-#{{ .Config.provider }}#/
+    - name: Package provider binary
+      shell: bash
+      working-directory: bin/${{ inputs.os }}-${{ inputs.arc }}
+      run: >
+        tar --gzip -cf bin/${{ inputs.os }}-${{ inputs.arc }}
+        README.md LICENCE
+        -C bin/${{ inputs.os }}-${{ inputs.arc }} pulumi-resource-#{{ .Config.provider }}#
