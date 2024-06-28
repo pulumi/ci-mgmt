@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      skipGoSdk:
+        description: "Skip the Go SDK verification. Defaults to 'false'. This is used when we're not publishing a Go SDK on the default branch build."
+        required: false
+        type: boolean
+        default: false
 
 env:
 #{{ .Config.env | toYaml | indent 2 }}#
@@ -89,6 +94,7 @@ jobs:
 #{{- if .Config.releaseVerification.go }}#
       - name: Verify go release
         uses: pulumi/verify-provider-release@v1
+        if: inputs.skipGoSdk == false
         with:
           runtime: go
           directory: #{{ .Config.releaseVerification.go }}#
