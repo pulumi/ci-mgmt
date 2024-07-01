@@ -57,7 +57,7 @@ jobs:
             #{{- if ge (index .Config "major-version") 2 }}#
             echo "provider/v#{{ index .Config "major-version" }}#"
             #{{- else }}#
-            echo "provider/v#{{ index .Config "major-version" }}#"
+            echo "provider"
             #{{- end }}#
           } >> "$GITHUB_OUTPUT"
       - name: Calc ldflags
