@@ -11,6 +11,8 @@ jobs:
   build_provider:
     name: Build ${{ matrix.platform.os }}-${{ matrix.platform.arch }}
     runs-on: ubuntu-latest
+    env:
+      PROVIDER_VERSION: ${{ inputs.version }}
     strategy:
       fail-fast: true
       matrix:

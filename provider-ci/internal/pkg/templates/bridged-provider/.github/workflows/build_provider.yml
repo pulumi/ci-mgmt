@@ -11,6 +11,8 @@ jobs:
   build_provider:
     name: Build ${{ matrix.platform.os }}-${{ matrix.platform.arch }}
     runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    env:
+      PROVIDER_VERSION: ${{ inputs.version }}
     strategy:
       fail-fast: true
       matrix:
