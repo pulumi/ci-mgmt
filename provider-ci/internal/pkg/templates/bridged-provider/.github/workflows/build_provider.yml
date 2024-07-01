@@ -49,34 +49,44 @@ jobs:
         # This installs plugins and prepares upstream
         # TODO: Can we just run `make upstream` here?
         run: make tfgen
+      - name: Calc provider path
+        id: provider_path
+        run: |
+          {
+            echo -n "PROVIDER_PATH="
+            #{{- if ge (index .Config "major-version") 2 }}#
+            echo "provider/v#{{ index .Config "major-version" }}#"
+            #{{- else }}#
+            echo "provider/v#{{ index .Config "major-version" }}#"
+            #{{- end }}#
+          } >> "$GITHUB_OUTPUT"
+      - name: Calc ldflags
+        id: ldflags
+        run: |
+          {
+            echo -n "LDFLAGS="
+            echo -n "-X github.com/#{{ .Repository }}#/${{ steps.provider_path.outputs.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}"
+            #{{- if .Config.providerVersion }}#
+            echo -n " -X #{{ .Config.providerVersion }}#=v${{ inputs.version }}"
+            #{{- end }}#
+            #{{- range (index .Config "extra-ld-flags") }}#
+            echo -n " #{{ . }}# "
+            #{{- end }}#
+            echo ""
+          } >> "$GITHUB_OUTPUT"
       - name: Go build
         shell: bash
         working-directory: provider
         env:
           GOOS: ${{ matrix.platform.os }}
           GOARCH: ${{ matrix.platform.arch }}
-          #{{- if ge (index .Config "major-version") 2 }}#
-          PROVIDER_PATH: provider/v#{{ index .Config "major-version" }}#
-          #{{- else }}#
-          PROVIDER_PATH: provider
-          #{{- end }}#
+          PARALLELISM: >-
+            #{{- if .Config.goBuildParallelism }}#
+            -p #{{ .Config.goBuildParallelism }}#
+            #{{- else }}#
+            #{{- end }}#
         # YAML `>` will join consecutive lines with a space
-        run: >
-          go build
-          #{{- if .Config.goBuildParallelism }}#
-          -p #{{ .Config.goBuildParallelism }}#
-          #{{- end }}#
-          -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-#{{ .Config.provider }}#
-          -ldflags "
-            -X github.com/#{{ .Repository }}#/${{ env.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}
-            #{{- if .Config.providerVersion }}#
-            -X #{{ .Config.providerVersion }}#=v${{ inputs.version }}
-            #{{- end }}#
-            #{{- range (index .Config "extra-ld-flags") }}#
-            #{{ . }}#
-            #{{- end }}#
-            "
-          github.com/#{{ .Repository }}#/${{ env.PROVIDER_PATH }}/cmd/pulumi-resource-#{{ .Config.provider }}#
+        run: go build ${{ env.PARALLELISM }} -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-#{{ .Config.provider }}# -ldflags "${{ steps.ldflags.outputs.LDFLAGS }}" github.com/#{{ .Repository }}#/${{ steps.provider_path.outputs.PROVIDER_PATH }}/cmd/pulumi-resource-#{{ .Config.provider }}#
       - name: Package provider binary
         shell: bash
         working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}

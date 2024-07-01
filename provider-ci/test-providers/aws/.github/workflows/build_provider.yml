@@ -45,23 +45,32 @@ jobs:
         # This installs plugins and prepares upstream
         # TODO: Can we just run `make upstream` here?
         run: make tfgen
+      - name: Calc provider path
+        id: provider_path
+        run: |
+          {
+            echo -n "PROVIDER_PATH="
+            echo "provider/v6"
+          } >> "$GITHUB_OUTPUT"
+      - name: Calc ldflags
+        id: ldflags
+        run: |
+          {
+            echo -n "LDFLAGS="
+            echo -n "-X github.com/pulumi/pulumi-aws/${{ steps.provider_path.outputs.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}"
+            echo -n " -X github.com/hashicorp/terraform-provider-aws/version.ProviderVersion=v${{ inputs.version }}"
+            echo ""
+          } >> "$GITHUB_OUTPUT"
       - name: Go build
         shell: bash
         working-directory: provider
         env:
           GOOS: ${{ matrix.platform.os }}
           GOARCH: ${{ matrix.platform.arch }}
-          PROVIDER_PATH: provider/v6
+          PARALLELISM: >-
+            -p 2
         # YAML `>` will join consecutive lines with a space
-        run: >
-          go build
-          -p 2
-          -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-aws
-          -ldflags "
-            -X github.com/pulumi/pulumi-aws/${{ env.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}
-            -X github.com/hashicorp/terraform-provider-aws/version.ProviderVersion=v${{ inputs.version }}
-            "
-          github.com/pulumi/pulumi-aws/${{ env.PROVIDER_PATH }}/cmd/pulumi-resource-aws
+        run: go build ${{ env.PARALLELISM }} -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-aws -ldflags "${{ steps.ldflags.outputs.LDFLAGS }}" github.com/pulumi/pulumi-aws/${{ steps.provider_path.outputs.PROVIDER_PATH }}/cmd/pulumi-resource-aws
       - name: Package provider binary
         shell: bash
         working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}
