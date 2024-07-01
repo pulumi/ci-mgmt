@@ -52,12 +52,9 @@ jobs:
           name: schema-embed.json
           path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema-embed.json
       - name: Prepare for build
-        shell: bash
         # This installs plugins and prepares upstream
         run: make upstream
       - name: Build & package provider
-        shell: bash
-        working-directory: provider
         run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
       - name: Upload artifacts
         uses: #{{ .Config.actionVersions.uploadArtifact }}#
