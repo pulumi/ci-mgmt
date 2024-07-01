@@ -44,7 +44,7 @@ jobs:
         shell: bash
         # This installs plugins and prepares upstream
         # TODO: Can we just run `make upstream` here?
-        run: make tfgen
+        run: make upstream
       - name: Calc provider path
         id: provider_path
         run: |
@@ -73,7 +73,6 @@ jobs:
         run: go build ${{ env.PARALLELISM }} -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-aws -ldflags "${{ steps.ldflags.outputs.LDFLAGS }}" github.com/pulumi/pulumi-aws/${{ steps.provider_path.outputs.PROVIDER_PATH }}/cmd/pulumi-resource-aws
       - name: Package provider binary
         shell: bash
-        working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}
         run: >
           tar --gzip -cf bin/pulumi-resource-aws-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
           README.md LICENCE
