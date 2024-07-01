@@ -49,50 +49,10 @@ jobs:
         # This installs plugins and prepares upstream
         # We have to run tfgen in order to generate the cmd/pulumi-resource-xyz/schema_embed.json file.
         run: make tfgen
-      - name: Calc provider path
-        id: provider_path
-        run: |
-          {
-            echo -n "PROVIDER_PATH="
-            #{{- if ge (index .Config "major-version") 2 }}#
-            echo "provider/v#{{ index .Config "major-version" }}#"
-            #{{- else }}#
-            echo "provider"
-            #{{- end }}#
-          } >> "$GITHUB_OUTPUT"
-      - name: Calc ldflags
-        id: ldflags
-        run: |
-          {
-            echo -n "LDFLAGS="
-            echo -n "-X github.com/#{{ .Repository }}#/${{ steps.provider_path.outputs.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}"
-            #{{- if .Config.providerVersion }}#
-            echo -n " -X #{{ .Config.providerVersion }}#=v${{ inputs.version }}"
-            #{{- end }}#
-            #{{- range (index .Config "extra-ld-flags") }}#
-            echo -n " #{{ . }}# "
-            #{{- end }}#
-            echo ""
-          } >> "$GITHUB_OUTPUT"
-      - name: Go build
+      - name: Build & package provider
         shell: bash
         working-directory: provider
-        env:
-          GOOS: ${{ matrix.platform.os }}
-          GOARCH: ${{ matrix.platform.arch }}
-          PARALLELISM: >-
-            #{{- if .Config.goBuildParallelism }}#
-            -p #{{ .Config.goBuildParallelism }}#
-            #{{- else }}#
-            #{{- end }}#
-        # YAML `>` will join consecutive lines with a space
-        run: go build ${{ env.PARALLELISM }} -o ${{ github.workspace }}/bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}/pulumi-resource-#{{ .Config.provider }}# -ldflags "${{ steps.ldflags.outputs.LDFLAGS }}" github.com/#{{ .Repository }}#/${{ steps.provider_path.outputs.PROVIDER_PATH }}/cmd/pulumi-resource-#{{ .Config.provider }}#
-      - name: Package provider binary
-        shell: bash
-        run: >
-          tar --gzip -cf bin/pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
-          README.md LICENSE
-          -C bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }} pulumi-resource-#{{ .Config.provider }}#
+        run: make bin/pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
       - name: Upload artifacts
         uses: #{{ .Config.actionVersions.uploadArtifact }}#
         with:
