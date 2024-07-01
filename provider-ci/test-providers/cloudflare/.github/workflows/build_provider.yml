@@ -51,7 +51,7 @@ jobs:
           -ldflags "
             -X github.com/pulumi/pulumi-cloudflare/${{ env.PROVIDER_PATH }}/pkg/version.Version=v${{ inputs.version }}
             "
-          ./cmd/pulumi-resource-cloudflare
+          github.com/pulumi/pulumi-cloudflare/${{ env.PROVIDER_PATH }}/cmd/pulumi-resource-cloudflare
       - name: Package provider binary
         shell: bash
         working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}

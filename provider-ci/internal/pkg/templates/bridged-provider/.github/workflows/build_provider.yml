@@ -76,7 +76,7 @@ jobs:
             #{{ . }}#
             #{{- end }}#
             "
-          ./cmd/pulumi-resource-#{{ .Config.provider }}#
+          github.com/#{{ .Repository }}#/${{ env.PROVIDER_PATH }}/cmd/pulumi-resource-#{{ .Config.provider }}#
       - name: Package provider binary
         shell: bash
         working-directory: bin/${{ matrix.platform.os }}-${{ matrix.platform.arch }}
