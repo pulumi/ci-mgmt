@@ -58,7 +58,7 @@ jobs:
       - name: Build & package provider
         shell: bash
         working-directory: provider
-        run: make bin/pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+        run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
       - name: Upload artifacts
         uses: #{{ .Config.actionVersions.uploadArtifact }}#
         with:
