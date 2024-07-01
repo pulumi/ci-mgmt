@@ -32,11 +32,15 @@ jobs:
         uses: ./.github/actions/setup-tools
         with:
           tools: pulumictl, go
+      - name: Download schema-embed.json
+        uses: actions/download-artifact@v4
+        with:
+          name: schema-embed.json
+          path: provider/cmd/pulumi-resource-docker/schema_embed.json
       - name: Prepare for build
         shell: bash
         # This installs plugins and prepares upstream
-        # We have to run tfgen in order to generate the cmd/pulumi-resource-xyz/schema_embed.json file.
-        run: make tfgen
+        run: make upstream
       - name: Build & package provider
         shell: bash
         working-directory: provider
