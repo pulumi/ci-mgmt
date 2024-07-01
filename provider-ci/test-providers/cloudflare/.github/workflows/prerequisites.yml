@@ -100,5 +100,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: schema-embed.json
-        path: provider/cmd/pulumi-resource-cloudflare/schema_embed.json
+        path: provider/cmd/pulumi-resource-cloudflare/schema-embed.json
         retention-days: 30

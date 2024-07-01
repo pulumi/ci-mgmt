@@ -124,5 +124,5 @@ jobs:
       uses: #{{ .Config.actionVersions.uploadArtifact }}#
       with:
         name: schema-embed.json
-        path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema_embed.json
+        path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema-embed.json
         retention-days: 30

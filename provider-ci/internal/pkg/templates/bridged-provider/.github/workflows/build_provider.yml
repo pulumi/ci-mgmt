@@ -50,7 +50,7 @@ jobs:
         uses: #{{ .Config.actionVersions.downloadArtifact }}#
         with:
           name: schema-embed.json
-          path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema_embed.json
+          path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema-embed.json
       - name: Prepare for build
         shell: bash
         # This installs plugins and prepares upstream
