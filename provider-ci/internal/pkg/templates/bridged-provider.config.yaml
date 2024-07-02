@@ -229,3 +229,12 @@ publish:
 #nixpkgs:
 # - name: foo
 #   version: 1.2.3
+
+# Package paths to ignore when running the license check
+#license:
+#  ignore:
+#    # Add comment to explain why skipping this license check is OK, e.g. "These projects don't have a LICENSE file,
+#    # but do say mention (in README.md) that they are under Apache-2.0."
+#    - github.com/alibabacloud-go/endpoint-util/service
+#    - github.com/alibabacloud-go/tea-roa-utils/service
+#    - github.com/alibabacloud-go/tea-roa/client
