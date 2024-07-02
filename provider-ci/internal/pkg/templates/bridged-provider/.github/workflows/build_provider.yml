@@ -42,7 +42,7 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         with:
           submodules: #{{ .Config.checkoutSubmodules }}#
-      #{{- end }}#
+        #{{- end }}#
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
