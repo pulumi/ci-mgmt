@@ -6,6 +6,7 @@ on:
       version:
         required: true
         type: string
+        description: Version of the provider to build
 
 jobs:
   build_provider:
