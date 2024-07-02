@@ -269,6 +269,9 @@ format_patches() {
   # Extract patches from the commits in the 'pulumi-patch' branch into the 'patches' directory.
   # Use the 'checkout-base' branch to determine the base commit of the patches.
   git format-patch checkout-base -o ../patches --zero-commit --no-signature --no-stat --no-numbered
+  # Checkout the 'checkout-base' branch to the current commit of the upstream repository 
+  # so the upstream HEAD is pointing at the correct base, ready to be committed as a submodule.
+  git checkout checkout-base
   cd ..
   # Mark the rebase as complete.
   rm rebase-in-progress
