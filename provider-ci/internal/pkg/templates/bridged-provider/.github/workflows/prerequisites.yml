@@ -119,3 +119,10 @@ jobs:
 
     - name: Upload bin
       uses: ./.github/actions/upload-bin
+
+    - name: Upload schema-embed.json
+      uses: #{{ .Config.actionVersions.uploadArtifact }}#
+      with:
+        name: schema-embed.json
+        path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema-embed.json
+        retention-days: 30
