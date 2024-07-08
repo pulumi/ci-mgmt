@@ -20,19 +20,23 @@ COMMANDS
   checkout [-f]         Create a branch in the upstream repository with the
                         patches applied as commits.
   rebase [-o] [-i]      Rebase the checked out patches.
-  format_patches        Create a new set of patches from the commits in the
-                        upstream repository.
+  format_patches        Write checkedout commits back to patches.
+  check_in              Write checkedout commits back to patches, add upstream
+                        and patches changes to the git staging area and exit
+                        checkout mode.
   help                  Print this help message, plus examples.
 
 OPTIONS
   -f   Force the command to run even if the upstream submodule is modified
   -o   The new base commit to rebase the patches on top of
   -i   Run the rebase command interactively
+  -h   Print this help message, plus examples
 EOF
 }
 
-docs() {
+extended_docs() {
   cat <<EOF
+
 DESCRIPTION
   We want to maintain changes to the upstream repository in a way that is easy
   to manage and track. Rather than creating a fork of the upstream repository,
@@ -42,17 +46,14 @@ DESCRIPTION
 
 EXAMPLES
   Discard all changes in upstream and reapply patches to the working directory:
-
     ${original_exec} init -f
 
   Moving the patches to a new base commit:
-
     ${original_exec} checkout
     ${original_exec} rebase -o <new_base_commit>
     ${original_exec} format_patches
 
   Interactively edit the patches:
-
     ${original_exec} checkout
     ${original_exec} rebase -i
     ${original_exec} format_patches
@@ -69,7 +70,7 @@ assert_upstream_exists() {
 # Check the upstream submodule isn't modified in the working tree
 assert_upstream_tracked() {
   status=$(git status --porcelain upstream)
-  if [[ ${status} == " M upstream" ]]; then
+  if [[ ${status} == *"M upstream" ]]; then
     current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
     if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
       cat <<EOF
@@ -104,9 +105,20 @@ EOF
 }
 
 assert_is_checked_out() {
-  current_branch=$(git --no-pager rev-parse --abbrev-ref HEAD)
+  current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
   if [[ "${current_branch}" != "pulumi/patch-checkout" ]]; then
     echo "Expected upstream to be checked out on the 'pulumi/patch-checkout' branch, but ${current_branch} is checked out."
+    exit 1
+  fi
+}
+
+assert_no_rebase_in_progress() {
+    # Use git to resolve the possible location of files indicating a rebase might be in progress.
+  rebase_merge_dir=$(cd upstream && git rev-parse --git-path rebase-merge)
+  rebase_apply_dir=$(cd upstream && git rev-parse --git-path rebase-apply)
+
+  if [[ -d "${rebase_merge_dir}" ]] || [[ -d "${rebase_apply_dir}" ]]; then
+    echo "rebase still in progress in './upstream'. Please resolve the rebase in"
     exit 1
   fi
 }
@@ -119,18 +131,30 @@ Failed to apply $1.
 Hint: to avoid conflicts when updating the upstream submodule, use the
 following commands:
 
-1. 'checkout' to create a branch with the patches applied as commits
-2. 'rebase' to rebase the patches on top of the new upstream commit
-   - Resolve any conflicts and continue the rebase
-3. 'format_patches' to create an updated set of patches from the commits
+1. '${original_exec} checkout' to create a branch with the patches applied as commits
+2. '${original_exec} rebase -o <new_base_commit>' to rebase the patches on top of the
+    new upstream commit. Resolve any conflicts and continue the rebase to completion.
+3. '${original_exec} check_in' to create an updated set of patches from the commits
 
 Reset the upstream submodule to the previous known good upstream commit before
 trying again. This can be done with:
 
     (cd upstream && git reset --hard <last_known_good_commit>)
+    git add upstream
 
 EOF
   exit 1
+}
+
+apply_patches() {
+  # Iterating over the patches folder in sorted order,
+  # apply the patch using a 3-way merge strategy. This mirrors the default behavior of 'git merge'
+  cd upstream
+  for patch in ../patches/*.patch; do
+    if ! git apply --3way "${patch}" --allow-empty; then
+      err_failed_to_apply "$(basename "${patch}")"
+    fi
+  done
 }
 
 init() {
@@ -151,14 +175,7 @@ init() {
   fi
 
   git submodule update --force --init
-  # Iterating over the patches folder in sorted order,
-  # apply the patch using a 3-way merge strategy. This mirrors the default behavior of 'git merge'
-  cd upstream
-  for patch in ../patches/*.patch; do
-    if ! git apply --3way "${patch}" --allow-empty; then
-      err_failed_to_apply "$(basename "${patch}")"
-    fi
-  done
+  apply_patches
 }
 
 checkout() {
@@ -184,6 +201,7 @@ checkout() {
     echo "Cleaning up any previous branches"
     git branch -D pulumi/patch-checkout
     git branch -D pulumi/checkout-base
+    git branch -D pulumi/original-base
   fi
   # Clean up any previous in-progress rebases.
   rebase_merge_dir=$(git rev-parse --git-path rebase-merge)
@@ -207,16 +225,18 @@ checkout() {
 
     cat <<EOF
 
-The patches have been checked out as commits in the './upstream' repository
-on the 'pulumi/patch-checkout' branch. You can now edit the commits directly in the
-upstream repository.
+The patches have been checked out as commits in the './upstream' repository.
+The 'pulumi/patch-checkout' branch is pointing to the last patch.
+The 'pulumi/checkout-base' branch is pointing to the base commit of the patches.
 
-You can use the 'rebase' command to rebase the patches on top of a new base commit.
+To interactively edit the commits:
+  ${original_exec} rebase -i
 
-Once you have finished editing the commits, run the 'format_patches' command
-to turn the commits back into patches in the 'patches' directory.
+To change the base of the patches:
+  ${original_exec} rebase -o <new_base_commit>
 
-Note: The 'pulumi/checkout-base' branch is used to track the base commit of the patches.
+Once you have finished editing the commits, run
+  ${original_exec} check_in
 
 EOF
 }
@@ -233,11 +253,15 @@ rebase() {
     esac
   done
 
-  cd upstream
   assert_is_checked_out
 
+  cd upstream
   # Fetch the latest changes from the upstream repository
   git fetch --all
+  # Set the "pulumi/original-base" branch to the current base commit of the patches
+  git branch -f pulumi/original-base pulumi/checkout-base
+  # Set the "pulumi/patch-checkout" branch to track the "pulumi/original-base" branch
+  git branch --set-upstream-to=pulumi/original-base pulumi/patch-checkout
   # Set the "pulumi/checkout-base" branch to the new base commit ready for formatting the patches after
   git branch -f pulumi/checkout-base "${onto}"
   # Rebase the 'pulumi/patch-checkout' branch on top of the new base commit
@@ -252,61 +276,88 @@ rebase() {
   cd ..
 }
 
-format_patches() {
-  # Use git to resolve the possible location of files indicating a rebase might be in progress.
-  rebase_merge_dir=$(cd upstream && git rev-parse --git-path rebase-merge)
-  rebase_apply_dir=$(cd upstream && git rev-parse --git-path rebase-apply)
-
-  if [[ -d "${rebase_merge_dir}" ]] || [[ -d "${rebase_apply_dir}" ]]; then
-    echo "rebase still in progress in './upstream'. Please resolve the rebase in"
-    exit 1
-  fi
-
+export_patches() {
   # Remove all existing patches before creating the new ones in case they've been renamed or removed.
-  rm patches/*.patch
-  cd upstream
+  rm -f patches/*.patch
+  
   # Extract patches from the commits in the 'pulumi/patch-checkout' branch into the 'patches' directory.
   # Use the 'pulumi/checkout-base' branch to determine the base commit of the patches.
-  git format-patch pulumi/checkout-base -o ../patches --zero-commit --no-signature --no-stat --no-numbered
-  # Checkout the 'pulumi/checkout-base' branch to the current commit of the upstream repository 
-  # so the upstream HEAD is pointing at the correct base, ready to be committed as a submodule.
-  git checkout pulumi/checkout-base
-  cd ..
+  (cd upstream && git format-patch pulumi/checkout-base -o ../patches --zero-commit --no-signature --no-stat --no-numbered)
 }
 
-# Parse the first argument as the command name to run.
-# Then, shift the arguments to pass the remaining arguments to the command.
-case $1 in
+format_patches() {
+  assert_upstream_exists
+  assert_is_checked_out
+  assert_no_rebase_in_progress
+
+  export_patches
+  cat <<EOF
+Patches have been created in the 'patches' directory. If you've made changes to
+the base, ensure you add 'upstream' to the git stage before running 'init -f'
+to exit the checkout mode.
+EOF
+}
+
+check_in() {
+  assert_upstream_exists
+  assert_is_checked_out
+  assert_no_rebase_in_progress
+
+  export_patches
+  # Check out the new base of the patches
+  (cd upstream && git checkout pulumi/checkout-base)
+
+  # Add the patches and upstream changes to the git staging area
+  git add patches upstream
+  # Exit the checkout mode and re-initialize the upstream submodule
+  git submodule update --force --init
+  apply_patches
+  cat <<EOF
+Changes to patches and upstream have been staged, exited checkout mode and
+re-initializing using updated patches and updated upstream base.
+EOF
+}
+
+if [[ -z ${original_cmd} ]]; then
+  echo "Error: command is required."
+  echo
+  usage
+  extended_docs
+  exit 1
+fi
+# Check for help flag and short-circuit to print usage.
+for arg in "$@"; do
+  case ${arg} in
+    "help"|"-h"|"--help")
+      usage
+      extended_docs
+      exit 0
+      ;;
+    *)
+      ;;
+  esac
+done
+
+# Remove the command argument from the list of arguments to pass to the command.
+shift
+case ${original_cmd} in
   init)
-    shift
     init "$@"
     ;;
   checkout)
-    shift
     checkout "$@"
     ;;
   rebase)
-    shift
     rebase "$@"
     ;;
   format_patches)
-    shift
     format_patches "$@"
     ;;
-  # Print usage if no arguments are provided or the command is unknown.
-  "help"|"-h"|"--help")
-    usage
-    echo
-    docs
-    ;;
-  "")
-    echo "Error: command is required."
-    echo
-    usage
-    exit 1
+  check_in)
+    check_in "$@"
     ;;
   *)
-    echo "Error: unknown command \"$1\"."
+    echo "Error: unknown command \"${original_cmd}\"."
     echo
     usage
     exit 1
