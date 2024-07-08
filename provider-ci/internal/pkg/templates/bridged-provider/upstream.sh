@@ -24,7 +24,7 @@ COMMANDS
                         upstream repository.
   help                  Print this help message, plus examples.
 
-OPTIONS:
+OPTIONS
   -f   Force the command to run even if the upstream submodule is modified
   -o   The new base commit to rebase the patches on top of
   -i   Run the rebase command interactively
@@ -34,7 +34,6 @@ EOF
 docs() {
   cat <<EOF
 DESCRIPTION
-
   We want to maintain changes to the upstream repository in a way that is easy
   to manage and track. Rather than creating a fork of the upstream repository,
   we maintain a set of patches (in the 'patches' directory) that we can apply
@@ -42,7 +41,6 @@ DESCRIPTION
   never pushed to the remote upstream repository.
 
 EXAMPLES
-
   Discard all changes in upstream and reapply patches to the working directory:
 
     ${original_exec} init -f
