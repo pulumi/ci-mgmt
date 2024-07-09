@@ -69,6 +69,10 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       data: new goreleaser.PulumiGoreleaserPreConfig(config),
     },
     {
+      path: "CODE-OF-CONDUCT.md",
+      data: fs.readFileSync("CODE-OF-CONDUCT.md"),
+    },
+    {
       path: ".goreleaser.yml",
       data: new goreleaser.PulumiGoreleaserConfig(config),
     },
