@@ -172,7 +172,7 @@ tfgen_build_only:
 
 upstream:
 ifneq ("$(wildcard upstream)","")
-	scripts/upstream.sh "$@" apply
+	./upstream.sh init
 endif
 
 	# Ensure tool is installed
@@ -181,10 +181,12 @@ endif
 	cd upstream-tools && yarn --silent run apply
 
 upstream.finalize:
-	scripts/upstream.sh "$@" end_rebase
+	echo "Deprecated: Use `./upstream.sh format_patches` instead"
+	scripts/upstream_old.sh "$@" end_rebase
 
 upstream.rebase:
-	scripts/upstream.sh "$@" start_rebase
+	echo "Deprecated: Use `./upstream.sh checkout` and `./upstream.sh rebase` instead"
+	scripts/upstream_old.sh "$@" start_rebase
 
 bin/pulumi-java-gen: .pulumi-java-gen.version
 	pulumictl download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
