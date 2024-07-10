@@ -70,7 +70,7 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
     },
     {
       path: "CODE-OF-CONDUCT.md",
-      data: fs.readFileSync("CODE-OF-CONDUCT.md"),
+      data: fs.readFileSync("CODE-OF-CONDUCT.md", { encoding: "utf-8" }),
     },
     {
       path: ".goreleaser.yml",
