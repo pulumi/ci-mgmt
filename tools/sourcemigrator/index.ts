@@ -72,32 +72,32 @@ function run(command: string): shell.ShellString {
   return checkError(shell.exec(command));
 }
 
-function respectSchemaVersion(): SourceMigration {
-  return {
-    name: "Respect Schema Version",
-    async execute(context) {
-      const patchPath = fs.realpathSync("respectSchemaVersion.patch");
-      shell.pushd(context.dir);
-      try {
-        // Apply patch
-        run(
-          `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
-        );
-        // Format the code - twice to ensure that the code is formatted correctly
-        run(`go install mvdan.cc/gofumpt@latest`);
-        run(`gofumpt -w ./provider/resources.go`);
-        run(`gofumpt -w ./provider/resources.go`);
-        // Check if we've made changes
-        const gitStatus = run(`git status --porcelain`).stdout;
-        if (gitStatus.includes("provider/resources.go")) {
-          run(`make tfgen build`);
-        }
-      } finally {
-        shell.popd();
-      }
-    },
-  };
-}
+// function respectSchemaVersion(): SourceMigration {
+//   return {
+//     name: "Respect Schema Version",
+//     async execute(context) {
+//       const patchPath = fs.realpathSync("respectSchemaVersion.patch");
+//       shell.pushd(context.dir);
+//       try {
+//         // Apply patch
+//         run(
+//           `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
+//         );
+//         // Format the code - twice to ensure that the code is formatted correctly
+//         run(`go install mvdan.cc/gofumpt@latest`);
+//         run(`gofumpt -w ./provider/resources.go`);
+//         run(`gofumpt -w ./provider/resources.go`);
+//         // Check if we've made changes
+//         const gitStatus = run(`git status --porcelain`).stdout;
+//         if (gitStatus.includes("provider/resources.go")) {
+//           run(`make tfgen build`);
+//         }
+//       } finally {
+//         shell.popd();
+//       }
+//     },
+//   };
+// }
 
 async function runMigrations(
   context: MigrateContext,
@@ -110,7 +110,7 @@ async function runMigrations(
 }
 
 function allMigrations(): SourceMigration[] {
-  return [respectSchemaVersion()];
+  return [];
 }
 
 async function main() {
