@@ -43,6 +43,12 @@ func GeneratePackage(opts GenerateOpts) error {
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
+	for _, deletedFile := range getDeletedFiles(opts.TemplateName) {
+		err = os.RemoveAll(filepath.Join(opts.OutDir, deletedFile))
+		if err != nil {
+			return fmt.Errorf("error deleting file %s: %w", deletedFile, err)
+		}
+	}
 	for _, templateDir := range templateDirs {
 		err = renderTemplateDir(templateDir, opts)
 		if err != nil {
@@ -66,6 +72,17 @@ func getTemplateDirs(templateName string) ([]string, error) {
 		return []string{"provider", "dev-container", "bridged-provider"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
+	}
+}
+
+func getDeletedFiles(templateName string) []string {
+	switch templateName {
+	case "bridged-provider":
+		return []string{
+			"scripts/upstream.sh",
+		}
+	default:
+		return nil
 	}
 }
 
