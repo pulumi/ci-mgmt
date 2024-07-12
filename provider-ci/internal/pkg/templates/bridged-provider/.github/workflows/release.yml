@@ -130,6 +130,12 @@ jobs:
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
+    #{{- if .Config.sshPrivateKey }}#
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: #{{ .Config.sshPrivateKey }}#
+    #{{- end }}#
     #{{- if .Config.integrationTestProvider }}#
     - name: Prepare upstream code
       run: make upstream
