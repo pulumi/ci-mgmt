@@ -1,0 +1,82 @@
+name: "Test Setup"
+description: Sets up repository, tools and SDK ready for running integration tests
+
+inputs:
+  language:
+    required: true
+    description: The SDK language being used for tests
+  token:
+    required: false
+    description: Optional GH_TOKEN.
+  aws-access-key-id:
+    required: false
+    description: e.g. secrets.AWS_ACCESS_KEY_ID
+  aws-region:
+    required: false
+    description: e.g. env.AWS_REGION
+  aws-secret-access-key:
+    required: false
+    description: e.g. secrets.AWS_SECRET_ACCESS_KEY
+  aws-role-to-assume:
+    required: false
+    description: e.g. secrets.AWS_CI_ROLE_ARN
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: pulumictl, pulumicli, go, node, dotnet, python, java
+    - name: Download bin
+      uses: ./.github/actions/download-bin
+    - name: Add local nuget source
+      run: dotnet nuget add source ${{ github.workspace }}/nuget
+      shell: bash
+    - name: Download SDK
+      uses: ./.github/actions/download-sdk
+      with:
+        language: ${{ inputs.language }}
+    - name: Update path
+      shell: bash
+      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+    - name: Install Python deps
+      shell: bash
+      run: |-
+        pip3 install virtualenv==20.0.23
+        pip3 install pipenv
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-region: ${{ inputs.aws-region }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        role-duration-seconds: 7200
+        role-session-name: docker@githubActions
+        role-to-assume: ${{ inputs.role-to-assume }}
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+          }}/locations/global/workloadIdentityPools/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+    - name: Setup gcloud auth
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        install_components: gke-gcloud-auth-plugin
+    - name: Login to Google Cloud Registry
+      shell: bash
+      run: gcloud --quiet auth configure-docker
+    - name: Install dependencies
+      shell: bash
+      run: make install_${{ matrix.language}}_sdk
+    - name: Prepare upstream code
+      shell: bash
+      run: make upstream
+    - name: Install gotestfmt
+      uses: GoTestTools/gotestfmt-action@v2
+      with:
+        token: ${{ inputs.token }}
+        version: v2.5.0

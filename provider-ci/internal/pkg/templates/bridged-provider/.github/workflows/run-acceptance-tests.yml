@@ -60,6 +60,32 @@ jobs:
     secrets: inherit
   #{{ end -}}#
 
+  test:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    name: Test
+    needs:
+      - prerequisites
+      - build_sdk
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+
+  #{{- if .Config.testPulumiExamples }}#
+  test_examples:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    name: Test p/examples
+    needs:
+      - prerequisites
+      - build_sdk
+    uses: ./.github/workflows/test-examples.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+  #{{- end }}#
+
   sentinel:
     name: sentinel
     if: github.event_name == 'repository_dispatch' ||
@@ -88,146 +114,15 @@ jobs:
         # otherwise use the current SHA for any other type of build.
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
-  test:
-    if: github.event_name == 'repository_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository
-    name: test
-    needs:
-      - prerequisites
-      - build_sdk
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
-    env:
-      PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
-    steps:
-#{{- if .Config.freeDiskSpaceBeforeTest }}#
-    # Run as first step so we don't delete things that have just been installed
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
-      with:
-        tool-cache: false
-        swap-storage: false
-#{{- end }}#
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        ref: ${{ env.PR_COMMIT_SHA }}
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
-        #{{- end }}#
-    - name: Checkout p/examples
-      if: matrix.testTarget == 'pulumiExamples'
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        repository: pulumi/examples
-        path: p-examples
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
-    - name: Download bin
-      uses: ./.github/actions/download-bin
-    - run: dotnet nuget add source ${{ github.workspace }}/nuget
-    - name: Download SDK
-      uses: ./.github/actions/download-sdk
-      with:
-        language: ${{ matrix.language }}
-    - name: Update path
-      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Install Python deps
-      run: |-
-        pip3 install virtualenv==20.0.23
-        pip3 install pipenv
-    #{{- if .Config.docker }}#
-    - name: Run docker compose
-      run: docker compose -f testing/docker-compose.yml up --build -d
-    #{{- end }}#
-    #{{- if .Config.aws }}#
-    - name: Configure AWS Credentials
-      uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-region: ${{ env.AWS_REGION }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 7200
-        role-session-name: #{{ .Config.provider }}#@githubActions
-        role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    #{{- end }}#
-    #{{- if .Config.gcp }}#
-    - name: Authenticate to Google Cloud
-      uses: #{{ .Config.actionVersions.googleAuth }}#
-      with:
-        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
-        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
-          }}/locations/global/workloadIdentityPools/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
-    - name: Setup gcloud auth
-      uses: #{{ .Config.actionVersions.setupGcloud }}#
-      with:
-        install_components: gke-gcloud-auth-plugin
-    #{{- end }}#
-    #{{- if .Config.gcpRegistry }}#
-    - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker
-    #{{- end }}#
-    #{{- if .Config.sshPrivateKey }}#
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: #{{ .Config.sshPrivateKey }}#
-    #{{- end }}#
-    #{{- if .Config.integrationTestProvider }}#
-    - name: Prepare upstream code
-      run: make upstream
-    #{{- end }}#
-    #{{- if index .Config "setup-script" }}#
-    - name: Run setup script
-      run: #{{ index .Config "setup-script" }}#
-    #{{- end }}#
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-    #{{- if .Config.integrationTestProvider }}#
-    - name: Run provider tests
-      if: matrix.testTarget == 'local'
-      working-directory: provider
-      run: go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
-    #{{- end }}#
-    - name: Run tests
-      if: matrix.testTarget == 'local'
-      run: cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
-    - name: Run pulumi/examples tests
-      if: matrix.testTarget == 'pulumiExamples'
-      run: cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{
-        matrix.language }} -run TestPulumiExamples -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
-        #{{- if .Config.testPulumiExamples }}#
-        testTarget: [local, pulumiExamples]
-        #{{- else }}#
-        testTarget: [local]
-        #{{- end }}#
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
+
 #{{- if .Config.extraTests }}#
 #{{ .Config.extraTests | toYaml | indent 2 }}#
 #{{ end }}#
+
 name: run-acceptance-tests
 on:
   pull_request:
