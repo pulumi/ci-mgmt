@@ -129,6 +129,9 @@ extraTests:
 #     name: My Test
 #     ...
 
+# Run e2e tests in the provider as well as in the examples directory
+integrationTestProvider: false
+
 # Run e2e tests using the examples and test suite in the pulumi/examples repo.
 # This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
