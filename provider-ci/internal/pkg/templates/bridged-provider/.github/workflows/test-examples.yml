@@ -1,0 +1,58 @@
+name: "Test Examples"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "The version of the provider to test"
+        required: true
+        type: string
+
+env:
+#{{ .Config.env | toYaml | indent 2 }}#
+
+jobs:
+  test_examples:
+    name: Test p/examples
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - nodejs
+          - python
+          - dotnet
+          - go
+          - java
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    env:
+      PROVIDER_VERSION: ${{ inputs.version }}
+    steps:
+      - name: Checkout Repo
+        uses: #{{ .Config.actionVersions.checkout }}#
+        #{{- if .Config.checkoutSubmodules }}#
+        with:
+          submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
+      - name: Test setup
+        uses: ./.github/actions/test-setup
+        with:
+          language: ${{ matrix.language }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          #{{- if .Config.aws }}#
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+          #{{- end }}#
+      - name: Checkout p/examples
+        uses: #{{ .Config.actionVersions.checkout }}#
+        with:
+          repository: pulumi/examples
+          path: p-examples
+      - name: Run pulumi/examples tests
+        run:
+          cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{
+          matrix.language }} -run TestPulumiExamples -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
