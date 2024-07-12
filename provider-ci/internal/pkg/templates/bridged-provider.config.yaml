@@ -112,15 +112,6 @@ env:
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
 
-# actions can contain preBuild and preTest additional steps to be spliced into workflows.
-# The use of these hooks vary - quite a few just build upstream and run provider tests.
-# Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
-actions: {}
-  # preBuild:
-  #  - Your action here
-  # preTest:
-  #  - Your action here
-
 # Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
 # `prerelease.yml` and `release.yml`.
 # Only used for aws: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code

@@ -211,9 +211,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         version: v2.5.0
-#{{- if .Config.actions.preTest }}#
-#{{ .Config.actions.preTest | toYaml | indent 4 }}#
-#{{- end }}#
     #{{- if .Config.integrationTestProvider }}#
     - name: Run provider tests
       working-directory: provider

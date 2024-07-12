@@ -57,9 +57,6 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         tools: go, pulumictl, pulumicli, schema-tools
-#{{- if .Config.actions.preBuild }}#
-#{{ .Config.actions.preBuild | toYaml | indent 4 }}#
-#{{- end }}#
     - name: Build schema generator binary
       run: make tfgen_build_only
     - name: Install plugins
