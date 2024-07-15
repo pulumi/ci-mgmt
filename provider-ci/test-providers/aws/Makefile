@@ -172,7 +172,7 @@ tfgen_build_only:
 
 upstream:
 ifneq ("$(wildcard upstream)","")
-	./upstream.sh init
+	./upstream.sh init -f
 endif
 
 	# Ensure tool is installed
