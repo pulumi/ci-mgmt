@@ -187,7 +187,7 @@ tfgen_build_only:
 
 upstream:
 ifneq ("$(wildcard upstream)","")
-	./upstream.sh init
+	./upstream.sh init -f
 endif
 
 #{{- if .Config.XrunUpstreamTools }}#
