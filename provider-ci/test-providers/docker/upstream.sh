@@ -12,7 +12,7 @@ NAME
   upstream.sh - Manages applying patches to the upstream submodule.
 
 SYNOPSIS
-  ${original_exec} <init|checkout|rebase|format_patches|check_in|help> [options]
+  ${original_exec} <init|checkout|rebase|check_in|help> [options]
 
 COMMANDS
   init [-f]             Initialize the upstream submodule and applies the
@@ -20,7 +20,6 @@ COMMANDS
   checkout [-f]         Create a branch in the upstream repository with the
                         patches applied as commits.
   rebase [-o] [-i]      Rebase the checked out patches.
-  format_patches        Write checkedout commits back to patches.
   check_in              Write checkedout commits back to patches, add upstream
                         and patches changes to the git staging area and exit
                         checkout mode.
@@ -51,12 +50,12 @@ EXAMPLES
   Moving the patches to a new base commit:
     ${original_exec} checkout
     ${original_exec} rebase -o <new_base_commit>
-    ${original_exec} format_patches
+    ${original_exec} check_in
 
   Interactively edit the patches:
     ${original_exec} checkout
     ${original_exec} rebase -i
-    ${original_exec} format_patches
+    ${original_exec} check_in
 EOF
 }
 
@@ -71,35 +70,41 @@ assert_upstream_exists() {
 assert_upstream_tracked() {
   status=$(git status --porcelain upstream)
   if [[ ${status} == *"M upstream" ]]; then
+    cat <<EOF
+Error: The 'upstream' submodule is modified with untracked changes, continuing
+might loose changes in the 'upstream' submodule.
+
+Git status of 'upstream':
+${status}
+
+EOF
     current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
     if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
+      # Show a special message as they've done a checkout but not checked in.
       cat <<EOF
-Error: The 'upstream' submodule is modified with untracked changes.
+Currently checked out on the 'pulumi/patch-checkout' branch. This was likely
+caused by running a 'checkout' command and not running 'check_in' afterwards.
 
-Currently checked out on the 'pulumi/patch-checkout' branch. This was likely caused by
-running a 'checkout' command and not running 'format_patches' afterwards.
-
-To turn the commits in the 'pulumi/patch-checkout' branch back into patches, run the
-'format_patches' command.
+To turn the commits in the 'pulumi/patch-checkout' branch back into patches, run:
+  ${original_exec} check_in
 
 To disgard changes in the 'pulumi/patch-checkout' branch, use the 'force' flag (-f):
-
   ${original_exec} ${original_cmd} -f
 
 EOF
-      exit 1
-    fi
-    echo "Error: The 'upstream' submodule is modified but not tracked."
-    echo "${current_branch}"
-    git submodule status upstream
-    cat <<EOF
-Either stage or reset the 'upstream' submodule changes before continuing:
+    else
+      # Show a generic message for other cases.
+      cat <<EOF
+Checked out upstream ref: ${current_branch}
 
-    git add upstream
-    # or #
-    (cd upstream && git checkout <current submodule commit of origin/default> && cd -)
+To continue and discard the changes to upstream, run:
+  ${original_exec} ${original_cmd} -f
+
+To keep the changes to upstream, run:
+  git add upstream
 
 EOF
+    fi
     exit 1
   fi
 }
