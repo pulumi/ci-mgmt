@@ -130,6 +130,16 @@ jobs:
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
+    #{{- if .Config.sshPrivateKey }}#
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: #{{ .Config.sshPrivateKey }}#
+    #{{- end }}#
+    #{{- if .Config.integrationTestProvider }}#
+    - name: Prepare upstream code
+      run: make upstream
+    #{{- end }}#
     #{{- if index .Config "setup-script" }}#
     - name: Run setup script
       run: #{{ index .Config "setup-script" }}#
@@ -144,9 +154,13 @@ jobs:
 #{{- if .Config.actions.preTest }}#
 #{{ .Config.actions.preTest | toYaml | indent 4 }}#
 #{{- end }}#
+    #{{- if .Config.integrationTestProvider }}#
+    - name: Run provider tests
+      working-directory: provider
+      run: go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
+    #{{- end }}#
     - name: Run tests
-      run: cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{
-        matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
+      run: cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
     strategy:
       fail-fast: false
       matrix:

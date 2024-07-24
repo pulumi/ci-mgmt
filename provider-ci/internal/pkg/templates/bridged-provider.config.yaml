@@ -129,6 +129,9 @@ extraTests:
 #     name: My Test
 #     ...
 
+# Run e2e tests in the provider as well as in the examples directory
+integrationTestProvider: false
+
 # Run e2e tests using the examples and test suite in the pulumi/examples repo.
 # This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
@@ -207,6 +210,11 @@ publish:
 # Run testing/docker-compose.yml up before running tests in CI job
 # Used in 9 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docker%3A%22&type=code
 #docker: false
+
+# Setup SSH with specified private key before running tests in CI job.
+# This should be provided from a secret
+# Used by the docker provider only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22sshPrivateKey%3A%22&type=code
+#sshPrivateKey: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
 
 # Authenticate with GCP before running tests in CI job
 # Used in gcp and docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22gcp%3A%22&type=code
