@@ -56,6 +56,12 @@ EXAMPLES
     ${original_exec} checkout
     ${original_exec} rebase -i
     ${original_exec} check_in
+
+  Add a new patch:
+    ${original_exec} checkout
+    # Make changes to the upstream repository
+    git commit -am "Add new feature"
+    ${original_exec} check_in
 EOF
 }
 
