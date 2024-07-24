@@ -66,24 +66,13 @@ assert_upstream_exists() {
   fi
 }
 
-# Check the upstream submodule isn't modified in the working tree
-assert_upstream_tracked() {
-  status=$(git status --porcelain upstream)
-  if [[ ${status} == *"M upstream" ]]; then
+assert_not_checked_out() {
+  current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
+  if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
     cat <<EOF
-Error: The 'upstream' submodule is modified with untracked changes, continuing
-might loose changes in the 'upstream' submodule.
-
-Git status of 'upstream':
-${status}
-
-EOF
-    current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
-    if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
-      # Show a special message as they've done a checkout but not checked in.
-      cat <<EOF
-Currently checked out on the 'pulumi/patch-checkout' branch. This was likely
-caused by running a 'checkout' command and not running 'check_in' afterwards.
+Error: 'upstream' submodule checked out on the 'pulumi/patch-checkout' branch.
+This was likely caused by running a 'checkout' command but not running
+'check_in' afterwards.
 
 To turn the commits in the 'pulumi/patch-checkout' branch back into patches, run:
   ${original_exec} check_in
@@ -92,21 +81,9 @@ To disgard changes in the 'pulumi/patch-checkout' branch, use the 'force' flag (
   ${original_exec} ${original_cmd} -f
 
 EOF
-    else
-      # Show a generic message for other cases.
-      cat <<EOF
-Checked out upstream ref: ${current_branch}
-
-To continue and discard the changes to upstream, run:
-  ${original_exec} ${original_cmd} -f
-
-To keep the changes to upstream, run:
-  git add upstream
-
-EOF
-    fi
     exit 1
   fi
+
 }
 
 assert_is_checked_out() {
@@ -174,7 +151,7 @@ init() {
   assert_upstream_exists
 
   if [[ "${force}" != "true" ]]; then
-    assert_upstream_tracked
+    assert_not_checked_out
   else
     echo "Warning: forcing init command to run even if the upstream submodule is modified."
   fi
@@ -195,7 +172,7 @@ checkout() {
   assert_upstream_exists
 
   if [[ "${force}" != "true" ]]; then
-    assert_upstream_tracked
+    assert_not_checked_out
   else
     echo "Warning: forcing checkout command to run even if the upstream submodule is modified."
   fi
