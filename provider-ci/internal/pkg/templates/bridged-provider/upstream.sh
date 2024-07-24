@@ -139,6 +139,30 @@ apply_patches() {
   done
 }
 
+clean_rebases() {
+  # Clean up any previous in-progress rebases.
+  cd upstream
+  rebase_merge_dir=$(git rev-parse --git-path rebase-merge)
+  rebase_apply_dir=$(git rev-parse --git-path rebase-apply)
+  rm -rf "${rebase_merge_dir}"
+  rm -rf "${rebase_apply_dir}"
+  cd ..
+}
+
+clean_branches() {
+  cd upstream
+  if git show-ref --verify --quiet refs/heads/pulumi/patch-checkout; then
+    git branch -D pulumi/patch-checkout
+  fi
+  if git show-ref --verify --quiet refs/heads/pulumi/checkout-base; then
+    git branch -D pulumi/checkout-base
+  fi
+  if git show-ref --verify --quiet refs/heads/pulumi/original-base; then
+    git branch -D pulumi/original-base
+  fi
+  cd ..
+}
+
 init() {
   # Parse additional flags
   while getopts "f" flag; do
@@ -152,11 +176,14 @@ init() {
 
   if [[ "${force}" != "true" ]]; then
     assert_not_checked_out
-  else
-    echo "Warning: forcing init command to run even if the upstream submodule is modified."
+    assert_no_rebase_in_progress
   fi
 
   git submodule update --force --init
+  if [[ "${force}" == "true" ]]; then
+    clean_rebases
+    clean_branches
+  fi
   apply_patches
 }
 
@@ -173,23 +200,16 @@ checkout() {
 
   if [[ "${force}" != "true" ]]; then
     assert_not_checked_out
-  else
-    echo "Warning: forcing checkout command to run even if the upstream submodule is modified."
+    assert_no_rebase_in_progress
   fi
 
   git submodule update --force --init
-  cd upstream
   if [[ "${force}" == "true" ]]; then
-    echo "Cleaning up any previous branches"
-    git branch -D pulumi/patch-checkout
-    git branch -D pulumi/checkout-base
-    git branch -D pulumi/original-base
+    clean_rebases
+    clean_branches
   fi
-  # Clean up any previous in-progress rebases.
-  rebase_merge_dir=$(git rev-parse --git-path rebase-merge)
-  rebase_apply_dir=$(git rev-parse --git-path rebase-apply)
-  rm -rf "${rebase_merge_dir}"
-  rm -rf "${rebase_apply_dir}"
+
+  cd upstream
   git fetch --all
 
   # Set the 'pulumi/checkout-base' branch to the current commit of the upstream repository
