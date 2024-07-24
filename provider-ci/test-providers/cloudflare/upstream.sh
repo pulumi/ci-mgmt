@@ -66,24 +66,13 @@ assert_upstream_exists() {
   fi
 }
 
-# Check the upstream submodule isn't modified in the working tree
-assert_upstream_tracked() {
-  status=$(git status --porcelain upstream)
-  if [[ ${status} == *"M upstream" ]]; then
+assert_not_checked_out() {
+  current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
+  if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
     cat <<EOF
-Error: The 'upstream' submodule is modified with untracked changes, continuing
-might loose changes in the 'upstream' submodule.
-
-Git status of 'upstream':
-${status}
-
-EOF
-    current_branch=$(cd upstream && git --no-pager rev-parse --abbrev-ref HEAD)
-    if [[ "${current_branch}" == "pulumi/patch-checkout" ]]; then
-      # Show a special message as they've done a checkout but not checked in.
-      cat <<EOF
-Currently checked out on the 'pulumi/patch-checkout' branch. This was likely
-caused by running a 'checkout' command and not running 'check_in' afterwards.
+Error: 'upstream' submodule checked out on the 'pulumi/patch-checkout' branch.
+This was likely caused by running a 'checkout' command but not running
+'check_in' afterwards.
 
 To turn the commits in the 'pulumi/patch-checkout' branch back into patches, run:
   ${original_exec} check_in
@@ -92,21 +81,9 @@ To disgard changes in the 'pulumi/patch-checkout' branch, use the 'force' flag (
   ${original_exec} ${original_cmd} -f
 
 EOF
-    else
-      # Show a generic message for other cases.
-      cat <<EOF
-Checked out upstream ref: ${current_branch}
-
-To continue and discard the changes to upstream, run:
-  ${original_exec} ${original_cmd} -f
-
-To keep the changes to upstream, run:
-  git add upstream
-
-EOF
-    fi
     exit 1
   fi
+
 }
 
 assert_is_checked_out() {
@@ -162,6 +139,30 @@ apply_patches() {
   done
 }
 
+clean_rebases() {
+  # Clean up any previous in-progress rebases.
+  cd upstream
+  rebase_merge_dir=$(git rev-parse --git-path rebase-merge)
+  rebase_apply_dir=$(git rev-parse --git-path rebase-apply)
+  rm -rf "${rebase_merge_dir}"
+  rm -rf "${rebase_apply_dir}"
+  cd ..
+}
+
+clean_branches() {
+  cd upstream
+  if git show-ref --verify --quiet refs/heads/pulumi/patch-checkout; then
+    git branch -D pulumi/patch-checkout
+  fi
+  if git show-ref --verify --quiet refs/heads/pulumi/checkout-base; then
+    git branch -D pulumi/checkout-base
+  fi
+  if git show-ref --verify --quiet refs/heads/pulumi/original-base; then
+    git branch -D pulumi/original-base
+  fi
+  cd ..
+}
+
 init() {
   # Parse additional flags
   while getopts "f" flag; do
@@ -174,12 +175,15 @@ init() {
   assert_upstream_exists
 
   if [[ "${force}" != "true" ]]; then
-    assert_upstream_tracked
-  else
-    echo "Warning: forcing init command to run even if the upstream submodule is modified."
+    assert_not_checked_out
+    assert_no_rebase_in_progress
   fi
 
   git submodule update --force --init
+  if [[ "${force}" == "true" ]]; then
+    clean_rebases
+    clean_branches
+  fi
   apply_patches
 }
 
@@ -195,24 +199,17 @@ checkout() {
   assert_upstream_exists
 
   if [[ "${force}" != "true" ]]; then
-    assert_upstream_tracked
-  else
-    echo "Warning: forcing checkout command to run even if the upstream submodule is modified."
+    assert_not_checked_out
+    assert_no_rebase_in_progress
   fi
 
   git submodule update --force --init
-  cd upstream
   if [[ "${force}" == "true" ]]; then
-    echo "Cleaning up any previous branches"
-    git branch -D pulumi/patch-checkout
-    git branch -D pulumi/checkout-base
-    git branch -D pulumi/original-base
+    clean_rebases
+    clean_branches
   fi
-  # Clean up any previous in-progress rebases.
-  rebase_merge_dir=$(git rev-parse --git-path rebase-merge)
-  rebase_apply_dir=$(git rev-parse --git-path rebase-apply)
-  rm -rf "${rebase_merge_dir}"
-  rm -rf "${rebase_apply_dir}"
+
+  cd upstream
   git fetch --all
 
   # Set the 'pulumi/checkout-base' branch to the current commit of the upstream repository
@@ -349,7 +346,7 @@ case ${original_cmd} in
   init)
     init "$@"
     ;;
-  checkout)
+  checkout|check_out)
     checkout "$@"
     ;;
   rebase)
@@ -358,7 +355,7 @@ case ${original_cmd} in
   format_patches)
     format_patches "$@"
     ;;
-  check_in)
+  check_in|checkin)
     check_in "$@"
     ;;
   *)
