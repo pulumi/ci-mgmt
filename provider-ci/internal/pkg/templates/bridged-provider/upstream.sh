@@ -349,7 +349,7 @@ case ${original_cmd} in
   init)
     init "$@"
     ;;
-  checkout)
+  checkout|check_out)
     checkout "$@"
     ;;
   rebase)
@@ -358,7 +358,7 @@ case ${original_cmd} in
   format_patches)
     format_patches "$@"
     ;;
-  check_in)
+  check_in|checkin)
     check_in "$@"
     ;;
   *)
