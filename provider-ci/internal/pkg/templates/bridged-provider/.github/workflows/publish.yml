@@ -105,7 +105,7 @@ jobs:
       with:
         tools: pulumictl, pulumicli, go, node, dotnet, python, java
     - name: Publish SDKs
-      uses: pulumi/pulumi-package-publisher@v0.0.19
+      uses: pulumi/pulumi-package-publisher@v0.0.20
       with:
         sdk: #{{ .Config.publish.sdk }}#
         version: ${{ inputs.version }}
