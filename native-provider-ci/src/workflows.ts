@@ -122,7 +122,6 @@ export function RunAcceptanceTestsWorkflow(
         types: ["run-acceptance-tests-command"],
       },
       pull_request: {
-        branches: ["master", "main"],
         "paths-ignore": ["CHANGELOG.md"],
       },
       workflow_dispatch: {},
@@ -155,14 +154,6 @@ export function RunAcceptanceTestsWorkflow(
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
       lint: new LintJob("lint").addDispatchConditional(true),
-    });
-  }
-  if (opts.provider === "kubernetes") {
-    workflow.on = Object.assign(workflow.on, {
-      pull_request: {
-        branches: ["master", "main", "v4"],
-        "paths-ignore": ["CHANGELOG.md"],
-      },
     });
   }
   return workflow;
