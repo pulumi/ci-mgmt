@@ -32,6 +32,7 @@
     "hcloud",
     "http",
     "ise",
+    "junipermist",
     "kafka",
     "keycloak",
     "kong",
