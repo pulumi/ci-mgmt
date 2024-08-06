@@ -536,8 +536,7 @@ jobs:
         version: ${{ steps.version.outputs.version }}
         additive: false
         files: |-
-          go.*
-          go/**
+          **/*.go
           !*.tar.gz
   dispatch_docs_build:
     runs-on: ubuntu-latest

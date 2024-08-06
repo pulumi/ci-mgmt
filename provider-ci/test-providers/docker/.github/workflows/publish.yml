@@ -148,8 +148,7 @@ jobs:
         additive: false
         # Avoid including other language SDKs & artifacts in the commit
         files: |
-          go.*
-          go/**
+          **/*.go
           !*.tar.gz
   create_docs_build:
     name: create_docs_build

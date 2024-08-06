@@ -1040,8 +1040,7 @@ export function PublishGoSdk(sdkModuleDir: string): Step {
       version: "${{ steps.version.outputs.version }}",
       additive: false,
       files: `\
-go.*
-go/**
+**/*.go
 !*.tar.gz`,
     },
   };
