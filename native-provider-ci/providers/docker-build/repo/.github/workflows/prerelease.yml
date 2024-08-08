@@ -589,7 +589,4 @@ jobs:
         path: sdk/go/dockerbuild
         version: ${{ steps.version.outputs.version }}
         additive: false
-        files: |-
-          go.*
-          go/**
-          !*.tar.gz
+        files: "**"

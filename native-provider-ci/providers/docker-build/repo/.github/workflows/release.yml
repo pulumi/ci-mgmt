@@ -589,10 +589,7 @@ jobs:
         path: sdk/go/dockerbuild
         version: ${{ steps.version.outputs.version }}
         additive: false
-        files: |-
-          go.*
-          go/**
-          !*.tar.gz
+        files: "**"
   dispatch_docs_build:
     runs-on: ubuntu-latest
     needs: publish_go_sdk
