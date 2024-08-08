@@ -1039,9 +1039,14 @@ export function PublishGoSdk(sdkModuleDir: string): Step {
       path: sdkModuleDir,
       version: "${{ steps.version.outputs.version }}",
       additive: false,
-      files: `\
-**/*.go
-!*.tar.gz`,
+      // TODO(https://github.com/pulumi/pulumi/issues/5403): go.mod should be scoped to only the Go SDK.
+      files:
+        sdkModuleDir == "sdk"
+          ? `\
+go.*
+go/**
+!*.tar.gz`
+          : "**",
     },
   };
 }

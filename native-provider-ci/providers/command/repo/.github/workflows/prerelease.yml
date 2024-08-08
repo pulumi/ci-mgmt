@@ -536,5 +536,6 @@ jobs:
         version: ${{ steps.version.outputs.version }}
         additive: false
         files: |-
-          **/*.go
+          go.*
+          go/**
           !*.tar.gz
