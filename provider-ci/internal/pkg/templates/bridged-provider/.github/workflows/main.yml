@@ -129,7 +129,7 @@ jobs:
 #{{- if .Config.freeDiskSpaceBeforeTest }}#
     # Run as first step so we don't delete things that have just been installed
     - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
       with:
         tool-cache: false
         swap-storage: false
