@@ -982,14 +982,14 @@ export function CreateUpdatePulumiPR(branch: string): Step {
     name: "Create PR",
     id: "create-pr",
     if: "steps.gomod.outputs.changes != 0",
-    uses: action.pullRequest,
-    with: {
-      source_branch:
-        "update-pulumi/${{ github.run_id }}-${{ github.run_number }}",
-      destination_branch: branch,
-      pr_title: "Automated Pulumi/Pulumi upgrade",
-      github_token: "${{ secrets.PULUMI_BOT_TOKEN }}",
-    },
+    run:
+      "ver=$(cat .pulumi.version)" +
+      "\n" +
+      'msg="Automated upgrade: bump pulumi/pulumi to ${ver}"' +
+      "\n" +
+      'gh pr create -t "$msg" -b "$msg" -B ' +
+      branch +
+      "\n",
     env: {
       GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
     },
