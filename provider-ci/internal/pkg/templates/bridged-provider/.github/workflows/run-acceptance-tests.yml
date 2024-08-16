@@ -41,16 +41,16 @@ jobs:
     name: comment-notification
     runs-on: #{{ .Config.runner.default }}#
     steps:
-    - id: run-url
-      name: Create URL to the run output
-      run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
-    - name: Update with Result
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
-        issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-        repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+      - id: run-url
+        name: Create URL to the run output
+        run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+      - name: Update with Result
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
+          issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
   #{{ if .Config.lint -}}#
   lint:
     if: github.event_name == 'repository_dispatch' ||
@@ -65,28 +65,28 @@ jobs:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     needs:
-    - test
-    - build_provider
-    - license_check
-    #{{- if .Config.lint }}#
-    - lint
-    #{{- end }}#
-    #{{- range $action, $_ := .Config.extraTests }}#
-    - #{{ $action }}#
+      - test
+      - build_provider
+      - license_check
+      #{{- if .Config.lint }}#
+      - lint
+      #{{- end }}#
+      #{{- range $action, $_ := .Config.extraTests }}#
+      -  #{{ $action }}#
     #{{- end }}#
     runs-on: #{{ .Config.runner.default }}#
     steps:
-    - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
-      with: 
-        authToken: ${{secrets.GITHUB_TOKEN}}
-        # Write an explicit status check called "Sentinel" which will only pass if this code really runs.
-        # This should always be a required check for PRs.
-        context: 'Sentinel'
-        description: 'All required checks passed'
-        state: 'success'
-        # Write to the PR commit SHA if it's available as we don't want the merge commit sha,
-        # otherwise use the current SHA for any other type of build.
-        sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
+        with:
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          # Write an explicit status check called "Sentinel" which will only pass if this code really runs.
+          # This should always be a required check for PRs.
+          context: "Sentinel"
+          description: "All required checks passed"
+          state: "success"
+          # Write to the PR commit SHA if it's available as we don't want the merge commit sha,
+          # otherwise use the current SHA for any other type of build.
+          sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   test:
     if: github.event_name == 'repository_dispatch' ||
@@ -102,117 +102,119 @@ jobs:
     env:
       PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
-#{{- if .Config.freeDiskSpaceBeforeTest }}#
-    # Run as first step so we don't delete things that have just been installed
-    - name: Free Disk Space (Ubuntu)
-      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
-      with:
-        tool-cache: false
-        swap-storage: false
-#{{- end }}#
-    - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        ref: ${{ env.PR_COMMIT_SHA }}
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
-        #{{- end }}#
-    #{{- if .Config.testPulumiExamples }}#
-    - name: Checkout p/examples
-      uses: #{{ .Config.actionVersions.checkout }}#
-      with:
-        repository: pulumi/examples
-        path: p-examples
-    #{{- end }}#
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
-    - name: Download bin
-      uses: ./.github/actions/download-bin
-    - run: dotnet nuget add source ${{ github.workspace }}/nuget
-    - name: Download SDK
-      uses: actions/download-artifact@v4
-      with:
-        name: sdk.tar.gz
-        path: ${{ github.workspace}}
-    - name: Update path
-      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Install Python deps
-      run: |-
-        pip3 install virtualenv==20.0.23
-        pip3 install pipenv
-    #{{- if .Config.docker }}#
-    - name: Run docker compose
-      run: docker compose -f testing/docker-compose.yml up --build -d
-    #{{- end }}#
-    #{{- if .Config.aws }}#
-    - name: Configure AWS Credentials
-      uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-region: ${{ env.AWS_REGION }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 7200
-        role-session-name: #{{ .Config.provider }}#@githubActions
-        role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    #{{- end }}#
-    #{{- if .Config.gcp }}#
-    - name: Authenticate to Google Cloud
-      uses: #{{ .Config.actionVersions.googleAuth }}#
-      with:
-        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
-        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
-          }}/locations/global/workloadIdentityPools/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
-    - name: Setup gcloud auth
-      uses: #{{ .Config.actionVersions.setupGcloud }}#
-      with:
-        install_components: gke-gcloud-auth-plugin
-    #{{- end }}#
-    #{{- if .Config.gcpRegistry }}#
-    - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker
-    #{{- end }}#
-    #{{- if .Config.sshPrivateKey }}#
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: #{{ .Config.sshPrivateKey }}#
-    #{{- end }}#
-    #{{- if .Config.integrationTestProvider }}#
-    - name: Prepare upstream code
-      run: make upstream
-    #{{- end }}#
-    #{{- if index .Config "setup-script" }}#
-    - name: Run setup script
-      run: #{{ index .Config "setup-script" }}#
-    #{{- end }}#
-    - name: Install dependencies
-      run: make install_sdks
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-#{{- if .Config.actions.preTest }}#
-#{{ .Config.actions.preTest | toYaml | indent 4 }}#
-#{{- end }}#
-    #{{- if .Config.integrationTestProvider }}#
-    - name: Shard provider tests
-      working-directory: provider
-      run: go run github.com/blampe/shard --total ${{ strategy.job-total }} --index ${{ strategy.job-index }} > tests
-    - name: Run provider tests
-      working-directory: provider
-      run: xargs go test -v -json -count=1 -cover -timeout 2h -tags=all -parallel 4 {} < tests 2>&1 | tee /tmp/gotest.log | gotestfmt
-    #{{- end }}#
-    - name: Shard tests
-      working-directory: examples
-      run: go run github.com/blampe/shard --total ${{ strategy.job-total }} --index ${{ strategy.job-index }} > tests
-    - name: Run tests
-      working-directory: examples
-      run: xargs go test -v -json -count=1 -cover -timeout 2h -tags=all -parallel 4 {} < tests 2>&1 | tee /tmp/gotest.log | gotestfmt
+      #{{- if .Config.freeDiskSpaceBeforeTest }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+      #{{- end }}#
+      - name: Checkout Repo
+        uses: #{{ .Config.actionVersions.checkout }}#
+        with:
+          ref: ${{ env.PR_COMMIT_SHA }}
+          #{{- if .Config.checkoutSubmodules }}#
+          submodules: #{{ .Config.checkoutSubmodules }}#
+          #{{- end }}#
+      #{{- if .Config.testPulumiExamples }}#
+      - name: Checkout p/examples
+        uses: #{{ .Config.actionVersions.checkout }}#
+        with:
+          repository: pulumi/examples
+          path: p-examples
+      #{{- end }}#
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        with:
+          tools: pulumictl, pulumicli, go, node, dotnet, python, java
+      - name: Download bin
+        uses: ./.github/actions/download-bin
+      - run: dotnet nuget add source ${{ github.workspace }}/nuget
+      - name: Download SDK
+        uses: actions/download-artifact@v4
+        with:
+          name: sdk.tar.gz
+          path: ${{ github.workspace}}
+      - name: UnTar SDK folder
+        run: tar -zxf ${{ github.workspace}}/sdk.tar.gz -C ${{github.workspace}}/sdk
+      - name: Update path
+        run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+      - name: Install Python deps
+        run: |-
+          pip3 install virtualenv==20.0.23
+          pip3 install pipenv
+      #{{- if .Config.docker }}#
+      - name: Run docker compose
+        run: docker compose -f testing/docker-compose.yml up --build -d
+      #{{- end }}#
+      #{{- if .Config.aws }}#
+      - name: Configure AWS Credentials
+        uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-duration-seconds: 7200
+          role-session-name: #{{ .Config.provider }}#@githubActions
+          role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+      #{{- end }}#
+      #{{- if .Config.gcp }}#
+      - name: Authenticate to Google Cloud
+        uses: #{{ .Config.actionVersions.googleAuth }}#
+        with:
+          service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+          workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+            }}/locations/global/workloadIdentityPools/${{
+            env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+            env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+      - name: Setup gcloud auth
+        uses: #{{ .Config.actionVersions.setupGcloud }}#
+        with:
+          install_components: gke-gcloud-auth-plugin
+      #{{- end }}#
+      #{{- if .Config.gcpRegistry }}#
+      - name: Login to Google Cloud Registry
+        run: gcloud --quiet auth configure-docker
+      #{{- end }}#
+      #{{- if .Config.sshPrivateKey }}#
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: #{{ .Config.sshPrivateKey }}#
+      #{{- end }}#
+      #{{- if .Config.integrationTestProvider }}#
+      - name: Prepare upstream code
+        run: make upstream
+      #{{- end }}#
+      #{{- if index .Config "setup-script" }}#
+      - name: Run setup script
+        run: #{{ index .Config "setup-script" }}#
+      #{{- end }}#
+      - name: Install dependencies
+        run: make install_sdks
+      - name: Install gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: v2.5.0
+      #{{- if .Config.actions.preTest }}#
+      #{{ .Config.actions.preTest | toYaml | indent 4 }}#
+      #{{- end }}#
+      #{{- if .Config.integrationTestProvider }}#
+      - name: Shard provider tests
+        working-directory: provider
+        run: go run github.com/blampe/shard --total ${{ strategy.job-total }} --index ${{ strategy.job-index }} > tests
+      - name: Run provider tests
+        working-directory: provider
+        run: xargs go test -v -json -count=1 -cover -timeout 2h -tags=all -parallel 4 {} < tests 2>&1 | tee /tmp/gotest.log | gotestfmt
+      #{{- end }}#
+      - name: Shard tests
+        working-directory: examples
+        run: go run github.com/blampe/shard --total ${{ strategy.job-total }} --index ${{ strategy.job-index }} > tests
+      - name: Run tests
+        working-directory: examples
+        run: xargs go test -v -json -count=1 -cover -timeout 2h -tags=all -parallel 4 {} < tests 2>&1 | tee /tmp/gotest.log | gotestfmt
     strategy:
       fail-fast: false
       matrix:
@@ -228,7 +230,7 @@ name: run-acceptance-tests
 on:
   pull_request:
     paths-ignore:
-    - CHANGELOG.md
+      - CHANGELOG.md
   repository_dispatch:
     types:
-    - run-acceptance-tests-command
+      - run-acceptance-tests-command
