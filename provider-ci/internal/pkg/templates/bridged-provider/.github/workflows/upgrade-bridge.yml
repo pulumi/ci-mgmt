@@ -57,6 +57,14 @@ jobs:
     name: upgrade-provider
     runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     steps:
+    #{{- if .Config.freeDiskSpaceBeforeBuild }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+    #{{- end }}#
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
