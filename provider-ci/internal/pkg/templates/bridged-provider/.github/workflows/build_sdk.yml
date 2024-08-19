@@ -25,6 +25,14 @@ jobs:
         - go
         - java
     steps:
+      #{{- if .Config.freeDiskSpaceBeforeSdkBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+      #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.actionVersions.checkout }}#
 #{{- if .Config.checkoutSubmodules }}#
