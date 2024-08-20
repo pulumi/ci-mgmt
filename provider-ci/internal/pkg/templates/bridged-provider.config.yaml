@@ -2,6 +2,9 @@
 # This MUST be set in every provider
 #provider: xyz
 
+# organization is the name of the Github organization the repository lives in. Defaults to 'pulumi'
+organization: pulumi
+
 # major version of the current provider - used in make files and goreleaser
 # This should always be set by all providers as this is key to go module paths.
 major-version: 2
