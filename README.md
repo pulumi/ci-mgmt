@@ -76,7 +76,7 @@ To add a new provider:
    ```
 
    `ci-mgmt` will read your provider's `.ci-mgmt.yaml` and generate the standard set of CI files from templates.
-   You can override every of the [default values](./provider-ci/internal/pkg/templates/bridged-provider.config.yaml)
+   You can override every one of the [default values](./provider-ci/internal/pkg/templates/bridged-provider.config.yaml)
    in your `.ci-mgmt.yaml` file.
 
 1. Add your provider to `provider-ci/providers.json` in alphabetical order. This ensures your provider receives regular
