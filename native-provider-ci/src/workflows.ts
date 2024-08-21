@@ -22,6 +22,8 @@ export const WorkflowOpts = z.object({
   parallel: z.number().default(3),
   timeout: z.number().default(60),
   providerVersion: z.string().default(""),
+  testShardDir: z.string().optional(), // Sharded test directory.
+  testShards: z.number().optional(), // How many test shards.
   sdkModuleDir: z.string().default("sdk"),
   skipCodegen: z.boolean().default(false),
   skipWindowsArmBuild: z.boolean().default(false),
@@ -543,12 +545,7 @@ export class TestsJob implements NormalJob {
   "runs-on" = "pulumi-ubuntu-8core"; // insufficient resources to run Go builds on ubuntu-latest, specifically for K8S
 
   needs = ["build_sdks"];
-  strategy = {
-    "fail-fast": true,
-    matrix: {
-      language: ["nodejs", "python", "dotnet", "go", "java"],
-    },
-  };
+  strategy: NormalJob["strategy"];
   permissions: NormalJob["permissions"];
   steps: NormalJob["steps"];
   name: string;
@@ -564,13 +561,28 @@ export class TestsJob implements NormalJob {
       this["runs-on"] = "ubuntu-latest";
     }
 
+    const strategy: NormalJob["strategy"] = {
+      "fail-fast": true,
+      matrix: {
+        language: ["nodejs", "python", "dotnet", "go", "java"],
+      },
+    };
+
+    // Don't shard on language if we have testShards defined.
+    if (opts.testShards !== undefined) {
+      strategy.matrix = {
+        shard: Array(opts.testShards).keys(),
+      };
+    }
+
     if (
       opts.provider === "kubernetes" &&
       workflowName === "run-acceptance-tests"
     ) {
-      this.strategy["fail-fast"] = false;
+      strategy["fail-fast"] = false;
     }
 
+    this.strategy = strategy;
     this.name = jobName;
     this.permissions = {
       contents: "read",
@@ -590,7 +602,7 @@ export class TestsJob implements NormalJob {
       steps.DownloadProviderBinaries(opts.provider, jobName),
       steps.UnTarProviderBinaries(opts.provider, jobName),
       steps.RestoreBinaryPerms(opts.provider, jobName),
-      steps.DownloadSDKs(),
+      ...steps.DownloadSDKs(opts.testShards !== undefined),
       steps.UnzipSDKs(),
       steps.UpdatePath(),
       steps.InstallNodeDeps(),
@@ -606,7 +618,7 @@ export class TestsJob implements NormalJob {
       steps.InstallandConfigureHelm(opts.provider),
       steps.SetupGotestfmt(),
       steps.CreateKindCluster(opts.provider, workflowName),
-      steps.RunTests(opts.provider, workflowName),
+      ...steps.RunTests(workflowName, opts.testShardDir),
       steps.NotifySlack("Failure in SDK tests"),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name: jobName });

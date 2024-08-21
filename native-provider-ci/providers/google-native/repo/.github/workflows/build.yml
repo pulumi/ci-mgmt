@@ -320,8 +320,8 @@ jobs:
         name: ${{ matrix.language }}-sdk.tar.gz
         path: ${{ github.workspace}}/sdk/
     - name: UnTar SDK folder
-      run: tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{
-        github.workspace}}/sdk/${{ matrix.language}}
+      run: for f in *.tar.gz; do tar -zxf "$f" -C "${f%.tar.gz}"; done
+      working-directory: ${{ github.workspace}}/sdk
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
     - name: Install Node dependencies
@@ -332,7 +332,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
+      run: make install_sdks
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v0
       with:
