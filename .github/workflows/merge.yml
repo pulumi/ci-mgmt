@@ -1,6 +1,5 @@
 on:
-  merge_group:
-    branches: main
+  merge_group: {}
   workflow_dispatch: {}
 
 jobs:
@@ -53,7 +52,7 @@ jobs:
         run: gh pr checks --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
 
       - name: Await PR merged
-        run: while [[ $(gh pr view --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --json "state" | grep "OPEN") ]] do sleep 1; done
+        run: while [[ $(gh pr view --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
         timeout-minutes: 2
 
       - name: Get merge commit
@@ -70,7 +69,7 @@ jobs:
       - name: Await main build start
         id: main_build
         run: |
-          while [[ $(gh run list --repo "pulumi/pulumi-xyz" --workflow main --json headSha | grep "${{ steps.merge_commit.outputs.oid }}" | wc -l) -eq 0 ]]; do sleep 1; done
+          until (gh run list --repo "pulumi/pulumi-xyz" --workflow main --json headSha | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
           database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow main --json "number,headSha,databaseId" | jq '.[] | select(.headSha == "${{ steps.merge_commit.outputs.oid }}") | .databaseId')
           echo "Main build started with database id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
