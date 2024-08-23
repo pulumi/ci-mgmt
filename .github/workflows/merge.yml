@@ -94,7 +94,7 @@ jobs:
         timeout-minutes: 2
         run: |
           until (gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
-          database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" -- jq '.[0].databaseId')
+          database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" --jq '.[0].databaseId')
           echo "Release workflow started with id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
 
