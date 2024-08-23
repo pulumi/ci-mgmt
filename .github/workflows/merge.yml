@@ -39,9 +39,8 @@ jobs:
           echo "PR number is $number"
           echo "number=${number}" >> "${GITHUB_OUTPUT}"
 
-      # TODO: Once we've got the main build check working, we should also cut a full release.
-      # - name: Add needs-release label
-      #   run: gh pr edit --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --add-label "needs-release/minor"
+      - name: Add needs-release label
+        run: gh pr edit --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --add-label "needs-release/minor"
 
       - name: Await first checks started
         # Wait for at least 3 checks to be started before we start waiting for them to finish.
@@ -78,4 +77,24 @@ jobs:
       - name: Await main build success
         run: gh run watch --repo "pulumi/pulumi-xyz" "${{ steps.main_build.outputs.id }}" --exit-status
 
-      # TODO: Identify the tag associated with the commit and wait for that to complete too.
+      - name: Get tag for release
+        id: release_tag
+        timeout-minutes: 2
+        run: |
+          until (git ls-remote --tags "git@github.com:pulumi/pulumi-xyz.git" | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
+          # Also handle annotated tags in the format refs/tags/v0.1.0^{}
+          tag=$(git ls-remote --tags "git@github.com:pulumi/pulumi-xyz.git" | grep "${{ steps.merge_commit.outputs.oid }}" | cut -d '/' -f 3 | sed -E 's/\^\{\}$//')
+          echo "Tag for release is ${tag}"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Wait for release workflow run
+        id: release_workflow
+        timeout-minutes: 2
+        run: |
+          until (gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
+          database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" -- jq '.[0].databaseId')
+          echo "Release workflow started with id ${database_id}"
+          echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
+
+      - name: Await release workflow success
+        run: gh run watch --repo "pulumi/pulumi-xyz" "${{ steps.release_workflow.outputs.id }}" --exit-status
