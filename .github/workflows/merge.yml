@@ -76,14 +76,6 @@ jobs:
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
         timeout-minutes: 2
 
-      # Checkout pulumi-xyz so we get credentials ready to use
-      - name: Checkout pulumi-xyz
-        uses: actions/checkout@v4
-        with:
-          repository: pulumi/pulumi-xyz
-          ref: main
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
-
       - name: Await main build success
         run: gh run watch --repo "pulumi/pulumi-xyz" "${{ steps.main_build.outputs.id }}" --exit-status
 
@@ -91,9 +83,9 @@ jobs:
         id: release_tag
         timeout-minutes: 2
         run: |
-          until (git ls-remote --tags "git@github.com:pulumi/pulumi-xyz.git" | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
+          until (git ls-remote --tags "https://github.com/pulumi/pulumi-xyz.git" | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
           # Also handle annotated tags in the format refs/tags/v0.1.0^{}
-          tag=$(git ls-remote --tags "git@github.com:pulumi/pulumi-xyz.git" | grep "${{ steps.merge_commit.outputs.oid }}" | cut -d '/' -f 3 | sed -E 's/\^\{\}$//')
+          tag=$(git ls-remote --tags "https://github.com/pulumi/pulumi-xyz.git" | grep "${{ steps.merge_commit.outputs.oid }}" | cut -d '/' -f 3 | sed -E 's/\^\{\}$//')
           echo "Tag for release is ${tag}"
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
 
