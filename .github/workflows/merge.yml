@@ -1,3 +1,5 @@
+name: Merge Queue
+
 on:
   merge_group: {}
   workflow_dispatch: {}
@@ -40,7 +42,7 @@ jobs:
           echo "number=${number}" >> "${GITHUB_OUTPUT}"
 
       - name: Add needs-release label
-        run: gh pr edit --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --add-label "needs-release/minor"
+        run: gh pr edit --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --add-label "needs-release/patch"
 
       - name: Await first checks started
         # Wait for at least 3 checks to be started before we start waiting for them to finish.
@@ -73,6 +75,14 @@ jobs:
           echo "Main build started with database id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
         timeout-minutes: 2
+
+      # Checkout pulumi-xyz so we get credentials ready to use
+      - name: Checkout pulumi-xyz
+        uses: actions/checkout@v4
+        with:
+          repository: pulumi/pulumi-xyz
+          ref: main
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
 
       - name: Await main build success
         run: gh run watch --repo "pulumi/pulumi-xyz" "${{ steps.main_build.outputs.id }}" --exit-status
