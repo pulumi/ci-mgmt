@@ -2,6 +2,9 @@ on:
   pull_request:
     branches:
       - master
+  merge_group: {}
+  workflow_dispatch: {}
+
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
 concurrency:
