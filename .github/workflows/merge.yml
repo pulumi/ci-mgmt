@@ -54,7 +54,7 @@ jobs:
 
       - name: Await PR merged
         run: while [[ $(gh pr view --repo "pulumi/pulumi-xyz" "${{ steps.pr_number.outputs.number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
-        timeout-minutes: 2
+        timeout-minutes: 5
 
       - name: Get merge commit
         id: merge_commit
@@ -74,14 +74,14 @@ jobs:
           database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow main --json "number,headSha,databaseId" | jq '.[] | select(.headSha == "${{ steps.merge_commit.outputs.oid }}") | .databaseId')
           echo "Main build started with database id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
-        timeout-minutes: 2
+        timeout-minutes: 5
 
       - name: Await main build success
         run: gh run watch --repo "pulumi/pulumi-xyz" "${{ steps.main_build.outputs.id }}" --exit-status
 
       - name: Get tag for release
         id: release_tag
-        timeout-minutes: 2
+        timeout-minutes: 5
         run: |
           until (git ls-remote --tags "https://github.com/pulumi/pulumi-xyz.git" | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
           # Also handle annotated tags in the format refs/tags/v0.1.0^{}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Wait for release workflow run
         id: release_workflow
-        timeout-minutes: 2
+        timeout-minutes: 5
         run: |
           until (gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
           database_id=$(gh run list --repo "pulumi/pulumi-xyz" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" --jq '.[0].databaseId')
