@@ -5,7 +5,7 @@ title: '[Epic] {your-title-here}'
 labels: kind/epic
 projects: ['pulumi/32']
 assignees: ''
-
+type: Epic
 ---
 
 ## Overview
