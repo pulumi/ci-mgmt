@@ -19,11 +19,7 @@ jobs:
       fail-fast: true
       matrix:
         language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
+#{{ .Config.languages | toYaml | indent 8 }}#
     steps:
       #{{- if .Config.freeDiskSpaceBeforeSdkBuild }}#
       # Run as first step so we don't delete things that have just been installed
@@ -48,7 +44,7 @@ jobs:
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
-          tools: pulumictl, pulumicli, go, node, dotnet, python, java
+          tools: pulumictl, pulumicli, ${{ matrix.language }}
       - name: Download bin
         uses: ./.github/actions/download-bin
       - name: Install plugins

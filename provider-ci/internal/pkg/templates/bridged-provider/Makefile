@@ -45,7 +45,7 @@ development: install_plugins provider build_sdks install_sdks
 
 build: install_plugins provider build_sdks install_sdks
 
-build_sdks: build_nodejs build_python build_go build_dotnet build_java
+build_sdks: #{{ range .Config.languages }}#build_#{{ . }}# #{{ end }}#
 
 install_go_sdk:
 

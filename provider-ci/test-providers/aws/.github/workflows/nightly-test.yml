@@ -69,7 +69,7 @@ jobs:
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
+        tools: pulumictl, pulumicli, ${{ matrix.language}}
     - name: Download bin
       uses: ./.github/actions/download-bin
     - run: dotnet nuget add source ${{ github.workspace }}/nuget
@@ -108,11 +108,11 @@ jobs:
       fail-fast: false
       matrix:
         language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
+          - nodejs
+          - python
+          - dotnet
+          - go
+          - java
 name: cron
 on:
   schedule:

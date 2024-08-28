@@ -9,7 +9,7 @@ inputs:
         pulumicli
         pulumictl
         schema-tools
-        node
+        nodejs
         python
         dotnet
         java
@@ -48,10 +48,10 @@ runs:
         repo: pulumi/schema-tools
 
     - name: Setup Node
-      if: inputs.tools == 'all' || contains(inputs.tools, 'node')
+      if: inputs.tools == 'all' || contains(inputs.tools, 'nodejs')
       uses: actions/setup-node@v4
       with:
-        node-version: #{{ .Config.toolVersions.node }}#
+        node-version: #{{ .Config.toolVersions.nodejs }}#
         registry-url: https://registry.npmjs.org
 
     - name: Setup DotNet

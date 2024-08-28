@@ -166,11 +166,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
+#{{ .Config.languages | toYaml | indent 8 }}#
 #{{- if .Config.extraTests }}#
 #{{ .Config.extraTests | toYaml | indent 2 }}#
 #{{ end }}#
