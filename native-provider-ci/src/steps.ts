@@ -314,7 +314,7 @@ export function InstallPythonDeps(): Step {
 export function InstallSDKDeps(): Step {
   return {
     name: "Install dependencies",
-    run: "make install_${{ matrix.language}}_sdk",
+    run: "make install_sdks",
   };
 }
 
@@ -467,21 +467,38 @@ export function DownloadProviderBinaries(provider: string, job: string): Step {
   };
 }
 
-export function DownloadSDKs(): Step {
-  return {
-    name: "Download SDK",
-    uses: action.downloadArtifact,
-    with: {
-      name: "${{ matrix.language }}-sdk.tar.gz",
-      path: "${{ github.workspace}}/sdk/",
+// Download all SDKs if sharded
+export function DownloadSDKs(sharded: boolean): Step[] {
+  if (sharded) {
+    return ["nodejs", "go", "dotnet", "python", "java"].map((language) => {
+      return {
+        name: `Download ${language} SDK`,
+        uses: action.downloadArtifact,
+        with: {
+          name: `${language}-sdk.tar.gz`,
+          path: "${{ github.workspace}}/sdk/",
+        },
+      };
+    });
+  }
+
+  return [
+    {
+      name: "Download SDK",
+      uses: action.downloadArtifact,
+      with: {
+        name: "${{ matrix.language }}-sdk.tar.gz",
+        path: "${{ github.workspace}}/sdk/",
+      },
     },
-  };
+  ];
 }
 
 export function UnzipSDKs(): Step {
   return {
     name: "UnTar SDK folder",
-    run: "tar -zxf ${{ github.workspace}}/sdk/${{ matrix.language}}.tar.gz -C ${{ github.workspace}}/sdk/${{ matrix.language}}",
+    run: 'for f in *.tar.gz; do tar -zxf "$f" -C "${f%.tar.gz}"; done',
+    "working-directory": "${{ github.workspace}}/sdk",
   };
 }
 
@@ -513,21 +530,32 @@ export function SetNugetSource(): Step {
   };
 }
 
-export function RunTests(provider: string, name: string): Step {
-  if (provider === "kubernetes") {
+export function RunTests(name: string, shardDir?: string): Step[] {
+  if (shardDir !== undefined) {
     const shortMode = name === "run-acceptance-tests" ? " -short" : "";
-    const testCmd = `cd tests/sdk/\${{ matrix.language }} && go test -v -count=1 -cover -timeout 2h -parallel 4${shortMode} ./...`;
-    return {
-      name: "Run tests",
-      run: testCmd,
-    };
+    const shardCmd = `echo go test -v -count=1 -cover -timeout 2h -parallel 4${shortMode} "$(go run github.com/blampe/shard@b251cf8da6a83022628496125f285095772ebe86 --total \${{ strategy.job-total }} --index \${{ strategy.job-index }})" > test-command`;
+    const testCmd = `cat test-command && $(cat test-command)`;
+    return [
+      {
+        name: "Shard tests",
+        run: shardCmd,
+        "working-directory": shardDir,
+      },
+      {
+        name: "Run tests",
+        run: testCmd,
+        "working-directory": shardDir,
+      },
+    ];
   }
-  return {
-    name: "Run tests",
-    run:
-      "set -euo pipefail\n" +
-      "cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt",
-  };
+  return [
+    {
+      name: "Run tests",
+      run:
+        "set -euo pipefail\n" +
+        "cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt",
+    },
+  ];
 }
 
 export function CommitEmptySDK(): Step {
@@ -1268,7 +1296,7 @@ export function CreateKindCluster(provider: string, name: string): Step {
       name: "Setup KinD cluster",
       uses: action.createKindCluster,
       with: {
-        cluster_name: "kind-integration-tests-${{ matrix.language }}",
+        cluster_name: "kind-integration-tests-${{ matrix.job-index }}",
         node_image: "kindest/node:v1.29.2",
       },
     };

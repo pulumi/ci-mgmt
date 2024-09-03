@@ -5,6 +5,8 @@ providerVersion: github.com/pulumi/pulumi-docker-build/provider.Version
 aws: true
 gcp: true
 sdkModuleDir: sdk/go/dockerbuild
+testShards: 5
+testShardDir: examples
 env:
   AWS_REGION: us-west-2
   PULUMI_API: "https://api.pulumi-staging.io"
