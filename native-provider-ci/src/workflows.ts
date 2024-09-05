@@ -604,7 +604,6 @@ export class TestsJob implements NormalJob {
       steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
       steps.InstallandConfigureHelm(opts.provider),
-      steps.SetupGotestfmt(),
       steps.CreateKindCluster(opts.provider, workflowName),
       steps.RunTests(opts.provider, workflowName),
       steps.NotifySlack("Failure in SDK tests"),
