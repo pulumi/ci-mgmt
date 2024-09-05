@@ -32,6 +32,7 @@ jobs:
         with:
           tool-cache: false
           swap-storage: false
+          dotnet: ${{matrix.language != 'dotnet'}}
       #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.actionVersions.checkout }}#
