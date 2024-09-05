@@ -65,6 +65,10 @@ jobs:
         tool-cache: false
         swap-storage: false
     #{{- end }}#
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: pulumictl, pulumicli, go, node, dotnet, python, java
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
