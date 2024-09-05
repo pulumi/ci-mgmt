@@ -526,7 +526,7 @@ export function RunTests(provider: string, name: string): Step {
     name: "Run tests",
     run:
       "set -euo pipefail\n" +
-      "cd examples && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt",
+      "cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .",
   };
 }
 
@@ -629,17 +629,6 @@ export function SchemaFileChanged(provider: string): Step {
     id: "schema_changed",
     with: {
       filters: "changed: 'provider/cmd/**/schema.json'",
-    },
-  };
-}
-
-export function SetupGotestfmt(): Step {
-  return {
-    name: "Install gotestfmt",
-    uses: "GoTestTools/gotestfmt-action@v2",
-    with: {
-      version: "v2.5.0",
-      token: "${{ secrets.GITHUB_TOKEN }}",
     },
   };
 }
