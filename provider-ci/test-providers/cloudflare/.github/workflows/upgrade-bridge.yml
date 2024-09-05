@@ -57,6 +57,8 @@ jobs:
     name: upgrade-provider
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:

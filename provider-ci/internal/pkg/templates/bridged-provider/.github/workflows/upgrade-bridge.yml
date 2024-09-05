@@ -65,6 +65,12 @@ jobs:
         tool-cache: false
         swap-storage: false
     #{{- end }}#
+    - name: Checkout Repo
+      uses: #{{ .Config.actionVersions.checkout }}#
+      #{{- if .Config.checkoutSubmodules }}#
+      with:
+        submodules: #{{ .Config.checkoutSubmodules }}#
+    #{{- end }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
