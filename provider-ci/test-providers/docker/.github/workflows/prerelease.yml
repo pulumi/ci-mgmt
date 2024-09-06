@@ -135,6 +135,11 @@ jobs:
       run: gcloud --quiet auth configure-docker
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
+    - name: Install gotestfmt
+      uses: GoTestTools/gotestfmt-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        version: v2.5.0
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.7.0
       with:
