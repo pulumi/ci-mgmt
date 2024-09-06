@@ -322,6 +322,11 @@ jobs:
         role-duration-seconds: 3600
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+    - name: Install gotestfmt
+      uses: GoTestTools/gotestfmt-action@v2
+      with:
+        version: v2.5.0
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Run tests
       run: >-
         set -euo pipefail

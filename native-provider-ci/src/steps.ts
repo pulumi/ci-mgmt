@@ -633,6 +633,17 @@ export function SchemaFileChanged(provider: string): Step {
   };
 }
 
+export function SetupGotestfmt(): Step {
+  return {
+    name: "Install gotestfmt",
+    uses: "GoTestTools/gotestfmt-action@v2",
+    with: {
+      version: "v2.5.0",
+      token: "${{ secrets.GITHUB_TOKEN }}",
+    },
+  };
+}
+
 export function SdkFilesChanged(): Step {
   return {
     name: "Check for diff in sdk/*",

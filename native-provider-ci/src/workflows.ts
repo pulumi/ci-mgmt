@@ -603,6 +603,7 @@ export class TestsJob implements NormalJob {
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
+      steps.SetupGotestfmt(),
       steps.InstallandConfigureHelm(opts.provider),
       steps.CreateKindCluster(opts.provider, workflowName),
       steps.RunTests(opts.provider, workflowName),

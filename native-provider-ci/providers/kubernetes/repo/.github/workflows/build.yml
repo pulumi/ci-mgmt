@@ -372,6 +372,11 @@ jobs:
         chmod +x ./kubectl
 
         sudo mv kubectl /usr/local/bin
+    - name: Install gotestfmt
+      uses: GoTestTools/gotestfmt-action@v2
+      with:
+        version: v2.5.0
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Install and configure Helm
       run: |
         curl -LO  https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
