@@ -5,7 +5,7 @@
 # organization is the name of the Github organization the repository lives in. Defaults to 'pulumi'
 organization: pulumi
 
-# major version of the current provider - used in make files and goreleaser
+# major version of the current provider - used in make files
 # This should always be set by all providers as this is key to go module paths.
 major-version: 2
 
@@ -31,12 +31,6 @@ major-version: 2
 # upstream-provider-repo is used in the bridge upgrade config.
 # Only set for 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
 #upstream-provider-repo: terraform-provider-xyz
-
-# parallel sets goreleaser's -p argument
-parallel: 3
-
-# timeout sets goreleaser's timeout during any kind of release
-timeout: 60
 
 # lint includes an extra lint job in workflows if enabled (default). Can be set explicit to false.
 # This is false in around 8 provider repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code
@@ -156,7 +150,6 @@ actionVersions:
   configureAwsCredentials: aws-actions/configure-aws-credentials@v4
   setupGcloud: google-github-actions/setup-gcloud@v2
   googleAuth: google-github-actions/auth@v2
-  goReleaser: goreleaser/goreleaser-action@v5
   checkout: actions/checkout@v4
   downloadArtifact: actions/download-artifact@v4
   pathsFilter: dorny/paths-filter@v2
@@ -182,15 +175,7 @@ publish:
   # dotnet: examples/simple-dotnet
   # go: exampels/simple-go
 
-# Go releaser: skip the post cleaning steps
-# Only used for gcp: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22skipGoReleaserHooks%3A%22&type=code
-#skipGoReleaserHooks: false
-
-# Go releaser: add ignore for arm64 windows.
-# Only used for minio: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22skipWindowsArmBuild%3A%22&type=code
-#skipWindowsArmBuild: false
-
-# List of extra flags used only in goreleaser.
+# List of extra flags used in Makefile.
 # Only used by newrelic: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extra-ld-flags%22&type=code
 #extra-ld-flags:
 # - "-X github.com/newrelic/terraform-provider-newrelic/v2/main.UserAgentServiceName=pulumi"
