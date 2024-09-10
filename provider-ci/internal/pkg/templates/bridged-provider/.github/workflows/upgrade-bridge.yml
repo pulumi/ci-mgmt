@@ -74,7 +74,7 @@ jobs:
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
+        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
       uses: #{{ .Config.actionVersions.upgradeProviderAction }}#

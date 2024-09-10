@@ -63,7 +63,7 @@ jobs:
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
-          tools: pulumicli, go, node, dotnet, python, java
+          tools: pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
 #{{- if .Config.releaseVerification.nodejs }}#
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@v1
