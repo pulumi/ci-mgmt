@@ -80,6 +80,8 @@ func getDeletedFiles(templateName string) []string {
 	case "bridged-provider":
 		return []string{
 			"scripts/upstream.sh",
+			".goreleaser.yml",
+			".goreleaser.prerelease.yml",
 		}
 	default:
 		return nil
