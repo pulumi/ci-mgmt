@@ -40,6 +40,7 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumicli, go, schema-tools
+#{{- if .Config.publish.cdn }}#
     - name: Configure AWS Credentials
       uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
       with:
@@ -50,6 +51,7 @@ jobs:
         role-external-id: upload-pulumi-release
         role-session-name: #{{ .Config.provider }}#@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
+#{{- end }}#
     - name: Create dist directory
       run: mkdir -p dist
     - name: Download provider assets
@@ -75,8 +77,10 @@ jobs:
           fi
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
+#{{- if .Config.publish.cdn }}#
     - name: Upload Provider Binaries
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
+#{{- end }}#
     - name: Create GH Release
       uses: softprops/action-gh-release@v1
       if: inputs.isPrerelease == false
