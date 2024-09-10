@@ -84,7 +84,7 @@ jobs:
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
+        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Download bin
       uses: ./.github/actions/download-bin
     - run: dotnet nuget add source ${{ github.workspace }}/nuget
@@ -166,11 +166,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
+#{{ .Config.languages | toYaml | indent 8 }}#
 #{{- if .Config.extraTests }}#
 #{{ .Config.extraTests | toYaml | indent 2 }}#
 #{{ end }}#

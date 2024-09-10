@@ -67,7 +67,7 @@ jobs:
       shell: bash
       run: |
         # Get latest stable release. Return only first column from result (tag).
-        LAST_VERSION=$(gh release view --repo pulumi/pulumi-#{{ .Config.provider }}# --json tagName -q .tagName || echo "No stable release" )
+        LAST_VERSION=$(gh release view --repo #{{ .Config.organization }}#/pulumi-#{{ .Config.provider }}# --json tagName -q .tagName || echo "No stable release" )
         {
           echo 'summary<<EOF'
           if [[ "$LAST_VERSION" != "No stable release" ]]; then
@@ -105,7 +105,7 @@ jobs:
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, go, node, dotnet, python, java
+        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Publish SDKs
       uses: pulumi/pulumi-package-publisher@v0.0.20
       with:

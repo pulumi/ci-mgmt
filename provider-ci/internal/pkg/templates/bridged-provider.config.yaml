@@ -82,9 +82,17 @@ toolVersions:
   go: "1.21.x"
   java: "11"
   gradle: "7.6"
-  node: "20.x"
+  nodejs: "20.x"
   pulumi: "dev"
   python: "3.11.8"
+
+# Control which language SDKs get built and published.
+languages:
+  - nodejs
+  - python
+  - dotnet
+  - go
+  - java
 
 # env contains an assortment of properties for different purposes.
 # Additional entries are added by individual providers for different reasons.

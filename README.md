@@ -51,7 +51,7 @@ Sometimes, you want those changes NOW rather than having to wait for a GitHub PR
 This example command will generate workflows for pulumi-datadog, and place them in the specified `--out` directory.
 Adjust for your provider and filesystem.
 
-```
+```bash
 ./bin/provider-ci generate --name pulumi/pulumi-datadog --template bridged-provider --config ./providers/datadog/config.yaml --out ../../pulumi-dtadog
 ```
 

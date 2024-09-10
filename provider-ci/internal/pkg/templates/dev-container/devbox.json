@@ -6,7 +6,7 @@
     "yarn@latest",
     "pulumictl@latest",
     "go@#{{ trimAll "x" .Config.toolVersions.go }}#",
-    "nodejs@#{{ trimAll "x" .Config.toolVersions.node }}#",
+    "nodejs@#{{ trimAll "x" .Config.toolVersions.nodejs }}#",
     "python3@#{{ trimAll "x" .Config.toolVersions.python }}#",
     "dotnet-sdk@#{{ trimAll "x" .Config.toolVersions.dotnet }}#",
     "gradle_7@#{{ trimAll "x" .Config.toolVersions.gradle }}#",
