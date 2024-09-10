@@ -912,8 +912,16 @@ export function InstallandConfigureHelm(provider: string): Step {
   return {};
 }
 
-export function GolangciLint(): Step {
-  return {
+export function GolangciLint(provider: string): Step[] {
+  const touchStep =
+    provider === "kubernetes"
+      ? {
+          name: "Touch empty generated files to ensure provider compiles",
+          run: "touch provider/cmd/pulumi-resource-kubernetes/{terraform-mapping,schema}-embed.json",
+        }
+      : {};
+
+  const lintStep = {
     name: "golangci-lint provider pkg",
     uses: action.goLint,
     with: {
@@ -922,6 +930,8 @@ export function GolangciLint(): Step {
       "working-directory": "provider",
     },
   };
+
+  return [touchStep, lintStep];
 }
 
 export function CodegenDuringSDKBuild(provider: string) {
