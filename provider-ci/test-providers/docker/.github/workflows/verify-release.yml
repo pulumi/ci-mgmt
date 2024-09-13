@@ -12,7 +12,7 @@ on:
         required: false
         type: boolean
       skipGoSdk:
-        description: "Skip the Go SDK verification. Defaults to 'false'. This is used when we're not publishing a Go SDK on the default branch build."
+        description: "Skip the Go SDK verification. Defaults to 'false'. Enable this when verifying a pre-release for which we don't publish the Go SDK (for PRs and the default branch)."
         required: false
         type: boolean
         default: false
