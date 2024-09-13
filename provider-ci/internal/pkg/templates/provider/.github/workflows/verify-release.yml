@@ -11,6 +11,11 @@ on:
         description: "Enable the MacOS runner in addition to Linux and Windows. Defaults to 'false'."
         required: false
         type: boolean
+      skipGoSdk:
+        description: "Skip the Go SDK verification. Defaults to 'false'. This is used when we're not publishing a Go SDK on the default branch build."
+        required: false
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       providerVersion:
