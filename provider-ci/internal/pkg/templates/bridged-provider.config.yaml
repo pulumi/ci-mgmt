@@ -175,6 +175,8 @@ publish:
   # passed to the sdk input of pulumi-package-publisher
   # This is overridden in pulumi-local to disable python
   sdk: all
+  # Publish the plugin binaries to the Pulumi CDN (get.pulumi.com) - requires AWS credentials for S3 upload
+  cdn: true
 
 # Set a path for each language example to enable the test
 # releaseVerification:
