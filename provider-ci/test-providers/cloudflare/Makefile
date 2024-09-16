@@ -31,7 +31,7 @@ build: install_plugins provider build_sdks install_sdks
 
 build_sdks: build_nodejs build_python build_dotnet build_go build_java 
 
-generate_sdks: build_nodejs build_python build_dotnet build_go build_java 
+generate_sdks: generate_nodejs generate_python generate_dotnet generate_go generate_java 
 
 install_go_sdk:
 
