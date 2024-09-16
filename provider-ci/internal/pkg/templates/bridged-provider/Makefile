@@ -47,7 +47,7 @@ build: install_plugins provider build_sdks install_sdks
 
 build_sdks: #{{ range .Config.languages }}#build_#{{ . }}# #{{ end }}#
 
-generate_sdks: #{{ range .Config.languages }}#build_#{{ . }}# #{{ end }}#
+generate_sdks: #{{ range .Config.languages }}#generate_#{{ . }}# #{{ end }}#
 
 install_go_sdk:
 
