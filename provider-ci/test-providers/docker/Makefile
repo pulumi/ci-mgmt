@@ -31,6 +31,8 @@ build: install_plugins provider build_sdks install_sdks
 
 build_sdks: build_nodejs build_python build_dotnet build_go build_java 
 
+generate_sdks: build_nodejs build_python build_dotnet build_go build_java 
+
 install_go_sdk:
 
 install_java_sdk:
@@ -44,48 +46,75 @@ only_build: build
 build_dotnet: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_dotnet: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 build_dotnet: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_dotnet: upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/
+build_dotnet: generate_dotnet
 	cd sdk/dotnet/ && \
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "$(VERSION_GENERIC)" >version.txt && \
 		dotnet build
 
+generate_dotnet: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+generate_dotnet: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+generate_dotnet: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+generate_dotnet: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+generate_dotnet: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+generate_dotnet: upstream
+	$(WORKING_DIR)/bin/$(TFGEN) dotnet --out sdk/dotnet/
+
 build_go: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_go: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 build_go: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_go: upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
+build_go: generate_go
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
+
+generate_go: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+generate_go: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+generate_go: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+generate_go: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+generate_go: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+generate_go: upstream
+	$(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
 
 build_java: PACKAGE_VERSION := $(VERSION_GENERIC)
 build_java: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 build_java: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_java: bin/pulumi-java-gen upstream
-	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+build_java: generate_java
 	cd sdk/java/ && \
 		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		gradle --console=plain build && \
 		gradle --console=plain javadoc
 
+generate_java: PACKAGE_VERSION := $(VERSION_GENERIC)
+generate_java: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+generate_java: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+generate_java: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+generate_java: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+generate_java: bin/pulumi-java-gen upstream
+	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+
 build_nodejs: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_nodejs: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 build_nodejs: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_nodejs: upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
+build_nodejs: generate_nodejs
 	cd sdk/nodejs/ && \
 		printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		yarn install && \
 		yarn run tsc && \
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/
 
+generate_nodejs: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+generate_nodejs: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+generate_nodejs: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+generate_nodejs: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+generate_nodejs: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+generate_nodejs: upstream
+	$(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
+
 build_python: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 build_python: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_python: upstream
-	rm -rf sdk/python/
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
+build_python: generate_python
 	cd sdk/python/ && \
 		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		cp ../../README.md . && \
@@ -95,6 +124,15 @@ build_python: upstream
 		./venv/bin/python -m pip install build==1.2.1 && \
 		cd ./bin && \
 		../venv/bin/python -m build .
+
+generate_python: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+generate_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+generate_python: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+generate_python: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+generate_python: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+generate_python: upstream
+	rm -rf sdk/python/
+	$(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
 
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
