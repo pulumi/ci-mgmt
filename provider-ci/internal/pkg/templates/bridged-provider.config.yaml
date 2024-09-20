@@ -178,6 +178,9 @@ publish:
   # Publish the plugin binaries to the Pulumi CDN (get.pulumi.com) - requires AWS credentials for S3 upload
   cdn: true
 
+# Enables automatic registry index doc file generation. Intended for use with Tier 2/3 providers.
+registryDocs: false
+
 # Set a path for each language example to enable the test
 # releaseVerification:
   # nodejs: examples/simple-nodejs
