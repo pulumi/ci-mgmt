@@ -70,7 +70,10 @@ func getTemplateDirs(templateName string) ([]string, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Render more specific templates last to allow them to override more general templates.
-		return []string{"provider", "dev-container", "bridged-provider"}, nil
+		return []string{"dev-container", "provider", "pulumi-provider", "bridged-provider"}, nil
+	case "external-bridged-provider":
+		// Render more specific templates last to allow them to override more general templates.
+		return []string{"dev-container", "provider", "bridged-provider"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
@@ -79,6 +82,12 @@ func getTemplateDirs(templateName string) ([]string, error) {
 func getDeletedFiles(templateName string) []string {
 	switch templateName {
 	case "bridged-provider":
+		return []string{
+			"scripts/upstream.sh",
+			".goreleaser.yml",
+			".goreleaser.prerelease.yml",
+		}
+	case "external-bridged-provider":
 		return []string{
 			"scripts/upstream.sh",
 			".goreleaser.yml",
