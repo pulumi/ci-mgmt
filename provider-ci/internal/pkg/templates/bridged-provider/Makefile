@@ -217,7 +217,7 @@ ci-mgmt: .ci-mgmt.yaml
 	go run github.com/pulumi/ci-mgmt/provider-ci@master generate \
 		--name $(ORG)/pulumi-$(PACK) \
 		--out . \
-		--template bridged-provider \
+		--template #{{ .Config.template }}# \
 		--config $<
 
 # Because some codegen depends on the version of the CLI used, we install a local CLI
