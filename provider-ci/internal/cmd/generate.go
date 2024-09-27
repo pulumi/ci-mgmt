@@ -31,14 +31,11 @@ var generateCmd = &cobra.Command{
 			return err
 		}
 
-		// Template name priority: CLI flag > config file > "bridged-provider"
+		// Template name priority: CLI flag > config file
 		if generateArgs.TemplateName == "" {
 			if templateName, ok := mergedConfig["template"].(string); ok {
 				generateArgs.TemplateName = templateName
 			}
-		}
-		if generateArgs.TemplateName == "" {
-			generateArgs.TemplateName = "bridged-provider"
 		}
 
 		// Name priority: CLI flag > config file ("repository", then "name" field)
