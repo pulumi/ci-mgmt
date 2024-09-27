@@ -114,7 +114,7 @@ build_python: upstream
 #{{- if .Config.registryDocs }}#
 
 build_registry_docs:
-	cd provider && $(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 #{{- end }}#
 
 clean:

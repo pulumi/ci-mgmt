@@ -97,7 +97,7 @@ build_python: upstream
 		../venv/bin/python -m build .
 
 build_registry_docs:
-	cd provider && $(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
