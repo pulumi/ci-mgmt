@@ -45,7 +45,7 @@ test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
 		find . -type f ! -name '.ci-mgmt.yaml' -delete && \
-		../../bin/provider-ci generate --name pulumi/pulumi-$(PROVIDER_NAME)
+		../../bin/provider-ci generate
 	mkdir -p bin/test-provider
 	rm -rf bin/test-provider/$(PROVIDER_NAME)
 	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider

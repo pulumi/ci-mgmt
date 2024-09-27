@@ -64,6 +64,7 @@ func GeneratePackage(opts GenerateOpts) error {
 func getTemplateDirs(templateName string) ([]string, error) {
 	// Available templates:
 	// - provider: the main template for any provider repository
+	// - pulumi-provider: a template for a Pulumi-managed provider. This folder consolidates files not needed for external providers.
 	// - bridged-provider: a template for a provider repository that uses tf-bridge & follows the boilerplate structure.
 	// - dev-container: a dev-container setup for any pulumi related project.
 	switch templateName {

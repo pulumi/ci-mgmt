@@ -25,7 +25,7 @@ func LoadLocalConfig(path string) (Config, error) {
 	return localConfig, nil
 }
 
-func (c Config) WithTemplateDefaults(templateName string) (Config, error) {
+func (c Config) WithTemplateDefaults() (Config, error) {
 	configForTemplate, err := loadDefaultConfig()
 	if err != nil {
 		return nil, err
