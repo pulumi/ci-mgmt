@@ -25,8 +25,8 @@ func LoadLocalConfig(path string) (Config, error) {
 	return localConfig, nil
 }
 
-func (c Config) WithTemplateDefaults(templateName string) (Config, error) {
-	configForTemplate, err := loadDefaultConfig(templateName)
+func (c Config) WithTemplateDefaults() (Config, error) {
+	configForTemplate, err := loadDefaultConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -37,19 +37,16 @@ func (c Config) WithTemplateDefaults(templateName string) (Config, error) {
 	return configForTemplate, nil
 }
 
-func loadDefaultConfig(templateName string) (Config, error) {
+func loadDefaultConfig() (Config, error) {
 	var config map[string]interface{}
 
-	configBytes, err := templateFS.ReadFile(filepath.Join("templates", templateName+".config.yaml"))
+	configBytes, err := templateFS.ReadFile(filepath.Join("templates", "defaults.config.yaml"))
 	if err != nil {
-		if !os.IsNotExist(err) {
-			return nil, fmt.Errorf("error reading embedded config file for template %s: %w", templateName, err)
-		}
-	} else {
-		err = yaml.Unmarshal(configBytes, &config)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing embedded config file for template %s: %w", templateName, err)
-		}
+		return nil, fmt.Errorf("error reading embedded defaults config file: %w", err)
+	}
+	err = yaml.Unmarshal(configBytes, &config)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing embedded defaults config file: %w", err)
 	}
 	return config, nil
 }

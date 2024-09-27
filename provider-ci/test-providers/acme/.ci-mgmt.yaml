@@ -1,3 +1,4 @@
+template: external-bridged-provider
 provider: acme
 organization: pulumiverse
 major-version: 0
