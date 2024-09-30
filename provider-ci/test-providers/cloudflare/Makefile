@@ -96,8 +96,9 @@ build_python: upstream
 		cd ./bin && \
 		../venv/bin/python -m build .
 
+# Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
 build_registry_docs:
-	cd provider && $(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}

@@ -113,8 +113,9 @@ build_python: upstream
 		../venv/bin/python -m build .
 #{{- if .Config.registryDocs }}#
 
+# Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
 build_registry_docs:
-	cd provider && $(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 #{{- end }}#
 
 clean:
