@@ -13,7 +13,7 @@ jobs:
       with:
         submodules: #{{ .Config.checkoutSubmodules }}#
 #{{- end }}#
-    - uses: peter-evans/slash-command-dispatch@v2
+    - uses: peter-evans/slash-command-dispatch@v4
       with:
         commands: |
           run-acceptance-tests
