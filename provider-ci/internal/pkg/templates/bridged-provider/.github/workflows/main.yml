@@ -103,6 +103,7 @@ jobs:
     runs-on: #{{ .Config.runner.default }}#
     steps:
     - name: check if this commit needs release
+      if: ${{ env.RELEASE_BOT_ENDPOINT != '' }}
       uses: pulumi/action-release-by-pr-label@main
       with:
         command: "release-if-needed"
