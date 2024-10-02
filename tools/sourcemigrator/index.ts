@@ -108,7 +108,7 @@ function removeExplicitSDKDependency(): SourceMigration {
       try {
         // Apply patch
         run(
-          `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
+          `go run github.com/uber-go/gopatch@v0.4.0 -p "${patchPath}" ./provider/resources.go`
         );
         // Format the code - twice to ensure that the code is formatted correctly
         run(`go install mvdan.cc/gofumpt@latest`);
