@@ -1,0 +1,55 @@
+@@
+// JS: Remove explicit SDK dependency
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.JavaScriptInfo{
+     ...,
+    Dependencies: map[string]string{
+        ...,
+-         "@pulumi/pulumi": "^3.0.0",
+        ...,
+    },
+     ...,
+ }
+
+@@
+// JS: Remove empty Dependencies
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.JavaScriptInfo{
+     ...,
+-    Dependencies: map[string]string{},
+    ...,
+ }
+
+@@
+// Py: Remove explicit SDK dependency
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.PythonInfo{
+     ...,
+    Requires: map[string]string{
+        ...,
+-         "pulumi": ">=3.0.0,<4.0.0",
+        ...,
+    },
+     ...,
+ }
+
+@@
+// Py: Remove empty Requires
+var tfbridge identifier
+@@
+ import tfbridge "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
+
+ tfbridge.PythonInfo{
+     ...,
+-    Requires: map[string]string{},
+     ...,
+ }
