@@ -259,4 +259,4 @@ provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist
 .PHONY: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64 provider_dist
 
 # Permit providers to extend the Makefile with provider-specific Make includes.
-include *.mk
+include $(wildcard .mk/*.mk)
