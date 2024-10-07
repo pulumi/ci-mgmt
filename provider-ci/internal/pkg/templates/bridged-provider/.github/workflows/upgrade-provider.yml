@@ -20,11 +20,10 @@ jobs:
       #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.actionVersions.checkout }}#
+        #{{- if .Config.checkoutSubmodules }}#
         with:
-          depth: 0 # Fetch full history for checking previous tags
-          #{{- if .Config.checkoutSubmodules }}#
           submodules: #{{ .Config.checkoutSubmodules }}#
-          #{{- end }}#
+        #{{- end }}#
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:

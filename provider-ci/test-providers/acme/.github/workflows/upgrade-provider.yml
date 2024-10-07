@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          depth: 0 # Fetch full history for checking previous tags
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
