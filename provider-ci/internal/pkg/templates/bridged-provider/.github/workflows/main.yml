@@ -134,6 +134,7 @@ jobs:
       with:
         tool-cache: false
         swap-storage: false
+        dotnet: false
 #{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
