@@ -9,26 +9,30 @@ jobs:
     name: upgrade-provider
     runs-on: #{{ .Config.runner.default }}#
     steps:
-    #{{- if .Config.freeDiskSpaceBeforeBuild }}#
-    # Run as first step so we don't delete things that have just been installed
-    - name: Free Disk Space (Ubuntu)
-      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
-      with:
-        tool-cache: false
-        swap-storage: false
-    #{{- end }}#
-    - name: Call upgrade provider action
-      uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
-      with:
-        kind: all
-        #{{- if .Config.javaGenVersion }}#
-        target-java-version: #{{ .Config.javaGenVersion }}#
-        #{{- end }}#
-        email: bot@pulumi.com
-        username: pulumi-bot
+      #{{- if .Config.freeDiskSpaceBeforeBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+      #{{- end }}#
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        with:
+          tools: pulumictl, pulumicli, go, nodejs, dotnet, python, java
+      - name: Call upgrade provider action
+        uses: #{{ .Config.actionVersions.upgradeProviderAction }}#
+        with:
+          kind: all
+          #{{- if .Config.javaGenVersion }}#
+          target-java-version: #{{ .Config.javaGenVersion }}#
+          #{{- end }}#
+          email: bot@pulumi.com
+          username: pulumi-bot
 name: Upgrade provider
 on:
   issues:
     types:
-    - opened
+      - opened
   workflow_dispatch: {}
