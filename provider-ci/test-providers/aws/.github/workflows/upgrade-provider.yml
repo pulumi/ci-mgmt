@@ -15,6 +15,7 @@ jobs:
         with:
           tool-cache: false
           swap-storage: false
+          dotnet: false
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
