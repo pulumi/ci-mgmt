@@ -18,3 +18,4 @@ license:
   ignore:
     # Package is licensed under Apache 2.0 but license is not picked up correctly by the license detector
     - github.com/OpenDNS/vegadns2client
+pr-assign: ringods

@@ -36,6 +36,10 @@ major-version: 2
 # Only set for 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
 #upstream-provider-repo: terraform-provider-xyz
 
+# pr-assign is used in the bridge upgrade config. The value must be a valid Github user name.
+# Defaults to `pulumi-bot` but can be overridden for third-party packages
+pr-assign: pulumi-bot
+
 # lint includes an extra lint job in workflows if enabled (default). Can be set explicit to false.
 # This is false in around 8 provider repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code
 lint: true

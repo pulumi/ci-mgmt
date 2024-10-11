@@ -9,8 +9,11 @@ upstream-provider-name: terraform-provider-#{{ .Config.provider }}#
 #{{- if (index .Config "upstreamProviderOrg") }}#
 upstream-provider-org: #{{ .Config.upstreamProviderOrg }}#
 #{{- end }}#
+#{{- if (eq .Config.organization "pulumi") }}#
 pulumi-infer-version: true
+#{{- end }}#
 remove-plugins: true
 #{{- if (index .Config "javaGenVersion") }}#
 javaVersion: "#{{ .Config.javaGenVersion }}#"
 #{{- end }}#
+pr-assign: #{{ index .Config "pr-assign" }}#
