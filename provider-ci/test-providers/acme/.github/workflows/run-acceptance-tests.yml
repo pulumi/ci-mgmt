@@ -65,6 +65,8 @@ jobs:
   comment-notification:
     if: github.event_name == 'repository_dispatch'
     name: comment-notification
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
     - id: run-url
@@ -76,7 +78,7 @@ jobs:
         body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
   lint:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
