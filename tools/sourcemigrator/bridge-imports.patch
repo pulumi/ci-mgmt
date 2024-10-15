@@ -1,0 +1,48 @@
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/pf"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/pf"
+
+ alias
+
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/pf/proto"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/pf/proto"
+
+ alias
+
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/pf/tfgen"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/pf/tfgen"
+
+ alias
+
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/pf/tfbridge"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/pf/tfbridge"
+
+ alias
+
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/testing/x"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/x/testing"
+
+ alias
+
+@@
+var alias identifier
+@@
+-import alias "github.com/pulumi/pulumi-terraform-bridge/x/muxer"
++import alias "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/x/muxer"
+
+ alias
+
