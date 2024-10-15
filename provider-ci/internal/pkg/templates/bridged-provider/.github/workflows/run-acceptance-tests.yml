@@ -12,37 +12,7 @@ on:
 
 env:
   PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
-  ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
-  ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
-  AWS_REGION: us-west-2
-  AZURE_LOCATION: westus
-  DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
-  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
-  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
-  GOOGLE_PROJECT: pulumi-ci-gcp-provider
-  GOOGLE_PROJECT_NUMBER: 895284651812
-  GOOGLE_REGION: us-central1
-  GOOGLE_ZONE: us-central1-a
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-  PYPI_USERNAME: __token__
-  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
-  TF_APPEND_USER_AGENT: pulumi
+#{{ .Config.env | toYaml | indent 2 }}#
 
 # This should cancel any previous runs of the same workflow on the same branch which are still running.
 concurrency:
@@ -82,7 +52,7 @@ jobs:
     name: comment-notification
     permissions:
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - id: run-url
       name: Create URL to the run output
@@ -94,12 +64,15 @@ jobs:
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         token: ${{ secrets.GITHUB_TOKEN }}
+  #{{ if .Config.lint -}}#
   lint:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
+  #{{ end -}}#
+
   sentinel:
     name: sentinel
     if: github.event_name == 'repository_dispatch' ||
@@ -108,8 +81,13 @@ jobs:
     - test
     - build_provider
     - license_check
+    #{{- if .Config.lint }}#
     - lint
-    runs-on: ubuntu-latest
+    #{{- end }}#
+    #{{- range $action, $_ := .Config.extraTests }}#
+    - #{{ $action }}#
+    #{{- end }}#
+    runs-on: #{{ .Config.runner.default }}#
     steps:
     - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
       with:
@@ -133,17 +111,29 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
+    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
+#{{- if .Config.freeDiskSpaceBeforeTest }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+        dotnet: false
+#{{- end }}#
     - name: Checkout Repo
-      uses: actions/checkout@v4
+      uses: #{{ .Config.actionVersions.checkout }}#
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
-      uses: actions/checkout@v4
+      uses: #{{ .Config.actionVersions.checkout }}#
       with:
         repository: pulumi/examples
         path: p-examples
@@ -167,17 +157,24 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    #{{- if .Config.docker }}#
+    - name: Run docker compose
+      run: docker compose -f testing/docker-compose.yml up --build -d
+    #{{- end }}#
+    #{{- if .Config.aws }}#
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: ${{ env.AWS_REGION }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         role-duration-seconds: 7200
-        role-session-name: docker@githubActions
+        role-session-name: #{{ .Config.provider }}#@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+    #{{- end }}#
+    #{{- if .Config.gcp }}#
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
+      uses: #{{ .Config.actionVersions.googleAuth }}#
       with:
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
@@ -185,11 +182,28 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@v2
+      uses: #{{ .Config.actionVersions.setupGcloud }}#
       with:
         install_components: gke-gcloud-auth-plugin
+    #{{- end }}#
+    #{{- if .Config.gcpRegistry }}#
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
+    #{{- end }}#
+    #{{- if .Config.sshPrivateKey }}#
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: #{{ .Config.sshPrivateKey }}#
+    #{{- end }}#
+    #{{- if .Config.integrationTestProvider }}#
+    - name: Prepare upstream code
+      run: make upstream
+    #{{- end }}#
+    #{{- if index .Config "setup-script" }}#
+    - name: Run setup script
+      run: #{{ index .Config "setup-script" }}#
+    #{{- end }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
     - name: Install gotestfmt
@@ -197,10 +211,15 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         version: v2.5.0
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
+#{{- if .Config.actions.preTest }}#
+#{{ .Config.actions.preTest | toYaml | indent 4 }}#
+#{{- end }}#
+    #{{- if .Config.integrationTestProvider }}#
+    - name: Run provider tests
+      if: matrix.testTarget == 'local'
+      working-directory: provider
+      run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+    #{{- end }}#
     - name: Run tests
       if: matrix.testTarget == 'local'
       run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
@@ -211,13 +230,16 @@ jobs:
       fail-fast: false
       matrix:
         language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
+#{{ .Config.languages | toYaml | indent 8 }}#
+        #{{- if .Config.testPulumiExamples }}#
+        testTarget: [local, pulumiExamples]
+        #{{- else }}#
         testTarget: [local]
+        #{{- end }}#
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
+#{{- if .Config.extraTests }}#
+#{{ .Config.extraTests | toYaml | indent 2 }}#
+#{{ end }}#
