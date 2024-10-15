@@ -153,7 +153,7 @@ export function RunAcceptanceTestsWorkflow(
   };
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintJob("lint").addDispatchConditional(true),
+      lint: new LintJob("lint", opts).addDispatchConditional(true),
     });
   }
   return workflow;
@@ -206,7 +206,7 @@ export function BuildWorkflow(
   };
   if (opts.lint) {
     workflow.jobs = Object.assign(workflow.jobs, {
-      lint: new LintJob("lint").addDispatchConditional(true),
+      lint: new LintJob("lint", opts).addDispatchConditional(true),
     });
   }
   if (opts.provider === "kubernetes") {
@@ -712,13 +712,19 @@ export class TeardownTestClusterJob implements NormalJob {
 
 export class LintJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  steps = [steps.CheckoutRepoStep(), steps.InstallGo(), steps.GolangciLint()];
+  steps: Step[];
   name: string;
   if: NormalJob["if"];
 
-  constructor(name: string) {
+  constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
-    Object.assign(this, { name });
+    this.steps = [
+      steps.CheckoutRepoStep(),
+      steps.InstallGo(),
+      ...steps.GolangciLint(opts.provider),
+    ];
+    this.steps = this.steps.filter((step: Step) => step.name !== undefined);
+    Object.assign(this, { name, steps: this.steps });
   }
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
