@@ -60,6 +60,7 @@ jobs:
     name: publish
     permissions:
       contents: write
+      pull-requests: write
     needs:
       - prerequisites
       - build_provider
