@@ -19,14 +19,27 @@ permissions:
 jobs:
   upgrade_provider:
     name: upgrade-provider
-    runs-on: ubuntu-latest
+    runs-on: #{{ .Config.runner.default }}#
     steps:
+      #{{- if .Config.freeDiskSpaceBeforeBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+          dotnet: false
+      #{{- end }}#
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: #{{ .Config.actionVersions.checkout }}#
+        #{{- if .Config.checkoutSubmodules }}#
+        with:
+          submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
-          tools: pulumictl, pulumicli, dotnet, go, nodejs, python
+          tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
       - name: Install upgrade-provider
         run: go install github.com/pulumi/upgrade-provider@main
         shell: bash
@@ -36,5 +49,5 @@ jobs:
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
         shell: bash
       - name: Run upgrade-provider
-        run: upgrade-provider "${{ github.repository }}" --kind="all" 
+        run: upgrade-provider "${{ github.repository }}" --kind="all" #{{ if .Config.javaGenVersion }}#--java-version="#{{ .Config.javaGenVersion }}#"#{{ end }}#
         shell: bash
