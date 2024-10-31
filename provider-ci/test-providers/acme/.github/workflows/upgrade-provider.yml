@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          # Persist credentials so upgrade-provider can push a new branch.
+          persist-credentials: true
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:

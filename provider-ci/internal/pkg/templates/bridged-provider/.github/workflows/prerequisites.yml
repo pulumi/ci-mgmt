@@ -38,10 +38,11 @@ jobs:
 #{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
       with:
+        #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        #{{- end }}#
+        persist-credentials: false
     - uses: pulumi/provider-version-action@v1
       id: provider-version
       with:

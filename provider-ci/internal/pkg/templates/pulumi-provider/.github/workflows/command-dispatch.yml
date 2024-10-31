@@ -9,10 +9,11 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
       with:
+        #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        #{{- end }}#
+        persist-credentials: false
     - uses: peter-evans/slash-command-dispatch@v4
       with:
         commands: |
