@@ -5,7 +5,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "The version of the upstream provider to upgrade to, without the 'v' prefix"
+        description: |
+          The version of the upstream provider to upgrade to, without the 'v' prefix
+          
+          If no version is specified, it will be inferred from the upstream provider's release tags.
         required: false
         type: string
   schedule:
