@@ -32,10 +32,11 @@ jobs:
       #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
         with:
+          #{{- if .Config.checkoutSubmodules }}#
           submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+          #{{- end }}#
+          persist-credentials: false
       - name: Cache examples generation
         uses: actions/cache@v4
         with:

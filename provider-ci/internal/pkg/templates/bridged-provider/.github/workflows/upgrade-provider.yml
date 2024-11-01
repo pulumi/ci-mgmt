@@ -34,10 +34,12 @@ jobs:
       #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.actionVersions.checkout }}#
-        #{{- if .Config.checkoutSubmodules }}#
         with:
+          #{{- if .Config.checkoutSubmodules }}#
           submodules: #{{ .Config.checkoutSubmodules }}#
-        #{{- end }}#
+          #{{- end }}#
+          # Persist credentials so upgrade-provider can push a new branch.
+          persist-credentials: true
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:

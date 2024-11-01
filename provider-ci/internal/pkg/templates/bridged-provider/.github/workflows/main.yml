@@ -41,10 +41,11 @@ jobs:
         swap-storage: false
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
       with:
+        #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        #{{- end }}#
+        persist-credentials: false
     - name: Configure AWS Credentials
       uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
       with:
@@ -140,10 +141,11 @@ jobs:
 #{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
-#{{- if .Config.checkoutSubmodules }}#
       with:
+        #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
-#{{- end }}#
+        #{{- end }}#
+        persist-credentials: false
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:

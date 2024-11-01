@@ -135,6 +135,7 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
         #{{- end }}#
+        persist-credentials: false
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
       uses: #{{ .Config.actionVersions.checkout }}#

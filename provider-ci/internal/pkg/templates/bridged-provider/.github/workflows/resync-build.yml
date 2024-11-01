@@ -11,15 +11,18 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.actionVersions.checkout }}#
-      #{{- if .Config.checkoutSubmodules }}#
       with:
+        #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
-      #{{- end }}#
+        #{{- end }}#
+        # Persist credentials so we can push a new branch.
+        persist-credentials: true
     - name: Checkout repo
       uses: #{{ .Config.actionVersions.checkout }}#
       with:
         path: ci-mgmt
         repository: pulumi/ci-mgmt
+        persist-credentials: false
     - id: run-url
       name: Create URL to the run output
       run:  echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
