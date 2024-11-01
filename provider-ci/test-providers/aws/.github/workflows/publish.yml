@@ -78,7 +78,7 @@ jobs:
         merge-multiple: true
     - name: Calculate checksums
       working-directory: dist
-      run: shasum ./*.tar.gz > pulumi-aws_${{ inputs.version }}_checksums.txt
+      run: shasum ./*.tar.gz > "pulumi-aws_${{ inputs.version }}_checksums.txt"
     - name: Get Schema Change Summary
       id: schema-summary
       shell: bash
