@@ -259,3 +259,6 @@ checkUpstreamUpgrade: true
 #    - github.com/alibabacloud-go/endpoint-util/service
 #    - github.com/alibabacloud-go/tea-roa-utils/service
 #    - github.com/alibabacloud-go/tea-roa/client
+
+# Delete whole of the .github directory before writing updated templates
+clean-all-github-workflows: true
