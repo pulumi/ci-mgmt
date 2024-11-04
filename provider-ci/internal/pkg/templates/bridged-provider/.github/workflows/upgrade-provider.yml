@@ -43,7 +43,7 @@ jobs:
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
-          tools: pulumictl, pulumicli, go, nodejs, dotnet, python, java
+          tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
       - name: Install upgrade-provider
         run: go install github.com/pulumi/upgrade-provider@main
         shell: bash
