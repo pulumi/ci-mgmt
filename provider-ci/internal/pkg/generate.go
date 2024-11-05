@@ -93,6 +93,8 @@ func getTemplateDirs(templateName string) ([]string, error) {
 	case "external-bridged-provider":
 		// Render more specific templates last to allow them to override more general templates.
 		return []string{"dev-container", "provider", "bridged-provider"}, nil
+	case "generic":
+		return []string{"provider", "pulumi-provider", "generic"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
