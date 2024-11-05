@@ -69,4 +69,3 @@ jobs:
         continue-on-error: true
         run: upgrade-provider "${{ github.repository }}" --kind="all" --target-version="${{ steps.target_version.outputs.version }}" 
         shell: bash
-

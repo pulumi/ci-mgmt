@@ -74,4 +74,4 @@ jobs:
         continue-on-error: true
         run: upgrade-provider "${{ github.repository }}" --kind="all" --target-version="${{ steps.target_version.outputs.version }}" #{{ if .Config.javaGenVersion }}#--java-version="#{{ .Config.javaGenVersion }}#"#{{ end }}#
         shell: bash
-#{{ end }}#
+#{{ end -}}#
