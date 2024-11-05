@@ -68,12 +68,6 @@ jobs:
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
       - name: Delete existing workflows
-        # Bridged providers completely replace workflow files from ci-mgmt currently except for custom workflows
-        # specific to the provider, named `provider*.yml` such as `aws-run-tests.yml`.
-        if: inputs.bridged
-        run: |
-          find pulumi-${{ inputs.provider_name }}/.github/workflows/*.yml -type f ! -name '${{inputs.provider_name}}*.yml' -delete
-      - name: Delete existing workflows
         # Curiously, native providers do not wipe all the workflows currently. This is a bit suspect and needs revisiting.
         if: ${{ inputs.bridged != true }}
         run: |
