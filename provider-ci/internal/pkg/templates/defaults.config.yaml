@@ -44,7 +44,7 @@ lint: true
 # Currently set in around 17 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerDefaultBranch%3A%22&type=code
 providerDefaultBranch: master
 
-# Sets PULUMI_MISSING_MAPPING_ERROR and PULUMI_EXTRA_MAPPING_ERROR in resync-build
+# Sets PULUMI_MISSING_MAPPING_ERROR in resync-build
 # Used in alicloud only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-missing-mapping%3A%22&type=code
 fail-on-missing-mapping: true
 # Not used: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-extra-mapping%3A%22&type=code
@@ -127,7 +127,8 @@ env:
 # actions can contain preBuild and preTest additional steps to be spliced into workflows.
 # The use of these hooks vary - quite a few just build upstream and run provider tests.
 # Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
-actions: {}
+actions:
+  {}
   # preBuild:
   #  - Your action here
   # preTest:
@@ -188,13 +189,12 @@ registryDocs: false
 # checkUpstreamUpgrade determines whether we run the upstream upgrade job for bridged providers.
 # Set to false for providers that cannot be upgraded, e.g. because of archived upstream or a license conflict.
 checkUpstreamUpgrade: true
-
 # Set a path for each language example to enable the test
 # releaseVerification:
-  # nodejs: examples/simple-nodejs
-  # python: examples/simple-python
-  # dotnet: examples/simple-dotnet
-  # go: exampels/simple-go
+# nodejs: examples/simple-nodejs
+# python: examples/simple-python
+# dotnet: examples/simple-dotnet
+# go: exampels/simple-go
 
 # List of extra flags used in Makefile.
 # Only used by newrelic: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extra-ld-flags%22&type=code
@@ -244,12 +244,6 @@ checkUpstreamUpgrade: true
 # Set to true to include the nightly-test workflow
 # Used in 11  providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22generate-nightly-test-workflow%3A%22&type=code
 #generate-nightly-test-workflow: false
-
-# List of objects with `name` and `version` properties for the devbox packages.
-# Unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22nixpkgs%3A%22&type=code
-#nixpkgs:
-# - name: foo
-#   version: 1.2.3
 
 # Package paths to ignore when running the license check
 #license:

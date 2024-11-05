@@ -1,15 +1,12 @@
 {
   "packages": [
-    #{{- range .Config.nixpkgs }}#
-      "#{{ .name }}#@#{{ .version }}#",
-    #{{- end }}#
     "yarn@latest",
     "pulumictl@latest",
-    "go@#{{ trimAll "x" .Config.toolVersions.go }}#",
-    "nodejs@#{{ trimAll "x" .Config.toolVersions.nodejs }}#",
-    "python3@#{{ trimAll "x" .Config.toolVersions.python }}#",
-    "dotnet-sdk@#{{ trimAll "x" .Config.toolVersions.dotnet }}#",
-    "gradle_7@#{{ trimAll "x" .Config.toolVersions.gradle }}#",
+    "go@#{{ trimAll "x" .Config.ToolVersions.Go }}#",
+    "nodejs@#{{ trimAll "x" .Config.ToolVersions.Nodejs }}#",
+    "python3@#{{ trimAll "x" .Config.ToolVersions.Python }}#",
+    "dotnet-sdk@#{{ trimAll "x" .Config.ToolVersions.Dotnet }}#",
+    "gradle_7@#{{ trimAll "x" .Config.ToolVersions.Gradle }}#",
     "curl@8"
   ],
   "shell": {

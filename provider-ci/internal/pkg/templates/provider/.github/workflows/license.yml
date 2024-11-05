@@ -7,15 +7,15 @@ on:
     inputs: {}
 
 env:
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
 
 jobs:
   license_check:
     name: License Check
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
       - name: Checkout Repo
-        uses: #{{ .Config.actionVersions.checkout }}#
+        uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
           persist-credentials: false
       - name: Setup tools
@@ -27,7 +27,7 @@ jobs:
         with:
           module-path: provider
           ignore-modules: >-
-            #{{ range $ignore := .Config.license.ignore }}#
+            #{{ range $ignore := .Config.License.Ignore }}#
             #{{- $ignore -}}#,
             #{{ end -}}#
             github.com/aead/chacha20,

@@ -7,7 +7,7 @@ on:
       version:
         description: |
           The version of the upstream provider to upgrade to, without the 'v' prefix
-          
+
           If no version is specified, it will be inferred from the upstream provider's release tags.
         required: false
         type: string
@@ -22,6 +22,7 @@ jobs:
   upgrade_provider:
     name: upgrade-provider
     runs-on: ubuntu-latest
+    if: true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4

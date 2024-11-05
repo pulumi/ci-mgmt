@@ -149,7 +149,7 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 		outPath = filepath.Join(opts.OutDir, outPath)
 		// Sub in the correct Workflow name by repo default branch
 		if strings.Contains(inPath, "main.yml") {
-			branchName := fmt.Sprint(config["providerDefaultBranch"])
+			branchName := config.ProviderDefaultBranch
 			outPath = strings.ReplaceAll(outPath, "main", branchName)
 		}
 		tmpl, err := parseTemplate(templateFS, inPath)

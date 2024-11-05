@@ -22,7 +22,7 @@ runs:
       if: inputs.tools == 'all' || contains(inputs.tools, 'go')
       uses: actions/setup-go@v5
       with:
-        go-version: "#{{ .Config.toolVersions.go }}#"
+        go-version: "#{{ .Config.ToolVersions.Go }}#"
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum
@@ -39,7 +39,7 @@ runs:
       if: inputs.tools == 'all' || contains(inputs.tools, 'pulumicli')
       uses: pulumi/actions@v5
       with:
-        pulumi-version: "#{{ .Config.toolVersions.pulumi }}#"
+        pulumi-version: "#{{ .Config.ToolVersions.Pulumi }}#"
 
     - name: Install Schema Tools
       if: inputs.tools == 'all' || contains(inputs.tools, 'schema-tools')
@@ -51,20 +51,20 @@ runs:
       if: inputs.tools == 'all' || contains(inputs.tools, 'nodejs')
       uses: actions/setup-node@v4
       with:
-        node-version: #{{ .Config.toolVersions.nodejs }}#
+        node-version: #{{ .Config.ToolVersions.Nodejs }}#
         registry-url: https://registry.npmjs.org
 
     - name: Setup DotNet
       if: inputs.tools == 'all' || contains(inputs.tools, 'dotnet')
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: #{{ .Config.toolVersions.dotnet }}#
+        dotnet-version: #{{ .Config.ToolVersions.Dotnet }}#
 
     - name: Setup Python
       if: inputs.tools == 'all' || contains(inputs.tools, 'python')
       uses: actions/setup-python@v5
       with:
-        python-version: #{{ .Config.toolVersions.python }}#
+        python-version: #{{ .Config.ToolVersions.Python }}#
 
     - name: Setup Java
       if: inputs.tools == 'all' || contains(inputs.tools, 'java')
@@ -72,10 +72,10 @@ runs:
       with:
         cache: gradle
         distribution: temurin
-        java-version: #{{ .Config.toolVersions.java }}#
+        java-version: #{{ .Config.ToolVersions.Java }}#
 
     - name: Setup Gradle
       if: inputs.tools == 'all' || contains(inputs.tools, 'java')
       uses: gradle/gradle-build-action@v3
       with:
-        gradle-version: #{{ .Config.toolVersions.gradle }}#
+        gradle-version: #{{ .Config.ToolVersions.Gradle }}#

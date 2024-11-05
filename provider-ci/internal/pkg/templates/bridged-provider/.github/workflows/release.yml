@@ -5,12 +5,12 @@ on:
     tags:
     - v*.*.*
     - "!v*.*.*-**"
-#{{- if .Config.testMasterAndReleaseWorkflows }}#
+#{{- if .Config.TestMasterAndReleaseWorkflows }}#
   pull_request:
 #{{ end }}#
 
 env:
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
 jobs:
   prerequisites:
     uses: ./.github/workflows/prerequisites.yml
@@ -35,7 +35,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
-  #{{ if .Config.lint -}}#
+  #{{ if .Config.Lint -}}#
   lint:
     name: lint
     uses: ./.github/workflows/lint.yml
@@ -57,7 +57,7 @@ jobs:
       - build_provider
       - test
       - license_check
-      #{{- range $action, $_ := .Config.extraTests }}#
+      #{{- range $action, $_ := .Config.ExtraTests }}#
       - #{{ $action }}#
       #{{- end }}#
     uses: ./.github/workflows/publish.yml
@@ -74,24 +74,24 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
-#{{- if .Config.freeDiskSpaceBeforeTest }}#
+#{{- if .Config.FreeDiskSpaceBeforeTest }}#
     # Run as first step so we don't delete things that have just been installed
     - name: Free Disk Space (Ubuntu)
-      uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
       with:
         tool-cache: false
         swap-storage: false
         dotnet: false
 #{{- end }}#
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
     - name: Setup tools
@@ -114,24 +114,24 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
-    #{{- if .Config.docker }}#
+    #{{- if .Config.Docker }}#
     - name: Run docker compose
       run: docker compose -f testing/docker-compose.yml up --build -d
     #{{- end }}#
-    #{{- if .Config.aws }}#
+    #{{- if .Config.AWS }}#
     - name: Configure AWS Credentials
-      uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
+      uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: ${{ env.AWS_REGION }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         role-duration-seconds: 7200
-        role-session-name: #{{ .Config.provider }}#@githubActions
+        role-session-name: #{{ .Config.Provider }}#@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
     #{{- end }}#
-    #{{- if .Config.gcp }}#
+    #{{- if .Config.GCP }}#
     - name: Authenticate to Google Cloud
-      uses: #{{ .Config.actionVersions.googleAuth }}#
+      uses: #{{ .Config.ActionVersions.GoogleAuth }}#
       with:
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
@@ -139,27 +139,27 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
     - name: Setup gcloud auth
-      uses: #{{ .Config.actionVersions.setupGcloud }}#
+      uses: #{{ .Config.ActionVersions.SetupGcloud }}#
       with:
         install_components: gke-gcloud-auth-plugin
     #{{- end }}#
-    #{{- if .Config.gcpRegistry }}#
+    #{{- if .Config.GCPRegistry }}#
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
-    #{{- if .Config.sshPrivateKey }}#
+    #{{- if .Config.SSHPrivateKey }}#
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.7.0
       with:
-        ssh-private-key: #{{ .Config.sshPrivateKey }}#
+        ssh-private-key: #{{ .Config.SSHPrivateKey }}#
     #{{- end }}#
-    #{{- if .Config.integrationTestProvider }}#
+    #{{- if .Config.IntegrationTestProvider }}#
     - name: Prepare upstream code
       run: make upstream
     #{{- end }}#
-    #{{- if index .Config "setup-script" }}#
+    #{{- if index .Config.SetupScript }}#
     - name: Run setup script
-      run: #{{ index .Config "setup-script" }}#
+      run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
@@ -168,10 +168,10 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         version: v2.5.0
-#{{- if .Config.actions.preTest }}#
-#{{ .Config.actions.preTest | toYaml | indent 4 }}#
+#{{- if .Config.Actions.PreTest }}#
+#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
-    #{{- if .Config.integrationTestProvider }}#
+    #{{- if .Config.IntegrationTestProvider }}#
     - name: Run provider tests
       working-directory: provider
       run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
@@ -182,7 +182,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
-#{{ .Config.languages | toYaml | indent 8 }}#
-#{{- if .Config.extraTests }}#
-#{{ .Config.extraTests | toYaml | indent 2 }}#
+#{{ .Config.Languages | toYaml | indent 8 }}#
+#{{- if .Config.ExtraTests }}#
+#{{ .Config.ExtraTests | toYaml | indent 2 }}#
 #{{ end }}#

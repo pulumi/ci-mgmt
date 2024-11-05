@@ -11,7 +11,7 @@ on:
 jobs:
   build_provider:
     name: Build ${{ matrix.platform.os }}-${{ matrix.platform.arch }}
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ inputs.version }}
     strategy:
@@ -29,20 +29,20 @@ jobs:
           - os: windows
             arch: amd64
     steps:
-      #{{- if .Config.freeDiskSpaceBeforeBuild }}#
+      #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed
       - name: Free Disk Space (Ubuntu)
-        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
         with:
           tool-cache: false
           swap-storage: false
           dotnet: false
       #{{- end }}#
       - name: Checkout Repo
-        uses: #{{ .Config.actionVersions.checkout }}#
+        uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
-          #{{- if .Config.checkoutSubmodules }}#
-          submodules: #{{ .Config.checkoutSubmodules }}#
+          #{{- if .Config.CheckoutSubmodules }}#
+          submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
           persist-credentials: false
       - name: Setup tools
@@ -50,21 +50,21 @@ jobs:
         with:
           tools: pulumictl, go
       - name: Download schema-embed.json
-        uses: #{{ .Config.actionVersions.downloadArtifact }}#
+        uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
         with:
           # Use a pattern to avoid failing if the artifact doesn't exist
           pattern: schema-embed.*
           # Avoid creating directories for each artifact
           merge-multiple: true
-          path: provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema-embed.json
+          path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
       - name: Prepare for build
         # This installs plugins and prepares upstream
         run: make upstream
       - name: Build & package provider
         run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
       - name: Upload artifacts
-        uses: #{{ .Config.actionVersions.uploadArtifact }}#
+        uses: #{{ .Config.ActionVersions.UploadArtifact }}#
         with:
-          name: pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
-          path: bin/pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          name: pulumi-resource-#{{ .Config.Provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          path: bin/pulumi-resource-#{{ .Config.Provider }}#-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
           retention-days: 30
