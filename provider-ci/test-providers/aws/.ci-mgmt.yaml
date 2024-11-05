@@ -9,7 +9,7 @@ env:
   PULUMI_MISSING_DOCS_ERROR: true
   AWS_REGION: "us-west-2"
   OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE_ARN }}
-makeTemplate: bridged
+template: bridged-provider
 checkoutSubmodules: true
 freeDiskSpaceBeforeBuild: true
 freeDiskSpaceBeforeSdkBuild: true

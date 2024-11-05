@@ -1,6 +1,6 @@
 provider: cloudflare
 major-version: 5
-makeTemplate: bridged
+template: bridged-provider
 plugins:
   - name: terraform
     version: "1.0.16"
