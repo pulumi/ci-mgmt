@@ -260,5 +260,7 @@ checkUpstreamUpgrade: true
 #    - github.com/alibabacloud-go/tea-roa-utils/service
 #    - github.com/alibabacloud-go/tea-roa/client
 
-# Delete whole of the .github directory before writing updated templates
-clean-all-github-workflows: true
+# Delete existing files within the .github/workflows directory, except where the file begins with the name of the provider
+# (e.g. `aws-*`) which are considered provider-specific workflows. This will likely change to false in the future once
+# we've made the process of cleaning up removed and renamed workflows more reliable.
+clean-github-workflows: true

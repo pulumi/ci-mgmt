@@ -44,7 +44,7 @@ func GeneratePackage(opts GenerateOpts) error {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
 	// Clean up old workflows if requested
-	if clean, found := opts.Config["clean-all-github-workflows"]; found && clean.(bool) {
+	if clean, found := opts.Config["clean-github-workflows"]; found && clean.(bool) {
 		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
 		if err != nil {
 			return fmt.Errorf("error reading .github/workflows directory: %w", err)
