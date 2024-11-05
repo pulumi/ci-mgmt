@@ -231,6 +231,14 @@ type Config struct {
 		Ignore []string `yaml:"ignore"`
 	} `yaml:"license"`
 
+	// CleanGithubWorkflows deletes existing files within the .github/workflows
+	// directory, except where the file begins with the name of the provider
+	// (e.g. `aws-*`) which are considered provider-specific workflows.
+	// Defaults to true but this will likely change to false in the future once
+	// we've made the process of cleaning up removed and renamed workflows more
+	// reliable.
+	CleanGithubWorkflows bool `yaml:"clean-github-workflows"`
+
 	// ProviderVersion controls the path of the version LD flag. Only set for 3
 	// providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerVersion%3A%22&type=code
