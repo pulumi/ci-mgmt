@@ -1,0 +1,130 @@
+name: "Prerequisites"
+
+on:
+  workflow_call:
+    inputs:
+      is_pr:
+        type: boolean
+        required: true
+      is_automated:
+        type: boolean
+        required: true
+      default_branch:
+        type: string
+        required: true
+    outputs:
+      version:
+        description: "Provider version being built"
+        value: ${{ jobs.prerequisites.outputs.version }}
+
+env:
+#{{ .Config.Env | toYaml | indent 2 }}#
+
+jobs:
+  prerequisites:
+    name: prerequisites
+    runs-on: #{{ .Config.Runner.Prerequisites }}#
+    outputs:
+      version: ${{ steps.provider-version.outputs.version }}
+    steps:
+#{{- if .Config.FreeDiskSpaceBeforeBuild }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+        dotnet: false
+#{{- end }}#
+    - name: Checkout Repo
+      uses: #{{ .Config.ActionVersions.Checkout }}#
+      with:
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
+        #{{- end }}#
+        persist-credentials: false
+    - uses: pulumi/provider-version-action@v1
+      id: provider-version
+      with:
+        set-env: 'PROVIDER_VERSION'
+    - name: Cache examples generation
+      uses: actions/cache@v4
+      with:
+        path: |
+          .pulumi/examples-cache
+        key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+    - name: Prepare upstream code
+      run: make upstream
+    - name: Setup tools
+      uses: ./.github/actions/setup-tools
+      with:
+        tools: go, pulumictl, pulumicli, schema-tools
+#{{- if .Config.Actions.PreBuild }}#
+#{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
+#{{- end }}#
+    - name: Build schema generator binary
+      run: make tfgen_build_only
+    - name: Install plugins
+      run: make install_plugins
+    - name: Generate schema
+      run: make tfgen_no_deps
+    - name: Build provider binary
+      run: make provider_no_deps
+    - name: Unit-test provider code
+      run: make test_provider
+    - if: inputs.is_pr
+      name: Check Schema is Valid
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "SCHEMA_CHANGES<<$EOF";
+          schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+    - if: inputs.is_pr && inputs.is_automated == false
+      name: Comment on PR with Details of Schema Check
+      uses: #{{ .Config.ActionVersions.PrComment }}#
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        comment_tag: schemaCheck
+        message: >+
+          ${{ env.SCHEMA_CHANGES }}
+
+
+          Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+#{{- if .Config.EnableConfigurationCheck }}#
+    - if: inputs.is_pr
+      name: Check Configuration section
+      run: |
+        sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
+        jq -r '.config | select(.variables) | .variables | keys[]' < provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json >> keys.txt
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "MISSING_CONFIG<<$EOF";
+          xargs -I {} sh -c "grep -q {} config_section.txt || echo \\\`{}\\\` not found in Configuration section" < keys.txt
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+
+    - if: inputs.is_pr && inputs.is_automated == false
+      name: Check for missing config
+      run: |
+        if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
+        cat <<EOF
+        ${{ env.MISSING_CONFIG }}
+        EOF
+        echo 'Please add a description for each of these options to `README.md`.'
+        echo 'Details about them can be found in either the upstream docs or `schema.json`.'
+        exit 1
+        fi
+#{{- end }}#
+
+    - name: Upload bin
+      uses: ./.github/actions/upload-bin
+
+    - name: Upload schema-embed.json
+      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
+      with:
+        name: schema-embed.json
+        path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
+        retention-days: 30
