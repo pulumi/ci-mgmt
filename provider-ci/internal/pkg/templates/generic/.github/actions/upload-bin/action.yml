@@ -1,12 +1,12 @@
 name: Upload bin assets
-description: Uploads the provider and tfgen binaries to `bin/`.
+description: Uploads the provider binaries to `bin/`.
 
 runs:
   using: "composite"
   steps:
     - name: Tar provider binaries
       shell: bash
-      run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin/ pulumi-resource-#{{ .Config.Provider }}# pulumi-tfgen-#{{ .Config.Provider }}#
+      run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin/ pulumi-resource-#{{ .Config.Provider }}#
     - name: Upload artifacts
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
       with:
