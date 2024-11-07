@@ -87,10 +87,10 @@ function fixupBridgeImports(): SourceMigration {
         // Format the code - twice to ensure that the code is formatted correctly
         run(`cd $(git rev-parse --show-toplevel)`); // back to repo root.
         run(
-          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '.*\.go') || true`
+          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '\.go$') || true`
         );
         run(
-          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '.*\.go') || true`
+          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '\.go$') || true`
         );
       } finally {
         shell.popd();
