@@ -82,11 +82,15 @@ function fixupBridgeImports(): SourceMigration {
         // Apply patch
         run(`go run github.com/uber-go/gopatch@v0.4.0 -p "${patchPath}" .`);
         run(
-          `for MODFILE in $(find $(pwd) -name go.mod); do cd $(dirname $MODFILE); go mod tidy; done`
+          `for MODFILE in $(find $(pwd) -name go.mod); do cd $(dirname $MODFILE); go mod tidy || true ; done`
         );
         // Format the code - twice to ensure that the code is formatted correctly
-        run(`go run mvdan.cc/gofumpt@v0.7.0 $(git diff --name-only) || true`);
-        run(`go run mvdan.cc/gofumpt@v0.7.0 $(git diff --name-only) || true`);
+        run(
+          `go run mvdan.cc/gofumpt@v0.7.0 $(git diff --name-only | grep '*.go$') || true`
+        );
+        run(
+          `go run mvdan.cc/gofumpt@v0.7.0 $(git diff --name-only | grep '*.go$') || true`
+        );
       } finally {
         shell.popd();
       }
