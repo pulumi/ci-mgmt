@@ -82,7 +82,7 @@ function fixupBridgeImports(): SourceMigration {
         // Apply patch
         run(`go run github.com/uber-go/gopatch@v0.4.0 -p "${patchPath}" .`);
         run(
-          `for MODFILE in $(find $(pwd) -name go.mod); do cd $(dirname $MODFILE); go mod tidy || true ; done`
+          `for MODFILE in $(find $(pwd) -name go.mod | grep -v upstream); do cd $(dirname $MODFILE); go mod tidy || true ; done`
         );
         // Format the code - twice to ensure that the code is formatted correctly
         run(`cd $(git rev-parse --show-toplevel)`); // back to repo root.
