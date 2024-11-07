@@ -85,6 +85,7 @@ function fixupBridgeImports(): SourceMigration {
           `for MODFILE in $(find $(pwd) -name go.mod); do cd $(dirname $MODFILE); go mod tidy || true ; done`
         );
         // Format the code - twice to ensure that the code is formatted correctly
+        run(`cd $(git rev-parse --show-toplevel)`); // back to repo root.
         run(
           `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '*.go$') || true`
         );
