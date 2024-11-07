@@ -23,6 +23,8 @@ jobs:
   prerequisites:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      pull-requests: write
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
@@ -77,6 +79,8 @@ jobs:
     name: sentinel
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      statuses: write
     needs:
     - test
     - build_provider
@@ -131,6 +135,7 @@ jobs:
         #{{- if .Config.checkoutSubmodules }}#
         submodules: #{{ .Config.checkoutSubmodules }}#
         #{{- end }}#
+        persist-credentials: false
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
       uses: #{{ .Config.actionVersions.checkout }}#

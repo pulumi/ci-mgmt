@@ -43,6 +43,25 @@ func GeneratePackage(opts GenerateOpts) error {
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
+	// Clean up old workflows if requested
+	if clean, found := opts.Config["clean-github-workflows"]; found && clean.(bool) {
+		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
+		if err != nil {
+			return fmt.Errorf("error reading .github/workflows directory: %w", err)
+		}
+		providerName := opts.Config["provider"].(string)
+		for _, workflow := range workflows {
+			// Skip provider-specific workflows which are prefixed with the provider name
+			if strings.HasPrefix(workflow.Name(), providerName+"-") {
+				continue
+			}
+			err = os.Remove(filepath.Join(opts.OutDir, ".github", "workflows", workflow.Name()))
+			if err != nil {
+				return fmt.Errorf("error deleting workflow %s: %w", workflow.Name(), err)
+			}
+		}
+	}
+	// Clean up files which are marked for deletion
 	for _, deletedFile := range getDeletedFiles(opts.TemplateName) {
 		err = os.RemoveAll(filepath.Join(opts.OutDir, deletedFile))
 		if err != nil {
@@ -83,6 +102,7 @@ func getDeletedFiles(templateName string) []string {
 	switch templateName {
 	case "bridged-provider":
 		return []string{
+			".github/workflows/check-upstream-upgrade.yml",
 			"scripts/upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",

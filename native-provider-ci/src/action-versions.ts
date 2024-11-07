@@ -38,7 +38,7 @@ export const pullRequest = "repo-sync/pull-request@v2.6.2";
 export const prComment = "thollander/actions-comment-pull-request@v2";
 export const slashCommand = "peter-evans/slash-command-dispatch@v2";
 export const uploadArtifact = "actions/upload-artifact@v4";
-export const githubScript = "actions/github-script@v6";
+export const githubScript = "actions/github-script@v7";
 export const upgradeProviderAction =
   "pulumi/pulumi-upgrade-provider-action@v0.0.5";
 export const slackNotification = "rtCamp/action-slack-notify@v2";

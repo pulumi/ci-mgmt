@@ -185,6 +185,10 @@ publish:
 # Enables automatic registry index doc file generation. Intended for use with Tier 2/3 providers.
 registryDocs: false
 
+# checkUpstreamUpgrade determines whether we run the upstream upgrade job for bridged providers.
+# Set to false for providers that cannot be upgraded, e.g. because of archived upstream or a license conflict.
+checkUpstreamUpgrade: true
+
 # Set a path for each language example to enable the test
 # releaseVerification:
   # nodejs: examples/simple-nodejs
@@ -255,3 +259,8 @@ registryDocs: false
 #    - github.com/alibabacloud-go/endpoint-util/service
 #    - github.com/alibabacloud-go/tea-roa-utils/service
 #    - github.com/alibabacloud-go/tea-roa/client
+
+# Delete existing files within the .github/workflows directory, except where the file begins with the name of the provider
+# (e.g. `aws-*`) which are considered provider-specific workflows. This will likely change to false in the future once
+# we've made the process of cleaning up removed and renamed workflows more reliable.
+clean-github-workflows: true
