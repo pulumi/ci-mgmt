@@ -14,6 +14,8 @@ on:
       upgradeProviderVersion:
         description: |
           Version of upgrade-provider to use. This must be a valid git reference in the pulumi/upgrade-provider repo. Defaults to "main"
+
+          See https://go.dev/ref/mod#versions for valid versions. E.g. "v0.1.0", "main", "da25dec".
         default: main
         type: string
   schedule:
