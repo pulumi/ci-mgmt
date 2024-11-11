@@ -53,8 +53,6 @@ jobs:
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Prepare upstream code
-      run: make upstream
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -62,14 +60,12 @@ jobs:
 #{{- if .Config.Actions.PreBuild }}#
 #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
 #{{- end }}#
-    - name: Build schema generator binary
-      run: make tfgen_build_only
     - name: Install plugins
       run: make install_plugins
     - name: Generate schema
-      run: make tfgen_no_deps
+      run: make schema
     - name: Build provider binary
-      run: make provider_no_deps
+      run: make provider
     - name: Unit-test provider code
       run: make test_provider
     - name: Upload coverage reports to Codecov
