@@ -134,29 +134,23 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
-    - name: Checkout p/examples
-      if: matrix.testTarget == 'pulumiExamples'
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        repository: pulumi/examples
-        path: p-examples
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, ${{ matrix.language }}
+        tools: pulumictl, pulumicli, go, nodejs, python, dotnet, java
     - name: Download bin
       uses: ./.github/actions/download-bin
     - name: Add NuGet source
-      if: matrix.language == 'dotnet'
       run: dotnet nuget add source ${{ github.workspace }}/nuget
-    - name: Download SDK
+    #{{- range $_, $language := .Config.Languages }}#
+    - name: Download #{{ $language }}# SDK
       uses: ./.github/actions/download-sdk
       with:
-        language: ${{ matrix.language }}
+        language: #{{ $language }}#
+    #{{- end }}#
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
-      if: matrix.language == 'python'
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
@@ -194,9 +188,10 @@ jobs:
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
     - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
+      run: make install_sdks
+    - name: Generate shard
+      id: shard
+      uses: hashicorp-forge/go-test-split-action@v2.0.0
       with:
         working-directory: examples # TODO: Parameterize this.
         flags: -tags=all
@@ -214,12 +209,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language:
-#{{ .Config.Languages | toYaml | indent 8 }}#
-        #{{- if .Config.TestPulumiExamples }}#
-        testTarget: [local, pulumiExamples]
-        #{{- else }}#
-        testTarget: [local]
+        total:
+        - #{{ .Config.Shards }}#
+        index:
+        #{{- range $i, $_ := until .Config.Shards }}#
+        - #{{ $i }}#
         #{{- end }}#
   license_check:
     name: License Check

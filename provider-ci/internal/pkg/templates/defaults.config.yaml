@@ -205,6 +205,8 @@ checkUpstreamUpgrade: true
 # Used in 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22goBuildParallelism%22&type=code
 #goBuildParallelism: 1
 
+shards: 10
+
 # Sets PULUMI_CONVERT to 1 if truthy
 # Is set to "1" in 74 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22pulumiConvert%22&type=code
 #pulumiConvert: false

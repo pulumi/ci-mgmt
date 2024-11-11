@@ -16,7 +16,9 @@ SCHEMA_PATH := provider/cmd/$(PROVIDER)/schema.json
 PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN := pulumi-java-gen
 JAVA_GEN_VERSION := v0.16.1
-TESTPARALLELISM := 10
+TESTPARALLELISM ?= 10
+TAGS ?= all
+TESTSHARDS ?= #{{ .Config.Shards }}#
 WORKING_DIR := $(shell pwd)
 #{{- if .Config.GoBuildParallelism }}#
 PULUMI_PROVIDER_BUILD_PARALLELISM ?= -p #{{ .Config.GoBuildParallelism }}#
