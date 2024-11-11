@@ -37,23 +37,23 @@ jobs:
     name: command-dispatch-for-testing
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: peter-evans/slash-command-dispatch@v4
-        with:
-          commands: |
-            run-acceptance-tests
-            release
-          issue-type: pull-request
-          permission: write
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: pulumi/pulumi-docker
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - uses: peter-evans/slash-command-dispatch@v4
+      with:
+        commands: |
+          run-acceptance-tests
+          release
+        issue-type: pull-request
+        permission: write
+        reaction-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: pulumi/pulumi-docker
+        token: ${{ secrets.PULUMI_BOT_TOKEN }}
 name: command-dispatch
 on:
   issue_comment:
     types:
-      - created
-      - edited
+    - created
+    - edited

@@ -7,26 +7,26 @@ jobs:
     name: command-dispatch-for-testing
     runs-on: #{{ .Config.runner.default }}#
     steps:
-      - name: Checkout Repo
-        uses: #{{ .Config.actionVersions.checkout }}#
-        with:
-          #{{- if .Config.checkoutSubmodules }}#
-          submodules: #{{ .Config.checkoutSubmodules }}#
-          #{{- end }}#
-          persist-credentials: false
-      - uses: peter-evans/slash-command-dispatch@v4
-        with:
-          commands: |
-            run-acceptance-tests
-            release
-          issue-type: pull-request
-          permission: write
-          reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: #{{ .Repository }}#
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+    - name: Checkout Repo
+      uses: #{{ .Config.actionVersions.checkout }}#
+      with:
+        #{{- if .Config.checkoutSubmodules }}#
+        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- end }}#
+        persist-credentials: false
+    - uses: peter-evans/slash-command-dispatch@v4
+      with:
+        commands: |
+          run-acceptance-tests
+          release
+        issue-type: pull-request
+        permission: write
+        reaction-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: #{{ .Repository }}#
+        token: ${{ secrets.PULUMI_BOT_TOKEN }}
 name: command-dispatch
 on:
   issue_comment:
     types:
-      - created
-      - edited
+    - created
+    - edited
