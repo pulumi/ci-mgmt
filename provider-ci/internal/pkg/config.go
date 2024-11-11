@@ -122,10 +122,14 @@ type Config struct {
 	// ExtraTests run as part of `run-acceptance-tests.yml`, `master.yml`,
 	// `main.yml`, `prerelease.yml` and `release.yml`. Only used for aws:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
+	//
+	// Not available in generic providers -- override make targets instead.
 	ExtraTests map[string]any `yaml:"extraTests"` // Only used by AWS...
 
 	// IntegrationTestProvider will run e2e tests in the provider as well as in
 	// the examples directory when set to true. Defaults to false.
+	//
+	// Not available in generic providers -- override make targets instead.
 	IntegrationTestProvider bool `yaml:"integrationTestProvider"`
 
 	// TestPulumiExamples runs e2e tests using the examples and test suite in
@@ -204,6 +208,9 @@ type Config struct {
 	// tests in CI job. This should be provided from a secret. Used by the
 	// docker provider only:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22sshPrivateKey%3A%22&type=code
+	//
+	// Not available in generic providers -- see docker-build for an example of
+	// how to programatically generate a key.
 	SSHPrivateKey string `yaml:"sshPrivateKey"`
 
 	// GCP authenticates with GCP before running tests in CI job. Used in gcp
@@ -219,6 +226,8 @@ type Config struct {
 	// SetupScript executes a script before running tests in CI job. Used in 3
 	// providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22setup-script%3A%22&type=code
+	//
+	// Not available in generic providers -- override make targets instead.
 	SetupScript string `yaml:"setup-script"`
 
 	// GenerateNightlyTestWorkflow will include the nightly-test workflow. Used
@@ -254,6 +263,9 @@ type Config struct {
 	// Parallel has no effect but is set by some providers.
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22parallel%3A%22&type=code
 	Parallel int `yaml:"parallel"`
+
+	// Shards controls how many jobs integration tests are distributed across.
+	Shards int `yaml:"shards"`
 
 	// Hybrid has no effect but is set by the docker provider.
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22hybrid%3A%22&type=code

@@ -48,9 +48,6 @@ jobs:
       - build_provider
       - test
       - license_check
-      #{{- range $action, $_ := .Config.ExtraTests }}#
-      - #{{ $action }}#
-      #{{- end }}#
     uses: ./.github/workflows/publish.yml
     secrets: inherit
     with:
@@ -138,45 +135,15 @@ jobs:
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
-    #{{- if .Config.SSHPrivateKey }}#
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: #{{ .Config.SSHPrivateKey }}#
-    #{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Prepare upstream code
-      run: make upstream
-    #{{- end }}#
-    #{{- if index .Config.SetupScript }}#
-    - name: Run setup script
-      run: #{{ index .Config.SetupScript }}#
-    #{{- end }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-#{{- if .Config.Actions.PreTest }}#
-#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
-#{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Run provider tests
-      working-directory: provider
-      run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
-    #{{- end }}#
-    - name: Run tests
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+    - name: Run example tests
+      run: make test_${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
         language:
 #{{ .Config.Languages | toYaml | indent 8 }}#
-#{{- if .Config.ExtraTests }}#
-#{{ .Config.ExtraTests | toYaml | indent 2 }}#
-#{{ end }}#
 
 name: prerelease
 on:

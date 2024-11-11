@@ -88,9 +88,6 @@ jobs:
     #{{- if .Config.Lint }}#
     - lint
     #{{- end }}#
-    #{{- range $action, $_ := .Config.ExtraTests }}#
-    - #{{ $action }}#
-    #{{- end }}#
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
@@ -105,6 +102,7 @@ jobs:
         # otherwise use the current SHA for any other type of build.
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  # TODO: Extract into shared action.
   test:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -195,36 +193,11 @@ jobs:
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
     #{{- end }}#
-    #{{- if .Config.SSHPrivateKey }}#
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: #{{ .Config.SSHPrivateKey }}#
-    #{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Prepare upstream code
-      run: make upstream
-    #{{- end }}#
-    #{{- if index .Config.SetupScript }}#
-    - name: Run setup script
-      run: #{{ index .Config.setupScript }}#
-    #{{- end }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
     - name: Install gotestfmt
       uses: GoTestTools/gotestfmt-action@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-#{{- if .Config.Actions.PreTest }}#
-#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
-#{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Run provider tests
-      if: matrix.testTarget == 'local'
-      working-directory: provider
-      run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
-    #{{- end }}#
         working-directory: examples # TODO: Parameterize this.
         flags: -tags=all
         total: ${{ matrix.total }}
@@ -252,6 +225,3 @@ jobs:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
-#{{- if .Config.ExtraTests }}#
-#{{ .Config.ExtraTests | toYaml | indent 2 }}#
-#{{ end }}#
