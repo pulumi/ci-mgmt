@@ -4,7 +4,6 @@ aws: true
 env:
   ALT_AWS_ACCESS_KEY_ID: ${{ secrets.ALT_AWS_ACCESS_KEY_ID }}
   ALT_AWS_SECRET_ACCESS_KEY: ${{ secrets.ALT_AWS_SECRET_ACCESS_KEY }}
-  ALT_AWS_PROFILE: ${{ secrets.ALT_AWS_PROFILE }}
   AWS_REGION: us-west-2
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   GOLANGCI_LINT_VERSION: v1.61.0
@@ -23,3 +22,4 @@ env:
   PULUMI_ENABLE_RESOURCE_REFERENCES: 1
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
 template: generic
+freeDiskSpaceBeforeTest: true # TODO: https://github.com/pulumi/pulumi/issues/17718
