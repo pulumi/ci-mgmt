@@ -26,49 +26,6 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
-  generate_coverage_data:
-    continue-on-error: true
-    env:
-      COVERAGE_OUTPUT_DIR: ${{ secrets.COVERAGE_OUTPUT_DIR }}
-    name: generate_coverage_data
-    needs: prerequisites
-    runs-on: #{{ .Config.Runner.Default }}#
-    steps:
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@v1.3.1
-      with:
-        tool-cache: false
-        swap-storage: false
-    - name: Checkout Repo
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        #{{- if .Config.CheckoutSubmodules }}#
-        submodules: #{{ .Config.CheckoutSubmodules }}#
-        #{{- end }}#
-        persist-credentials: false
-    - name: Configure AWS Credentials
-      uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
-      with:
-        aws-access-key-id: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
-        aws-region: us-west-2
-        aws-secret-access-key: ${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: pulumictl, pulumicli, go, schema-tools
-    - name: Echo Coverage Output Dir
-      run: 'echo "Coverage output directory: ${{ env.COVERAGE_OUTPUT_DIR }}"'
-    - name: Generate Coverage Data
-      run: PULUMI_MISSING_DOCS_ERROR=true make tfgen
-    - name: Summarize Provider Coverage Results
-      run: cat ${{ env.COVERAGE_OUTPUT_DIR }}/shortSummary.txt
-    - name: Upload coverage data to S3
-      run: >-
-        summaryName="${PROVIDER}_summary_$(date +"%Y-%m-%d_%H-%M-%S").json"
-
-        s3FullURI="s3://${{ secrets.S3_COVERAGE_BUCKET_NAME }}/summaries/${summaryName}"
-
-        aws s3 cp "${{ env.COVERAGE_OUTPUT_DIR }}/summary.json" "${s3FullURI}" --acl bucket-owner-full-control
   #{{ if .Config.Lint -}}#
   lint:
     name: lint
@@ -228,8 +185,14 @@ jobs:
       working-directory: provider
       run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4
     #{{- end }}#
-    - name: Run tests
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4
+    - name: Run example tests
+      run: make test_${{ matrix.language }}
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Run example tests
+      run: make test_${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:

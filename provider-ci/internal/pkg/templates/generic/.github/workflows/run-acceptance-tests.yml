@@ -225,12 +225,19 @@ jobs:
       working-directory: provider
       run: go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
     #{{- end }}#
-    - name: Run tests
-      if: matrix.testTarget == 'local'
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
-    - name: Run pulumi/examples tests
-      if: matrix.testTarget == 'pulumiExamples'
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
+        working-directory: examples # TODO: Parameterize this.
+        flags: -tags=all
+        total: ${{ matrix.total }}
+        index: ${{ matrix.index }}
+    - name: Run example tests
+      run: make test_shard
+      env:
+        TAGS: all
+        TESTS: ${{ steps.shard.outputs.run}}
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
