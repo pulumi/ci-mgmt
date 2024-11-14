@@ -69,6 +69,7 @@
     "spotinst",
     "sumologic",
     "tailscale",
+    "tf-provider-boilerplate",
     "tls",
     "vault",
     "venafi",
