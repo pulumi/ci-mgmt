@@ -30,7 +30,6 @@ jobs:
   upgrade_provider:
     name: upgrade-provider
     runs-on: #{{ .Config.Runner.Default }}#
-    if: #{{ .Config.CheckUpstreamUpgrade }}#
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed

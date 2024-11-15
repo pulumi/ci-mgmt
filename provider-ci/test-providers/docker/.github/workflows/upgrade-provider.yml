@@ -29,7 +29,6 @@ jobs:
   upgrade_provider:
     name: upgrade-provider
     runs-on: ubuntu-latest
-    if: true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
