@@ -44,12 +44,12 @@ func GeneratePackage(opts GenerateOpts) error {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
 	// Clean up old workflows if requested
-	if clean, found := opts.Config["clean-github-workflows"]; found && clean.(bool) {
+	if opts.Config.CleanGithubWorkflows {
 		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
 		if err != nil {
 			return fmt.Errorf("error reading .github/workflows directory: %w", err)
 		}
-		providerName := opts.Config["provider"].(string)
+		providerName := opts.Config.Provider
 		for _, workflow := range workflows {
 			// Skip provider-specific workflows which are prefixed with the provider name
 			if strings.HasPrefix(workflow.Name(), providerName+"-") {
@@ -168,7 +168,7 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 		outPath = filepath.Join(opts.OutDir, outPath)
 		// Sub in the correct Workflow name by repo default branch
 		if strings.Contains(inPath, "main.yml") {
-			branchName := fmt.Sprint(config["providerDefaultBranch"])
+			branchName := config.ProviderDefaultBranch
 			outPath = strings.ReplaceAll(outPath, "main", branchName)
 		}
 		tmpl, err := parseTemplate(templateFS, inPath)

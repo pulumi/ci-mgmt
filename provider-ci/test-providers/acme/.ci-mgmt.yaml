@@ -5,7 +5,6 @@ major-version: 0
 providerDefaultBranch: main
 upstreamProviderOrg: vancluever
 publishRegistry: false
-enableAutoRelease: false
 languages:
   - dotnet
   - go

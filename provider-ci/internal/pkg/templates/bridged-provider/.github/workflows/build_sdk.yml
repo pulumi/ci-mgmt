@@ -8,33 +8,33 @@ on:
         type: string
 
 env:
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
   PROVIDER_VERSION: ${{ inputs.version }}
 
 jobs:
   build_sdk:
     name: build_sdk
-    runs-on: #{{ if .Config.runner.buildSdk }}##{{- .Config.runner.buildSdk }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     strategy:
       fail-fast: true
       matrix:
         language:
-#{{ .Config.languages | toYaml | indent 8 }}#
+#{{ .Config.Languages | toYaml | indent 8 }}#
     steps:
-      #{{- if .Config.freeDiskSpaceBeforeSdkBuild }}#
+      #{{- if .Config.FreeDiskSpaceBeforeSdkBuild }}#
       # Run as first step so we don't delete things that have just been installed
       - name: Free Disk Space (Ubuntu)
-        uses: #{{ .Config.actionVersions.freeDiskSpace }}#
+        uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
         with:
           tool-cache: false
           swap-storage: false
           dotnet: false
       #{{- end }}#
       - name: Checkout Repo
-        uses: #{{ .Config.actionVersions.checkout }}#
+        uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
-          #{{- if .Config.checkoutSubmodules }}#
-          submodules: #{{ .Config.checkoutSubmodules }}#
+          #{{- if .Config.CheckoutSubmodules }}#
+          submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
           persist-credentials: false
       - name: Cache examples generation

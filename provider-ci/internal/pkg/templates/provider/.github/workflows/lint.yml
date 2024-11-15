@@ -7,18 +7,18 @@ on:
     inputs: {}
 
 env:
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
 
 jobs:
   lint:
     name: lint
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
     - name: Install go

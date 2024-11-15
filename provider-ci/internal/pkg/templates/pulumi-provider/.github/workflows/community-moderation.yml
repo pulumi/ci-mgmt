@@ -5,30 +5,30 @@ env:
 jobs:
   warn_codegen:
     name: warn_codegen
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
     - id: schema_changed
       name: Check for diff in schema
-      uses: #{{ .Config.actionVersions.pathsFilter }}#
+      uses: #{{ .Config.ActionVersions.PathsFilter }}#
       with:
         filters: "changed: 'provider/cmd/**/schema.json'"
     - id: sdk_changed
       if: steps.schema_changed.outputs.changed == 'false'
       name: Check for diff in sdk/**
-      uses: #{{ .Config.actionVersions.pathsFilter }}#
+      uses: #{{ .Config.ActionVersions.PathsFilter }}#
       with:
         filters: "changed: 'sdk/**'"
     - if: steps.sdk_changed.outputs.changed == 'true' &&
         github.event.pull_request.head.repo.full_name != github.repository
       name: Send codegen warning as comment on PR
-      uses: #{{ .Config.actionVersions.prComment }}#
+      uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         message: >
@@ -43,6 +43,6 @@ name: warn-codegen
 on:
   pull_request_target:
     branches:
-    - #{{ .Config.providerDefaultBranch }}#
+    - #{{ .Config.ProviderDefaultBranch }}#
     types:
     - opened

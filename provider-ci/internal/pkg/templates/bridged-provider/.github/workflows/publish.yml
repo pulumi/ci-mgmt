@@ -17,12 +17,12 @@ on:
 
 env:
   IS_PRERELEASE: ${{ inputs.isPrerelease }}
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
 
 jobs:
   publish:
     name: publish
-    runs-on: #{{ if .Config.runner.publish }}##{{- .Config.runner.publish }}##{{ else }}##{{- .Config.runner.default }}##{{ end }}#
+    runs-on: #{{ if .Config.Runner.Publish }}##{{- .Config.Runner.Publish }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     steps:
     - name: Validate prerelease
       if: inputs.isPrerelease == false && (contains(inputs.version, '-') || contains(inputs.version, '+'))
@@ -31,54 +31,54 @@ jobs:
       if: inputs.skipGoSdk && inputs.isPrerelease == false
       run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumicli, go, schema-tools
-#{{- if .Config.publish.cdn }}#
+#{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
-      uses: #{{ .Config.actionVersions.configureAwsCredentials }}#
+      uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         role-duration-seconds: 7200
         role-external-id: upload-pulumi-release
-        role-session-name: #{{ .Config.provider }}#@githubActions
+        role-session-name: #{{ .Config.Provider }}#@githubActions
         role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
 #{{- end }}#
     - name: Create dist directory
       run: mkdir -p dist
     - name: Download provider assets
-      uses: #{{ .Config.actionVersions.downloadArtifact }}#
+      uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
-        pattern: pulumi-resource-#{{ .Config.provider }}#-v${{ inputs.version }}-*
+        pattern: pulumi-resource-#{{ .Config.Provider }}#-v${{ inputs.version }}-*
         path: dist
         # Don't create a directory for each artifact
         merge-multiple: true
     - name: Calculate checksums
       working-directory: dist
-      run: shasum ./*.tar.gz > "pulumi-#{{ .Config.provider }}#_${{ inputs.version }}_checksums.txt"
+      run: shasum ./*.tar.gz > "pulumi-#{{ .Config.Provider }}#_${{ inputs.version }}_checksums.txt"
     - name: Get Schema Change Summary
       id: schema-summary
       shell: bash
       run: |
         # Get latest stable release. Return only first column from result (tag).
-        LAST_VERSION=$(gh release view --repo #{{ .Config.organization }}#/pulumi-#{{ .Config.provider }}# --json tagName -q .tagName || echo "No stable release" )
+        LAST_VERSION=$(gh release view --repo #{{ .Config.Organization }}#/pulumi-#{{ .Config.Provider }}# --json tagName -q .tagName || echo "No stable release" )
         {
           echo 'summary<<EOF'
           if [[ "$LAST_VERSION" != "No stable release" ]]; then
-            schema-tools compare --provider="#{{ .Config.provider }}#" --old-commit="$LAST_VERSION" --repository="github://api.github.com/#{{ .Config.organization }}#" --new-commit="--local-path=provider/cmd/pulumi-resource-#{{ .Config.provider }}#/schema.json"
+            schema-tools compare --provider="#{{ .Config.Provider }}#" --old-commit="$LAST_VERSION" --repository="github://api.github.com/#{{ .Config.Organization }}#" --new-commit="--local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json"
           fi
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
-#{{- if .Config.publish.cdn }}#
+#{{- if .Config.Publish.CDN }}#
     - name: Upload Provider Binaries
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
 #{{- end }}#
@@ -99,24 +99,24 @@ jobs:
   publish_sdk:
     name: publish_sdk
     needs: publish
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
-        #{{- if .Config.checkoutSubmodules }}#
-        submodules: #{{ .Config.checkoutSubmodules }}#
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         # Persist credentials so we can push back to the repo
         persist-credentials: true
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
-        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
+        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Publish SDKs
       uses: pulumi/pulumi-package-publisher@v0.0.20
       with:
-        sdk: #{{ .Config.publish.sdk }}#
+        sdk: #{{ .Config.Publish.SDK }}#
         version: ${{ inputs.version }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
@@ -137,13 +137,13 @@ jobs:
           go/**
           !*.tar.gz
 
-#{{- if .Config.publishRegistry }}#
+#{{- if .Config.PublishRegistry }}#
   create_docs_build:
     name: create_docs_build
     needs: publish_sdk
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
       - name: Dispatch Metadata build
         uses: peter-evans/repository-dispatch@v3
@@ -154,7 +154,7 @@ jobs:
           client-payload: |-
             {
               "project": "${{ github.repository }}",
-              "project-shortname": "#{{ .Config.provider }}#",
+              "project-shortname": "#{{ .Config.Provider }}#",
               "ref": "${{ github.ref_name }}"
             }
 #{{- end }}#
@@ -163,15 +163,15 @@ jobs:
     name: Clean up release labels
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
-    #{{ if .Config.publishRegistry -}}#
+    #{{ if .Config.PublishRegistry -}}#
     needs: create_docs_build
     #{{ else }}#
     needs: publish_sdk
     #{{- end }}#
-    runs-on: #{{ .Config.runner.default }}#
+    runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - name: Checkout Repo
-      uses: #{{ .Config.actionVersions.checkout }}#
+      uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         persist-credentials: false
     - name: Clean up release labels

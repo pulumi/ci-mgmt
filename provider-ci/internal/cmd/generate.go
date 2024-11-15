@@ -21,33 +21,26 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate repository files.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		localConfig, err := pkg.LoadLocalConfig(generateArgs.ConfigPath)
-		if err != nil {
-			return err
-		}
-		// Merge local config with template defaults
-		mergedConfig, err := localConfig.WithTemplateDefaults()
+		config, err := pkg.LoadLocalConfig(generateArgs.ConfigPath)
 		if err != nil {
 			return err
 		}
 
 		// Template name priority: CLI flag > config file
 		if generateArgs.TemplateName == "" {
-			if templateName, ok := mergedConfig["template"].(string); ok {
-				generateArgs.TemplateName = templateName
+			if config.Template != "" {
+				generateArgs.TemplateName = config.Template
 			}
 		}
 
 		// Name priority: CLI flag > config file ("repository", then "name" field)
 		if generateArgs.RepositoryName == "" {
-			if repositoryName, ok := mergedConfig["repository"].(string); ok {
-				generateArgs.RepositoryName = repositoryName
-			} else if name, ok := mergedConfig["name"].(string); ok {
-				generateArgs.RepositoryName = name
+			if config.Repository != "" {
+				generateArgs.RepositoryName = config.Repository
 			} else {
-				providerName, providerOk := mergedConfig["provider"].(string)
-				organizationName, organizationOk := mergedConfig["organization"].(string)
-				if providerOk && organizationOk {
+				providerName := config.Provider
+				organizationName := config.Organization
+				if providerName != "" && organizationName != "" {
 					generateArgs.RepositoryName = fmt.Sprintf("%s/pulumi-%s", organizationName, providerName)
 				}
 			}
@@ -61,7 +54,7 @@ var generateCmd = &cobra.Command{
 			RepositoryName: generateArgs.RepositoryName,
 			OutDir:         generateArgs.OutDir,
 			TemplateName:   generateArgs.TemplateName,
-			Config:         mergedConfig,
+			Config:         config,
 		})
 		return err
 	},

@@ -34,12 +34,12 @@ on:
         default: false
 
 env:
-#{{ .Config.env | toYaml | indent 2 }}#
+#{{ .Config.Env | toYaml | indent 2 }}#
 
 jobs:
   verify-release:
     name: verify-release
-#{{- if not .Config.releaseVerification }}#
+#{{- if not .Config.ReleaseVerification }}#
     # We don't have any release verification configurations, so we never run this workflow.
     # Configure your .ci-mgmt.yaml files to include the release verification configurations e.g.
     # releaseVerification:
@@ -51,7 +51,7 @@ jobs:
 #{{- end }}#
     strategy:
       matrix:
-#{{- if .Config.releaseVerification }}#
+#{{- if .Config.ReleaseVerification }}#
         # We always run on Linux and Windows, and optionally on MacOS. This is because MacOS runners have limited availability.
         # Expression expands to ["ubuntu-latest","windows-latest"] or ["ubuntu-latest","windows-latest","macos-latest"]
         # GitHub expressions don't have 'if' statements, so we use a ternary operator to conditionally include the MacOS runner suffix.
@@ -64,47 +64,49 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout Repo
-        uses: #{{ .Config.actionVersions.checkout }}#
+        uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
           persist-credentials: false
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
-          tools: pulumicli, #{{ range $index, $element := .Config.languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
-#{{- if .Config.releaseVerification.nodejs }}#
+          tools: pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
+#{{- if .Config.ReleaseVerification }}#
+#{{- if .Config.ReleaseVerification.Nodejs }}#
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@v1
         with:
           runtime: nodejs
-          directory: #{{ .Config.releaseVerification.nodejs }}#
-          provider: #{{ .Config.provider }}#
+          directory: #{{ .Config.ReleaseVerification.Nodejs }}#
+          provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
 #{{- end }}#
-#{{- if .Config.releaseVerification.python }}#
+#{{- if .Config.ReleaseVerification.Python }}#
       - name: Verify python release
         uses: pulumi/verify-provider-release@v1
         with:
           runtime: python
-          directory: #{{ .Config.releaseVerification.python }}#
-          provider: #{{ .Config.provider }}#
+          directory: #{{ .Config.ReleaseVerification.Python }}#
+          provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
 #{{- end }}#
-#{{- if .Config.releaseVerification.dotnet }}#
+#{{- if .Config.ReleaseVerification.Dotnet }}#
       - name: Verify dotnet release
         uses: pulumi/verify-provider-release@v1
         with:
           runtime: dotnet
-          directory: #{{ .Config.releaseVerification.dotnet }}#
-          provider: #{{ .Config.provider }}#
+          directory: #{{ .Config.ReleaseVerification.Dotnet }}#
+          provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
 #{{- end }}#
-#{{- if .Config.releaseVerification.go }}#
+#{{- if .Config.ReleaseVerification.Go }}#
       - name: Verify go release
         uses: pulumi/verify-provider-release@v1
         if: inputs.skipGoSdk == false
         with:
           runtime: go
-          directory: #{{ .Config.releaseVerification.go }}#
-          provider: #{{ .Config.provider }}#
+          directory: #{{ .Config.ReleaseVerification.Go }}#
+          provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
+#{{- end }}#
 #{{- end }}#
