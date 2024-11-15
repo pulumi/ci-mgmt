@@ -72,32 +72,32 @@ function run(command: string): shell.ShellString {
   return checkError(shell.exec(command));
 }
 
-// function respectSchemaVersion(): SourceMigration {
-//   return {
-//     name: "Respect Schema Version",
-//     async execute(context) {
-//       const patchPath = fs.realpathSync("respectSchemaVersion.patch");
-//       shell.pushd(context.dir);
-//       try {
-//         // Apply patch
-//         run(
-//           `go run github.com/uber-go/gopatch@latest -p "${patchPath}" ./provider/resources.go`
-//         );
-//         // Format the code - twice to ensure that the code is formatted correctly
-//         run(`go install mvdan.cc/gofumpt@latest`);
-//         run(`gofumpt -w ./provider/resources.go`);
-//         run(`gofumpt -w ./provider/resources.go`);
-//         // Check if we've made changes
-//         const gitStatus = run(`git status --porcelain`).stdout;
-//         if (gitStatus.includes("provider/resources.go")) {
-//           run(`make tfgen build`);
-//         }
-//       } finally {
-//         shell.popd();
-//       }
-//     },
-//   };
-// }
+function fixupBridgeImports(): SourceMigration {
+  return {
+    name: "Fixup Bridge Imports",
+    async execute(context) {
+      const patchPath = fs.realpathSync("bridge-imports.patch");
+      shell.pushd(context.dir);
+      try {
+        // Apply patch
+        run(`go run github.com/uber-go/gopatch@v0.4.0 -p "${patchPath}" .`);
+        run(
+          `for MODFILE in $(find $(pwd) -name go.mod | grep -v upstream); do cd $(dirname $MODFILE); go mod tidy || true ; done`
+        );
+        // Format the code - twice to ensure that the code is formatted correctly
+        run(`cd $(git rev-parse --show-toplevel)`); // back to repo root.
+        run(
+          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '\.go$') || true`
+        );
+        run(
+          `go run mvdan.cc/gofumpt@v0.7.0 -w $(git diff --name-only | grep '\.go$') || true`
+        );
+      } finally {
+        shell.popd();
+      }
+    },
+  };
+}
 
 function removeExplicitSDKDependency(): SourceMigration {
   return {
@@ -137,7 +137,7 @@ async function runMigrations(
 }
 
 function allMigrations(): SourceMigration[] {
-  return [removeExplicitSDKDependency()];
+  return [fixupBridgeImports(), removeExplicitSDKDependency()];
 }
 
 async function main() {

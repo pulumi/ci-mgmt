@@ -78,8 +78,6 @@ jobs:
         if: inputs.bridged
         run: |
           cd ci-mgmt/provider-ci && go run ./... generate \
-          	--name pulumi/pulumi-${{ inputs.provider_name }} \
-                --template bridged-provider \
                 --config ../../pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml \
                 --out ../../pulumi-${{ inputs.provider_name }}
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
