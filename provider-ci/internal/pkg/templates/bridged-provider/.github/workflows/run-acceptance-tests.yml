@@ -207,7 +207,7 @@ jobs:
     #{{- end }}#
     #{{- if index .Config.SetupScript }}#
     - name: Run setup script
-      run: #{{ index .Config.setupScript }}#
+      run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
