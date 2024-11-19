@@ -163,6 +163,7 @@ test_provider:
 	@echo ""
 	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
 
+.PHONY: tfgen tfgen_no_deps tfgen_build_only
 tfgen: install_plugins upstream docs tfgen_no_deps
 
 tfgen_no_deps: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
@@ -171,11 +172,13 @@ tfgen_no_deps: export PULUMI_CONVERT := $(PULUMI_CONVERT)
 tfgen_no_deps: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
 tfgen_no_deps: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
 tfgen_no_deps: export PULUMI_MISSING_DOCS_ERROR := $(PULUMI_MISSING_DOCS_ERROR)
-tfgen_no_deps: tfgen_build_only
+tfgen_no_deps: bin/$(TFGEN)
 	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(VERSION_GENERIC) go generate cmd/$(PROVIDER)/main.go)
 
-tfgen_build_only:
+tfgen_build_only: bin/$(TFGEN)
+
+bin/$(TFGEN):
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
 
 upstream:
@@ -217,7 +220,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup docs help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider provider_no_deps test tfgen upstream ci-mgmt test_provider debug_tfgen tfgen_build_only
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup docs help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider provider_no_deps test upstream ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
