@@ -27,6 +27,13 @@ LDFLAGS_UPSTREAM_VERSION=-X github.com/hashicorp/terraform-provider-aws/version.
 LDFLAGS_EXTRAS=
 LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(LDFLAGS_STRIP_SYMBOLS)
 
+# Create a `.make` directory for tracking targets which don't generate a single file output. This should be ignored by git.
+# For targets which either don't generate a single file output, or the output file is committed, we use a "sentinel"
+# file within `.make/` to track the staleness of the target and only rebuild when needed. 
+# For each phony target, we create an internal target with the same name, but prefixed with `.make/` where the work is performed.
+# At the end of each internal target we run `@touch $@` to update the file which is the name of the target.
+_ := $(shell mkdir -p .make)
+
 development: install_plugins provider build_sdks install_sdks
 
 build: install_plugins provider build_sdks install_sdks
