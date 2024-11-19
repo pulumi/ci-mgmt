@@ -12,6 +12,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/migrations"
 	"gopkg.in/yaml.v3"
 )
 
@@ -73,6 +74,11 @@ func GeneratePackage(opts GenerateOpts) error {
 		if err != nil {
 			return fmt.Errorf("error rendering template %s: %w", templateDir, err)
 		}
+	}
+	// Run any relevant migrations
+	err = migrations.Migrate(opts.TemplateName, opts.OutDir)
+	if err != nil {
+		return fmt.Errorf("error running migrations: %w", err)
 	}
 	return nil
 }
