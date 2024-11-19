@@ -1,10 +1,10 @@
 name: Download binary assets
-description: Downloads the provider and tfgen binaries to `bin/`.
+description: Downloads provider binaries to `bin/`.
 
 runs:
   using: "composite"
   steps:
-    - name: Download provider + tfgen binaries
+    - name: Download provider binaries
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
         name: #{{ .Config.Provider }}#-provider.tar.gz

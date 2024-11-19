@@ -70,7 +70,7 @@ jobs:
         rm .gitignore.temp
       shell: bash
     - name: Build
-      run: make build
+      run: make -j4 build
     - name: Create PR (no linked issue)
       uses: peter-evans/create-pull-request@v3.12.0
       with:
