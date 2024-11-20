@@ -222,6 +222,7 @@ ci-mgmt: .ci-mgmt.yaml
 .pulumi/bin/pulumi: .pulumi/version
 	@if [ -x .pulumi/bin/pulumi ] && [ "v$$(cat .pulumi/version)" = "$$(.pulumi/bin/pulumi version)" ]; then \
 		echo "pulumi/bin/pulumi version: v$$(cat .pulumi/version)"; \
+		touch $@; \
 	else \
 		curl -fsSL https://get.pulumi.com | \
 			HOME=$(WORKING_DIR) sh -s -- --version "$$(cat .pulumi/version)"; \
