@@ -32,7 +32,9 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # file within `.make/` to track the staleness of the target and only rebuild when needed. 
 # For each phony target, we create an internal target with the same name, but prefixed with `.make/` where the work is performed.
 # At the end of each internal target we run `@touch $@` to update the file which is the name of the target.
-_ := $(shell mkdir -p .make)
+
+# Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
+_ := $(shell mkdir -p .make bin .pulumi/bin)
 
 development: .make/install_plugins provider build_sdks install_sdks
 
@@ -230,8 +232,7 @@ ci-mgmt: .ci-mgmt.yaml
 
 # Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
 .pulumi/version: provider/go.mod
-	@mkdir -p .pulumi
-	@cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
+	cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
 
 # Start debug server for tfgen
 debug_tfgen:
