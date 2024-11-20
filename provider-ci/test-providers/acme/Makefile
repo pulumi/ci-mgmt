@@ -34,9 +34,9 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # At the end of each internal target we run `@touch $@` to update the file which is the name of the target.
 _ := $(shell mkdir -p .make)
 
-development: install_plugins provider build_sdks install_sdks
+development: .make/install_plugins provider build_sdks install_sdks
 
-build: install_plugins provider build_sdks install_sdks
+build: .make/install_plugins provider build_sdks install_sdks
 
 build_sdks: build_dotnet build_go build_nodejs build_python 
 
@@ -124,9 +124,12 @@ install_dotnet_sdk:
 install_nodejs_sdk:
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 
-install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-install_plugins: .pulumi/bin/pulumi
+.PHONY: install_plugins
+install_plugins: .make/install_plugins
+.make/install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+.make/install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/install_plugins: .pulumi/bin/pulumi
+	@touch $@
 
 lint_provider: provider
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
@@ -215,7 +218,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup help install_dotnet_sdk install_nodejs_sdk install_plugins lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
