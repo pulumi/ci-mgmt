@@ -167,18 +167,22 @@ test_provider:
 	@echo ""
 	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
 
-.PHONY: tfgen tfgen_no_deps tfgen_build_only
-tfgen: install_plugins upstream tfgen_no_deps
+.PHONY: tfgen schema tfgen_no_deps tfgen_build_only
+tfgen: schema
+schema: .make/schema 
+# This does actually have dependencies, but we're keeping it around for backwards compatibility for now
+tfgen_no_deps: .make/schema
 
-tfgen_no_deps: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-tfgen_no_deps: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-tfgen_no_deps: export PULUMI_CONVERT := $(PULUMI_CONVERT)
-tfgen_no_deps: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-tfgen_no_deps: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
-tfgen_no_deps: export PULUMI_MISSING_DOCS_ERROR := $(PULUMI_MISSING_DOCS_ERROR)
-tfgen_no_deps: bin/$(TFGEN)
+.make/schema: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
+.make/schema: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/schema: export PULUMI_CONVERT := $(PULUMI_CONVERT)
+.make/schema: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
+.make/schema: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
+.make/schema: export PULUMI_MISSING_DOCS_ERROR := $(PULUMI_MISSING_DOCS_ERROR)
+.make/schema: bin/$(TFGEN) provider/resources.go provider/go.mod .make/install_plugins .make/upstream
 	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(VERSION_GENERIC) go generate cmd/$(PROVIDER)/main.go)
+	@touch $@
 
 tfgen_build_only: bin/$(TFGEN)
 
