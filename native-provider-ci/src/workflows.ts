@@ -201,7 +201,6 @@ export function BuildWorkflow(
       test: new TestsJob(name, "test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
-      publish_java_sdk: new PublishJavaSDKJob("publish_java_sdk"),
     },
   };
   if (opts.lint) {
