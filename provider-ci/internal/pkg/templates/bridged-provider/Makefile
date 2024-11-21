@@ -56,7 +56,7 @@ development: .make/install_plugins provider build_sdks install_sdks
 
 build: .make/install_plugins provider build_sdks install_sdks
 
-build_sdks: #{{ range .Config.Languages }}#build_#{{ . }}# #{{ end }}##{{- if .Config.RegistryDocs }}#build_registry_docs#{{- end }}#
+build_sdks: #{{ range .Config.Languages }}#build_#{{ . }}# #{{ end }}##{{- if .Config.RegistryDocs }}#.make/build_registry_docs#{{- end }}#
 
 install_go_sdk:
 
@@ -122,11 +122,14 @@ build_python: .make/upstream
 		./venv/bin/python -m pip install build==1.2.1 && \
 		cd ./bin && \
 		../venv/bin/python -m build .
-#{{- if .Config.RegistryDocs }}#
 
+#{{- if .Config.RegistryDocs }}#
 # Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
-build_registry_docs:
-	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+.PHONY: build_registry_docs
+build_registry_docs: .make/build_registry_docs
+.make/build_registry_docs: bin/$(TFGEN)
+	bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
+	@touch $@
 #{{- end }}#
 
 .PHONY: clean
