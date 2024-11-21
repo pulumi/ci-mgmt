@@ -113,11 +113,6 @@ clean:
 	rm -rf bin/*
 	rm -rf .make/*
 
-help:
-	@grep '^[^.#]\+:\s\+.*#' Makefile | \
-	sed "s/\(.\+\):\s*\(.*\) #\s*\(.*\)/`printf "\033[93m"`\1`printf "\033[0m"`	\3 [\2]/" | \
-	expand -t20
-
 install_dotnet_sdk:
 	mkdir -p $(WORKING_DIR)/nuget
 	find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \;
@@ -237,7 +232,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
