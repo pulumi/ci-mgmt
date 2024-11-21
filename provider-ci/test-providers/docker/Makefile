@@ -116,9 +116,11 @@ clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
 	rm -rf bin/*
 	rm -rf .make/*
-
-docs:
+.PHONY: docs
+docs: .make/docs
+.make/docs:
 	cd provider/pkg/docs-gen/examples/ && go run generate.go ./yaml ./
+	@touch $@
 
 help:
 	@grep '^[^.#]\+:\s\+.*#' Makefile | \
@@ -169,7 +171,7 @@ test_provider:
 
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 tfgen: schema
-schema: .make/schema  docs
+schema: .make/schema  .make/docs
 # This does actually have dependencies, but we're keeping it around for backwards compatibility for now
 tfgen_no_deps: .make/schema
 
@@ -232,7 +234,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python docs help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 

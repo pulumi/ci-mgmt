@@ -136,9 +136,11 @@ clean:
 	rm -rf .make/*
 
 #{{- if .Config.DocsCmd }}#
-
-docs:
+.PHONY: docs
+docs: .make/docs
+.make/docs:
 	#{{ .Config.DocsCmd }}#
+	@touch $@
 #{{- end }}#
 
 help:
@@ -191,7 +193,7 @@ test_provider:
 
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 tfgen: schema
-schema: .make/schema #{{ if .Config.DocsCmd }}# docs#{{ end }}#
+schema: .make/schema #{{ if .Config.DocsCmd }}# .make/docs#{{ end }}#
 # This does actually have dependencies, but we're keeping it around for backwards compatibility for now
 tfgen_no_deps: .make/schema
 
@@ -260,7 +262,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python#{{ if .Config.DocsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
