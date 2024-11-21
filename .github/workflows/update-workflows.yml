@@ -84,12 +84,6 @@ jobs:
         if: ${{ inputs.bridged != true }}
         run: |
           cp -r ci-mgmt/native-provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
-      - name: Run source code migrations
-        run: |
-          DIR="$PWD/pulumi-${{ inputs.provider_name }}"
-          cd ci-mgmt/tools/sourcemigrator
-          npm ci
-          npx ts-node index.ts "$DIR"
       - name: Close obsolete PRs started by this workflow
         uses: actions/github-script@v7
         if: ${{ !inputs.skip_closing_prs }}
