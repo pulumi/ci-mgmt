@@ -129,12 +129,11 @@ build_registry_docs:
 	$(WORKING_DIR)/bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 #{{- end }}#
 
+.PHONY: clean
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
-
-cleanup:
-	rm -r $(WORKING_DIR)/bin
-	rm -f provider/cmd/$(PROVIDER)/schema.go
+	rm -rf bin/*
+	rm -rf .make/*
 
 #{{- if .Config.DocsCmd }}#
 
@@ -261,7 +260,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python clean cleanup#{{ if .Config.DocsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_dotnet build_go build_java build_nodejs build_python#{{ if .Config.DocsCmd }}# docs#{{end}}# help install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
