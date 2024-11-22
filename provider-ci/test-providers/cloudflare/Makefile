@@ -107,21 +107,24 @@ build_nodejs: .make/build_nodejs
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/
 	@touch $@
 
-build_python: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-build_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-build_python: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_python: .make/upstream
-	rm -rf sdk/python/
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
+.PHONY: generate_python build_python
+generate_python: .make/generate_python
+build_python: .make/build_python
+.make/generate_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/generate_python: bin/$(TFGEN)
+	$(GEN_ENVS) $(WORKING_DIR)/bin/$(TFGEN) python --out sdk/python/
+	printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/python/go.mod
+	cp README.md sdk/python/
+	@touch $@
+.make/build_python: .make/generate_python
 	cd sdk/python/ && \
-		printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
-		cp ../../README.md . && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
 		rm ./bin/go.mod && \
 		python3 -m venv venv && \
 		./venv/bin/python -m pip install build==1.2.1 && \
 		cd ./bin && \
 		../venv/bin/python -m build .
+	@touch $@
 # Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
 .PHONY: build_registry_docs
 build_registry_docs: .make/build_registry_docs
@@ -247,7 +250,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
