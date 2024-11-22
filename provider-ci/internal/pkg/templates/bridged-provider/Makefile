@@ -189,11 +189,11 @@ install_plugins: .make/install_plugins
 
 lint_provider: provider
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
-
 # `lint_provider.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
 lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
+.PHONY: lint_provider lint_provider.fix
 
 # `make provider_no_deps` builds the provider binary directly, without ensuring that
 # `cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json` is valid and up to date.
@@ -209,12 +209,11 @@ bin/$(PROVIDER): .make/schema
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
+.PHONY: test
 
 test_provider:
-	@echo ""
-	@echo "== test_provider ==================================================================="
-	@echo ""
 	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
+.PHONY: test_provider
 
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 tfgen: schema
@@ -263,6 +262,7 @@ bin/pulumi-java-gen: .pulumi-java-gen.version
 #
 ci-mgmt: .ci-mgmt.yaml
 	go run github.com/pulumi/ci-mgmt/provider-ci@master generate
+.PHONY: ci-mgmt
 
 # Because some codegen depends on the version of the CLI used, we install a local CLI
 # version pinned to the same version as `provider/go.mod`.
@@ -286,8 +286,7 @@ ci-mgmt: .ci-mgmt.yaml
 # Start debug server for tfgen
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
-
-.PHONY: lint_provider test ci-mgmt test_provider debug_tfgen
+.PHONY: debug_tfgen
 
 # Provider cross-platform build & packaging
 
