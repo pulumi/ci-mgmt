@@ -36,21 +36,20 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
 _ := $(shell mkdir -p .make bin .pulumi/bin)
 
-development: .make/install_plugins provider build_sdks install_sdks
-
-build: .make/install_plugins provider build_sdks install_sdks
-
-build_sdks: build_nodejs build_python build_dotnet build_go build_java .make/build_registry_docs
+.PHONY: development only_build build generate_sdks build_sdks install_sdks
+# Keep aliases for old targets to ensure backwards compatibility
+development: build
+only_build: build
+build: install_plugins provider build_sdks install_sdks
+generate_sdks: generate_nodejs generate_python generate_dotnet generate_go generate_java
+build_sdks: build_nodejs build_python build_dotnet build_go build_java.make/build_registry_docs
+install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_go_sdk install_java_sdk
 
 install_go_sdk:
 
 install_java_sdk:
 
 install_python_sdk:
-
-install_sdks: install_dotnet_sdk install_python_sdk install_nodejs_sdk install_java_sdk
-
-only_build: build
 
 GEN_PULUMI_HOME := $(WORKING_DIR)/.pulumi
 GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(GEN_PULUMI_HOME)/examples-cache
@@ -258,7 +257,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: install_go_sdk install_java_sdk install_python_sdk install_sdks install_dotnet_sdk install_nodejs_sdk lint_provider test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
