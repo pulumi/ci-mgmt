@@ -131,12 +131,18 @@ clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
 	rm -rf bin/*
 	rm -rf .make/*
+	if dotnet nuget list source | grep "$(WORKING_DIR)/nuget"; then \
+		dotnet nuget remove source "$(WORKING_DIR)/nuget" \
+	; fi
 .PHONY: clean
 
 install_dotnet_sdk: .make/install_dotnet_sdk
 .make/install_dotnet_sdk: .make/build_dotnet
-	mkdir -p $(WORKING_DIR)/nuget
-	find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \;
+	mkdir -p nuget
+	find sdk/dotnet/bin -name '*.nupkg' -print -exec cp -p "{}" ${WORKING_DIR}/nuget \;
+	if ! dotnet nuget list source | grep "${WORKING_DIR}/nuget"; then \
+		dotnet nuget add source "${WORKING_DIR}/nuget" --name "${WORKING_DIR}/nuget" \
+	; fi
 	@touch $@
 install_go_sdk:
 install_java_sdk:
