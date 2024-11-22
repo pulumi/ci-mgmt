@@ -81,16 +81,21 @@ build_go: .make/build_go
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
 	@touch $@
 
-build_java: PACKAGE_VERSION := $(VERSION_GENERIC)
-build_java: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-build_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-build_java: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_java: bin/pulumi-java-gen .make/upstream
-	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+.PHONY: generate_java build_java
+generate_java: .make/generate_java
+build_java: .make/build_java
+.make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/generate_java: PACKAGE_VERSION := $(VERSION_GENERIC)
+.make/generate_java: bin/pulumi-java-gen .make/schema
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
+	@touch $@
+.make/build_java: PACKAGE_VERSION := $(VERSION_GENERIC)
+.make/build_java: .make/generate_java
 	cd sdk/java/ && \
-		printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		gradle --console=plain build && \
 		gradle --console=plain javadoc
+	@touch $@
 
 .PHONY: generate_nodejs build_nodejs
 generate_nodejs: .make/generate_nodejs
@@ -254,7 +259,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
