@@ -45,12 +45,6 @@ generate_sdks: generate_nodejs generate_python generate_dotnet generate_go gener
 build_sdks: build_nodejs build_python build_dotnet build_go build_java
 install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_go_sdk install_java_sdk
 
-install_go_sdk:
-
-install_java_sdk:
-
-install_python_sdk:
-
 GEN_PULUMI_HOME := $(WORKING_DIR)/.pulumi
 GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(GEN_PULUMI_HOME)/examples-cache
 GEN_ENVS := PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT)
@@ -136,12 +130,19 @@ clean:
 	rm -rf bin/*
 	rm -rf .make/*
 
-install_dotnet_sdk:
+.PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
+install_dotnet_sdk: .make/install_dotnet_sdk
+.make/install_dotnet_sdk: .make/build_dotnet
 	mkdir -p $(WORKING_DIR)/nuget
 	find . -name '*.nupkg' -print -exec cp -p {} $(WORKING_DIR)/nuget \;
-
-install_nodejs_sdk:
+	@touch $@
+install_go_sdk:
+install_java_sdk:
+install_nodejs_sdk: .make/install_nodejs_sdk
+.make/install_nodejs_sdk: .make/build_nodejs
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
+	@touch $@
+install_python_sdk:
 
 .PHONY: install_plugins
 install_plugins: .make/install_plugins
@@ -258,7 +259,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: install_go_sdk install_java_sdk install_python_sdk install_sdks install_dotnet_sdk install_nodejs_sdk lint_provider test ci-mgmt test_provider debug_tfgen
+.PHONY: lint_provider test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
