@@ -11,7 +11,7 @@ import (
 type ignoreMakeDir struct{}
 
 func (ignoreMakeDir) Name() string {
-	return "Fixup Bridge Imports"
+	return "Add .make directory to .gitignore"
 }
 func (ignoreMakeDir) ShouldRun(templateName string) bool {
 	return templateName == "bridged-provider"
