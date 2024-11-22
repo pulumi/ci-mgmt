@@ -36,7 +36,6 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
 _ := $(shell mkdir -p .make bin .pulumi/bin)
 
-.PHONY: development only_build build generate_sdks build_sdks install_sdks
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
@@ -44,12 +43,12 @@ build: install_plugins provider build_sdks install_sdks
 generate_sdks: generate_nodejs generate_python generate_dotnet generate_go generate_java
 build_sdks: build_nodejs build_python build_dotnet build_go build_java.make/build_registry_docs
 install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_go_sdk install_java_sdk
+.PHONY: development only_build build generate_sdks build_sdks install_sdks
 
 GEN_PULUMI_HOME := $(WORKING_DIR)/.pulumi
 GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(GEN_PULUMI_HOME)/examples-cache
 GEN_ENVS := PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT)
 
-.PHONY: generate_dotnet build_dotnet
 generate_dotnet: .make/generate_dotnet
 build_dotnet: .make/build_dotnet
 .make/generate_dotnet: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -62,8 +61,8 @@ build_dotnet: .make/build_dotnet
 .make/build_dotnet: .make/generate_dotnet
 	cd sdk/dotnet/ && dotnet build
 	@touch $@
+.PHONY: generate_dotnet build_dotnet
 
-.PHONY: generate_go build_go
 generate_go: .make/generate_go
 build_go: .make/build_go
 .make/generate_go: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -73,8 +72,8 @@ build_go: .make/build_go
 .make/build_go: .make/generate_go
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
 	@touch $@
+.PHONY: generate_go build_go
 
-.PHONY: generate_java build_java
 generate_java: .make/generate_java
 build_java: .make/build_java
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -89,8 +88,8 @@ build_java: .make/build_java
 		gradle --console=plain build && \
 		gradle --console=plain javadoc
 	@touch $@
+.PHONY: generate_java build_java
 
-.PHONY: generate_nodejs build_nodejs
 generate_nodejs: .make/generate_nodejs
 build_nodejs: .make/build_nodejs
 .make/generate_nodejs: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -104,8 +103,8 @@ build_nodejs: .make/build_nodejs
 		yarn run tsc && \
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/
 	@touch $@
+.PHONY: generate_nodejs build_nodejs
 
-.PHONY: generate_python build_python
 generate_python: .make/generate_python
 build_python: .make/build_python
 .make/generate_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -123,20 +122,20 @@ build_python: .make/build_python
 		cd ./bin && \
 		../venv/bin/python -m build .
 	@touch $@
+.PHONY: generate_python build_python
 # Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
-.PHONY: build_registry_docs
 build_registry_docs: .make/build_registry_docs
 .make/build_registry_docs: bin/$(TFGEN)
 	bin/$(TFGEN) registry-docs --out $(WORKING_DIR)/docs
 	@touch $@
+.PHONY: build_registry_docs
 
-.PHONY: clean
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
 	rm -rf bin/*
 	rm -rf .make/*
+.PHONY: clean
 
-.PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 install_dotnet_sdk: .make/install_dotnet_sdk
 .make/install_dotnet_sdk: .make/build_dotnet
 	mkdir -p $(WORKING_DIR)/nuget
@@ -149,8 +148,8 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
 	@touch $@
 install_python_sdk:
+.PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
-.PHONY: install_plugins
 install_plugins: .make/install_plugins
 .make/install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 .make/install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -160,42 +159,40 @@ install_plugins: .make/install_plugins
 	.pulumi/bin/pulumi plugin install resource gcp 5.0.0
 	.pulumi/bin/pulumi plugin install resource tls 4.0.0
 	@touch $@
+.PHONY: install_plugins
 
 lint_provider: provider
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
-
 # `lint_provider.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
 lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
+.PHONY: lint_provider lint_provider.fix
 
 # `make provider_no_deps` builds the provider binary directly, without ensuring that
 # `cmd/pulumi-resource-cloudflare/schema.json` is valid and up to date.
 # To create a release ready binary, you should use `make provider`.
-.PHONY: provider provider_no_deps
 build_provider_cmd = cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
 provider: bin/$(PROVIDER)
 provider_no_deps:
 	$(call build_provider_cmd)
 bin/$(PROVIDER): .make/schema
 	$(call build_provider_cmd)
+.PHONY: provider provider_no_deps
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
+.PHONY: test
 
 test_provider:
-	@echo ""
-	@echo "== test_provider ==================================================================="
-	@echo ""
 	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
+.PHONY: test_provider
 
-.PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 tfgen: schema
 schema: .make/schema 
 # This does actually have dependencies, but we're keeping it around for backwards compatibility for now
 tfgen_no_deps: .make/schema
-
 .make/schema: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 .make/schema: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/schema: export PULUMI_CONVERT := $(PULUMI_CONVERT)
@@ -206,13 +203,11 @@ tfgen_no_deps: .make/schema
 	$(WORKING_DIR)/bin/$(TFGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(VERSION_GENERIC) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
-
 tfgen_build_only: bin/$(TFGEN)
-
 bin/$(TFGEN):
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
+.PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
-.PHONY: upstream
 upstream: .make/upstream
 # Re-run if the upstream commit or the patches change
 .make/upstream: $(wildcard patches/*) $(wildcard .git/modules/upstream/HEAD)
@@ -220,6 +215,7 @@ ifneq ("$(wildcard upstream)","")
 	./upstream.sh init
 endif
 	@touch $@
+.PHONY: upstream
 
 bin/pulumi-java-gen: .pulumi-java-gen.version
 	pulumictl download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
@@ -231,6 +227,7 @@ bin/pulumi-java-gen: .pulumi-java-gen.version
 #
 ci-mgmt: .ci-mgmt.yaml
 	go run github.com/pulumi/ci-mgmt/provider-ci@master generate
+.PHONY: ci-mgmt
 
 # Because some codegen depends on the version of the CLI used, we install a local CLI
 # version pinned to the same version as `provider/go.mod`.
@@ -254,8 +251,7 @@ ci-mgmt: .ci-mgmt.yaml
 # Start debug server for tfgen
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
-
-.PHONY: lint_provider test ci-mgmt test_provider debug_tfgen
+.PHONY: debug_tfgen
 
 # Provider cross-platform build & packaging
 
