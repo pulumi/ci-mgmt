@@ -12,6 +12,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/migrations"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,6 +26,7 @@ type GenerateOpts struct {
 	OutDir         string
 	TemplateName   string // path inside templates, e.g.: bridged-provider
 	Config         Config // .yaml file containing template config
+	SkipMigrations bool
 }
 
 // Data exposed to text/template that can be referenced in the template code.
@@ -72,6 +74,13 @@ func GeneratePackage(opts GenerateOpts) error {
 		err = renderTemplateDir(templateDir, opts)
 		if err != nil {
 			return fmt.Errorf("error rendering template %s: %w", templateDir, err)
+		}
+	}
+	if !opts.SkipMigrations {
+		// Run any relevant migrations
+		err = migrations.Migrate(opts.TemplateName, opts.OutDir)
+		if err != nil {
+			return fmt.Errorf("error running migrations: %w", err)
 		}
 	}
 	return nil

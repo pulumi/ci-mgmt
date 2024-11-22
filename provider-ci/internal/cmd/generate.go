@@ -12,6 +12,7 @@ type generateArguments struct {
 	OutDir         string
 	TemplateName   string
 	ConfigPath     string
+	SkipMigrations bool
 }
 
 var generateArgs generateArguments
@@ -55,6 +56,7 @@ var generateCmd = &cobra.Command{
 			OutDir:         generateArgs.OutDir,
 			TemplateName:   generateArgs.TemplateName,
 			Config:         config,
+			SkipMigrations: generateArgs.SkipMigrations,
 		})
 		return err
 	},
@@ -67,4 +69,5 @@ func init() {
 	generateCmd.Flags().StringVarP(&generateArgs.OutDir, "out", "o", ".", "directory to write generate files to")
 	generateCmd.Flags().StringVarP(&generateArgs.TemplateName, "template", "t", "", "template name to generate (default \"{config.template}\" or otherwise \"bridged-provider\")")
 	generateCmd.Flags().StringVarP(&generateArgs.ConfigPath, "config", "c", ".ci-mgmt.yaml", "local config file to use")
+	generateCmd.Flags().BoolVar(&generateArgs.SkipMigrations, "skip-migrations", false, "skip running migrations")
 }
