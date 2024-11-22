@@ -55,11 +55,14 @@ _ := $(shell mkdir -p .make bin .pulumi/bin)
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
+# Build the provider and all SDKs and install ready for testing
 build: install_plugins provider build_sdks install_sdks
+# Creates all generated files which need to be committed
+generate: generate_sdks schema#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}#
-build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}#.make/build_registry_docs#{{- end }}#
+build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}#build_registry_docs#{{- end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
-.PHONY: development only_build build generate_sdks build_sdks install_sdks
+.PHONY: development only_build build generate generate_sdks build_sdks install_sdks
 
 GEN_PULUMI_HOME := $(WORKING_DIR)/.pulumi
 GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(GEN_PULUMI_HOME)/examples-cache
