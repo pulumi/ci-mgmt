@@ -92,16 +92,20 @@ build_java: bin/pulumi-java-gen .make/upstream
 		gradle --console=plain build && \
 		gradle --console=plain javadoc
 
-build_nodejs: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-build_nodejs: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-build_nodejs: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_nodejs: .make/upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
+.PHONY: generate_nodejs build_nodejs
+generate_nodejs: .make/generate_nodejs
+build_nodejs: .make/build_nodejs
+.make/generate_nodejs: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/generate_nodejs: bin/$(TFGEN)
+	$(GEN_ENVS) $(WORKING_DIR)/bin/$(TFGEN) nodejs --out sdk/nodejs/
+	printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/nodejs/go.mod
+	@touch $@
+.make/build_nodejs: .make/generate_nodejs
 	cd sdk/nodejs/ && \
-		printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		yarn install && \
 		yarn run tsc && \
 		cp ../../README.md ../../LICENSE* package.json yarn.lock ./bin/
+	@touch $@
 
 build_python: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 build_python: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -247,7 +251,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java build_nodejs build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
