@@ -70,12 +70,16 @@ build_dotnet: .make/build_dotnet
 	cd sdk/dotnet/ && dotnet build
 	@touch $@
 
-build_go: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-build_go: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-build_go: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
-build_go: .make/upstream
-	PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT) $(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
+.PHONY: generate_go build_go
+generate_go: .make/generate_go
+build_go: .make/build_go
+.make/generate_go: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/generate_go: bin/$(TFGEN)
+	$(GEN_ENVS) $(WORKING_DIR)/bin/$(TFGEN) go --out sdk/go/
+	@touch $@
+.make/build_go: .make/generate_go
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
+	@touch $@
 
 build_java: PACKAGE_VERSION := $(VERSION_GENERIC)
 build_java: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
@@ -242,7 +246,7 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(TFGEN) -- schema --out provider/cmd/$(PROVIDER)
 
-.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_go build_java build_nodejs build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
+.PHONY: development build build_sdks install_go_sdk install_java_sdk install_python_sdk install_sdks only_build build_java build_nodejs build_python install_dotnet_sdk install_nodejs_sdk lint_provider provider provider_no_deps test ci-mgmt test_provider debug_tfgen
 
 # Provider cross-platform build & packaging
 
