@@ -148,10 +148,13 @@ lint_provider.fix:
 # `make provider_no_deps` builds the provider binary directly, without ensuring that
 # `cmd/pulumi-resource-cloudflare/schema.json` is valid and up to date.
 # To create a release ready binary, you should use `make provider`.
+.PHONY: provider provider_no_deps
+build_provider_cmd = cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+provider: bin/$(PROVIDER)
 provider_no_deps:
-	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER))
-
-provider: tfgen provider_no_deps
+	$(call build_provider_cmd)
+bin/$(PROVIDER): .make/schema
+	$(call build_provider_cmd)
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
