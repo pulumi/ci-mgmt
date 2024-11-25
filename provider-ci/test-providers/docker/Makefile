@@ -40,11 +40,11 @@ _ := $(shell mkdir -p .make bin .pulumi/bin)
 development: build
 only_build: build
 # Build the provider and all SDKs and install ready for testing
-build: install_plugins provider build_sdks install_sdks
+build: install_plugins provider build_sdks install_sdks build_registry_docs
 # Creates all generated files which need to be committed
 generate: generate_sdks schema build_registry_docs
 generate_sdks: generate_nodejs generate_python generate_dotnet generate_go generate_java
-build_sdks: build_nodejs build_python build_dotnet build_go build_javabuild_registry_docs
+build_sdks: build_nodejs build_python build_dotnet build_go build_java
 install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_go_sdk install_java_sdk
 .PHONY: development only_build build generate generate_sdks build_sdks install_sdks
 

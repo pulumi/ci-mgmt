@@ -56,11 +56,11 @@ _ := $(shell mkdir -p .make bin .pulumi/bin)
 development: build
 only_build: build
 # Build the provider and all SDKs and install ready for testing
-build: install_plugins provider build_sdks install_sdks
+build: install_plugins provider build_sdks install_sdks#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 # Creates all generated files which need to be committed
 generate: generate_sdks schema#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}#
-build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}#build_registry_docs#{{- end }}#
+build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
 .PHONY: development only_build build generate generate_sdks build_sdks install_sdks
 
