@@ -36,11 +36,14 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
 _ := $(shell mkdir -p .make bin .pulumi/bin)
 
+# Build the provider and all SDKs and install ready for testing
+build: install_plugins provider build_sdks install_sdks build_registry_docs
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
-# Build the provider and all SDKs and install ready for testing
-build: install_plugins provider build_sdks install_sdks build_registry_docs
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
+prepare_local_workspace: install_plugins upstream
 # Creates all generated files which need to be committed
 generate: generate_sdks schema build_registry_docs
 generate_sdks: generate_nodejs generate_python generate_dotnet generate_go generate_java
@@ -159,6 +162,7 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
+# Install Pulumi plugins required for TFGen to resolve references
 install_plugins: .make/install_plugins
 .make/install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 .make/install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
@@ -217,6 +221,7 @@ bin/$(TFGEN):
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
+# Apply patches to the upstream submodule, if it exists
 upstream: .make/upstream
 # Re-run if the upstream commit or the patches change
 .make/upstream: $(wildcard patches/*) $(wildcard .git/modules/upstream/HEAD)
