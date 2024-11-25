@@ -16,6 +16,7 @@ func Migrate(templateName, outDir string) error {
 	migrations := []Migration{
 		fixupBridgeImports{},
 		removeExplicitSDKDependency{},
+		ignoreMakeDir{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
