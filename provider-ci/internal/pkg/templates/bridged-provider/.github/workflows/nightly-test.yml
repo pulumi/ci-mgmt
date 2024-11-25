@@ -59,14 +59,19 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumicli, ${{ matrix.language}}
+    - name: Prepare local workspace
+      run: make prepare_local_workspace
     - name: Download bin
       uses: ./.github/actions/download-bin
     - name: Download SDK
       uses: ./.github/actions/download-sdk
       with:
         language: ${{ matrix.language }}
-    - name: Mark SDK up to date
-      run: make --touch build_${{ matrix.language }}
+    - name: Restore makefile progress
+      uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
+      with:
+        name: build_${{ matrix.language }}.make
+        path: .make
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
@@ -112,10 +117,6 @@ jobs:
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: #{{ .Config.SSHPrivateKey }}#
-    #{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Prepare upstream code
-      run: make upstream
     #{{- end }}#
     #{{- if index .Config.SetupScript }}#
     - name: Run setup script
