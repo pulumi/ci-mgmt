@@ -67,6 +67,43 @@ build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
 .PHONY: development only_build build generate generate_sdks build_sdks install_sdks
 
+help:
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Main Targets"
+	@echo "  build (default)     Build the provider and all SDKs and install for testing"
+	@echo "  generate            Generate all SDKs, documentation and schema"
+	@echo "  provider            Build the local provider binary"
+	@echo "  lint_provider<.fix> Run the linter on the provider (& optionally fix)"
+	@echo "  test_provider       Run the provider tests"
+	@echo "  test                Run the example tests (must run 'build' first)"
+	@echo "  clean               Clean up generated files"
+	@echo ""
+	@echo "More Precise Targets"
+	@echo "  schema        Generate the schema"
+	@echo "  generate_sdks Generate all SDKs"
+	@echo "  build_sdks    Build all SDKs"
+	@echo "  install_sdks  Install all SDKs"
+	@echo "  provider_dist Build and package the provider for all platforms"
+	@echo ""
+	@echo "Tool Targets"
+	@echo "  ci-mgmt     Re-generate CI configuration from .ci-mgmt.yaml"
+	@echo "  debug_tfgen Start a debug server for tfgen"
+	@echo ""
+	@echo "Internal Targets (automatically run as dependencies of other targets)"
+	@echo "  prepare_local_workspace  Prepare for building"
+	@echo "  install_plugins          Install plugin dependencies"
+	@echo "  upstream                 Initialize the upstream submodule, if present"
+	@echo ""
+	@echo "Language-Specific Targets"
+	@echo "  generate_[language]    Generate the SDK files ready for committing"
+	@echo "  build_[language]       Build the SDK to check correctness"
+	@echo "  install_[language]_sdk Install the SDK ready for testing"
+	@echo ""
+	@echo "  [language] =#{{ range .Config.Languages }}# #{{ . }}##{{ end }}#"
+	@echo ""
+.PHONY: help
+
 GEN_PULUMI_HOME := $(WORKING_DIR)/.pulumi
 GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(GEN_PULUMI_HOME)/examples-cache
 GEN_ENVS := PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) PULUMI_CONVERT=$(PULUMI_CONVERT) PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION=$(PULUMI_CONVERT)
