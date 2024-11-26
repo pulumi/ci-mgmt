@@ -77,12 +77,6 @@ jobs:
           schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
           echo "$EOF";
         } >> "$GITHUB_ENV"
-    - name: Save makefile progress
-      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
-      with:
-        name: prerequisites.make
-        path: .make
-        include-hidden-files: true
     - if: inputs.is_pr && inputs.is_automated == false
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.ActionVersions.PrComment }}#
