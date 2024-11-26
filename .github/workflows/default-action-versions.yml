@@ -1,0 +1,136 @@
+# This is a no-op job which exists only to be maintained by Renovate. It is the
+# source of truth for our workflows, which are generated with the same versions
+# used by these steps.
+#
+# Please think hard before adding new actions to this list. Local targets which
+# understand how to perform this setup are always preferred over CI-only
+# actions.
+on:
+  push:
+    branches:
+      - thisneverruns
+
+jobs:
+  default-versions:
+    if: false # Never runs
+    runs-on: ubuntu-latest
+
+    steps:
+      # Languages
+
+      - name: golangci/golangci-lint-action
+        uses: golangci/golangci-lint-action@v4.0.1
+
+      - name: actions/setup-go
+        uses: actions/setup-go@v5.1.0
+
+      - name: actions/setup-dotnet
+        uses: actions/setup-dotnet@v4.1.0
+
+      - name: actions/setup-java
+        uses: actions/setup-java@v4.5.0
+
+      - name: gradle/gradle-build-action
+        uses: gradle/gradle-build-action@v3.5.0
+
+      - name: actions/setup-node
+        uses: actions/setup-node@v4.1.0
+
+      - name: actions/setup-python
+        uses: actions/setup-python@v5.3.0
+
+      # Cloud Auth
+
+      - name: azure/login
+        uses: azure/login@v1.6.1
+
+      - name: aws-actions/configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+
+      - name: google-github-actions/setup-gcloud
+        uses: google-github-actions/setup-gcloud@v2.1.2
+
+      - name: google-github-actions/auth
+        uses: google-github-actions/auth@v0.9.0
+
+      # Tools
+
+      - name: goreleaser/goreleaser-action
+        uses: goreleaser/goreleaser-action@v5.1.0
+
+      - name: jaxxstorm/action-install-gh-release
+        uses: jaxxstorm/action-install-gh-release@v1.11.0
+
+      - name: pulumi/actions
+        uses: pulumi/actions@v5.5.1
+
+      - name: codecov/codecov-action
+        uses: codecov/codecov-action@v4.6.0
+
+      - name: pulumi/provider-version-action
+        uses: pulumi/provider-version-action@v1.5.3
+
+      # GHA Utilities
+
+      - name: EndBug/add-and-commit
+        uses: EndBug/add-and-commit@v7.5.0
+
+      - name: actions-ecosystem/action-add-labels
+        uses: actions-ecosystem/action-add-labels@v1.1.0
+
+      - name: peter-evans/enable-pull-request-automerge@v1
+        uses: peter-evans/enable-pull-request-automerge@v1.2.0
+
+      - name: actions/checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: pulumi/git-status-check-action
+        uses: pulumi/git-status-check-action@v1.1.1
+
+      - name: c-hive/gha-remove-artifacts
+        uses: c-hive/gha-remove-artifacts@v1.4.0
+
+      - name: peter-evans/create-or-update-comment
+        uses: peter-evans/create-or-update-comment@v1.4.5
+
+      - name: geekyeggo/delete-artifact
+        uses: geekyeggo/delete-artifact@v5.1.0
+
+      - name: actions/download-artifact
+        uses: actions/download-artifact@v4.1.8
+
+      - name: 8398a7/action-slack
+        uses: 8398a7/action-slack@v3.16.2
+
+      - name: dorny/paths-filter
+        uses: dorny/paths-filter@v2.12.0
+
+      - name: repo-sync/pull-request
+        uses: repo-sync/pull-request@v2.6.2
+
+      - name: thollander/actions-comment-pull-request
+        uses: thollander/actions-comment-pull-request@v2.5.0
+
+      - name: peter-evans/slash-command-dispatch
+        uses: peter-evans/slash-command-dispatch@v2.3.0
+
+      - name: actions/upload-artifact
+        uses: actions/upload-artifact@v4.4.3
+
+      - name: actions/github-script
+        uses: actions/github-script@v7.0.1
+
+      - name: pulumi/pulumi-upgrade-provider-action
+        uses: pulumi/pulumi-upgrade-provider-action@v0.0.12
+
+      - name: rtCamp/action-slack-notify
+        uses: rtCamp/action-slack-notify@v2.3.2
+
+      - name: jlumbroso/free-disk-space
+        uses: jlumbroso/free-disk-space@v1.3.1
+
+      - name: helm/kind-action
+        uses: helm/kind-action@v1.10.0
+
+      - name: guibranco/github-status-action-v2
+        uses: guibranco/github-status-action-v2@1.1.13
