@@ -35,7 +35,7 @@ jobs:
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@v1.3.1
+      uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       with:
         tool-cache: false
         swap-storage: false
@@ -202,7 +202,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.SSHPrivateKey }}#
     - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@836c84ec59a0e7bc0eabc79988384eb567561ee2 # v0.7.0
       with:
         ssh-private-key: #{{ .Config.SSHPrivateKey }}#
     #{{- end }}#

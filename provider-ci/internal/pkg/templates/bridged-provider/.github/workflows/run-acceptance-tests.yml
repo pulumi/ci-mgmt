@@ -60,7 +60,7 @@ jobs:
       name: Create URL to the run output
       run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
     - name: Update with Result
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae # v1
       with:
         body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
@@ -198,7 +198,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.SSHPrivateKey }}#
     - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@836c84ec59a0e7bc0eabc79988384eb567561ee2 # v0.7.0
       with:
         ssh-private-key: #{{ .Config.SSHPrivateKey }}#
     #{{- end }}#

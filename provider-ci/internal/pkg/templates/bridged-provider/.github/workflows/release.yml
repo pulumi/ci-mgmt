@@ -150,7 +150,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.SSHPrivateKey }}#
     - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@836c84ec59a0e7bc0eabc79988384eb567561ee2 # v0.7.0
       with:
         ssh-private-key: #{{ .Config.SSHPrivateKey }}#
     #{{- end }}#

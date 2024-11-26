@@ -28,7 +28,7 @@ jobs:
       uses: actions/checkout@v4.2.2
       with:
         persist-credentials: false
-    - uses: peter-evans/slash-command-dispatch@v4
+    - uses: peter-evans/slash-command-dispatch@13bc09769d122a64f75aa5037256f6f2d78be8c4 # v4
       with:
         commands: |
           run-acceptance-tests
