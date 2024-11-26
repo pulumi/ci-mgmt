@@ -54,10 +54,7 @@ jobs:
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
       - name: Restore makefile progress
-        uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
-        with:
-          name: prerequisites.make
-          path: .make
+        run: make --touch provider schema
       - name: Build SDK
         run: make build_${{ matrix.language }}
       - name: Check worktree clean
@@ -73,9 +70,3 @@ jobs:
         uses: ./.github/actions/upload-sdk
         with:
           language: ${{ matrix.language }}
-      - name: Save makefile progress
-        uses: #{{ .Config.ActionVersions.UploadArtifact }}#
-        with:
-          name: build_${{ matrix.language }}.make
-          path: .make
-          include-hidden-files: true
