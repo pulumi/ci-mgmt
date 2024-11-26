@@ -2,9 +2,11 @@ package pkg
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -345,15 +347,23 @@ type publish struct {
 func loadDefaultConfig() (Config, error) {
 	var config Config
 
-	out, err := os.ReadFile("../../../.github/workflows/default-action-versions.yml")
-	if err != nil {
-		return Config{}, err
-	}
-
+	// Walk up our directory tree until we can find GitHub workflows.
 	var wf workflow
-	err = yaml.Unmarshal(out, &wf)
-	if err != nil {
-		return Config{}, err
+	cwd, _ := os.Getwd()
+	for attempt := 0; attempt < 10; attempt++ {
+		out, err := os.ReadFile(filepath.Join(cwd, ".github/workflows/default-action-versions.yml"))
+		if errors.Is(err, syscall.ENOENT) && attempt < 9 {
+			cwd += "/.."
+			continue
+		}
+		if err != nil {
+			return Config{}, err
+		}
+		err = yaml.Unmarshal(out, &wf)
+		if err != nil {
+			return Config{}, err
+		}
+		break
 	}
 
 	for _, j := range wf.Jobs {
