@@ -107,7 +107,7 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
   blobs: Blob[];
 
   constructor(opts: GoReleaserOpts) {
-    let ldflags: string[];
+    const ldflags = ["-s", "-w"];
     const ignores: Ignores[] = [];
 
     if (opts.skipWindowsArmBuild) {
@@ -115,13 +115,13 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     }
 
     if (opts["major-version"] > 1) {
-      ldflags = [
-        `-X github.com/pulumi/pulumi-${opts.provider}/provider/v${opts["major-version"]}/pkg/version.Version={{.Tag}}`,
-      ];
+      ldflags.push(
+        `-X github.com/pulumi/pulumi-${opts.provider}/provider/v${opts["major-version"]}/pkg/version.Version={{.Tag}}`
+      );
     } else {
-      ldflags = [
-        `-X github.com/pulumi/pulumi-${opts.provider}/provider/pkg/version.Version={{.Tag}}`,
-      ];
+      ldflags.push(
+        `-X github.com/pulumi/pulumi-${opts.provider}/provider/pkg/version.Version={{.Tag}}`
+      );
     }
 
     if (opts.providerVersion !== "") {
