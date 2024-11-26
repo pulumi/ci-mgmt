@@ -88,12 +88,6 @@ jobs:
           schema-tools compare -r github://api.github.com/pulumi -p aws -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-aws/schema.json;
           echo "$EOF";
         } >> "$GITHUB_ENV"
-    - name: Save makefile progress
-      uses: actions/upload-artifact@v4
-      with:
-        name: prerequisites.make
-        path: .make
-        include-hidden-files: true
     - if: inputs.is_pr && inputs.is_automated == false
       name: Comment on PR with Details of Schema Check
       uses: thollander/actions-comment-pull-request@v2
