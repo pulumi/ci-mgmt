@@ -14,7 +14,7 @@ func (ignoreMakeDir) Name() string {
 	return "Add .make directory to .gitignore"
 }
 func (ignoreMakeDir) ShouldRun(templateName string) bool {
-	return templateName == "bridged-provider"
+	return templateName == "bridged-provider" || templateName == "external-bridged-provider"
 }
 func (ignoreMakeDir) Migrate(templateName, outDir string) error {
 	gitignorePath := filepath.Join(outDir, ".gitignore")
