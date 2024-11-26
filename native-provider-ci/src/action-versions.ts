@@ -57,7 +57,7 @@ function readDefaults() {
 
   const parsed = yaml.parse(
     fs.readFileSync(
-      __dirname + "/../../.github/workflows/default-action-versions.yml",
+      __dirname + "/../../provider-ci/internal/pkg/action-versions.yml",
       "utf-8"
     )
   ) as workflow;

@@ -13,6 +13,8 @@
       // Only bump to releases older than 7 days since these will include
       // third-party / untrusted actions.
       minimumReleaseAge: "7 days",
+      // Extend our matching to maintain our default action versions.
+      fileMatch: [".*/action-versions\\.ya?ml$"],
     },
     // Pins
     {

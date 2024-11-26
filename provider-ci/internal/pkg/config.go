@@ -1,16 +1,19 @@
 package pkg
 
 import (
+	_ "embed" // For embedding action versions.
+
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed action-versions.yml
+var defaultActionVersions []byte
 
 // Config describes the shape of .ci-mgmt.yaml files.
 type Config struct {
@@ -347,23 +350,10 @@ type publish struct {
 func loadDefaultConfig() (Config, error) {
 	var config Config
 
-	// Walk up our directory tree until we can find GitHub workflows.
 	var wf workflow
-	cwd, _ := os.Getwd()
-	for attempt := 0; attempt < 10; attempt++ {
-		out, err := os.ReadFile(filepath.Join(cwd, ".github/workflows/default-action-versions.yml"))
-		if errors.Is(err, syscall.ENOENT) && attempt < 9 {
-			cwd += "/.."
-			continue
-		}
-		if err != nil {
-			return Config{}, err
-		}
-		err = yaml.Unmarshal(out, &wf)
-		if err != nil {
-			return Config{}, err
-		}
-		break
+	err := yaml.Unmarshal(defaultActionVersions, &wf)
+	if err != nil {
+		return Config{}, err
 	}
 
 	for _, j := range wf.Jobs {
