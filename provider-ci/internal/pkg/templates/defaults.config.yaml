@@ -157,20 +157,6 @@ runner:
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
 
-# actionVersions should be used wherever we use external actions to make upgrading easier.
-# These are never overridden by providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actionVersions%3A%22&type=code
-actionVersions:
-  configureAwsCredentials: aws-actions/configure-aws-credentials@v4
-  setupGcloud: google-github-actions/setup-gcloud@v2
-  googleAuth: google-github-actions/auth@v2
-  checkout: actions/checkout@v4
-  downloadArtifact: actions/download-artifact@v4
-  pathsFilter: dorny/paths-filter@v2
-  prComment: thollander/actions-comment-pull-request@v2
-  uploadArtifact: actions/upload-artifact@v4
-  upgradeProviderAction: pulumi/pulumi-upgrade-provider-action@v0.0.12
-  freeDiskSpace: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
-
 # publish contains multiple properties relating to the publish jobs.
 # Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code
 publish:

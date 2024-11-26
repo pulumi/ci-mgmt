@@ -127,13 +127,13 @@ jobs:
       PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
       with:
         ref: ${{ env.PR_COMMIT_SHA }}
         persist-credentials: false
     - name: Checkout p/examples
       if: matrix.testTarget == 'pulumiExamples'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
       with:
         repository: pulumi/examples
         path: p-examples

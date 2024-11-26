@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	_ "embed" // For embedding action versions.
+
 	"bytes"
 	"fmt"
 	"os"
@@ -9,6 +11,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed action-versions.yml
+var defaultActionVersions []byte
 
 // Config describes the shape of .ci-mgmt.yaml files.
 type Config struct {
@@ -345,6 +350,39 @@ type publish struct {
 func loadDefaultConfig() (Config, error) {
 	var config Config
 
+	var wf workflow
+	err := yaml.Unmarshal(defaultActionVersions, &wf)
+	if err != nil {
+		return Config{}, err
+	}
+
+	for _, j := range wf.Jobs {
+		for _, s := range j.Steps {
+			switch s.Name {
+			case "aws-actions/configure-aws-credentials":
+				config.ActionVersions.ConfigureAwsCredentials = s.Uses
+			case "google-github-actions/setup-gcloud":
+				config.ActionVersions.SetupGcloud = s.Uses
+			case "google-github-actions/auth":
+				config.ActionVersions.GoogleAuth = s.Uses
+			case "actions/checkout":
+				config.ActionVersions.Checkout = s.Uses
+			case "actions/download-artifact":
+				config.ActionVersions.DownloadArtifact = s.Uses
+			case "dorny/paths-filter":
+				config.ActionVersions.PathsFilter = s.Uses
+			case "thollander/actions-comment-pull-request":
+				config.ActionVersions.PrComment = s.Uses
+			case "actions/upload-artifact":
+				config.ActionVersions.UploadArtifact = s.Uses
+			case "pulumi/pulumi-upgrade-provider-action":
+				config.ActionVersions.UpgradeProviderAction = s.Uses
+			case "jlumbroso/free-disk-space":
+				config.ActionVersions.FreeDiskSpace = s.Uses
+			}
+		}
+	}
+
 	configBytes, err := templateFS.ReadFile(filepath.Join("templates", "defaults.config.yaml"))
 	if err != nil {
 		return Config{}, fmt.Errorf("error reading embedded defaults config file: %w", err)
@@ -393,4 +431,17 @@ func (x *intOrDuration) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	*x = intOrDuration(i * int64(time.Minute))
 	return nil
+}
+
+type workflow struct {
+	Jobs map[string]job
+}
+
+type job struct {
+	Steps []step
+}
+
+type step struct {
+	Name string
+	Uses string
 }
