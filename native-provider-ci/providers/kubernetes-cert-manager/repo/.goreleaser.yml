@@ -16,6 +16,8 @@ builds:
   ignore: []
   main: ./cmd/pulumi-resource-kubernetes-cert-manager/
   ldflags:
+  - -s
+  - -w
   - -X
     github.com/pulumi/pulumi-kubernetes-cert-manager/provider/pkg/version.Version={{.Tag}}
   binary: pulumi-resource-kubernetes-cert-manager

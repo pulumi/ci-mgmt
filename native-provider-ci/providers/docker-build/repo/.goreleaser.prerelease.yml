@@ -16,6 +16,8 @@ builds:
   ignore: []
   main: ./cmd/pulumi-resource-docker-build/
   ldflags:
+  - -s
+  - -w
   - -X
     github.com/pulumi/pulumi-docker-build/provider/pkg/version.Version={{.Tag}}
   - -X github.com/pulumi/pulumi-docker-build/provider.Version={{.Tag}}
