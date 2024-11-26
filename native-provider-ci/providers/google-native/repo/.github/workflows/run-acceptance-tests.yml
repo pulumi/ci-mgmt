@@ -354,7 +354,7 @@ jobs:
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v0.9.0
+      uses: google-github-actions/auth@v2.1.7
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{

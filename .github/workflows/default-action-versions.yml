@@ -51,7 +51,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2.1.2
 
       - name: google-github-actions/auth
-        uses: google-github-actions/auth@v0.9.0
+        uses: google-github-actions/auth@v2.1.7
 
       # Tools
 

@@ -343,7 +343,7 @@ jobs:
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v0.9.0
+      uses: google-github-actions/auth@v2.1.7
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -642,7 +642,7 @@ jobs:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v0.9.0
+      uses: google-github-actions/auth@v2.1.7
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -706,7 +706,7 @@ jobs:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v0.9.0
+      uses: google-github-actions/auth@v2.1.7
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
