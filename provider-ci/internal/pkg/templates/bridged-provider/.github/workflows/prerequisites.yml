@@ -64,6 +64,10 @@ jobs:
 #{{- end }}#
     - name: Generate schema
       run: make schema
+    #{{- if .Config.RegistryDocs }}#
+    - name: Build registry docs
+      run: make build_registry_docs
+    #{{- end }}#
     - name: Build provider binary
       run: make provider
     - name: Unit-test provider code
