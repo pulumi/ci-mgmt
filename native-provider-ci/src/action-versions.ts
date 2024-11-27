@@ -55,18 +55,28 @@ export const githubStatusAction = defaults["guibranco/github-status-action-v2"];
 function readDefaults() {
   const defaults: { [key: string]: string } = {};
 
-  const parsed = yaml.parse(
+  // Parse YAML and preserve comments.
+  const doc = yaml.parseDocument(
     fs.readFileSync(
       __dirname + "/../../provider-ci/internal/pkg/action-versions.yml",
       "utf-8"
     )
-  ) as workflow;
+  );
 
-  for (const name in parsed.jobs) {
-    parsed.jobs[name].steps.forEach((s) => {
-      defaults[s.name] = s.uses;
-    });
-  }
+  const steps = doc.getIn([
+    "jobs",
+    "default-versions",
+    "steps",
+  ]) as yaml.YAMLSeq;
+
+  steps.items.forEach((item) => {
+    const step = item as yaml.YAMLMap;
+
+    const name = (step.items[0] as yaml.Pair).value as string;
+    const uses = (step.items[1] as yaml.Pair).value as string;
+
+    defaults[name] = uses;
+  });
 
   return defaults;
 }

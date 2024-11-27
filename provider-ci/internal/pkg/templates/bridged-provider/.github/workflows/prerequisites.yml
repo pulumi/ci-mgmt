@@ -43,7 +43,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
-    - uses: pulumi/provider-version-action@v1
+    - uses: #{{ .Config.ActionVersions.ProviderVersionAction }}#
       id: provider-version
       with:
         set-env: 'PROVIDER_VERSION'
