@@ -322,6 +322,7 @@ type actionVersions struct {
 	UploadArtifact          string `yaml:"uploadArtifact"`
 	UpgradeProviderAction   string `yaml:"upgradeProviderAction"`
 	FreeDiskSpace           string `yaml:"freeDiskSpace"`
+	ProviderVersionAction   string `yaml:"providerVersionAction"`
 }
 
 type toolVersions struct {
@@ -351,9 +352,59 @@ func loadDefaultConfig() (Config, error) {
 	var config Config
 
 	var wf workflow
-	err := yaml.Unmarshal(defaultActionVersions, &wf)
+
+	// Parse our actions file while preserving comments.
+	var doc yaml.Node
+	err := yaml.Unmarshal(defaultActionVersions, &doc)
 	if err != nil {
 		return Config{}, err
+	}
+
+	for _, subdoc := range doc.Content {
+		for _, jobs := range subdoc.Content {
+			for _, job := range jobs.Content {
+				for _, steps := range job.Content {
+					if steps.Kind != yaml.SequenceNode {
+						continue
+					}
+					for _, step := range steps.Content {
+						if len(step.Content) != 4 {
+							continue
+						}
+						name := step.Content[1].Value
+						uses := step.Content[3].Value + step.Content[3].FootComment
+						if step.Content[3].LineComment != "" {
+							uses += " " + step.Content[3].LineComment
+						}
+
+						switch name {
+						case "aws-actions/configure-aws-credentials":
+							config.ActionVersions.ConfigureAwsCredentials = uses
+						case "google-github-actions/setup-gcloud":
+							config.ActionVersions.SetupGcloud = uses
+						case "google-github-actions/auth":
+							config.ActionVersions.GoogleAuth = uses
+						case "actions/checkout":
+							config.ActionVersions.Checkout = uses
+						case "actions/download-artifact":
+							config.ActionVersions.DownloadArtifact = uses
+						case "dorny/paths-filter":
+							config.ActionVersions.PathsFilter = uses
+						case "thollander/actions-comment-pull-request":
+							config.ActionVersions.PrComment = uses
+						case "actions/upload-artifact":
+							config.ActionVersions.UploadArtifact = uses
+						case "pulumi/pulumi-upgrade-provider-action":
+							config.ActionVersions.UpgradeProviderAction = uses
+						case "jlumbroso/free-disk-space":
+							config.ActionVersions.FreeDiskSpace = uses
+						case "pulumi/provider-version-action":
+							config.ActionVersions.ProviderVersionAction = uses
+						}
+					}
+				}
+			}
+		}
 	}
 
 	for _, j := range wf.Jobs {
@@ -379,6 +430,8 @@ func loadDefaultConfig() (Config, error) {
 				config.ActionVersions.UpgradeProviderAction = s.Uses
 			case "jlumbroso/free-disk-space":
 				config.ActionVersions.FreeDiskSpace = s.Uses
+			case "pulumi/provider-version-action":
+				config.ActionVersions.ProviderVersionAction = s.Uses
 			}
 		}
 	}
