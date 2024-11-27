@@ -62,7 +62,7 @@ jobs:
         uses: pulumi/actions@v5.5.1
 
       - name: codecov/codecov-action
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        uses: codecov/codecov-action@985343d70564a82044c1b7fcb84c2fa05405c1a2 # v5.0.4
 
       - name: pulumi/provider-version-action
         uses: pulumi/provider-version-action@v1.5.3
