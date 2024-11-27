@@ -97,7 +97,7 @@ jobs:
         uses: repo-sync/pull-request@65785d95a5a466e46a9d0708933a3bd51bbf9dde # v2.6.2
 
       - name: thollander/actions-comment-pull-request
-        uses: thollander/actions-comment-pull-request@fabd468d3a1a0b97feee5f6b9e499eab0dd903f6 # v2.5.0
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
 
       - name: peter-evans/slash-command-dispatch
         uses: peter-evans/slash-command-dispatch@40877f718dce0101edfc7aea2b3800cc192f9ed5 # v2.3.0
