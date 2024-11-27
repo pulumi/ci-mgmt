@@ -5,7 +5,7 @@
     // Extend our matching to maintain our default action versions.
     fileMatch: [".*/action-versions\\.ya?ml$"],
     ignorePaths: [
-      "provider-ci/providers/**",
+      "provider-ci/test-providers/**",
       "native-provider-ci/providers/**",
     ],
   },

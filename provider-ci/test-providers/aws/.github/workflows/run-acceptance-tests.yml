@@ -174,7 +174,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         version: v2.5.0
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-region: ${{ env.AWS_REGION }}
@@ -209,7 +209,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
           - name: Checkout Repo
-            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+            uses: actions/checkout@v4
             with:
               ref: ${{ env.PR_COMMIT_SHA }}
               submodules: true
@@ -231,7 +231,7 @@ jobs:
           - env:
               CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
             name: Upload coverage reports to Codecov
-            uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
+            uses: codecov/codecov-action@v4
       timeout-minutes: 60
   provider_test:
       name: provider_test
@@ -247,7 +247,7 @@ jobs:
               swap-storage: false
               tool-cache: false
           - name: Checkout Repo
-            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+            uses: actions/checkout@v4
             with:
               ref: ${{ env.PR_COMMIT_SHA }}
               submodules: true
@@ -261,7 +261,7 @@ jobs:
           - name: Make upstream
             run: make upstream
           - name: Download provider + tfgen binaries
-            uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+            uses: actions/download-artifact@v4
             with:
               name: aws-provider.tar.gz
               path: ${{ github.workspace }}/bin
@@ -271,7 +271,7 @@ jobs:
               find ${{ github.workspace }} -name "pulumi-*-aws" -print -exec chmod +x {} \;
           - run: dotnet nuget add source ${{ github.workspace }}/nuget
           - name: Download SDK
-            uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+            uses: actions/download-artifact@v4
             with:
               name: ${{ matrix.language }}-sdk.tar.gz
               path: ${{ github.workspace}}/sdk/
@@ -291,7 +291,7 @@ jobs:
               token: ${{ secrets.GITHUB_TOKEN }}
               version: v2.5.0
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
+            uses: aws-actions/configure-aws-credentials@v4
             with:
               aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
               aws-region: ${{ env.AWS_REGION }}
@@ -333,7 +333,7 @@ jobs:
               swap-storage: false
               tool-cache: false
           - name: Checkout Repo
-            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+            uses: actions/checkout@v4
             with:
               ref: ${{ env.PR_COMMIT_SHA }}
               submodules: true
@@ -345,7 +345,7 @@ jobs:
             with:
               tools: pulumictl, pulumi, go, node
           - name: Download provider + tfgen binaries
-            uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+            uses: actions/download-artifact@v4
             with:
               name: aws-provider.tar.gz
               path: ${{ github.workspace }}/bin
@@ -354,7 +354,7 @@ jobs:
               tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin
               find ${{ github.workspace }} -name "pulumi-*-aws" -print -exec chmod +x {} \;
           - name: Download SDK
-            uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
+            uses: actions/download-artifact@v4
             with:
               name: ${{ matrix.language }}-sdk.tar.gz
               path: ${{ github.workspace}}/sdk/
@@ -374,7 +374,7 @@ jobs:
           - name: Run selected tests with manual web identity/OIDC auth
             run: cd examples && go test -v -json -count=1 -run TestAccCloudWatchOidcManual -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
           - name: Configure AWS Credentials for OIDC
-            uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
+            uses: aws-actions/configure-aws-credentials@v4
             with:
               aws-region: ${{ env.AWS_REGION }}
               role-duration-seconds: 3600
@@ -405,12 +405,12 @@ jobs:
               swap-storage: false
               tool-cache: false
           - name: Checkout Repo
-            uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+            uses: actions/checkout@v4
             with:
               ref: ${{ env.PR_COMMIT_SHA }}
               submodules: true
           - name: Install Go
-            uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5
+            uses: actions/setup-go@v5
             with:
               cache: false
               go-version: 1.22.x
