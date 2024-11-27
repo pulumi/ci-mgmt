@@ -93,7 +93,7 @@ jobs:
     #{{- end }}#
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
-    - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
+    - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
       with:
         authToken: ${{secrets.GITHUB_TOKEN}}
         # Write an explicit status check called "Sentinel" which will only pass if this code really runs.
