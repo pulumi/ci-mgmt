@@ -79,7 +79,7 @@ jobs:
         uses: pulumi/git-status-check-action@v1.1.1
 
       - name: peter-evans/create-or-update-comment
-        uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae # v1.4.5
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
 
       - name: geekyeggo/delete-artifact
         uses: geekyeggo/delete-artifact@f275313e70c08f6120db482d7a6b98377786765b # v5.1.0
