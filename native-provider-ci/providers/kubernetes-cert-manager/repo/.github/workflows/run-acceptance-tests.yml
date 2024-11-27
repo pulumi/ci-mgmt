@@ -71,7 +71,7 @@ jobs:
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version
-      uses: pulumi/provider-version-action@v1.5.3
+      uses: pulumi/provider-version-action@0391d47b9b0d865d33dd0a295b1fcf9f7021dd4c # v1.5.3
       with:
         set-env: PROVIDER_VERSION
     - name: Install Go
@@ -84,7 +84,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v5.5.1
+      uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
       with:
         pulumi-version-file: .pulumi.version
     - if: github.event_name == 'pull_request'
@@ -125,7 +125,7 @@ jobs:
     - name: Build Provider
       run: make provider
     - name: Check worktree clean
-      uses: pulumi/git-status-check-action@v1.1.1
+      uses: pulumi/git-status-check-action@54000b91124a8dd9fd6a872cb41f5dd246a46e7c # v1.1.1
       with:
         allowed-changes: |-
           sdk/**/pulumi-plugin.json
@@ -179,7 +179,7 @@ jobs:
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version
-      uses: pulumi/provider-version-action@v1.5.3
+      uses: pulumi/provider-version-action@0391d47b9b0d865d33dd0a295b1fcf9f7021dd4c # v1.5.3
       with:
         set-env: PROVIDER_VERSION
     - name: Install Go
@@ -192,7 +192,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v5.5.1
+      uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
       with:
         pulumi-version-file: .pulumi.version
     - name: Setup Node
@@ -234,7 +234,7 @@ jobs:
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
-      uses: pulumi/git-status-check-action@v1.1.1
+      uses: pulumi/git-status-check-action@54000b91124a8dd9fd6a872cb41f5dd246a46e7c # v1.1.1
       with:
         allowed-changes: |-
           sdk/**/pulumi-plugin.json
@@ -285,7 +285,7 @@ jobs:
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version
-      uses: pulumi/provider-version-action@v1.5.3
+      uses: pulumi/provider-version-action@0391d47b9b0d865d33dd0a295b1fcf9f7021dd4c # v1.5.3
       with:
         set-env: PROVIDER_VERSION
     - name: Install Go
@@ -298,7 +298,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@v5.5.1
+      uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
       with:
         pulumi-version-file: .pulumi.version
     - name: Setup Node

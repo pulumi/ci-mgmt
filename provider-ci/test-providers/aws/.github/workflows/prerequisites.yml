@@ -57,7 +57,7 @@ jobs:
       with:
         submodules: true
         persist-credentials: false
-    - uses: pulumi/provider-version-action@v1.5.3
+    - uses: pulumi/provider-version-action@0391d47b9b0d865d33dd0a295b1fcf9f7021dd4c # v1.5.3
       id: provider-version
       with:
         set-env: 'PROVIDER_VERSION'
