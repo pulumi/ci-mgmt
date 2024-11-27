@@ -205,12 +205,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docker%3A%22&type=code
 	Docker bool `yaml:"docker"`
 
-	// SSHPrivateKey sets up SSH with specified private key before running
-	// tests in CI job. This should be provided from a secret. Used by the
-	// docker provider only:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22sshPrivateKey%3A%22&type=code
-	SSHPrivateKey string `yaml:"sshPrivateKey"`
-
 	// GCP authenticates with GCP before running tests in CI job. Used in gcp
 	// and docker:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22gcp%3A%22&type=code
