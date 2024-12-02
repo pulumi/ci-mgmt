@@ -112,12 +112,14 @@ func getDeletedFiles(templateName string) []string {
 	case "bridged-provider":
 		return []string{
 			".github/workflows/check-upstream-upgrade.yml",
+			".github/workflows/resync-build.yml",
 			"scripts/upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 		}
 	case "external-bridged-provider":
 		return []string{
+			".github/workflows/resync-build.yml",
 			"scripts/upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
