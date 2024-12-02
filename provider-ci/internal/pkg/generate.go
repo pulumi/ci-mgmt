@@ -101,7 +101,7 @@ func getTemplateDirs(templateName string) ([]string, error) {
 		return []string{"dev-container", "provider", "pulumi-provider", "bridged-provider"}, nil
 	case "external-bridged-provider":
 		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "bridged-provider"}, nil
+		return []string{"dev-container", "provider", "external-provider", "bridged-provider"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
@@ -119,7 +119,6 @@ func getDeletedFiles(templateName string) []string {
 		}
 	case "external-bridged-provider":
 		return []string{
-			".github/workflows/resync-build.yml",
 			"scripts/upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
