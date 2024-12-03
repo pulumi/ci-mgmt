@@ -14,6 +14,7 @@ jobs:
     runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ inputs.version }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: true
       matrix:
