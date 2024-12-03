@@ -1,16 +1,23 @@
-name: Download binary assets
-description: Downloads the provider and tfgen binaries to `bin/`.
+name: Download the provider binary
+description: Downloads the provider binary to `bin/`.
 
 runs:
   using: "composite"
   steps:
-    - name: Download provider + tfgen binaries
+
+    - name: Download pulumi-resource-#{{ .Config.Provider }}#
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
-        name: #{{ .Config.Provider }}#-provider.tar.gz
+        pattern: pulumi-resource-#{{ .Config.Provider }}#-*-linux-amd64.tar.gz
         path: ${{ github.workspace }}/bin
-    - name: Untar provider binaries
+        merge-multiple: true
+
+    - name: Untar pulumi-resource-#{{ .Config.Provider }}#
       shell: bash
       run: |
-        tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin
+        tar -zxf ${{ github.workspace }}/bin/*amd64.tar.gz -C ${{ github.workspace}}/bin
+
+    - name: Mark pulumi-resource-#{{ .Config.Provider }}# as executable
+      shell: bash
+      run: |
         find ${{ github.workspace }} -name "pulumi-*-#{{ .Config.Provider }}#" -print -exec chmod +x {} \;
