@@ -68,10 +68,6 @@ jobs:
     - name: Build registry docs
       run: make build_registry_docs
     #{{- end }}#
-    - name: Build provider binary
-      run: make provider
-    - name: Unit-test provider code
-      run: make test_provider
     - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
@@ -119,8 +115,12 @@ jobs:
         fi
 #{{- end }}#
 
-    - name: Upload bin
-      uses: ./.github/actions/upload-bin
+    - name: Upload pulumi-tfgen-#{{ .Config.Provider }}#
+      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
+      with:
+        name: pulumi-tfgen-#{{ .Config.Provider }}#
+        path: ${{ github.workspace }}/bin/pulumi-tfgen-#{{ .Config.Provider }}#
+        retention-days: 30
 
     - name: Upload schema-embed.json
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
