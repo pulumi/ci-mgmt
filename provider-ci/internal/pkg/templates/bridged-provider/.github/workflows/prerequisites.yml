@@ -68,6 +68,8 @@ jobs:
     - name: Build registry docs
       run: make build_registry_docs
     #{{- end }}#
+    - name: Build provider binary
+      run: make provider
     - name: Unit-test provider code
       run: make test_provider
     - if: inputs.is_pr
