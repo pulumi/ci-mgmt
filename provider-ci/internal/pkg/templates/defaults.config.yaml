@@ -210,11 +210,6 @@ checkUpstreamUpgrade: true
 # Used in 9 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docker%3A%22&type=code
 #docker: false
 
-# Setup SSH with specified private key before running tests in CI job.
-# This should be provided from a secret
-# Used by the docker provider only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22sshPrivateKey%3A%22&type=code
-#sshPrivateKey: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
-
 # Authenticate with GCP before running tests in CI job
 # Used in gcp and docker: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22gcp%3A%22&type=code
 #gcp: false
