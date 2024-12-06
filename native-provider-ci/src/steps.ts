@@ -912,8 +912,13 @@ export function InstallandConfigureHelm(provider: string): Step {
   return {};
 }
 
-export function GolangciLint(): Step {
-  return {
+export function GolangciLint(): Step[] {
+  const disarmGoEmbed = {
+    name: "Disarm go:embed directives to enable linters that compile source code",
+    run: "git grep -l 'go:embed' -- provider | xargs --no-run-if-empty sed -i 's/go:embed/ goembed/g'",
+  };
+
+  const lintStep = {
     name: "golangci-lint provider pkg",
     uses: action.goLint,
     with: {
@@ -922,6 +927,8 @@ export function GolangciLint(): Step {
       "working-directory": "provider",
     },
   };
+
+  return [disarmGoEmbed, lintStep];
 }
 
 export function CodegenDuringSDKBuild(provider: string) {
