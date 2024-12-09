@@ -711,13 +711,17 @@ export class TeardownTestClusterJob implements NormalJob {
 
 export class LintJob implements NormalJob {
   "runs-on" = "ubuntu-latest";
-  steps = [steps.CheckoutRepoStep(), steps.InstallGo(), steps.GolangciLint()];
+  steps = [
+    steps.CheckoutRepoStep(),
+    steps.InstallGo(),
+    ...steps.GolangciLint(),
+  ];
   name: string;
   if: NormalJob["if"];
 
   constructor(name: string) {
     this.name = name;
-    Object.assign(this, { name });
+    Object.assign(this, { name, steps: this.steps });
   }
 
   addDispatchConditional(isWorkflowDispatch: boolean) {
