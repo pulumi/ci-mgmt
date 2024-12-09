@@ -94,8 +94,8 @@ jobs:
       with:
         message: |
           ${{ env.SCHEMA_CHANGES }}
-        comment_tag: schemaCheck
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        comment-tag: schemaCheck
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - if: contains(env.SCHEMA_CHANGES, 'Looking good! No breaking changes found.') &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes

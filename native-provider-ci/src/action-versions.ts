@@ -80,16 +80,3 @@ function readDefaults() {
 
   return defaults;
 }
-
-type workflow = {
-  jobs: { [key: string]: job };
-};
-
-type job = {
-  steps: step[];
-};
-
-type step = {
-  name: string;
-  uses: string;
-};
