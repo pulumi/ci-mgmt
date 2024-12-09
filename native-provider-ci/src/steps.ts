@@ -46,7 +46,7 @@ export function CommentPRWithSlashCommandStep(): Step {
       message:
         "PR is now waiting for a maintainer to run the acceptance tests.\n" +
         "**Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR\n",
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      "github-token": "${{ secrets.GITHUB_TOKEN }}",
     },
   };
 }
@@ -613,8 +613,8 @@ export function CommentSchemaChangesOnPR(provider: string): Step {
     uses: action.prComment,
     with: {
       message: "${{ env.SCHEMA_CHANGES }}\n",
-      comment_tag: "schemaCheck",
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}",
+      "comment-tag": "schemaCheck",
+      "github-token": "${{ secrets.GITHUB_TOKEN }}",
     },
   };
 }

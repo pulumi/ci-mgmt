@@ -85,8 +85,8 @@ jobs:
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        comment_tag: schemaCheck
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-tag: schemaCheck
         message: >+
           ${{ env.SCHEMA_CHANGES }}
 
