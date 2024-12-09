@@ -83,7 +83,7 @@ jobs:
              --keystore "PulumiCodeSigning" \
              --url ${{ secrets.AZURE_SIGNING_KEY_VAULT_URI }} \
              --storepass "$(az account get-access-token --resource "https://vault.azure.net" | jq -r .accessToken)" \
-             bin/windows-amd64/pulumi-resource-aws.exe
+             bin/windows-amd64/pulumi-resource-aws.exe;
 
       - name: Package provider
         run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
