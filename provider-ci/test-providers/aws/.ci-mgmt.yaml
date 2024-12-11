@@ -5,11 +5,19 @@ parallel: 1
 timeout: 150
 generate-nightly-test-workflow: true
 providerVersion: github.com/hashicorp/terraform-provider-aws/version.ProviderVersion
+toolVersions:
+  dotnet: "6.0.x"
+  go: "1.23.x"
+  java: "11"
+  gradle: "7.6"
+  nodejs: "20.x"
+  pulumi: "dev"
+  python: "3.11.8"
 env:
   PULUMI_MISSING_DOCS_ERROR: true
   AWS_REGION: "us-west-2"
   OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE_ARN }}
-template: bridged-provider
+makeTemplate: bridged
 checkoutSubmodules: true
 freeDiskSpaceBeforeBuild: true
 freeDiskSpaceBeforeSdkBuild: true
@@ -62,6 +70,11 @@ extraTests:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        swap-storage: false
+        tool-cache: false
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
@@ -74,8 +87,8 @@ extraTests:
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumi, go
-    - name: Make upstream
-      run: make upstream
+    - name: Prepare local workspace
+      run: make prepare_local_workspace
     - name: go test
       run: |
         cd upstream
@@ -105,10 +118,10 @@ extraTests:
     - name: Install Go
       uses: actions/setup-go@v5
       with:
-        go-version: "1.22.x"
+        go-version: "1.23.x"
         cache: false
-    - name: Make upstream
-      run: make upstream
+    - name: Prepare local workspace
+      run: make prepare_local_workspace
     - name: upstream lint
       run: |
         cd upstream
@@ -139,25 +152,16 @@ extraTests:
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumi, go, node
-    - name: Download provider + tfgen binaries
-      uses: actions/download-artifact@v4
-      with:
-        name: aws-provider.tar.gz
-        path: ${{ github.workspace }}/bin
-    - name: Untar provider binaries
-      run: >-
-        tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
-        github.workspace}}/bin
-
-        find ${{ github.workspace }} -name "pulumi-*-aws" -print -exec chmod +x {} \;
+    - name: Prepare local workspace
+      run: make prepare_local_workspace
+    - name: Download bin
+      uses: ./.github/actions/download-bin
     - name: Download SDK
-      uses: actions/download-artifact@v4
+      uses: ./.github/actions/download-sdk
       with:
-        name: ${{ matrix.language }}-sdk.tar.gz
-        path: ${{ github.workspace}}/sdk/
-    - name: Uncompress SDK folder
-      run: tar -zxf ${{ github.workspace }}/sdk/${{ matrix.language }}.tar.gz -C ${{
-        github.workspace }}/sdk/${{ matrix.language }}
+        language: ${{ matrix.language }}
+    - name: Restore makefile progress
+      run: make --touch provider schema build_${{ matrix.language }}
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install dependencies
@@ -167,8 +171,6 @@ extraTests:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         version: v2.4.0
-    - name: Make upstream
-      run: make upstream
     - name: Run selected tests with manual web identity/OIDC auth
       run: cd examples && go test -v -json -count=1 -run TestAccCloudWatchOidcManual -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
     - name: Configure AWS Credentials for OIDC
@@ -181,13 +183,6 @@ extraTests:
         role-to-assume: ${{ secrets.OIDC_ROLE_ARN }}
     - name: Run selected tests with configure-aws-credentials web identity/OIDC auth
       run: cd examples && go test -v -json -count=1 -run TestAccCloudWatch -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
-    - if: failure() && github.event_name == 'push'
-      name: Notify Slack
-      uses: 8398a7/action-slack@v3
-      with:
-        author_name: Failure in running ${{ matrix.language }} tests
-        fields: repo,commit,author,action
-        status: ${{ job.status }}
     strategy:
       fail-fast: false
       matrix:
@@ -218,28 +213,16 @@ extraTests:
         uses: ./.github/actions/setup-tools
         with:
           tools: pulumictl, pulumi, go, node, dotnet, python, java
-      - name: Make upstream
-        run: make upstream
-      - name: Download provider + tfgen binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: aws-provider.tar.gz
-          path: ${{ github.workspace }}/bin
-      - name: Untar provider binaries
-        run: >-
-          tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
-          github.workspace}}/bin
-
-          find ${{ github.workspace }} -name "pulumi-*-aws" -print -exec chmod +x {} \;
-      - run: dotnet nuget add source ${{ github.workspace }}/nuget
+      - name: Prepare local workspace
+        run: make prepare_local_workspace
+      - name: Download bin
+        uses: ./.github/actions/download-bin
       - name: Download SDK
-        uses: actions/download-artifact@v4
+        uses: ./.github/actions/download-sdk
         with:
-          name: ${{ matrix.language }}-sdk.tar.gz
-          path: ${{ github.workspace}}/sdk/
-      - name: Uncompress SDK folder
-        run: tar -zxf ${{ github.workspace }}/sdk/${{ matrix.language }}.tar.gz -C ${{
-          github.workspace }}/sdk/${{ matrix.language }}
+          language: ${{ matrix.language }}
+      - name: Restore makefile progress
+        run: make --touch provider schema build_${{ matrix.language }}
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
       - name: Install Python deps
@@ -265,13 +248,6 @@ extraTests:
       - name: Run provider tests
         run: |
           cd provider && go test -v -json -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 . 2>&1 | tee /tmp/gotest.log | gotestfmt
-      - if: failure() && github.event_name == 'push'
-        name: Notify Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          author_name: Failure in running ${{ matrix.language }} provider tests
-          fields: repo,commit,author,action
-          status: ${{ job.status }}
     strategy:
       fail-fast: false
       matrix:
