@@ -1270,7 +1270,10 @@ export function FreeDiskSpace(runner: string): Step {
 }
 
 export function CreateKindCluster(provider: string, name: string): Step {
-  if (provider === "kubernetes" && name === "run-acceptance-tests") {
+  if (
+    (provider === "kubernetes" || provider == "kubernetes-cert-manager") &&
+    name === "run-acceptance-tests"
+  ) {
     return {
       name: "Setup KinD cluster",
       uses: action.createKindCluster,
