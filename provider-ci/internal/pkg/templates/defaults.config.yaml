@@ -124,6 +124,8 @@ env:
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
 
+# DEPRECATED
+#
 # actions can contain preBuild and preTest additional steps to be spliced into workflows.
 # The use of these hooks vary - quite a few just build upstream and run provider tests.
 # Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
@@ -134,6 +136,8 @@ actions:
   # preTest:
   #  - Your action here
 
+# DEPRECATED
+#
 # Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
 # `prerelease.yml` and `release.yml`.
 # Only used for aws: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
@@ -145,9 +149,17 @@ extraTests:
 # Run e2e tests in the provider as well as in the examples directory
 integrationTestProvider: false
 
+# DEPRECATED
+#
 # Run e2e tests using the examples and test suite in the pulumi/examples repo.
 # This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
+
+# How many shared to execute integration tests with. If omitted, shard behavior defaults to language-based sharding.
+shards: 0
+
+# The working directory for running integration tests.
+e2eTestDirectory: examples
 
 # runner defines the runs-on property for various stages of the build
 # These are not overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22runner%3A%22&type=code

@@ -39,29 +39,50 @@ jobs:
         #{{- end }}#
         persist-credentials: false
     - name: Checkout p/examples
+      #{{- if not .Config.Shards }}#
       if: matrix.testTarget == 'pulumiExamples'
+      #{{- end }}#
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         repository: pulumi/examples
         path: p-examples
     - name: Setup tools
       uses: ./.github/actions/setup-tools
+      #{{- if not .Config.Shards }}#
       with:
         tools: pulumictl, pulumicli, ${{ matrix.language }}
+      #{{- end }}#
     - name: Prepare local workspace
       run: make prepare_local_workspace
     - name: Download bin
       uses: ./.github/actions/download-bin
+    #{{- if not .Config.Shards }}#
     - name: Download SDK
       uses: ./.github/actions/download-sdk
       with:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
       run: make --touch provider schema build_${{ matrix.language }}
+    - name: Install dependencies
+      run: make install_${{ matrix.language}}_sdk
+    #{{- else }}#
+      #{{- range $_, $language := .Config.Languages }}#
+    - name: Download #{{ $language }}# SDK
+      uses: ./.github/actions/download-sdk
+      with:
+        language: #{{ $language }}#
+    - name: Restore makefile progress
+      run: make --touch provider schema build_#{{ $language }}#
+    - name: Install dependencies
+      run: make install_#{{ $language }}#_sdk
+      #{{- end }}#
+    #{{- end }}#
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
+      #{{- if not .Config.Shards }}#
       if: matrix.language == 'python'
+      #{{- end }}#
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
@@ -102,8 +123,6 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
     - name: Install gotestfmt
       uses: GoTestTools/gotestfmt-action@v2
       with:
@@ -112,6 +131,7 @@ jobs:
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
+    #{{- if not .Config.Shards }}#
     #{{- if .Config.IntegrationTestProvider }}#
     - name: Run provider tests
       if: matrix.testTarget == 'local'
@@ -134,6 +154,24 @@ jobs:
         #{{- else }}#
         testTarget: [local]
         #{{- end }}#
+    #{{- else }}#
+    - name: Generate shard
+      run: make shard
+      env:
+        SHARD_TOTAL: ${{ matrix.total }}
+        SHARD_INDEX: ${{ matrix.index }}
+    - name: Run integration tests
+      run: make test_shard
+    strategy:
+       fail-fast: false
+       matrix:
+         total:
+         - #{{ .Config.Shards }}#
+         index:
+         #{{- range $i, $_ := until .Config.Shards }}#
+         - #{{ $i }}#
+         #{{- end }}#
+    #{{- end }}#
 #{{- if .Config.ExtraTests }}#
 #{{ .Config.ExtraTests | toYaml | indent 2 }}#
 #{{ end }}#

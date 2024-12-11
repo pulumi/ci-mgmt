@@ -76,6 +76,8 @@ jobs:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
       run: make --touch provider schema build_${{ matrix.language }}
+    - name: Install dependencies
+      run: make install_${{ matrix.language}}_sdk
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
@@ -106,8 +108,6 @@ jobs:
         install_components: gke-gcloud-auth-plugin
     - name: Login to Google Cloud Registry
       run: gcloud --quiet auth configure-docker
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
     - name: Install gotestfmt
       uses: GoTestTools/gotestfmt-action@v2
       with:

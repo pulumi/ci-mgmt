@@ -258,7 +258,7 @@ bin/$(PROVIDER): .make/schema
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
+	cd #{{ .Config.E2ETestDirectory }}# && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 .PHONY: test
 
 test_provider:
@@ -379,6 +379,15 @@ provider_dist-darwin-arm64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-darwin-arm64.tar
 provider_dist-windows-amd64: bin/$(PROVIDER)-v$(VERSION_GENERIC)-windows-amd64.tar.gz
 provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64
 .PHONY: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64 provider_dist
+#{{ if .Config.Shards -}}#
+# shard computes tests to run and modifies the CI runner's environment.
+shard:
+	@(cd #{{ .Config.E2ETestDirectory }}# && go run github.com/blampe/shard@latest --total $(SHARD_TOTAL) --index $(SHARD_INDEX) --output env) >> "$(GITHUB_ENV)"
 
+# test_shard runs the tests specified by a regex contained in $SHARD_TESTS for paths $SHARD_PATHS.
+test_shard:
+	cd #{{ .Config.E2ETestDirectory }}# && \
+		go test -tags=all -v -count=1 -coverprofile="coverage.txt" -coverpkg=./... -timeout 3h -parallel ${TESTPARALLELISM} -run "$(SHARD_TESTS)" $(SHARD_PATHS)
+#{{- end }}#
 # Permit providers to extend the Makefile with provider-specific Make includes.
 include $(wildcard .mk/*.mk)
