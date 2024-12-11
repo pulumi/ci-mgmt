@@ -124,6 +124,10 @@ jobs:
     - name: Run pulumi/examples tests
       if: matrix.testTarget == 'pulumiExamples'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
+    - name: Upload coverage reports to Codecov
+      uses: #{{ .Config.ActionVersions.Codecov }}#
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     strategy:
       fail-fast: false
       matrix:

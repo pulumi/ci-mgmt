@@ -239,7 +239,7 @@ test:
 .PHONY: test
 
 test_provider:
-	cd provider && go test -v -short ./... -parallel $(TESTPARALLELISM)
+	cd provider && go test -v -short -coverprofile="coverage.txt" -coverpkg=./... ./... -parallel $(TESTPARALLELISM)
 .PHONY: test_provider
 
 tfgen: schema

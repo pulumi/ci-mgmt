@@ -72,6 +72,10 @@ jobs:
       run: make provider
     - name: Unit-test provider code
       run: make test_provider
+    - name: Upload coverage reports to Codecov
+      uses: #{{ .Config.ActionVersions.Codecov }}#
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - if: inputs.is_pr
       name: Check Schema is Valid
       run: |

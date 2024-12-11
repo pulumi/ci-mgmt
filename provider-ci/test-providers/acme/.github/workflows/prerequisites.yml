@@ -68,6 +68,10 @@ jobs:
       run: make provider
     - name: Unit-test provider code
       run: make test_provider
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v5.0.7
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
