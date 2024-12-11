@@ -129,10 +129,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
 	ExtraTests map[string]any `yaml:"extraTests"` // Only used by AWS...
 
-	// IntegrationTestProvider will run e2e tests in the provider as well as in
-	// the examples directory when set to true. Defaults to false.
-	IntegrationTestProvider bool `yaml:"integrationTestProvider"`
-
 	// TestPulumiExamples runs e2e tests using the examples and test suite in
 	// the pulumi/examples repo when set to true. Defaults to false. This is
 	// unused but potentially useful for azure-native onboarding:
