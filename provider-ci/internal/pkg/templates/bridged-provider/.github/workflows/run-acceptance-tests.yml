@@ -88,9 +88,6 @@ jobs:
     #{{- if .Config.Lint }}#
     - lint
     #{{- end }}#
-    #{{- range $action, $_ := .Config.ExtraTests }}#
-    - #{{ $action }}#
-    #{{- end }}#
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
     - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
@@ -106,137 +103,19 @@ jobs:
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   test:
+    # Don't run tests on PRs from forks.
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
-    name: test
+    uses: ./.github/workflows/test.yml
     needs:
       - prerequisites
       - build_provider
       - build_sdk
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSdk }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
-    env:
-      PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
-    steps:
-#{{- if .Config.FreeDiskSpaceBeforeTest }}#
-    # Run as first step so we don't delete things that have just been installed
-    - name: Free Disk Space (Ubuntu)
-      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
-      with:
-        tool-cache: false
-        swap-storage: false
-        dotnet: false
-#{{- end }}#
-    - name: Checkout Repo
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        ref: ${{ env.PR_COMMIT_SHA }}
-        #{{- if .Config.CheckoutSubmodules }}#
-        submodules: #{{ .Config.CheckoutSubmodules }}#
-        #{{- end }}#
-        persist-credentials: false
-    - name: Checkout p/examples
-      if: matrix.testTarget == 'pulumiExamples'
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        repository: pulumi/examples
-        path: p-examples
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: pulumictl, pulumicli, ${{ matrix.language }}
-    - name: Prepare local workspace
-      run: make prepare_local_workspace
-    - name: Download bin
-      uses: ./.github/actions/download-bin
-    - name: Download SDK
-      uses: ./.github/actions/download-sdk
-      with:
-        language: ${{ matrix.language }}
-    - name: Restore makefile progress
-      run: make --touch provider schema build_${{ matrix.language }}
-    - name: Update path
-      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Install Python deps
-      if: matrix.language == 'python'
-      run: |-
-        pip3 install virtualenv==20.0.23
-        pip3 install pipenv
-    #{{- if .Config.Docker }}#
-    - name: Run docker compose
-      run: docker compose -f testing/docker-compose.yml up --build -d
-    #{{- end }}#
-    #{{- if .Config.AWS }}#
-    - name: Configure AWS Credentials
-      uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-region: ${{ env.AWS_REGION }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 7200
-        role-session-name: #{{ .Config.Provider }}#@githubActions
-        role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    #{{- end }}#
-    #{{- if .Config.GCP }}#
-    - name: Authenticate to Google Cloud
-      uses: #{{ .Config.ActionVersions.GoogleAuth }}#
-      with:
-        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
-        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
-          }}/locations/global/workloadIdentityPools/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
-    - name: Setup gcloud auth
-      uses: #{{ .Config.ActionVersions.SetupGcloud }}#
-      with:
-        install_components: gke-gcloud-auth-plugin
-    #{{- end }}#
-    #{{- if .Config.GCPRegistry }}#
-    - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker
-    #{{- end }}#
-    #{{- if index .Config.SetupScript }}#
-    - name: Run setup script
-      run: #{{ index .Config.SetupScript }}#
-    #{{- end }}#
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-#{{- if .Config.Actions.PreTest }}#
-#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
-#{{- end }}#
-    #{{- if .Config.IntegrationTestProvider }}#
-    - name: Run provider tests
-      if: matrix.testTarget == 'local'
-      working-directory: provider
-      run: go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
-    #{{- end }}#
-    - name: Run tests
-      if: matrix.testTarget == 'local'
-      run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
-    - name: Run pulumi/examples tests
-      if: matrix.testTarget == 'pulumiExamples'
-      run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-#{{ .Config.Languages | toYaml | indent 8 }}#
-        #{{- if .Config.TestPulumiExamples }}#
-        testTarget: [local, pulumiExamples]
-        #{{- else }}#
-        testTarget: [local]
-        #{{- end }}#
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
-#{{- if .Config.ExtraTests }}#
-#{{ .Config.ExtraTests | toYaml | indent 2 }}#
-#{{ end }}#
