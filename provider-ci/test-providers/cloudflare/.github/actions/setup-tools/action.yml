@@ -26,7 +26,9 @@ runs:
         cache-dependency-path: |
           provider/*.sum
           upstream/*.sum
+          sdk/go/*.sum
           sdk/*.sum
+          *.sum
 
     - name: Install pulumictl
       if: inputs.tools == 'all' || contains(inputs.tools, 'pulumictl')
