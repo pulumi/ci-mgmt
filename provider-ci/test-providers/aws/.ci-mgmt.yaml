@@ -116,7 +116,6 @@ extraTests:
 
   test_oidc:
     name: test_oidc
-    needs: build_sdk
     permissions:
       contents: read
       id-token: write
@@ -197,7 +196,6 @@ extraTests:
 
   provider_test:
     name: provider_test
-    needs: build_sdk
     permissions:
       contents: read
       id-token: write
