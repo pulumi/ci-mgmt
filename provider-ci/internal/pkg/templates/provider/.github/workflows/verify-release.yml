@@ -16,6 +16,10 @@ on:
         required: false
         type: boolean
         default: false
+      pythonVersion:
+        description: "Optional python SDK version to verify. Defaults to inputs.providerVersion."
+        type: string
+        required: false
   workflow_call:
     inputs:
       providerVersion:
@@ -32,6 +36,10 @@ on:
         required: false
         type: boolean
         default: false
+      pythonVersion:
+        description: "Optional python SDK version to verify. Defaults to inputs.providerVersion."
+        type: string
+        required: false
 
 env:
 #{{ .Config.Env | toYaml | indent 2 }}#
@@ -89,6 +97,7 @@ jobs:
           directory: #{{ .Config.ReleaseVerification.Python }}#
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
+          packageVersion: ${{ inputs.pythonVersion || inputs.providerVersion }}
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Dotnet }}#
       - name: Verify dotnet release
