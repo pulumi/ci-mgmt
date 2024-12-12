@@ -31,6 +31,7 @@ jobs:
           - os: windows
             arch: amd64
     steps:
+      #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed
       - name: Free Disk Space (Ubuntu)
         uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
@@ -38,10 +39,7 @@ jobs:
           tool-cache: false
           swap-storage: false
           dotnet: false
-      - name: Restore Azure CLI
-        uses: azure/cli@v2.1.0
-        with:
-          inlineScript: az account show
+      #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -69,15 +67,21 @@ jobs:
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
 
+      - name: Login to Azure for signing
+        if: matrix.platform.os == 'windows' && env.AZURE_SIGNING_CONFIGURED == 'true'
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_SIGNING_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
+            }
+          allow-no-subscriptions: true
+
       - name: Sign windows provider
         if: matrix.platform.os == 'windows' && env.AZURE_SIGNING_CONFIGURED == 'true'
         run: |
-          az login --service-principal \
-            -u ${{ secrets.AZURE_SIGNING_CLIENT_ID }} \
-            -p ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }} \
-            -t ${{ secrets.AZURE_SIGNING_TENANT_ID }} \
-            -o none;
-
           wget https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar;
 
           java -jar jsign-6.0.jar \
