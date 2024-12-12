@@ -75,9 +75,9 @@ jobs:
             {
               "clientId": "${{ secrets.AZURE_SIGNING_CLIENT_ID }}",
               "clientSecret": "${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}",
+              "subscriptionId": "${{ secrets.ARM_SUBSCRIPTION_ID }}",
               "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
             }
-          allow-no-subscriptions: true
 
       - name: Sign windows provider
         if: matrix.platform.os == 'windows' && env.AZURE_SIGNING_CONFIGURED == 'true'
