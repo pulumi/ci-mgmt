@@ -40,6 +40,8 @@ jobs:
           dotnet: false
       - name: Restore Azure CLI
         uses: azure/cli@v2.1.0
+        with:
+          inlineScript: az account show
       - name: Checkout Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
