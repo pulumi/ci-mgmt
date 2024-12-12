@@ -31,7 +31,6 @@ jobs:
           - os: windows
             arch: amd64
     steps:
-      #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed
       - name: Free Disk Space (Ubuntu)
         uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
@@ -39,7 +38,8 @@ jobs:
           tool-cache: false
           swap-storage: false
           dotnet: false
-      #{{- end }}#
+      - name: Restore Azure CLI
+        uses: azure/cli@v2.1.0
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
