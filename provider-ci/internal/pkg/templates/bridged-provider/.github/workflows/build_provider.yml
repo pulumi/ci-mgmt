@@ -39,6 +39,7 @@ jobs:
           tool-cache: false
           swap-storage: false
           dotnet: false
+          large-packages: false
       #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
