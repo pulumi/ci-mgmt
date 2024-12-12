@@ -96,7 +96,8 @@ jobs:
           runtime: python
           directory: #{{ .Config.ReleaseVerification.Python }}#
           provider: #{{ .Config.Provider }}#
-          providerVersion: ${{ inputs.pythonVersion || inputs.providerVersion }}
+          providerVersion: ${{ inputs.providerVersion }}
+          packageVersion: ${{ inputs.pythonVersion || inputs.providerVersion }}
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Dotnet }}#
       - name: Verify dotnet release
