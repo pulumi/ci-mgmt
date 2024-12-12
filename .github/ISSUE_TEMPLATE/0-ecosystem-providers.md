@@ -7,6 +7,7 @@ assignees: ''
 ---
 
 <!-- Start with a one- to three-sentence summary of what needs to be done for every proivder . -->
+# Providers
 
 ## Native Providers
 
@@ -20,6 +21,7 @@ assignees: ''
 - [ ] [google-native](https://github.com/pulumi/pulumi-google-native) (deprecated)
 - [ ] [kubernetes](https://github.com/pulumi/pulumi-kubernetes)
 - [ ] [kubernetes-cert-manager](https://github.com/pulumi/pulumi-kubernetes-cert-manager)
+- [ ] [kubernetes-ingress-nginx](https://github.com/pulumi/pulumi-kubernetes-ingress-nginx)
 
 ## Bridged Providers
 
@@ -31,6 +33,7 @@ assignees: ''
 - [ ] [azuread](https://github.com/pulumi/pulumi-azuread)
 
 ### Tier 2
+
 - [ ] [auth0](https://github.com/pulumi/pulumi-auth0)
 - [ ] [cloudflare](https://github.com/pulumi/pulumi-cloudflare)
 - [ ] [datadog](https://github.com/pulumi/pulumi-datadog)
