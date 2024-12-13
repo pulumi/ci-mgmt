@@ -327,7 +327,7 @@ bin/linux-arm64/$(PROVIDER): TARGET := linux-arm64
 bin/darwin-amd64/$(PROVIDER): TARGET := darwin-amd64
 bin/darwin-arm64/$(PROVIDER): TARGET := darwin-arm64
 bin/windows-amd64/$(PROVIDER).exe: TARGET := windows-amd64
-bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
+bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe: bin/jsign-6.0.jar
 	@# check the TARGET is set
 	test $(TARGET)
 	cd provider && \
@@ -353,7 +353,6 @@ bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
 				--tenant "${AZURE_SIGNING_TENANT_ID}" \
 				--output none; \
 			ACCESS_TOKEN=$$(az account get-access-token --resource "https://vault.azure.net" | jq -r .accessToken); \
-			wget https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar --output-document=bin/jsign-6.0.jar; \
 			java -jar bin/jsign-6.0.jar \
 				--storetype AZUREKEYVAULT \
 				--keystore "PulumiCodeSigning" \
@@ -364,6 +363,9 @@ bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe:
 			az logout; \
 		fi; \
 	fi
+
+bin/jsign-6.0.jar:
+	wget https://github.com/ebourg/jsign/releases/download/6.0/jsign-6.0.jar --output-document=bin/jsign-6.0.jar
 
 provider-linux-amd64: bin/linux-amd64/$(PROVIDER)
 provider-linux-arm64: bin/linux-arm64/$(PROVIDER)
