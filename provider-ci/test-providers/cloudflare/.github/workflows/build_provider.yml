@@ -58,6 +58,7 @@ jobs:
           AZURE_SIGNING_CLIENT_SECRET: ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}
           AZURE_SIGNING_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
           AZURE_SIGNING_KEY_VAULT_URI: ${{ secrets.AZURE_SIGNING_KEY_VAULT_URI }}
+          SKIP_SIGNING: ${{ secrets.AZURE_SIGNING_CLIENT_ID == '' && secrets.AZURE_SIGNING_CLIENT_SECRET == '' && secrets.AZURE_SIGNING_TENANT_ID == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}
 
       - name: Package provider
         run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}
