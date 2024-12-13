@@ -124,11 +124,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
 	Actions actions `yaml:"actions"`
 
-	// ExtraTests run as part of `run-acceptance-tests.yml`, `master.yml`,
-	// `main.yml`, `prerelease.yml` and `release.yml`. Only used for aws:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
-	ExtraTests map[string]any `yaml:"extraTests"` // Only used by AWS...
-
 	// IntegrationTestProvider will run e2e tests in the provider as well as in
 	// the examples directory when set to true. Defaults to false.
 	IntegrationTestProvider bool `yaml:"integrationTestProvider"`

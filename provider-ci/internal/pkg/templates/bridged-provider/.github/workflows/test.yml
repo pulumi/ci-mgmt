@@ -134,6 +134,3 @@ jobs:
         #{{- else }}#
         testTarget: [local]
         #{{- end }}#
-#{{- if .Config.ExtraTests }}#
-#{{ .Config.ExtraTests | toYaml | indent 2 }}#
-#{{ end }}#
