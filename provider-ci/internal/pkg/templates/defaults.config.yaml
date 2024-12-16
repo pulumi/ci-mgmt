@@ -134,14 +134,6 @@ actions:
   # preTest:
   #  - Your action here
 
-# Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
-# `prerelease.yml` and `release.yml`.
-# Only used for aws: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
-extraTests:
-#   your_test_name:
-#     name: My Test
-#     ...
-
 # Run e2e tests in the provider as well as in the examples directory
 integrationTestProvider: false
 
