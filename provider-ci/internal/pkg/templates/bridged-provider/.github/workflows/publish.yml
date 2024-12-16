@@ -121,13 +121,13 @@ jobs:
         tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false
-      uses: #{{ .Config.Publish.PublisherAction }}#
+      uses: pulumi/pulumi-package-publisher@696a0fe98f86d86ada2a842d1859f3e8c40d6cd7 # v0.0.21
       with:
         sdk: #{{ .Config.Publish.SDK }}#
         version: ${{ inputs.version }}
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
-      uses: #{{ .Config.Publish.PublisherAction }}#
+      uses: pulumi/pulumi-package-publisher@696a0fe98f86d86ada2a842d1859f3e8c40d6cd7 # v0.0.21
       with:
         sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}

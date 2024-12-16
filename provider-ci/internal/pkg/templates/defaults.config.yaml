@@ -160,9 +160,6 @@ runner:
 # publish contains multiple properties relating to the publish jobs.
 # Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code
 publish:
-  # publisherAction is the version of the pulumi-package-publisher action to use.
-  # This should be pinned to just the major version once v1 is released.
-  publisherAction: "pulumi/pulumi-package-publisher@696a0fe98f86d86ada2a842d1859f3e8c40d6cd7 # v0.0.21"
   # passed to the sdk input of pulumi-package-publisher
   # This is overridden in pulumi-local to disable python
   sdk: all
