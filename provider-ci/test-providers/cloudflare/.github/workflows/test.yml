@@ -63,6 +63,8 @@ jobs:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
       run: make --touch provider schema build_${{ matrix.language }}
+    - name: Install dependencies
+      run: make install_${{ matrix.language}}_sdk
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
@@ -72,8 +74,6 @@ jobs:
         pip3 install pipenv
     - name: Run setup script
       run: example/script.sh
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
     - name: Install gotestfmt
       uses: GoTestTools/gotestfmt-action@v2
       with:

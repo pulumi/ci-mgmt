@@ -254,6 +254,14 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22parallel%3A%22&type=code
 	Parallel int `yaml:"parallel"`
 
+	// Shards controls how many jobs integration tests are distributed across.
+	Shards int `yaml:"shards"`
+
+	// E2ETestDirectory controls the working directory when executing long-running/sharded integration tests.
+	//
+	// Defaults to "examples".
+	E2ETestDirectory string `yaml:"e2eTestDirectory"`
+
 	// Hybrid has no effect but is set by the docker provider.
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22hybrid%3A%22&type=code
 	Hybrid bool `yaml:"hybrid"`
