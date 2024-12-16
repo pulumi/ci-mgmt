@@ -1271,7 +1271,9 @@ export function FreeDiskSpace(runner: string): Step {
 
 export function CreateKindCluster(provider: string, name: string): Step {
   if (
-    (provider === "kubernetes" || provider == "kubernetes-cert-manager") &&
+    (provider === "kubernetes" ||
+      provider == "kubernetes-cert-manager" ||
+      provider == "kubernetes-ingress-nginx") &&
     name === "run-acceptance-tests"
   ) {
     return {
