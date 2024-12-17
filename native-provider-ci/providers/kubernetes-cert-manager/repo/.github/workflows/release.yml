@@ -330,6 +330,11 @@ jobs:
       with:
         version: v2.5.0
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup KinD cluster
+      uses: helm/kind-action@0025e74a8c7512023d06dc019c617aa3cf561fde # v1.10.0
+      with:
+        cluster_name: kind-integration-tests-${{ matrix.language }}
+        node_image: kindest/node:v1.29.2
     - name: Run tests
       run: >-
         set -euo pipefail

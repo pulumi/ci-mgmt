@@ -1270,20 +1270,24 @@ export function FreeDiskSpace(runner: string): Step {
 }
 
 export function CreateKindCluster(provider: string, name: string): Step {
-  if (
-    (provider === "kubernetes" ||
-      provider == "kubernetes-cert-manager" ||
-      provider == "kubernetes-ingress-nginx") &&
-    name === "run-acceptance-tests"
-  ) {
-    return {
-      name: "Setup KinD cluster",
-      uses: action.createKindCluster,
-      with: {
-        cluster_name: "kind-integration-tests-${{ matrix.language }}",
-        node_image: "kindest/node:v1.29.2",
-      },
-    };
+  // Always create a KinD cluster for any jobs in "kubernetes-*" providers.
+  // For the "kubernetes" provider, create a KinD cluster only for the "run-acceptance-tests" job,
+  // as other jobs will use GKE clusters for testing.
+  const step = {
+    name: "Setup KinD cluster",
+    uses: action.createKindCluster,
+    with: {
+      cluster_name: "kind-integration-tests-${{ matrix.language }}",
+      node_image: "kindest/node:v1.29.2",
+    },
+  };
+
+  switch (provider) {
+    case "kubernetes":
+      return name === "run-acceptance-tests" ? step : {};
+    case "kubernetes-cert-manager":
+    case "kubernetes-ingress-nginx":
+      return step;
   }
 
   return {};
