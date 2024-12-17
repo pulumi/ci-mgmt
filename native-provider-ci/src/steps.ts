@@ -1270,9 +1270,9 @@ export function FreeDiskSpace(runner: string): Step {
 }
 
 export function CreateKindCluster(provider: string, name: string): Step {
-  // We always want to create a KinD cluster for any jobs in the "kubernetes-*" providers.
-  // For "kubernetes" provider, we only create a KinD cluster for the "run-acceptance-tests" job,
-  // as the other jobs will spin up GKE clusteres for testing.
+  // Always create a KinD cluster for any jobs in "kubernetes-*" providers.
+  // For the "kubernetes" provider, create a KinD cluster only for the "run-acceptance-tests" job,
+  // as other jobs will use GKE clusters for testing.
   const step = {
     name: "Setup KinD cluster",
     uses: action.createKindCluster,
