@@ -7,7 +7,7 @@ ACTIONLINT_VERSION := 1.6.24
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
 .PHONY: all test gen ensure
-all: ensure test format lint
+all: ensure test format lint unit
 test: test-providers
 gen: test-providers
 ensure:: bin/provider-ci $(ACTIONLINT)
@@ -20,7 +20,7 @@ $(ACTIONLINT):
 	mv bin/actionlint $(ACTIONLINT)
 
 # Basic helper targets.
-.PHONY: clean lint format
+.PHONY: clean lint format unit
 clean:
 	rm -rf bin
 
@@ -29,6 +29,9 @@ lint:
 
 format:
 	go fmt ./...
+
+unit:
+	go test -v ./...
 
 # We check in a subset of provider workflows so template changes are visible in PR diffs.
 #

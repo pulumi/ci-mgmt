@@ -76,10 +76,9 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         if: inputs.bridged
-        run: |
-          cd ci-mgmt/provider-ci && go run ./... generate \
-                --config ../../pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml \
-                --out ../../pulumi-${{ inputs.provider_name }}
+        run: go run github.com/pulumi/ci-mgmt/provider-ci@${{ github.sha }} generate
+        shell: bash
+        working-directory: pulumi-${{ inputs.provider_name }}
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
         if: ${{ inputs.bridged != true }}
         run: |

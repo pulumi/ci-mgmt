@@ -14,6 +14,7 @@ type Migration interface {
 
 func Migrate(templateName, outDir string) error {
 	migrations := []Migration{
+		consolidateModules{},
 		fixupBridgeImports{},
 		removeExplicitSDKDependency{},
 		ignoreMakeDir{},
