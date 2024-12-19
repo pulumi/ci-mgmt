@@ -44,7 +44,11 @@ func TestConsolidateModules(t *testing.T) {
 			// Make sure we got the expected output.
 			want := filepath.Join("testdata/modules", tt.Name(), "WANT")
 			assertDirectoryContains(t, want, tmp)
-			assertDirectoryContains(t, tmp, want)
+			if !t.Failed() {
+				// Check containment in the other direction to establish
+				// equality.
+				assertDirectoryContains(t, tmp, want)
+			}
 		})
 	}
 }
