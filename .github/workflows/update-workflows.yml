@@ -27,6 +27,10 @@ on:
         description: "Whether to skip closing PRs"
         type: boolean
         default: false
+      ci-mgmt-ref:
+        description: The revision of ci-mgmt to use for workflows.
+        type: string
+        default: "master"
     outputs:
       pull_request_created:
         value: ${{ jobs.update_workflows.outputs.pull_request_created }}
@@ -58,6 +62,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           path: ci-mgmt
+          ref: ${{ inputs.ci-mgmt-ref }}
       - name: Clone pulumi-${{ inputs.provider_name }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
@@ -76,7 +81,7 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         if: inputs.bridged
-        run: go run github.com/pulumi/ci-mgmt/provider-ci@${{ github.sha }} generate
+        run: go run github.com/pulumi/ci-mgmt/provider-ci@${{ inputs.ci-mgmt-ref }} generate
         shell: bash
         working-directory: pulumi-${{ inputs.provider_name }}
       - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}

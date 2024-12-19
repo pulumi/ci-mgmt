@@ -1,8 +1,6 @@
 name: Test Provider CI
 on:
-  pull_request:
-    branches:
-      - master
+  pull_request: {}
   merge_group: {}
   workflow_dispatch: {}
 
@@ -43,6 +41,7 @@ jobs:
       downstream_test: true
       skip_closing_prs: true
       caller_workflow: "pull-request"
+      ci-mgmt-ref: ${{ github.event.pull_request.head.sha || 'master' }}
 
   downstream:
     name: Test xyz
