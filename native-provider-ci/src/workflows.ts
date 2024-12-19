@@ -144,6 +144,7 @@ export function RunAcceptanceTestsWorkflow(
         .addRunsOn(opts.provider),
       test: new TestsJob(name, "test", opts).addDispatchConditional(true),
       sentinel: new EmptyJob("sentinel")
+        .addPermissions({ statuses: "write" })
         .addConditional(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
@@ -164,7 +165,7 @@ function calculateSentinelNeeds(
   requiresLint: boolean,
   provider: string
 ): string[] {
-  const needs: string[] = ["test"];
+  const needs: string[] = ["test", "prerequisites"];
 
   if (requiresLint) {
     needs.push("lint");
@@ -1009,6 +1010,7 @@ export class EmptyJob implements NormalJob {
   name: string;
   if?: string;
   needs?: string[];
+  permissions?: any;
 
   constructor(name: string, params?: Partial<NormalJob>) {
     this.name = name;
@@ -1033,6 +1035,11 @@ export class EmptyJob implements NormalJob {
 
   addNeeds(name: string[]) {
     this.needs = name;
+    return this;
+  }
+
+  addPermissions(permissions: any) {
+    this.permissions = permissions;
     return this;
   }
 }
