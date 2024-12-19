@@ -63,7 +63,7 @@ func assertDirectoryContains(t *testing.T, dir1, dir2 string) {
 		}
 
 		stat, err := os.Stat(filepath.Join(dir1, entry.Name()))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, entry.IsDir(), stat.IsDir())
 
 		subPath1 := filepath.Join(dir1, entry.Name())

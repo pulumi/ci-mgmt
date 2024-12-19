@@ -51,6 +51,9 @@ func (consolidateModules) Migrate(_, outDir string) error {
 	if _, err := run("git", "mv", "-f", "provider/go.sum", "go.sum"); err != nil {
 		return fmt.Errorf("moving provider/go.sum: %w", err)
 	}
+	// Update our workspace, if it exists. It's OK if these fail.
+	_, _ = run("go", "work", "edit", "-dropuse=./provider")
+	_, _ = run("go", "work", "edit", "-use=./")
 
 	// Load the module as JSON.
 	out, err := run("go", "mod", "edit", "-json", "go.mod")
@@ -91,6 +94,8 @@ func (consolidateModules) Migrate(_, outDir string) error {
 	_, _ = run("git", "rm", "examples/go.sum")
 	_, _ = run("git", "rm", "tests/go.mod")
 	_, _ = run("git", "rm", "tests/go.sum")
+	_, _ = run("go", "work", "edit", "-dropuse=./examples")
+	_, _ = run("go", "work", "edit", "-dropuse=./tests")
 
 	// Rewrite our module path and determine our new import, if it's changed.
 	//
