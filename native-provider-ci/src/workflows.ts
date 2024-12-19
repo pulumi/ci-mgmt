@@ -519,6 +519,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
+      steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native"),
       steps.TestProviderLibrary(),
       steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
