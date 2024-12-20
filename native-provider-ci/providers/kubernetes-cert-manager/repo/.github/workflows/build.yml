@@ -428,6 +428,7 @@ jobs:
       with:
         cluster_name: kind-integration-tests-${{ matrix.language }}
         node_image: kindest/node:v1.29.2
+        config: ""
     - name: Run tests
       run: >-
         set -euo pipefail

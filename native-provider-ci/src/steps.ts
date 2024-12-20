@@ -1325,6 +1325,7 @@ export function CreateKindCluster(provider: string, name: string): Step {
     with: {
       cluster_name: "kind-integration-tests-${{ matrix.language }}",
       node_image: "kindest/node:v1.29.2",
+      config: "",
     },
   };
 
@@ -1332,8 +1333,11 @@ export function CreateKindCluster(provider: string, name: string): Step {
     case "kubernetes":
       return name === "run-acceptance-tests" ? step : {};
     case "kubernetes-cert-manager":
+      return step;
     case "kubernetes-coredns":
+      return step;
     case "kubernetes-ingress-nginx":
+      step.with.config = "kind.config.yml";
       return step;
   }
 
