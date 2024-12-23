@@ -190,7 +190,7 @@ jobs:
     needs: prerequisites
     runs-on: pulumi-ubuntu-8core
     strategy:
-      fail-fast: true
+      fail-fast: ${{ ! contains(github.actor, 'renovate') }}
       matrix:
         language:
         - nodejs
