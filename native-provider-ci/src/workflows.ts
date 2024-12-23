@@ -463,6 +463,7 @@ export class BuildSdkJob implements NormalJob {
       steps.GenerateSDKs(opts.provider),
       steps.BuildSDKs(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
       steps.ZipSDKsStep(),
       steps.UploadSDKs(tag),
