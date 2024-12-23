@@ -9,6 +9,7 @@ export function CheckoutRepoStep(): Step {
     uses: action.checkout,
     with: {
       lfs: true,
+      "persist-credentials": false,
     },
   };
 }
