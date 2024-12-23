@@ -1,6 +1,7 @@
 provider: kubernetes-cert-manager
 pulumiVersionFile: .pulumi.version
 major-version: 0
+sdkModuleDir: .
 env:
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi
