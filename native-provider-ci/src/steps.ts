@@ -495,7 +495,9 @@ export function ZipSDKsStep(): Step {
 export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
+    id: "worktreeClean",
     uses: action.gitStatusCheck,
+    // Keep these in sync with the Renovate step below to avoid them getting checked in.
     with: {
       "allowed-changes": `\
 sdk/**/pulumi-plugin.json
@@ -504,6 +506,45 @@ sdk/go/**/pulumiUtilities.go
 sdk/nodejs/package.json
 sdk/python/pyproject.toml`,
     },
+  };
+}
+
+export function CommitSDKChangesForRenovate(): Step {
+  // If the worktree is dirty and this is a Renovate PR to bump dependencies,
+  // commit the updated SDK and push it back to the PR. The job will still be
+  // marked as a failure.
+
+  return {
+    name: "Commit ${{ matrix.language }} SDK changes for Renovate",
+    if: "failure() && steps.worktreeClean.outcome == 'failure' && contains(github.actor, 'renovate')",
+    shell: "bash",
+    run: `git config --global user.email "bot@pulumi.com"
+git config --global user.name "pulumi-bot"
+\
+# Stash local changes and check out the PR's branch directly.
+git stash
+git fetch
+git checkout "origin/$HEAD_REF"
+
+# Apply and add our changes, but don't commit any files we expect to
+# always change due to versioning.
+git stash pop
+git add sdk
+git reset \
+    sdk/python/*/pulumi-plugin.json \
+    sdk/dotnet/Pulumi.*.csproj \
+    sdk/go/*/internal/pulumiUtilities.go \
+    sdk/nodejs/package.json \
+    sdk/python/pyproject.toml
+git commit -m 'Commit \${{ matrix.language }} SDK for Renovate'
+
+# Push with pulumi-bot credentials to trigger a re-run of the
+# workflow. https://github.com/orgs/community/discussions/25702
+git push https://pulumi-bot:\${{ secrets.PULUMI_BOT_TOKEN }}@github.com/\${{ github.repository }} \
+    "HEAD:$HEAD_REF"
+`,
+    // head_ref is untrusted so it's recommended to pass via env var to avoid injections.
+    env: { HEAD_REF: "${{ github.head_ref }}" },
   };
 }
 
