@@ -516,9 +516,11 @@ export function CommitSDKChangesForRenovate(): Step {
 
   return {
     name: "Commit ${{ matrix.language }} SDK changes for Renovate",
-    if: "failure() && steps.worktreeClean.outcome == 'failure' && contains(github.actor, 'renovate')",
+    if: "failure() && steps.worktreeClean.outcome == 'failure' && contains(github.actor, 'renovate') && github.event_name == 'pull_request'",
     shell: "bash",
-    run: `git config --global user.email "bot@pulumi.com"
+    run: `git diff --quiet -- sdk && echo "no changes to sdk" && exit
+\
+git config --global user.email "bot@pulumi.com"
 git config --global user.name "pulumi-bot"
 \
 # Stash local changes and check out the PR's branch directly.

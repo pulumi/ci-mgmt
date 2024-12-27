@@ -518,6 +518,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.LabelIfNoBreakingChanges(opts.provider),
       steps.BuildProvider(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
