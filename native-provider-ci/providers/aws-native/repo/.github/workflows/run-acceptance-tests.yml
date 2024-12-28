@@ -63,6 +63,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         lfs: true
+        persist-credentials: false
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version
@@ -160,7 +161,7 @@ jobs:
 
         git add sdk
 
-        git reset     sdk/python/*/pulumi-plugin.json     sdk/dotnet/Pulumi.*.csproj     sdk/go/*/internal/pulumiUtilities.go     sdk/nodejs/package.json     sdk/python/pyproject.toml
+        git reset     sdk/python/*/pulumi-plugin.json     sdk/python/pyproject.toml     sdk/dotnet/pulumi-plugin.json     sdk/dotnet/Pulumi.*.csproj     sdk/go/*/pulumi-plugin.json     sdk/go/*/internal/pulumiUtilities.go     sdk/nodejs/package.json
 
         git commit -m 'Commit ${{ matrix.language }} SDK for Renovate'
 
@@ -224,6 +225,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         lfs: true
+        persist-credentials: false
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version
@@ -322,7 +324,7 @@ jobs:
 
         git add sdk
 
-        git reset     sdk/python/*/pulumi-plugin.json     sdk/dotnet/Pulumi.*.csproj     sdk/go/*/internal/pulumiUtilities.go     sdk/nodejs/package.json     sdk/python/pyproject.toml
+        git reset     sdk/python/*/pulumi-plugin.json     sdk/python/pyproject.toml     sdk/dotnet/pulumi-plugin.json     sdk/dotnet/Pulumi.*.csproj     sdk/go/*/pulumi-plugin.json     sdk/go/*/internal/pulumiUtilities.go     sdk/nodejs/package.json
 
         git commit -m 'Commit ${{ matrix.language }} SDK for Renovate'
 
@@ -374,6 +376,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         lfs: true
+        persist-credentials: false
         ref: ${{ env.PR_COMMIT_SHA }}
     - id: version
       name: Set Provider Version

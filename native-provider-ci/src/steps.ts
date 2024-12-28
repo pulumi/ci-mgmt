@@ -9,7 +9,6 @@ export function CheckoutRepoStep(): Step {
     uses: action.checkout,
     with: {
       lfs: true,
-      "persist-credentials": false,
     },
   };
 }
@@ -151,6 +150,7 @@ export function CheckoutRepoStepAtPR(): Step {
     uses: action.checkout,
     with: {
       lfs: true,
+      "persist-credentials": false,
       ref: "${{ env.PR_COMMIT_SHA }}",
     },
   };
@@ -535,10 +535,12 @@ git stash pop
 git add sdk
 git reset \
     sdk/python/*/pulumi-plugin.json \
+    sdk/python/pyproject.toml \
+    sdk/dotnet/pulumi-plugin.json \
     sdk/dotnet/Pulumi.*.csproj \
+    sdk/go/*/pulumi-plugin.json \
     sdk/go/*/internal/pulumiUtilities.go \
-    sdk/nodejs/package.json \
-    sdk/python/pyproject.toml
+    sdk/nodejs/package.json
 git commit -m 'Commit \${{ matrix.language }} SDK for Renovate'
 
 # Push with pulumi-bot credentials to trigger a re-run of the
