@@ -427,7 +427,7 @@ export class BuildSdkJob implements NormalJob {
   "runs-on" = "pulumi-ubuntu-8core"; // insufficient resources to run Go builds on ubuntu-latest
 
   strategy = {
-    "fail-fast": true,
+    "fail-fast": "${{ ! contains(github.actor, 'renovate') }}",
     matrix: {
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
@@ -518,6 +518,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.LabelIfNoBreakingChanges(opts.provider),
       steps.BuildProvider(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
