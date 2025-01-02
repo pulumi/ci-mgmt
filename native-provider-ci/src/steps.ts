@@ -1332,6 +1332,7 @@ export function CreateKindCluster(provider: string, name: string): Step {
     case "kubernetes":
       return name === "run-acceptance-tests" ? step : {};
     case "kubernetes-cert-manager":
+    case "kubernetes-coredns":
     case "kubernetes-ingress-nginx":
       return step;
   }
