@@ -8,7 +8,7 @@ on:
     - "!v*.*.*-**"
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-  PROVIDER: kubernetes-coredns
+  PROVIDER: pulumistack
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -31,13 +31,6 @@ env:
     6.0.x
     3.1.301
   JAVAVERSION: "11"
-  AWS_REGION: us-west-2
-  PULUMI_TEST_OWNER: moolumi
-  GOLANGCI_LINT_VERSION: v1.61.0
-  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-k8s-provider.iam.gserviceaccount.com
-  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
-  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
-  GOOGLE_PROJECT_NUMBER: 637339343727
 jobs:
   prerequisites:
     runs-on: ubuntu-latest
@@ -414,11 +407,6 @@ jobs:
       with:
         version: v2.5.0
         token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Setup KinD cluster
-      uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
-      with:
-        cluster_name: kind-integration-tests-${{ matrix.language }}
-        node_image: kindest/node:v1.29.2
     - name: Run tests
       run: >-
         set -euo pipefail
