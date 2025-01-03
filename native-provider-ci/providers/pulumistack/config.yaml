@@ -1,3 +1,4 @@
 provider: pulumistack
-pulumiVersionFile: .pulumi.version
 major-version: 0
+defaultBranch: master
+hasGenBinary: false

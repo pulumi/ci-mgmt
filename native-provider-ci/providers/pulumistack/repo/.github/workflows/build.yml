@@ -64,8 +64,6 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
-      with:
-        pulumi-version-file: .pulumi.version
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
@@ -73,8 +71,6 @@ jobs:
         repo: pulumi/schema-tools
     - name: Build codegen binaries
       run: make codegen
-    - name: Build Schema
-      run: make generate_schema
     - if: github.event_name == 'pull_request'
       name: Check Schema is Valid
       run: >-
@@ -158,7 +154,6 @@ jobs:
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
         github.workspace}}/bin/ pulumi-resource-${{ env.PROVIDER }}
-        pulumi-gen-${{ env.PROVIDER}}
     - name: Upload artifacts
       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
       with:
@@ -211,8 +206,6 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
-      with:
-        pulumi-version-file: .pulumi.version
     - name: Setup Node
       uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
       with:
@@ -248,7 +241,7 @@ jobs:
       run: find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print
         -exec chmod +x {} \;
     - name: Generate SDK
-      run: make generate_${{ matrix.language }}
+      run: make ${{ matrix.language }}_sdk
     - name: Build SDK
       run: make build_${{ matrix.language }}
     - name: Check worktree clean
@@ -356,8 +349,6 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
-      with:
-        pulumi-version-file: .pulumi.version
     - name: Setup Node
       uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
       with:
@@ -462,8 +453,6 @@ jobs:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
       uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
-      with:
-        pulumi-version-file: .pulumi.version
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
       with:
