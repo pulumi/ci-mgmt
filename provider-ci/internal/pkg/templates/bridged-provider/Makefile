@@ -424,7 +424,7 @@ provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist
 #{{ if .Config.Shards -}}#
 # shard computes tests to run and modifies the CI runner's environment.
 shard:
-	@(cd #{{ .Config.E2ETestDirectory }}# && go run github.com/blampe/shard@latest --total $(SHARD_TOTAL) --index $(SHARD_INDEX) --output env) >> "$(GITHUB_ENV)"
+	@(cd #{{ .Config.E2ETestDirectory }}# && go run github.com/pulumi/shard@48b47318fce7d75fd2df16b5c87467368d2bf3d5 --total $(SHARD_TOTAL) --index $(SHARD_INDEX) --output env) >> "$(GITHUB_ENV)"
 
 # test_shard runs the tests specified by a regex contained in $SHARD_TESTS for paths $SHARD_PATHS.
 test_shard:
