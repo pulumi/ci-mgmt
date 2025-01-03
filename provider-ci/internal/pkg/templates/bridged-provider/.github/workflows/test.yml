@@ -76,7 +76,7 @@ jobs:
     - name: Restore makefile progress
       run: make --touch provider schema build_#{{ $language }}#
     - name: Install dependencies
-      run: make install_#{{ $language }}#_sdk
+      run: make install_sdks
       #{{- end }}#
     #{{- end }}#
     - name: Update path
