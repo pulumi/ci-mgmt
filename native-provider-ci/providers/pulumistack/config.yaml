@@ -1,0 +1,4 @@
+provider: pulumistack
+major-version: 0
+defaultBranch: master
+hasGenBinary: false

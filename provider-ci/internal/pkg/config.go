@@ -124,11 +124,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
 	Actions actions `yaml:"actions"`
 
-	// ExtraTests run as part of `run-acceptance-tests.yml`, `master.yml`,
-	// `main.yml`, `prerelease.yml` and `release.yml`. Only used for aws:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
-	ExtraTests map[string]any `yaml:"extraTests"` // Only used by AWS...
-
 	// IntegrationTestProvider will run e2e tests in the provider as well as in
 	// the examples directory when set to true. Defaults to false.
 	IntegrationTestProvider bool `yaml:"integrationTestProvider"`
@@ -325,6 +320,7 @@ type actionVersions struct {
 	UpgradeProviderAction   string `yaml:"upgradeProviderAction"`
 	FreeDiskSpace           string `yaml:"freeDiskSpace"`
 	ProviderVersionAction   string `yaml:"providerVersionAction"`
+	Codecov                 string `yaml:"codeCov"`
 }
 
 type toolVersions struct {
@@ -352,8 +348,6 @@ type publish struct {
 
 func loadDefaultConfig() (Config, error) {
 	var config Config
-
-	var wf workflow
 
 	// Parse our actions file while preserving comments.
 	var doc yaml.Node
@@ -402,38 +396,11 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.FreeDiskSpace = uses
 						case "pulumi/provider-version-action":
 							config.ActionVersions.ProviderVersionAction = uses
+						case "codecov/codecov-action":
+							config.ActionVersions.Codecov = uses
 						}
 					}
 				}
-			}
-		}
-	}
-
-	for _, j := range wf.Jobs {
-		for _, s := range j.Steps {
-			switch s.Name {
-			case "aws-actions/configure-aws-credentials":
-				config.ActionVersions.ConfigureAwsCredentials = s.Uses
-			case "google-github-actions/setup-gcloud":
-				config.ActionVersions.SetupGcloud = s.Uses
-			case "google-github-actions/auth":
-				config.ActionVersions.GoogleAuth = s.Uses
-			case "actions/checkout":
-				config.ActionVersions.Checkout = s.Uses
-			case "actions/download-artifact":
-				config.ActionVersions.DownloadArtifact = s.Uses
-			case "dorny/paths-filter":
-				config.ActionVersions.PathsFilter = s.Uses
-			case "thollander/actions-comment-pull-request":
-				config.ActionVersions.PrComment = s.Uses
-			case "actions/upload-artifact":
-				config.ActionVersions.UploadArtifact = s.Uses
-			case "pulumi/pulumi-upgrade-provider-action":
-				config.ActionVersions.UpgradeProviderAction = s.Uses
-			case "jlumbroso/free-disk-space":
-				config.ActionVersions.FreeDiskSpace = s.Uses
-			case "pulumi/provider-version-action":
-				config.ActionVersions.ProviderVersionAction = s.Uses
 			}
 		}
 	}
@@ -486,17 +453,4 @@ func (x *intOrDuration) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	*x = intOrDuration(i * int64(time.Minute))
 	return nil
-}
-
-type workflow struct {
-	Jobs map[string]job
-}
-
-type job struct {
-	Steps []step
-}
-
-type step struct {
-	Name string
-	Uses string
 }

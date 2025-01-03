@@ -136,16 +136,6 @@ actions:
   # preTest:
   #  - Your action here
 
-# DEPRECATED
-#
-# Additional tests run as part of `run-acceptance-tests.yml`, `master.yml`, `main.yml`,
-# `prerelease.yml` and `release.yml`.
-# Only used for aws: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
-extraTests:
-#   your_test_name:
-#     name: My Test
-#     ...
-
 # Run e2e tests in the provider as well as in the examples directory
 integrationTestProvider: false
 
@@ -172,9 +162,6 @@ runner:
 # publish contains multiple properties relating to the publish jobs.
 # Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code
 publish:
-  # publisherAction is the version of the pulumi-package-publisher action to use.
-  # This should be pinned to just the major version once v1 is released.
-  publisherAction: pulumi/pulumi-package-publisher@v0.0.20
   # passed to the sdk input of pulumi-package-publisher
   # This is overridden in pulumi-local to disable python
   sdk: all
