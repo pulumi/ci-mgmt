@@ -403,8 +403,8 @@ export function BuildCodegenBinaries(provider: string): Step {
   };
 }
 
-export function BuildSDKs(provider: string): Step {
-  if (provider === "command" || provider === "kubernetes") {
+export function BuildSDKs(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false || provider === "kubernetes") {
     return {};
   }
   return {

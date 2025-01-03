@@ -461,7 +461,7 @@ export class BuildSdkJob implements NormalJob {
       steps.CodegenDuringSDKBuild(opts.provider),
       steps.InitializeSubModules(opts.submodules),
       steps.GenerateSDKs(opts.provider, opts.hasGenBinary),
-      steps.BuildSDKs(opts.provider),
+      steps.BuildSDKs(opts.provider, opts.hasGenBinary),
       steps.CheckCleanWorkTree(),
       steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
