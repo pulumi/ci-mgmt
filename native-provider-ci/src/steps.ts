@@ -403,8 +403,8 @@ export function BuildCodegenBinaries(provider: string): Step {
   };
 }
 
-export function BuildSDKs(provider: string): Step {
-  if (provider === "command" || provider === "kubernetes") {
+export function BuildSDKs(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false || provider === "kubernetes") {
     return {};
   }
   return {
@@ -712,8 +712,8 @@ export function InitializeSubModules(submodules?: boolean): Step {
   return {};
 }
 
-export function BuildSchema(provider: string): Step {
-  if (provider === "command") {
+export function BuildSchema(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false) {
     return {};
   }
   if (provider === "kubernetes") {
@@ -759,8 +759,8 @@ export function RestoreBinaryPerms(provider: string, job: string): Step {
   };
 }
 
-export function GenerateSDKs(provider: string): Step {
-  if (provider === "command" || provider === "kubernetes") {
+export function GenerateSDKs(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false || provider === "kubernetes") {
     return {
       name: "Generate SDK",
       run: "make ${{ matrix.language }}_sdk",

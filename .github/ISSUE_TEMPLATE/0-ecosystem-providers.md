@@ -23,6 +23,7 @@ assignees: ''
 - [ ] [kubernetes-cert-manager](https://github.com/pulumi/pulumi-kubernetes-cert-manager)
 - [ ] [kubernetes-ingress-nginx](https://github.com/pulumi/pulumi-kubernetes-ingress-nginx)
 - [ ] [kubernetes-coredns](https://github.com/pulumi/pulumi-kubernetes-coredns)
+- [ ] [pulumistack](https://github.com/pulumi/pulumi-pulumistack)
 
 ## Bridged Providers
 
