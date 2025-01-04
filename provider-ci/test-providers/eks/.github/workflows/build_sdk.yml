@@ -10,36 +10,50 @@ on:
         type: string
 
 env:
-#{{ .Config.Env | toYaml | indent 2 }}#
+  ALT_AWS_ACCESS_KEY_ID: ${{ secrets.ALT_AWS_ACCESS_KEY_ID }}
+  ALT_AWS_SECRET_ACCESS_KEY: ${{ secrets.ALT_AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-west-2
+  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+  GOLANGCI_LINT_VERSION: v1.61.0
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+  PROVIDER: eks
+  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_ENABLE_RESOURCE_REFERENCES: "1"
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+  PYPI_USERNAME: __token__
+  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
+  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
+  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  TF_APPEND_USER_AGENT: pulumi
   PROVIDER_VERSION: ${{ inputs.version }}
 
 jobs:
   build_sdk:
     name: build_sdk
-    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
+    runs-on: ubuntu-latest
     strategy:
       # We normally fail fast unless this is a PR from Renovate in which case
       # we'll always build all SDKs in case there are any changes to commit.
       fail-fast: ${{ ! contains(github.actor, 'renovate') }}
       matrix:
         language:
-#{{ .Config.Languages | toYaml | indent 8 }}#
+        - nodejs
+        - python
+        - dotnet
+        - go
+        - java
     steps:
-      #{{- if .Config.FreeDiskSpaceBeforeSdkBuild }}#
-      # Run as first step so we don't delete things that have just been installed
-      - name: Free Disk Space (Ubuntu)
-        uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
-        with:
-          tool-cache: false
-          swap-storage: false
-          dotnet: false
-      #{{- end }}#
       - name: Checkout Repo
-        uses: #{{ .Config.ActionVersions.Checkout }}#
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          #{{- if .Config.CheckoutSubmodules }}#
-          submodules: #{{ .Config.CheckoutSubmodules }}#
-          #{{- end }}#
           persist-credentials: false
       - name: Cache examples generation
         uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4
@@ -53,10 +67,6 @@ jobs:
           tools: pulumictl, pulumicli, ${{ matrix.language }}
       - name: Prepare local workspace
         run: make prepare_local_workspace
-      #{{- if not .Config.NoUpstream }}#
-      - name: Download tfgen
-        uses: ./.github/actions/download-tfgen
-      #{{- end }}#
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
       - name: Restore makefile progress

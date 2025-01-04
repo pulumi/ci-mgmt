@@ -45,6 +45,11 @@ func GeneratePackage(opts GenerateOpts) error {
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
+	if opts.Config.Template == "generic" {
+		opts.Config.NoUpstream = true
+		opts.Config.CheckUpstreamUpgrade = false
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
@@ -102,6 +107,8 @@ func getTemplateDirs(templateName string) ([]string, error) {
 	case "external-bridged-provider":
 		// Render more specific templates last to allow them to override more general templates.
 		return []string{"dev-container", "provider", "external-provider", "bridged-provider"}, nil
+	case "generic":
+		return []string{"provider", "pulumi-provider", "bridged-provider"}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}

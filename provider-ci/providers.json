@@ -23,6 +23,7 @@
     "dnsimple",
     "docker",
     "ec",
+    "eks",
     "external",
     "f5bigip",
     "fastly",

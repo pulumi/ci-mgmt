@@ -1,3 +1,4 @@
+#{{ if not .Config.NoUpstream -}}#
 name: Download the tfgen binary
 description: Downloads the tfgen binary to `bin/`.
 
@@ -15,3 +16,4 @@ runs:
       shell: bash
       run: |
         find ${{ github.workspace }} -name "pulumi-*-#{{ .Config.Provider }}#" -print -exec chmod +x {} \;
+#{{ end -}}#
