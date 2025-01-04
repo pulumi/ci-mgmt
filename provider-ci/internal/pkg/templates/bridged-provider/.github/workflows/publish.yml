@@ -14,6 +14,10 @@ on:
         default: false
         type: boolean
         description: Skip publishing & verifying the Go SDK
+      skipJavaSdk:
+        default: false
+        type: boolean
+        description: Skip publishing the Java SDK
 
 env:
   IS_PRERELEASE: ${{ inputs.isPrerelease }}
@@ -83,7 +87,7 @@ jobs:
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
 #{{- end }}#
     - name: Create GH Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@e7a8f85e1c67a31e6ed99a94b41bd0b71bbee6b8 # v2
       if: inputs.isPrerelease == false
       with:
         tag_name: v${{ inputs.version }}
@@ -100,6 +104,8 @@ jobs:
     name: publish_sdk
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
+    outputs:
+      python_version: ${{ steps.python_version.outputs.version }}
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
@@ -114,9 +120,16 @@ jobs:
       with:
         tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
     - name: Publish SDKs
-      uses: pulumi/pulumi-package-publisher@v0.0.20
+      if: inputs.skipJavaSdk == false
+      uses: pulumi/pulumi-package-publisher@696a0fe98f86d86ada2a842d1859f3e8c40d6cd7 # v0.0.21
       with:
         sdk: #{{ .Config.Publish.SDK }}#
+        version: ${{ inputs.version }}
+    - name: Publish SDKs (except Java)
+      if: inputs.skipJavaSdk == true
+      uses: pulumi/pulumi-package-publisher@696a0fe98f86d86ada2a842d1859f3e8c40d6cd7 # v0.0.21
+      with:
+        sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
@@ -136,6 +149,13 @@ jobs:
           go.*
           go/**
           !*.tar.gz
+    - name: Extract python version
+      id: python_version
+      working-directory: sdk/python
+      run: |
+        pip install toml-cli==0.7.0
+        version=$(toml get --toml-path pyproject.toml project.version)
+        echo "version=${version}" >> "$GITHUB_OUTPUT"
 
 #{{- if .Config.PublishRegistry }}#
   create_docs_build:
@@ -146,7 +166,7 @@ jobs:
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
       - name: Dispatch Metadata build
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
           token: ${{ secrets.PULUMI_BOT_TOKEN }}
           repository: pulumi/registry
@@ -193,3 +213,4 @@ jobs:
       # Prelease is run often but we only have 5 concurrent macos runners, so we only test after the stable release.
       enableMacosRunner: ${{ inputs.isPrerelease == false }}
       skipGoSdk: ${{ inputs.skipGoSdk }}
+      pythonVersion: ${{ needs.publish_sdk.outputs.python_version }}

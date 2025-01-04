@@ -90,7 +90,7 @@ jobs:
       name: Create URL to the run output
       run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
     - name: Update with Result
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
       with:
         body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
@@ -115,7 +115,7 @@ jobs:
     - lint
     runs-on: ubuntu-latest
     steps:
-    - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76
+    - uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
       with:
         authToken: ${{secrets.GITHUB_TOKEN}}
         # Write an explicit status check called "Sentinel" which will only pass if this code really runs.
@@ -128,100 +128,21 @@ jobs:
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
   test:
+    # Don't run tests on PRs from forks.
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
-    name: test
+    uses: ./.github/workflows/test.yml
     needs:
       - prerequisites
+      - build_provider
       - build_sdk
     permissions:
       contents: read
       id-token: write
-    runs-on: ubuntu-latest
-    env:
-      PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ env.PR_COMMIT_SHA }}
-        persist-credentials: false
-    - name: Checkout p/examples
-      if: matrix.testTarget == 'pulumiExamples'
-      uses: actions/checkout@v4
-      with:
-        repository: pulumi/examples
-        path: p-examples
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: pulumictl, pulumicli, ${{ matrix.language }}
-    - name: Download bin
-      uses: ./.github/actions/download-bin
-    - name: Add NuGet source
-      if: matrix.language == 'dotnet'
-      run: dotnet nuget add source ${{ github.workspace }}/nuget
-    - name: Download SDK
-      uses: ./.github/actions/download-sdk
-      with:
-        language: ${{ matrix.language }}
-    - name: Update path
-      run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
-    - name: Install Python deps
-      if: matrix.language == 'python'
-      run: |-
-        pip3 install virtualenv==20.0.23
-        pip3 install pipenv
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-region: ${{ env.AWS_REGION }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-duration-seconds: 7200
-        role-session-name: docker@githubActions
-        role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
-        workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
-          }}/locations/global/workloadIdentityPools/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
-          env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
-    - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@v2
-      with:
-        install_components: gke-gcloud-auth-plugin
-    - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
-    - name: Run tests
-      if: matrix.testTarget == 'local'
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
-    - name: Run pulumi/examples tests
-      if: matrix.testTarget == 'pulumiExamples'
-      run: cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-        - nodejs
-        - python
-        - dotnet
-        - go
-        - java
-        testTarget: [local]
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml

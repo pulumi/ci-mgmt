@@ -20,7 +20,7 @@ jobs:
   generate-providers-list:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
         working-directory: provider-ci
@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
-        uses: benc-uk/workflow-dispatch@v1.2.2
+        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
         continue-on-error: true
         with:
             workflow: upgrade-bridge.yml
@@ -52,7 +52,7 @@ jobs:
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
         if: steps.upgrade-on-main.outcome == 'failure'
-        uses: benc-uk/workflow-dispatch@v1.2.2
+        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
         with:
             workflow: upgrade-bridge.yml
             token: ${{ secrets.PULUMI_BOT_TOKEN }} 

@@ -12,6 +12,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/migrations"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,6 +26,7 @@ type GenerateOpts struct {
 	OutDir         string
 	TemplateName   string // path inside templates, e.g.: bridged-provider
 	Config         Config // .yaml file containing template config
+	SkipMigrations bool
 }
 
 // Data exposed to text/template that can be referenced in the template code.
@@ -74,6 +76,13 @@ func GeneratePackage(opts GenerateOpts) error {
 			return fmt.Errorf("error rendering template %s: %w", templateDir, err)
 		}
 	}
+	if !opts.SkipMigrations {
+		// Run any relevant migrations
+		err = migrations.Migrate(opts.TemplateName, opts.OutDir)
+		if err != nil {
+			return fmt.Errorf("error running migrations: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -92,7 +101,7 @@ func getTemplateDirs(templateName string) ([]string, error) {
 		return []string{"dev-container", "provider", "pulumi-provider", "bridged-provider"}, nil
 	case "external-bridged-provider":
 		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "bridged-provider"}, nil
+		return []string{"dev-container", "provider", "external-provider", "bridged-provider"}, nil
 	case "generic":
 		return []string{"provider", "pulumi-provider", "generic"}, nil
 	default:
@@ -105,6 +114,7 @@ func getDeletedFiles(templateName string) []string {
 	case "bridged-provider":
 		return []string{
 			".github/workflows/check-upstream-upgrade.yml",
+			".github/workflows/resync-build.yml",
 			"scripts/upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",

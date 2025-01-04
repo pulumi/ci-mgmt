@@ -1,48 +1,82 @@
+import * as fs from "fs";
+import * as yaml from "yaml";
+
+const defaults = readDefaults();
+
 // Languages
-export const goLint = "golangci/golangci-lint-action@v4";
-export const setupGo = "actions/setup-go@v5";
-export const setupDotNet = "actions/setup-dotnet@v4";
-export const setupJava = "actions/setup-java@v4";
-export const setupGradle = "gradle/gradle-build-action@v3";
-export const setupNode = "actions/setup-node@v4";
-export const setupPython = "actions/setup-python@v5";
+export const goLint = defaults["golangci/golangci-lint-action"];
+export const setupGo = defaults["actions/setup-go"];
+export const setupDotNet = defaults["actions/setup-dotnet"];
+export const setupJava = defaults["actions/setup-java"];
+export const setupGradle = defaults["gradle/gradle-build-action"];
+export const setupNode = defaults["actions/setup-node"];
+export const setupPython = defaults["actions/setup-python"];
 
 // Cloud Auth
-export const azureLogin = "azure/login@v1";
+export const azureLogin = defaults["azure/login"];
 export const configureAwsCredentials =
-  "aws-actions/configure-aws-credentials@v4";
-export const setupGcloud = "google-github-actions/setup-gcloud@v2";
-export const googleAuth = "google-github-actions/auth@v0";
+  defaults["aws-actions/configure-aws-credentials"];
+export const setupGcloud = defaults["google-github-actions/setup-gcloud"];
+export const googleAuth = defaults["google-github-actions/auth"];
 
 // Tools
-export const goReleaser = "goreleaser/goreleaser-action@v5";
-export const gradleBuildAction = "gradle/gradle-build-action@v3";
-export const installGhRelease = "jaxxstorm/action-install-gh-release@v1.11.0";
-export const installPulumiCli = "pulumi/actions@v5";
-export const codecov = "codecov/codecov-action@v4";
-export const providerVersion = "pulumi/provider-version-action@v1";
+export const goReleaser = defaults["goreleaser/goreleaser-action"];
+export const gradleBuildAction = defaults["gradle/gradle-build-action"];
+export const installGhRelease = defaults["jaxxstorm/action-install-gh-release"];
+export const installPulumiCli = defaults["pulumi/actions"];
+export const codecov = defaults["codecov/codecov-action"];
+export const providerVersion = defaults["pulumi/provider-version-action"];
 
 // GHA Utilities
-export const addAndCommit = "EndBug/add-and-commit@v7";
-export const addLabel = "actions-ecosystem/action-add-labels@v1.1.0";
-export const autoMerge = "peter-evans/enable-pull-request-automerge@v1";
-export const checkout = "actions/checkout@v4";
-export const gitStatusCheck = "pulumi/git-status-check-action@v1";
-export const cleanupArtifact = "c-hive/gha-remove-artifacts@v1";
-export const createOrUpdateComment = "peter-evans/create-or-update-comment@v1";
-export const deleteArtifact = "geekyeggo/delete-artifact@v5";
-export const downloadArtifact = "actions/download-artifact@v4";
-export const notifySlack = "8398a7/action-slack@v3";
-export const pathsFilter = "dorny/paths-filter@v2";
-export const pullRequest = "repo-sync/pull-request@v2.6.2";
-export const prComment = "thollander/actions-comment-pull-request@v2";
-export const slashCommand = "peter-evans/slash-command-dispatch@v2";
-export const uploadArtifact = "actions/upload-artifact@v4";
-export const githubScript = "actions/github-script@v7";
+export const addAndCommit = defaults["EndBug/add-and-commit"];
+export const addLabel = defaults["actions-ecosystem/action-add-labels"];
+export const autoMerge = defaults["peter-evans/enable-pull-request-automerge"];
+export const checkout = defaults["actions/checkout"];
+export const gitStatusCheck = defaults["pulumi/git-status-check-action"];
+export const cleanupArtifact = defaults["c-hive/gha-remove-artifacts"];
+export const createOrUpdateComment =
+  defaults["peter-evans/create-or-update-comment"];
+export const deleteArtifact = defaults["geekyeggo/delete-artifact"];
+export const downloadArtifact = defaults["actions/download-artifact"];
+export const notifySlack = defaults["8398a7/action-slack"];
+export const pathsFilter = defaults["dorny/paths-filter"];
+export const pullRequest = defaults["repo-sync/pull-request"];
+export const prComment = defaults["thollander/actions-comment-pull-request"];
+export const slashCommand = defaults["peter-evans/slash-command-dispatch"];
+export const uploadArtifact = defaults["actions/upload-artifact"];
+export const githubScript = defaults["actions/github-script"];
 export const upgradeProviderAction =
-  "pulumi/pulumi-upgrade-provider-action@v0.0.5";
-export const slackNotification = "rtCamp/action-slack-notify@v2";
-export const freeDiskSpace = "jlumbroso/free-disk-space@v1.3.1"; // action does not support major version pinning, so we need to pin to exact version
-export const createKindCluster = "helm/kind-action@v1";
-export const githubStatusAction =
-  "guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76";
+  defaults["pulumi/pulumi-upgrade-provider-action"];
+export const slackNotification = defaults["rtCamp/action-slack-notify"];
+export const freeDiskSpace = defaults["jlumbroso/free-disk-space"];
+export const createKindCluster = defaults["helm/kind-action"];
+export const githubStatusAction = defaults["guibranco/github-status-action-v2"];
+
+function readDefaults() {
+  const defaults: { [key: string]: string } = {};
+
+  // Parse YAML and preserve comments.
+  const doc = yaml.parseDocument(
+    fs.readFileSync(
+      __dirname + "/../../provider-ci/internal/pkg/action-versions.yml",
+      "utf-8"
+    )
+  );
+
+  const steps = doc.getIn([
+    "jobs",
+    "default-versions",
+    "steps",
+  ]) as yaml.YAMLSeq;
+
+  steps.items.forEach((item) => {
+    const step = item as yaml.YAMLMap;
+
+    const name = (step.items[0] as yaml.Pair).value as string;
+    const uses = (step.items[1] as yaml.Pair).value as string;
+
+    defaults[name] = uses;
+  });
+
+  return defaults;
+}

@@ -1,0 +1,17 @@
+name: Download the tfgen binary
+description: Downloads the tfgen binary to `bin/`.
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Download pulumi-tfgen-#{{ .Config.Provider }}#
+      uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
+      with:
+        name: pulumi-tfgen-#{{ .Config.Provider }}#
+        path: ${{ github.workspace }}/bin
+
+    - name: Ensure pulumi-tfgen-#{{ .Config.Provider }}# is executable
+      shell: bash
+      run: |
+        find ${{ github.workspace }} -name "pulumi-*-#{{ .Config.Provider }}#" -print -exec chmod +x {} \;

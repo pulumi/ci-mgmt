@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	_ "embed" // For embedding action versions.
+
 	"bytes"
 	"fmt"
 	"os"
@@ -9,6 +11,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed action-versions.yml
+var defaultActionVersions []byte
 
 // Config describes the shape of .ci-mgmt.yaml files.
 type Config struct {
@@ -119,13 +124,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
 	Actions actions `yaml:"actions"`
 
-	// ExtraTests run as part of `run-acceptance-tests.yml`, `master.yml`,
-	// `main.yml`, `prerelease.yml` and `release.yml`. Only used for aws:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22extraTests%3A%22&type=code
-	//
-	// Not available in generic providers -- override make targets instead.
-	ExtraTests map[string]any `yaml:"extraTests"` // Only used by AWS...
-
 	// IntegrationTestProvider will run e2e tests in the provider as well as in
 	// the examples directory when set to true. Defaults to false.
 	//
@@ -203,15 +201,6 @@ type Config struct {
 	// job. Used in 9 providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22docker%3A%22&type=code
 	Docker bool `yaml:"docker"`
-
-	// SSHPrivateKey sets up SSH with specified private key before running
-	// tests in CI job. This should be provided from a secret. Used by the
-	// docker provider only:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22sshPrivateKey%3A%22&type=code
-	//
-	// Not available in generic providers -- see docker-build for an example of
-	// how to programatically generate a key.
-	SSHPrivateKey string `yaml:"sshPrivateKey"`
 
 	// GCP authenticates with GCP before running tests in CI job. Used in gcp
 	// and docker:
@@ -329,6 +318,8 @@ type actionVersions struct {
 	UploadArtifact          string `yaml:"uploadArtifact"`
 	UpgradeProviderAction   string `yaml:"upgradeProviderAction"`
 	FreeDiskSpace           string `yaml:"freeDiskSpace"`
+	ProviderVersionAction   string `yaml:"providerVersionAction"`
+	Codecov                 string `yaml:"codeCov"`
 }
 
 type toolVersions struct {
@@ -356,6 +347,62 @@ type publish struct {
 
 func loadDefaultConfig() (Config, error) {
 	var config Config
+
+	// Parse our actions file while preserving comments.
+	var doc yaml.Node
+	err := yaml.Unmarshal(defaultActionVersions, &doc)
+	if err != nil {
+		return Config{}, err
+	}
+
+	for _, subdoc := range doc.Content {
+		for _, jobs := range subdoc.Content {
+			for _, job := range jobs.Content {
+				for _, steps := range job.Content {
+					if steps.Kind != yaml.SequenceNode {
+						continue
+					}
+					for _, step := range steps.Content {
+						if len(step.Content) != 4 {
+							continue
+						}
+						name := step.Content[1].Value
+						uses := step.Content[3].Value + step.Content[3].FootComment
+						if step.Content[3].LineComment != "" {
+							uses += " " + step.Content[3].LineComment
+						}
+
+						switch name {
+						case "aws-actions/configure-aws-credentials":
+							config.ActionVersions.ConfigureAwsCredentials = uses
+						case "google-github-actions/setup-gcloud":
+							config.ActionVersions.SetupGcloud = uses
+						case "google-github-actions/auth":
+							config.ActionVersions.GoogleAuth = uses
+						case "actions/checkout":
+							config.ActionVersions.Checkout = uses
+						case "actions/download-artifact":
+							config.ActionVersions.DownloadArtifact = uses
+						case "dorny/paths-filter":
+							config.ActionVersions.PathsFilter = uses
+						case "thollander/actions-comment-pull-request":
+							config.ActionVersions.PrComment = uses
+						case "actions/upload-artifact":
+							config.ActionVersions.UploadArtifact = uses
+						case "pulumi/pulumi-upgrade-provider-action":
+							config.ActionVersions.UpgradeProviderAction = uses
+						case "jlumbroso/free-disk-space":
+							config.ActionVersions.FreeDiskSpace = uses
+						case "pulumi/provider-version-action":
+							config.ActionVersions.ProviderVersionAction = uses
+						case "codecov/codecov-action":
+							config.ActionVersions.Codecov = uses
+						}
+					}
+				}
+			}
+		}
+	}
 
 	configBytes, err := templateFS.ReadFile(filepath.Join("templates", "defaults.config.yaml"))
 	if err != nil {

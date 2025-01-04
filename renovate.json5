@@ -1,0 +1,34 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>pulumi/renovate-config//default.json5"],
+  "github-actions": {
+    // Extend our matching to maintain our default action versions.
+    fileMatch: [".*/action-versions\\.ya?ml$"],
+    ignorePaths: [
+      "provider-ci/test-providers/**",
+      "native-provider-ci/providers/**",
+    ],
+  },
+  packageRules: [
+    {
+      matchManagers: ["github-actions"],
+      // Automatically submit PRs to bump GitHub actions.
+      dependencyDashboardApproval: false,
+      // Only bump to releases older than 7 days since these will include
+      // third-party / untrusted actions.
+      minimumReleaseAge: "7 days",
+      // Re-generate test workflows in case action versions have been bumped.
+      postUpgradeTasks: {
+        commands: ["make build"],
+        executionMode: "branch", // Only run once.
+      },
+    },
+    // Pins
+    {
+      // GoReleases has backwards-incompatible changes in v6.
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["goreleaser/goreleaser-action"],
+      allowedVersions: "^5",
+    },
+  ],
+}

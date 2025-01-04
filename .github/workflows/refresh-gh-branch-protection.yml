@@ -9,13 +9,13 @@ jobs:
     name: Pulumi Refresh
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4
         with:
           node-version: 18.x
       - run: npm install
         working-directory: infra/providers
-      - uses: pulumi/actions@v5
+      - uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6
         with:
           command: refresh
           stack-name: pulumi/production
