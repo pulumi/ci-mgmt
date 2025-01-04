@@ -25,10 +25,10 @@ jobs:
         uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
 
       - name: actions/setup-dotnet
-        uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
+        uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852 # v4.2.0
 
       - name: actions/setup-java
-        uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+        uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
 
       - name: gradle/gradle-build-action
         uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1 # v3.5.0
@@ -62,7 +62,7 @@ jobs:
         uses: pulumi/actions@c7fad9e2f0b79653172b36538b8b34b3c0291952 # v6.0.0
 
       - name: codecov/codecov-action
-        uses: codecov/codecov-action@7f8b4b4bde536c465e797be725718b88c5d95e0e # v5.1.1
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
 
       - name: pulumi/provider-version-action
         uses: pulumi/provider-version-action@0391d47b9b0d865d33dd0a295b1fcf9f7021dd4c # v1.5.3
@@ -103,7 +103,7 @@ jobs:
         uses: peter-evans/slash-command-dispatch@13bc09769d122a64f75aa5037256f6f2d78be8c4 # v4.0.0
 
       - name: actions/upload-artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
 
       - name: pulumi/pulumi-upgrade-provider-action
         uses: pulumi/pulumi-upgrade-provider-action@a1d9f03fbfd923f787427c1d9e99c2356711d483 # v0.0.13
@@ -112,7 +112,7 @@ jobs:
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
 
       - name: helm/kind-action
-        uses: helm/kind-action@0025e74a8c7512023d06dc019c617aa3cf561fde # v1.10.0
+        uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
 
       - name: guibranco/github-status-action-v2
         uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13

@@ -144,6 +144,7 @@ export function RunAcceptanceTestsWorkflow(
         .addRunsOn(opts.provider),
       test: new TestsJob(name, "test", opts).addDispatchConditional(true),
       sentinel: new EmptyJob("sentinel")
+        .addPermissions({ statuses: "write" })
         .addConditional(
           "github.event_name == 'repository_dispatch' || github.event.pull_request.head.repo.full_name == github.repository"
         )
@@ -164,7 +165,7 @@ function calculateSentinelNeeds(
   requiresLint: boolean,
   provider: string
 ): string[] {
-  const needs: string[] = ["test"];
+  const needs: string[] = ["test", "prerequisites"];
 
   if (requiresLint) {
     needs.push("lint");
@@ -426,7 +427,7 @@ export class BuildSdkJob implements NormalJob {
   "runs-on" = "pulumi-ubuntu-8core"; // insufficient resources to run Go builds on ubuntu-latest
 
   strategy = {
-    "fail-fast": true,
+    "fail-fast": "${{ ! contains(github.actor, 'renovate') }}",
     matrix: {
       language: ["nodejs", "python", "dotnet", "go", "java"],
     },
@@ -459,9 +460,10 @@ export class BuildSdkJob implements NormalJob {
       steps.RestoreBinaryPerms(opts.provider, name),
       steps.CodegenDuringSDKBuild(opts.provider),
       steps.InitializeSubModules(opts.submodules),
-      steps.GenerateSDKs(opts.provider),
-      steps.BuildSDKs(opts.provider),
+      steps.GenerateSDKs(opts.provider, opts.hasGenBinary),
+      steps.BuildSDKs(opts.provider, opts.hasGenBinary),
       steps.CheckCleanWorkTree(),
+      steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
       steps.ZipSDKsStep(),
       steps.UploadSDKs(tag),
@@ -509,16 +511,18 @@ export class PrerequisitesJob implements NormalJob {
       steps.PrepareOpenAPIFile(opts.provider),
       steps.InitializeSubModules(opts.submodules),
       steps.BuildCodegenBinaries(opts.provider),
-      steps.BuildSchema(opts.provider),
+      steps.BuildSchema(opts.provider, opts.hasGenBinary),
       steps.MakeKubernetesProvider(opts.provider),
       steps.CheckSchemaChanges(opts.provider),
       steps.CommentSchemaChangesOnPR(opts.provider),
       steps.LabelIfNoBreakingChanges(opts.provider),
       steps.BuildProvider(opts.provider),
       steps.CheckCleanWorkTree(),
+      steps.CommitSDKChangesForRenovate(),
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
+      steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native"),
       steps.TestProviderLibrary(),
       steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
@@ -1009,6 +1013,7 @@ export class EmptyJob implements NormalJob {
   name: string;
   if?: string;
   needs?: string[];
+  permissions?: any;
 
   constructor(name: string, params?: Partial<NormalJob>) {
     this.name = name;
@@ -1033,6 +1038,11 @@ export class EmptyJob implements NormalJob {
 
   addNeeds(name: string[]) {
     this.needs = name;
+    return this;
+  }
+
+  addPermissions(permissions: any) {
+    this.permissions = permissions;
     return this;
   }
 }

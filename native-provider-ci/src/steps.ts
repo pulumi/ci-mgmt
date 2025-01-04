@@ -150,6 +150,7 @@ export function CheckoutRepoStepAtPR(): Step {
     uses: action.checkout,
     with: {
       lfs: true,
+      "persist-credentials": false,
       ref: "${{ env.PR_COMMIT_SHA }}",
     },
   };
@@ -402,8 +403,8 @@ export function BuildCodegenBinaries(provider: string): Step {
   };
 }
 
-export function BuildSDKs(provider: string): Step {
-  if (provider === "command" || provider === "kubernetes") {
+export function BuildSDKs(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false || provider === "kubernetes") {
     return {};
   }
   return {
@@ -495,7 +496,9 @@ export function ZipSDKsStep(): Step {
 export function CheckCleanWorkTree(): Step {
   return {
     name: "Check worktree clean",
+    id: "worktreeClean",
     uses: action.gitStatusCheck,
+    // Keep these in sync with the Renovate step below to avoid them getting checked in.
     with: {
       "allowed-changes": `\
 sdk/**/pulumi-plugin.json
@@ -504,6 +507,49 @@ sdk/go/**/pulumiUtilities.go
 sdk/nodejs/package.json
 sdk/python/pyproject.toml`,
     },
+  };
+}
+
+export function CommitSDKChangesForRenovate(): Step {
+  // If the worktree is dirty and this is a Renovate PR to bump dependencies,
+  // commit the updated SDK and push it back to the PR. The job will still be
+  // marked as a failure.
+
+  return {
+    name: "Commit ${{ matrix.language }} SDK changes for Renovate",
+    if: "failure() && steps.worktreeClean.outcome == 'failure' && contains(github.actor, 'renovate') && github.event_name == 'pull_request'",
+    shell: "bash",
+    run: `git diff --quiet -- sdk && echo "no changes to sdk" && exit
+\
+git config --global user.email "bot@pulumi.com"
+git config --global user.name "pulumi-bot"
+\
+# Stash local changes and check out the PR's branch directly.
+git stash
+git fetch
+git checkout "origin/$HEAD_REF"
+
+# Apply and add our changes, but don't commit any files we expect to
+# always change due to versioning.
+git stash pop
+git add sdk
+git reset \
+    sdk/python/*/pulumi-plugin.json \
+    sdk/python/pyproject.toml \
+    sdk/dotnet/pulumi-plugin.json \
+    sdk/dotnet/Pulumi.*.csproj \
+    sdk/go/*/pulumi-plugin.json \
+    sdk/go/*/internal/pulumiUtilities.go \
+    sdk/nodejs/package.json
+git commit -m 'Commit \${{ matrix.language }} SDK for Renovate'
+
+# Push with pulumi-bot credentials to trigger a re-run of the
+# workflow. https://github.com/orgs/community/discussions/25702
+git push https://pulumi-bot:\${{ secrets.PULUMI_BOT_TOKEN }}@github.com/\${{ github.repository }} \
+    "HEAD:$HEAD_REF"
+`,
+    // head_ref is untrusted so it's recommended to pass via env var to avoid injections.
+    env: { HEAD_REF: "${{ github.head_ref }}" },
   };
 }
 
@@ -666,8 +712,8 @@ export function InitializeSubModules(submodules?: boolean): Step {
   return {};
 }
 
-export function BuildSchema(provider: string): Step {
-  if (provider === "command") {
+export function BuildSchema(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false) {
     return {};
   }
   if (provider === "kubernetes") {
@@ -713,8 +759,8 @@ export function RestoreBinaryPerms(provider: string, job: string): Step {
   };
 }
 
-export function GenerateSDKs(provider: string): Step {
-  if (provider === "command" || provider === "kubernetes") {
+export function GenerateSDKs(provider: string, hasGenBinary: boolean): Step {
+  if (hasGenBinary === false || provider === "kubernetes") {
     return {
       name: "Generate SDK",
       run: "make ${{ matrix.language }}_sdk",
@@ -1270,20 +1316,25 @@ export function FreeDiskSpace(runner: string): Step {
 }
 
 export function CreateKindCluster(provider: string, name: string): Step {
-  if (
-    (provider === "kubernetes" ||
-      provider == "kubernetes-cert-manager" ||
-      provider == "kubernetes-ingress-nginx") &&
-    name === "run-acceptance-tests"
-  ) {
-    return {
-      name: "Setup KinD cluster",
-      uses: action.createKindCluster,
-      with: {
-        cluster_name: "kind-integration-tests-${{ matrix.language }}",
-        node_image: "kindest/node:v1.29.2",
-      },
-    };
+  // Always create a KinD cluster for any jobs in "kubernetes-*" providers.
+  // For the "kubernetes" provider, create a KinD cluster only for the "run-acceptance-tests" job,
+  // as other jobs will use GKE clusters for testing.
+  const step = {
+    name: "Setup KinD cluster",
+    uses: action.createKindCluster,
+    with: {
+      cluster_name: "kind-integration-tests-${{ matrix.language }}",
+      node_image: "kindest/node:v1.29.2",
+    },
+  };
+
+  switch (provider) {
+    case "kubernetes":
+      return name === "run-acceptance-tests" ? step : {};
+    case "kubernetes-cert-manager":
+    case "kubernetes-coredns":
+    case "kubernetes-ingress-nginx":
+      return step;
   }
 
   return {};
