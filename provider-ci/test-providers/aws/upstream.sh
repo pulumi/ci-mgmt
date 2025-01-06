@@ -335,6 +335,8 @@ re-initializing using updated patches and updated upstream base.
 EOF
 }
 
+# file_target prints a file path to depend on in make to trigger an init when required.
+# Also updates the file timestamp if the submodule needs updating.
 file_target() {
   path=.git/modules/upstream/HEAD
   # Don't print a file if it doesn't exist - it's probably not initialized yet.
