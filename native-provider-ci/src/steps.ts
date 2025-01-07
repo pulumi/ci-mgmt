@@ -654,7 +654,7 @@ export function CommentSchemaChangesOnPR(provider: string): Step {
     return {};
   }
   return {
-    if: "github.event_name == 'pull_request'",
+    if: "github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'",
     name: "Comment on PR with Details of Schema Check",
     uses: action.prComment,
     with: {
