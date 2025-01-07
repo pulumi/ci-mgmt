@@ -1319,12 +1319,15 @@ export function CreateKindCluster(provider: string, name: string): Step {
   // Always create a KinD cluster for any jobs in "kubernetes-*" providers.
   // For the "kubernetes" provider, create a KinD cluster only for the "run-acceptance-tests" job,
   // as other jobs will use GKE clusters for testing.
-  const step = {
+  const step: Step = {
     name: "Setup KinD cluster",
     uses: action.createKindCluster,
     with: {
       cluster_name: "kind-integration-tests-${{ matrix.language }}",
       node_image: "kindest/node:v1.29.2",
+      ...(provider === "kubernetes-ingress-nginx"
+        ? { config: "kind.config.yml" }
+        : {}),
     },
   };
 
@@ -1332,7 +1335,9 @@ export function CreateKindCluster(provider: string, name: string): Step {
     case "kubernetes":
       return name === "run-acceptance-tests" ? step : {};
     case "kubernetes-cert-manager":
+      return step;
     case "kubernetes-coredns":
+      return step;
     case "kubernetes-ingress-nginx":
       return step;
   }
