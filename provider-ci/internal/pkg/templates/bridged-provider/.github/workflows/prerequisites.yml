@@ -124,6 +124,16 @@ jobs:
         exit 1
         fi
 #{{- end }}#
+#{{- if .Config.NoUpstream }}#
+
+    - name: Upload pulumi-gen-#{{ .Config.Provider }}#
+      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
+      with:
+        name: pulumi-gen-#{{ .Config.Provider }}#
+        path: ${{ github.workspace }}/bin/pulumi-gen-#{{ .Config.Provider }}#
+        retention-days: 30
+
+#{{- else }}#
 
     - name: Upload pulumi-tfgen-#{{ .Config.Provider }}#
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
@@ -131,6 +141,8 @@ jobs:
         name: pulumi-tfgen-#{{ .Config.Provider }}#
         path: ${{ github.workspace }}/bin/pulumi-tfgen-#{{ .Config.Provider }}#
         retention-days: 30
+
+#{{- end }}#
 
     - name: Upload schema-embed.json
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#

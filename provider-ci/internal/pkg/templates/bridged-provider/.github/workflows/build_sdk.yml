@@ -55,7 +55,10 @@ jobs:
         run: make prepare_local_workspace
       #{{- if not .Config.NoUpstream }}#
       - name: Download tfgen
-        uses: ./.github/actions/download-tfgen
+        uses: ./.github/actions/download-codegen
+      #{{- else }}#
+      - name: Download gen
+        uses: ./.github/actions/download-codegen
       #{{- end }}#
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
