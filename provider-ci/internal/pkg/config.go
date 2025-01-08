@@ -285,7 +285,7 @@ type Config struct {
 	//
 	// This Makefile function receives the target binary path as $(1) parameter and is executed in a context where
 	// $GOOS and $GOARCH environment variables may be set to specify a non-default architecture and platform.
-	CustomBuildProviderCmd bool
+	CustomBuildProviderCmd bool `yaml:"customBuildProviderCmd"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
