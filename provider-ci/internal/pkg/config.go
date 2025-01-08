@@ -277,6 +277,15 @@ type Config struct {
 	// NoUpstream is a temporary hack to disable bridge-specific workflow steps
 	// as part of the work to cnsolidate these with native providers.
 	NoUpstream bool
+
+	// CustomBuildProviderCmd allows providers to customize how the binary is built.
+	//
+	// If set, build_provider_cmd will not be defined in the generated Makefile but instead is expected to be
+	// defined in .mk/build_provider.mk include file.
+	//
+	// This Makefile function receives the target binary path as $(1) parameter and is executed in a context where
+	// $GOOS and $GOARCH environment variables may be set to specify a non-default architecture and platform.
+	CustomBuildProviderCmd bool
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
