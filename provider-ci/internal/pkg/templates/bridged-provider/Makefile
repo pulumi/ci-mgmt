@@ -296,8 +296,9 @@ bin/$(TFGEN): provider/*.go $(wildcard go.mod provider/go.mod) .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(TFGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(TFGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 #{{ if .Config.NoUpstream }}#
-upstream:
+upstream: .make/upstream
 .make/upstream:
+	@touch $@
 #{{- else }}#
 # Apply patches to the upstream submodule, if it exists
 upstream: .make/upstream
