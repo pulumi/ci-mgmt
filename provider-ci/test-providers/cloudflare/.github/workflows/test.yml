@@ -76,11 +76,6 @@ jobs:
       run: example/script.sh
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        version: v2.5.0
     - name: make upstream
       run: |
         make upstream
