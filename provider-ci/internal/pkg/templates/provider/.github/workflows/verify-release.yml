@@ -80,9 +80,6 @@ jobs:
         with:
           tools: pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
 #{{- if .Config.ReleaseVerification }}#
-#{{- if .Config.Actions.PreTest }}#
-#{{ .Config.Actions.PreTest | toYaml | indent 6 }}#
-#{{- end }}#
 #{{- if .Config.ReleaseVerification.Nodejs }}#
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@v1
