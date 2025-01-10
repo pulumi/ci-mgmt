@@ -373,7 +373,7 @@ provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist
 .PHONY: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64 provider_dist
 # shard computes tests to run and modifies the CI runner's environment.
 shard:
-	@(cd examples && go run github.com/pulumi/shard@48b47318fce7d75fd2df16b5c87467368d2bf3d5 --total $(SHARD_TOTAL) --index $(SHARD_INDEX) --output env) >> "$(GITHUB_ENV)"
+	@(cd examples && go run github.com/pulumi/shard@6dbd62a9c3c5ef92806a9a030b18fe073228ddd2 --total $(SHARD_TOTAL) --index $(SHARD_INDEX) --output env) >> "$(GITHUB_ENV)"
 
 # test_shard runs the tests specified by a regex contained in $SHARD_TESTS for paths $SHARD_PATHS.
 test_shard:
