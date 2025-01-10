@@ -125,10 +125,14 @@ jobs:
         fi
 #{{- end }}#
 
-    - name: Upload pulumi-tfgen-#{{ .Config.Provider }}#
+    - name: Upload codegen binary for #{{ .Config.Provider }}#
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
       with:
+        #{{- if .Config.NoUpstream }}#
+        name: pulumi-gen-#{{ .Config.Provider }}#
+        #{{- else }}#
         name: pulumi-tfgen-#{{ .Config.Provider }}#
+        #{{- end }}#
         path: ${{ github.workspace }}/bin/pulumi-tfgen-#{{ .Config.Provider }}#
         retention-days: 30
 
