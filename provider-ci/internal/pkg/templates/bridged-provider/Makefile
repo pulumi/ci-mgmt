@@ -35,7 +35,7 @@ VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version
 # Strips debug information from the provider binary to reduce its size and speed up builds
 LDFLAGS_STRIP_SYMBOLS=-s -w
 LDFLAGS_PROJ_VERSION=-X $(PROJECT)/$(VERSION_PATH)=$(VERSION_GENERIC)#{{if .Config.ProviderVersion}}# -X #{{ .Config.ProviderVersion }}#=$(VERSION_GENERIC)#{{end}}#
-#{{- if .Config.ProviderVersion }}#
+#{{- if and (not (eq .Config.ProviderVersion "")) (not .Config.NoUpstream) }}#
 LDFLAGS_UPSTREAM_VERSION=-X #{{ .Config.ProviderVersion }}#=v$(VERSION_GENERIC)
 #{{- else }}#
 LDFLAGS_UPSTREAM_VERSION=
