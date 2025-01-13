@@ -51,7 +51,7 @@ func GeneratePackage(opts GenerateOpts) error {
 	}
 
 	if opts.Config.ToolVersions.PulumiCTL == "" {
-		opts.Config.ToolVersions.PulumiCTL = "v0.0.46"
+		opts.Config.ToolVersions.PulumiCTL = defaultPulumiCTLVersion
 	}
 
 	// Clean up old workflows if requested
