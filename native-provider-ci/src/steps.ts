@@ -1042,6 +1042,7 @@ export function CreateUpdatePulumiPR(branch: string): Step {
       "\n" +
       'gh pr create -t "$msg" -b "$msg" -B ' +
       branch +
+      " --head update-pulumi/${{ github.run_id }}-${{ github.run_number }}" +
       "\n",
     env: {
       GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
