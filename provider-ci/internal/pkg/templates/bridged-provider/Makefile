@@ -30,11 +30,17 @@ PULUMI_CONVERT := 0
 #{{- end }}#
 PULUMI_MISSING_DOCS_ERROR := true
 
+PULUMICTL_VERSION := #{{ .Config.ToolVersions.PulumiCTL }}#
+PULUMICTL := $(shell which pulumictl || \
+	(test ! -e $(WORKING_DIR)/bin/pulumictl && \
+		GOPATH="$(WORKING_DIR)" go install "github.com/pulumi/pulumictl/cmd/pulumictl@$(PULUMICTL_VERSION)"; \
+	echo "$(WORKING_DIR)/bin/puluimctl"))
+
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
 PROVIDER_VERSION ?= #{{ .Config.MajorVersion }}#.0.0-alpha.0+dev
 # Use this normalised version everywhere rather than the raw input to ensure consistency.
-VERSION_GENERIC = $(shell pulumictl convert-version --language generic --version "$(PROVIDER_VERSION)")
+VERSION_GENERIC = $(shell $(PULUMICTL) convert-version --language generic --version "$(PROVIDER_VERSION)")
 
 # Strips debug information from the provider binary to reduce its size and speed up builds
 LDFLAGS_STRIP_SYMBOLS=-s -w
@@ -318,7 +324,7 @@ endif
 .PHONY: upstream
 
 bin/pulumi-java-gen: .pulumi-java-gen.version
-	pulumictl download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
+	$(PULUMICTL) download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
 
 # To make an immediately observable change to .ci-mgmt.yaml:
 #
