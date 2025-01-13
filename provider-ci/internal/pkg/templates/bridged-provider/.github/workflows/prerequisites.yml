@@ -130,10 +130,11 @@ jobs:
       with:
         #{{- if .Config.NoUpstream }}#
         name: pulumi-gen-#{{ .Config.Provider }}#
+        path: ${{ github.workspace }}/bin/pulumi-gen-#{{ .Config.Provider }}#
         #{{- else }}#
         name: pulumi-tfgen-#{{ .Config.Provider }}#
-        #{{- end }}#
         path: ${{ github.workspace }}/bin/pulumi-tfgen-#{{ .Config.Provider }}#
+        #{{- end }}#
         retention-days: 30
 
     - name: Upload schema-embed.json
