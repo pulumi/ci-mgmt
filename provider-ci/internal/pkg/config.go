@@ -269,6 +269,21 @@ type Config struct {
 	// NoUpstream is a temporary hack to disable bridge-specific workflow steps
 	// as part of the work to consolidate these with native providers.
 	NoUpstream bool
+
+	// Customizes the Make function build_provider_cmd.
+	//
+	// This function is responsible for creating a provider binary for the desired platform.
+	//
+	// Use "$(1)" to refer to the desired output location.
+	//
+	// If a cross-compiling build is requested, the environment will have GOOS and GOARCH set.
+	//
+	// The default value uses go build:
+	//
+	//     cd provider && go build -o "$(1)" ...
+	//
+	// Customizing this value allows providers implemented in Node or other languages.
+	BuildProviderCmd string `yaml:"buildProviderCmd"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
