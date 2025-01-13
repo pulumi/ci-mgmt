@@ -342,6 +342,8 @@ type toolVersions struct {
 	Nodejs string `yaml:"nodejs"`
 	Pulumi string `yaml:"pulumi"`
 	Python string `yaml:"python"`
+
+	PulumiCTL string `yaml:"pulumictl"`
 }
 
 type releaseVerification struct {
