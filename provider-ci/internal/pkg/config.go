@@ -265,6 +265,10 @@ type Config struct {
 	// MakeTemplate has no effect but is set by 78 providers.
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22makeTemplate%3A%22&type=code
 	MakeTemplate string `yaml:"makeTemplate"`
+
+	// NoUpstream is a temporary hack to disable bridge-specific workflow steps
+	// as part of the work to consolidate these with native providers.
+	NoUpstream bool
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
