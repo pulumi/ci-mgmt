@@ -267,7 +267,7 @@ type Config struct {
 	MakeTemplate string `yaml:"makeTemplate"`
 
 	// NoUpstream is a temporary hack to disable bridge-specific workflow steps
-	// as part of the work to cnsolidate these with native providers.
+	// as part of the work to consolidate these with native providers.
 	NoUpstream bool
 }
 
