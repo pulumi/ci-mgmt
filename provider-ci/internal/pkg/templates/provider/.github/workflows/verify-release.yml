@@ -80,6 +80,35 @@ jobs:
         with:
           tools: pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
 #{{- if .Config.ReleaseVerification }}#
+      #{{- if .Config.AWS }}#
+      - name: Configure AWS Credentials
+        uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ env.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-duration-seconds: 7200
+          role-session-name: #{{ .Config.Provider }}#@githubActions
+          role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
+      #{{- end }}#
+      #{{- if .Config.GCP }}#
+      - name: Authenticate to Google Cloud
+        uses: #{{ .Config.ActionVersions.GoogleAuth }}#
+        with:
+          service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
+          workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
+            }}/locations/global/workloadIdentityPools/${{
+            env.GOOGLE_CI_WORKLOAD_IDENTITY_POOL }}/providers/${{
+            env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
+      - name: Setup gcloud auth
+        uses: #{{ .Config.ActionVersions.SetupGcloud }}#
+        with:
+          install_components: gke-gcloud-auth-plugin
+      #{{- end }}#
+      #{{- if .Config.GCPRegistry }}#
+      - name: Login to Google Cloud Registry
+        run: gcloud --quiet auth configure-docker
+      #{{- end }}#
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 6 }}#
 #{{- end }}#
