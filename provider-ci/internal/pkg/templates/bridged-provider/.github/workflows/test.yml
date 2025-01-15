@@ -121,6 +121,10 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
+#{{- if .Config.Shards }}#
+    - name: Install prebuilt SDKs
+      run: make install_sdks
+#{{- end }}#
 #{{- if not .Config.Shards }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
