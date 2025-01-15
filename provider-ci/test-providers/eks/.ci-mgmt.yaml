@@ -24,3 +24,4 @@ env:
 template: generic
 freeDiskSpaceBeforeTest: true # TODO: https://github.com/pulumi/pulumi/issues/17718
 buildProviderPre: echo building-provider
+shards: 3

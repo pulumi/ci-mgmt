@@ -41,29 +41,46 @@ jobs:
         #{{- end }}#
         persist-credentials: false
     - name: Checkout p/examples
+      #{{- if not .Config.Shards }}#
       if: matrix.testTarget == 'pulumiExamples'
+      #{{- end }}#
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         repository: pulumi/examples
         path: p-examples
     - name: Setup tools
       uses: ./.github/actions/setup-tools
+      #{{- if not .Config.Shards }}#
       with:
         tools: pulumictl, pulumicli, ${{ matrix.language }}
+      #{{- end }}#
     - name: Prepare local workspace
       run: make prepare_local_workspace
     - name: Download bin
       uses: ./.github/actions/download-bin
+    #{{- if not .Config.Shards }}#
     - name: Download SDK
       uses: ./.github/actions/download-sdk
       with:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
       run: make --touch provider schema build_${{ matrix.language }}
+    #{{- else }}#
+    #{{- range $_, $language := .Config.Languages }}#
+    - name: Download #{{ $language }}# SDK
+      uses: ./.github/actions/download-sdk
+      with:
+        language: #{{ $language }}#
+    #{{- end }}#
+    - name: Restore makefile progress
+      run: make --touch provider schema build_sdks
+    #{{- end }}#
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
+    #{{- if not .Config.Shards }}#
       if: matrix.language == 'python'
+    #{{- end }}#
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
@@ -104,6 +121,7 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
+#{{- if not .Config.Shards }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
 #{{- if .Config.Actions.PreTest }}#
@@ -121,8 +139,29 @@ jobs:
     - name: Run pulumi/examples tests
       if: matrix.testTarget == 'pulumiExamples'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
+#{{- else }}#
+    - name: Generate test shards
+      run: |
+        cd examples
+        go run github.com/pulumi/shard@48b47318fce7d75fd2df16b5c87467368d2bf3d5 \
+            --total ${{ matrix.total-shards }} \
+            --index ${{ matrix.current-shard }} \
+            --output env >> $GITHUB_ENV
+    - name: Run tests
+      run: |
+        make GOTESTARGS="-run \"${SHARD_PATHS}\" ${SHARD_TESTS}" test
+#{{- end }}#
     strategy:
       fail-fast: false
+#{{- if .Config.Shards }}#
+      matrix:
+        total-shards:
+          - #{{ .Config.Shards }}#
+        current-shard:
+          #{{- range $i, $_ := until .Config.Shards }}#
+          - #{{ $i }}#
+          #{{- end }}#
+#{{- else }}#
       matrix:
         language:
 #{{ .Config.Languages | toYaml | indent 8 }}#
@@ -131,3 +170,4 @@ jobs:
         #{{- else }}#
         testTarget: [local]
         #{{- end }}#
+#{{- end }}#

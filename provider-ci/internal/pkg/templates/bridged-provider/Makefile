@@ -17,6 +17,7 @@ CODEGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN := pulumi-java-gen
 TESTPARALLELISM := 10
+GOTESTARGS := ""
 WORKING_DIR := $(shell pwd)
 #{{- if .Config.GoBuildParallelism }}#
 PULUMI_PROVIDER_BUILD_PARALLELISM ?= -p #{{ .Config.GoBuildParallelism }}#
@@ -280,7 +281,7 @@ bin/$(PROVIDER): .make/schema
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
+	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(GOTESTARGS)
 .PHONY: test
 
 #{{- if .Config.TestProviderCmd }}#

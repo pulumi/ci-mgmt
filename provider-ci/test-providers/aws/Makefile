@@ -9,6 +9,7 @@ CODEGEN := pulumi-tfgen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN := pulumi-java-gen
 TESTPARALLELISM := 10
+GOTESTARGS := ""
 WORKING_DIR := $(shell pwd)
 PULUMI_PROVIDER_BUILD_PARALLELISM ?= -p 2
 PULUMI_CONVERT := 1
@@ -239,7 +240,7 @@ bin/$(PROVIDER): .make/schema
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
+	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(GOTESTARGS)
 .PHONY: test
 test_provider_cmd = cd provider && go test -v -short \
 	-coverprofile="coverage.txt" \
