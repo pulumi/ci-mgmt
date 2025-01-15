@@ -274,13 +274,13 @@ type Config struct {
 	//
 	// This function is responsible for creating a provider binary for the desired platform.
 	//
-	// Use "$(1)" to refer to the desired output location.
+	// "$(1)" refers to the desired OS, in the same format as GOOS in the Go toolchain
+	// "$(2)" refers to the desired architecture, in the same format as GOARCH in the Go toolchain
+	// "$(3)" refers to the desired destination path for the binary
 	//
-	// If a cross-compiling build is requested, the environment will have GOOS and GOARCH set.
+	// An example value for the command is:
 	//
-	// The default value uses go build:
-	//
-	//     cd provider && go build -o "$(1)" ...
+	//     cd provider && GOOS=$(1) GOARCH=$(2) go build -o "$(3)" ...
 	//
 	// Customizing this value allows providers implemented in Node or other languages.
 	BuildProviderCmd string `yaml:"buildProviderCmd"`
