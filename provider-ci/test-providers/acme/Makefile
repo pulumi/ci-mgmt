@@ -230,13 +230,13 @@ test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h
 .PHONY: test
-
+test_provider_cmd = cd provider && go test -v -short \
+	-coverprofile="coverage.txt" \
+	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
+	-parallel $(TESTPARALLELISM) \
+	./...
 test_provider:
-	cd provider && go test -v -short \
-		-coverprofile="coverage.txt" \
-		-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
-		-parallel $(TESTPARALLELISM) \
-		./...
+	$(call test_provider_cmd)
 .PHONY: test_provider
 
 tfgen: schema
