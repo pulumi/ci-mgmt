@@ -106,12 +106,12 @@ jobs:
         role-session-name: eks@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
     - name: Generate test shards
-      run: |
+      run: |-
         cd examples
         go run github.com/pulumi/shard@48b47318fce7d75fd2df16b5c87467368d2bf3d5 \
             --total ${{ matrix.total-shards }} \
             --index ${{ matrix.current-shard }} \
-            --output env >> $GITHUB_ENV
+            --output env >> "$GITHUB_ENV"
     - name: Run tests
       run: |
         make GOTESTARGS="-run \"${SHARD_PATHS}\" ${SHARD_TESTS}" test
