@@ -228,11 +228,14 @@ lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
 .PHONY: lint_provider lint_provider.fix
 
+build_provider_cmd_default = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = $(call build_provider_cmd_default,$(1),$(2),$(3))
+
+provider: bin/$(PROVIDER)
+
 # `make provider_no_deps` builds the provider binary directly, without ensuring that
 # `cmd/pulumi-resource-docker/schema.json` is valid and up to date.
 # To create a release ready binary, you should use `make provider`.
-build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
-provider: bin/$(PROVIDER)
 provider_no_deps:
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 bin/$(PROVIDER): .make/schema
