@@ -141,6 +141,9 @@ integrationTestProvider: false
 # This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
 
+# How many shared to execute integration tests with. If omitted, shard behavior defaults to language-based sharding.
+shards: 0
+
 # runner defines the runs-on property for various stages of the build
 # These are not overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22runner%3A%22&type=code
 runner:
