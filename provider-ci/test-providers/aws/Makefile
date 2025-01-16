@@ -224,9 +224,7 @@ lint_provider: provider
 lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
 .PHONY: lint_provider lint_provider.fix
-
-build_provider_cmd_default = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
-build_provider_cmd = $(call build_provider_cmd_default,$(1),$(2),$(3))
+build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
 
 provider: bin/$(PROVIDER)
 
@@ -253,7 +251,7 @@ test_provider:
 .PHONY: test_provider
 
 tfgen: schema
-schema: .make/schema 
+schema: .make/schema
 # This does actually have dependencies, but we're keeping it around for backwards compatibility for now
 tfgen_no_deps: .make/schema
 .make/schema: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
