@@ -285,6 +285,9 @@ type Config struct {
 	// Customizing this value allows providers implemented in Node or other languages.
 	BuildProviderCmd string `yaml:"buildProviderCmd"`
 
+	// Customizes a hook to run right before BuildProviderCmd.
+	BuildProviderPre string `yaml:"buildProviderPre"`
+
 	// Customizes the Make function test_provider_cmd.
 	//
 	// This function is called without arguments to run unit tests for the provider binary.

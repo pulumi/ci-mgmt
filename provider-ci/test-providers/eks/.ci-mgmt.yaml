@@ -23,3 +23,4 @@ env:
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
 template: generic
 freeDiskSpaceBeforeTest: true # TODO: https://github.com/pulumi/pulumi/issues/17718
+buildProviderPre: echo building-provider
