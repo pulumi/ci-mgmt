@@ -965,7 +965,7 @@ export class WeeklyPulumiUpdate implements NormalJob {
       steps.UpdatePulumi(),
       steps.InitializeSubModules(opts.submodules),
       steps.ProviderWithPulumiUpgrade(opts.provider),
-      steps.CreateUpdatePulumiPR(opts.defaultBranch),
+      steps.CreateUpdatePulumiPR(),
       // steps.SetPRAutoMerge(opts.provider),
     ].filter((step: Step) => step.uses !== undefined || step.run !== undefined);
     Object.assign(this, { name });
