@@ -1030,7 +1030,7 @@ export function ProviderWithPulumiUpgrade(provider: string): Step {
   };
 }
 
-export function CreateUpdatePulumiPR(branch: string): Step {
+export function CreateUpdatePulumiPR(): Step {
   return {
     name: "Create PR",
     id: "create-pr",
@@ -1040,8 +1040,9 @@ export function CreateUpdatePulumiPR(branch: string): Step {
       "\n" +
       'msg="Automated upgrade: bump pulumi/pulumi to ${ver}"' +
       "\n" +
-      'gh pr create -t "$msg" -b "$msg" -B ' +
-      branch +
+      "# See https://github.com/cli/cli/issues/6485#issuecomment-2560935183 for --head workaround" +
+      "\n" +
+      'gh pr create -t "$msg" -b "$msg" --head $(git branch --show-current)' +
       "\n",
     env: {
       GITHUB_TOKEN: "${{ secrets.PULUMI_BOT_TOKEN }}",
