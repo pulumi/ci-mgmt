@@ -41,7 +41,7 @@ type templateContext struct {
 }
 
 func GeneratePackage(opts GenerateOpts) error {
-	templateDirs, err := getTemplateDirs(opts.TemplateName)
+	templateDirs, err := getTemplateDirs(opts)
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}

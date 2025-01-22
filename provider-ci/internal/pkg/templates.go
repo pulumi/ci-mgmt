@@ -24,10 +24,10 @@ const (
 // Templates are composed of one or more template folders within this directory.
 // Each directory is rendered into the same output directory.
 // Care should be taken to ensure that the template files do not conflict with each other.
-func getTemplateDirs(templateName string) ([]string, error) {
+func getTemplateDirs(opts GenerateOpts) ([]string, error) {
 	// Note: Render more specific templates last to allow them to override more general templates.
 	// The `.ci-mgmt.yaml` `template` property can be set to one of 3 values:
-	switch templateName {
+	switch opts.TemplateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
 		return []string{devContainer, provider, pulumiProvider, providerCi, bridgedProvider}, nil
@@ -41,6 +41,6 @@ func getTemplateDirs(templateName string) ([]string, error) {
 		// currently almost identical to the bridged-provider template
 		return []string{provider, pulumiProvider, providerCi, bridgedProvider}, nil
 	default:
-		return nil, fmt.Errorf("unknown template: %s", templateName)
+		return nil, fmt.Errorf("unknown template: %s", opts.TemplateName)
 	}
 }
