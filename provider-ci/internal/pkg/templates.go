@@ -34,6 +34,9 @@ func getTemplateDirs(templateName string) ([]string, error) {
 	case "external-bridged-provider":
 		// third-party bridged providers
 		return []string{devContainer, provider, externalProvider, providerCi, bridgedProvider}, nil
+	case "pulumi-custom-provider":
+		// Any Pulumi-owned provider that isn't bridged
+		return []string{devContainer, provider, pulumiProvider, providerCi}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
 		return []string{provider, pulumiProvider, providerCi, bridgedProvider}, nil
