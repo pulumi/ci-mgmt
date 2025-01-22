@@ -6,6 +6,7 @@
     "artifactory",
     "auth0",
     "aws",
+    "aws-apigateway",
     "awsx",
     "azure",
     "azuread",
