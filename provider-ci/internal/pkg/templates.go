@@ -18,6 +18,8 @@ const (
 	providerCi = "provider-ci"
 	// Makefile for bridged providers (internal & external)
 	bridgedProvider = "bridged-provider"
+	// Makefile for typescript providers
+	typescriptProvider = "typescript-provider"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -37,6 +39,9 @@ func getTemplateDirs(opts GenerateOpts) ([]string, error) {
 	case "pulumi-custom-provider":
 		// Any Pulumi-owned provider that isn't bridged
 		return []string{devContainer, provider, pulumiProvider, providerCi}, nil
+	case "pulumi-typescript-provider":
+		// Any Pulumi-owned provider that's written in TypeScript
+		return []string{devContainer, provider, pulumiProvider, typescriptProvider}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
 		return []string{provider, pulumiProvider, providerCi, bridgedProvider}, nil
