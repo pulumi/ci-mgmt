@@ -99,29 +99,6 @@ func GeneratePackage(opts GenerateOpts) error {
 	return nil
 }
 
-// getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
-// Each directory is rendered into the same output directory.
-// Care should be taken to ensure that the template files do not conflict with each other.
-func getTemplateDirs(templateName string) ([]string, error) {
-	// Available templates:
-	// - provider: the main template for any provider repository
-	// - pulumi-provider: a template for a Pulumi-managed provider. This folder consolidates files not needed for external providers.
-	// - bridged-provider: a template for a provider repository that uses tf-bridge & follows the boilerplate structure.
-	// - dev-container: a dev-container setup for any pulumi related project.
-	switch templateName {
-	case "bridged-provider":
-		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "pulumi-provider", "bridged-provider"}, nil
-	case "external-bridged-provider":
-		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "external-provider", "bridged-provider"}, nil
-	case "generic":
-		return []string{"provider", "pulumi-provider", "bridged-provider"}, nil
-	default:
-		return nil, fmt.Errorf("unknown template: %s", templateName)
-	}
-}
-
 func getDeletedFiles(templateName string) []string {
 	switch templateName {
 	case "bridged-provider":
