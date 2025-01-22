@@ -57,6 +57,14 @@ jobs:
         uses: ./.github/actions/download-codegen
       - name: Update path
         run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+      - name: Download schema-embed.json
+        uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
+        with:
+          # Use a pattern to avoid failing if the artifact doesn't exist
+          pattern: schema-embed.*
+          # Avoid creating directories for each artifact
+          merge-multiple: true
+          path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#
       - name: Restore makefile progress
         run: make --touch provider schema
       - name: Build SDK
