@@ -139,14 +139,14 @@ jobs:
     #{{- end }}#
     - name: Run tests
       if: matrix.testTarget == 'local'
-      run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
+      run: cd #{{ .Config.TestFolder }}# && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
     - name: Run pulumi/examples tests
       if: matrix.testTarget == 'pulumiExamples'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
 #{{- else }}#
     - name: Generate test shards
       run: |-
-        cd examples
+        cd #{{ .Config.TestFolder }}#
         go run github.com/pulumi/shard@861c9ce4aa851e98c19f8376892bf7e47238fa1b \
             --total ${{ matrix.total-shards }} \
             --index ${{ matrix.current-shard }} \

@@ -304,6 +304,10 @@ type Config struct {
 
 	// Kubectl determines if we need to install the kubectl CLI. Used in pulumi-eks currently.
 	Kubectl bool `yaml:"kubectl"`
+
+	// TestFolder defines where the test directory for integration tests is located.
+	// Defaults to "examples" if not set.
+	TestFolder string `yaml:"test-folder"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with

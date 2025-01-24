@@ -54,6 +54,10 @@ func GeneratePackage(opts GenerateOpts) error {
 		opts.Config.ToolVersions.PulumiCTL = defaultPulumiCTLVersion
 	}
 
+	if opts.Config.TestFolder == "" {
+		opts.Config.TestFolder = "examples"
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
