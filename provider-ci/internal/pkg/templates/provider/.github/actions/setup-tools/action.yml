@@ -56,6 +56,16 @@ runs:
       uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1.14.0
       with:
         repo: pulumi/schema-tools
+    
+    #{{- if .Config.Kubectl }}#
+
+    - name: Install Kubectl
+      shell: bash
+      run: |
+        curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv kubectl /usr/local/bin
+    #{{- end }}#
 
     - name: Setup Node
       if: inputs.tools == 'all' || contains(inputs.tools, 'nodejs')

@@ -301,6 +301,9 @@ type Config struct {
 	// This function is called by the make renovate target after the Renovate bot has finished updating
 	// project dependencies in a PR. It is responsible for rebuilding any generated files as needed.
 	RenovateCmd string `yaml:"renovateCmd"`
+
+	// Kubectl determines if we need to install the kubectl CLI. Used in pulumi-eks currently.
+	Kubectl bool `yaml:"kubectl"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
