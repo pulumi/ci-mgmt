@@ -70,6 +70,11 @@ jobs:
         runner: ["ubuntu-latest"]
 #{{- end }}#
     runs-on: ${{ matrix.runner }}
+#{{- if and .Config.ReleaseVerification .Config.GCP }}#
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+#{{- end }}#
     steps:
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
