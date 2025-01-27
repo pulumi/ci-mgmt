@@ -71,6 +71,8 @@ jobs:
 #{{- end }}#
     runs-on: ${{ matrix.runner }}
     steps:
+      - name: Configure Git to checkout files with long names
+        run: git config --global core.longpaths true
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
