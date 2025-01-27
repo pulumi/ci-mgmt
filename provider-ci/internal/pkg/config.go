@@ -302,8 +302,9 @@ type Config struct {
 	// project dependencies in a PR. It is responsible for rebuilding any generated files as needed.
 	RenovateCmd string `yaml:"renovateCmd"`
 
-	// Kubectl determines if we need to install the kubectl CLI. Used in pulumi-eks currently.
-	Kubectl bool `yaml:"kubectl"`
+	// InstallKubectl determines if we need to install the kubectl CLI. This will use the latest stable version.
+	// Used in pulumi-eks currently.
+	InstallKubectl string `yaml:"install-kubectl"`
 
 	// TestFolder defines where the test directory for integration tests is located.
 	// Defaults to "examples" if not set.
