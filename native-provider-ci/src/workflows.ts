@@ -207,7 +207,7 @@ export function BuildWorkflow(
       },
       workflow_dispatch: {},
     },
-    env: env(opts),
+    env: azureEnv(env(opts)),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
