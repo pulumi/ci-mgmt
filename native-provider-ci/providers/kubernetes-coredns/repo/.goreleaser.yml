@@ -2,25 +2,42 @@
 
 project_name: pulumi-kubernetes-coredns
 builds:
-- dir: provider
+- id: build-provider
+  dir: provider
   env:
   - CGO_ENABLED=0
   - GO111MODULE=on
   goos:
   - darwin
-  - windows
   - linux
   goarch:
   - amd64
   - arm64
-  ignore: []
+  ignore: &a1 []
   main: ./cmd/pulumi-resource-kubernetes-coredns/
-  ldflags:
-  - -s
-  - -w
-  - -X
-    github.com/pulumi/pulumi-kubernetes-coredns/provider/pkg/version.Version={{.Tag}}
+  ldflags: &a2
+    - -s
+    - -w
+    - -X
+      github.com/pulumi/pulumi-kubernetes-coredns/provider/pkg/version.Version={{.Tag}}
   binary: pulumi-resource-kubernetes-coredns
+- id: build-provider-sign-windows
+  dir: provider
+  env:
+  - CGO_ENABLED=0
+  - GO111MODULE=on
+  goos:
+  - windows
+  goarch:
+  - amd64
+  - arm64
+  ignore: *a1
+  main: ./cmd/pulumi-resource-kubernetes-coredns/
+  ldflags: *a2
+  binary: pulumi-resource-kubernetes-coredns
+  hooks:
+    post:
+    - make sign-goreleaser-exe-{{ .Arch }}
 archives:
 - name_template: "{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
   id: archive

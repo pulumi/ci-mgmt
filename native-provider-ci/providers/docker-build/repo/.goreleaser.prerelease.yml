@@ -2,26 +2,43 @@
 
 project_name: pulumi-docker-build
 builds:
-- dir: provider
+- id: build-provider
+  dir: provider
   env:
   - CGO_ENABLED=0
   - GO111MODULE=on
   goos:
   - darwin
-  - windows
   - linux
   goarch:
   - amd64
   - arm64
-  ignore: []
+  ignore: &a1 []
   main: ./cmd/pulumi-resource-docker-build/
-  ldflags:
-  - -s
-  - -w
-  - -X
-    github.com/pulumi/pulumi-docker-build/provider/pkg/version.Version={{.Tag}}
-  - -X github.com/pulumi/pulumi-docker-build/provider.Version={{.Tag}}
+  ldflags: &a2
+    - -s
+    - -w
+    - -X
+      github.com/pulumi/pulumi-docker-build/provider/pkg/version.Version={{.Tag}}
+    - -X github.com/pulumi/pulumi-docker-build/provider.Version={{.Tag}}
   binary: pulumi-resource-docker-build
+- id: build-provider-sign-windows
+  dir: provider
+  env:
+  - CGO_ENABLED=0
+  - GO111MODULE=on
+  goos:
+  - windows
+  goarch:
+  - amd64
+  - arm64
+  ignore: *a1
+  main: ./cmd/pulumi-resource-docker-build/
+  ldflags: *a2
+  binary: pulumi-resource-docker-build
+  hooks:
+    post:
+    - make sign-goreleaser-exe-{{ .Arch }}
 archives:
 - name_template: "{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
   id: archive

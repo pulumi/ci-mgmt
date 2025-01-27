@@ -60,6 +60,20 @@ const env = (opts: WorkflowOpts) =>
     opts.env
   );
 
+// azureEnv sets up the environment variables required to sign Windows binaries.
+const azureEnv = (env: { [k: string]: string | number | boolean }) =>
+  Object.assign(
+    {
+      AZURE_SIGNING_CLIENT_ID: "${{ secrets.AZURE_SIGNING_CLIENT_ID }}",
+      AZURE_SIGNING_CLIENT_SECRET: "${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}",
+      AZURE_SIGNING_TENANT_ID: "${{ secrets.AZURE_SIGNING_TENANT_ID }}",
+      AZURE_SIGNING_KEY_VAULT_URI: "${{ secrets.AZURE_SIGNING_KEY_VAULT_URI }}",
+      SKIP_SIGNING:
+        "${{ secrets.AZURE_SIGNING_CLIENT_ID == '' && secrets.AZURE_SIGNING_CLIENT_SECRET == '' && secrets.AZURE_SIGNING_TENANT_ID == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}",
+    },
+    env
+  );
+
 // This section represents GHA files, sub-jobs are in a section below
 
 // Creates command-dispatch.yml
@@ -193,7 +207,7 @@ export function BuildWorkflow(
       },
       workflow_dispatch: {},
     },
-    env: env(opts),
+    env: azureEnv(env(opts)),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
@@ -236,7 +250,7 @@ export function PrereleaseWorkflow(
       },
     },
     env: {
-      ...env(opts),
+      ...azureEnv(env(opts)),
       IS_PRERELEASE: true,
     },
     jobs: {
@@ -275,7 +289,7 @@ export function ReleaseWorkflow(
         tags: ["v*.*.*", "!v*.*.*-**"],
       },
     },
-    env: env(opts),
+    env: azureEnv(env(opts)),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
       build_sdks: new BuildSdkJob("build_sdks", opts, true),

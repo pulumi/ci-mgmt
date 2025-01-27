@@ -13,6 +13,7 @@ export interface Build {
   goarm?: string[];
   skip?: boolean;
   ignore?: Ignores[];
+  hooks?: { post: string[] };
 }
 
 export interface FormatOverride {
@@ -162,14 +163,27 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
     }
     this.builds = [
       {
+        id: "build-provider",
         dir: "provider",
         env: ["CGO_ENABLED=0", "GO111MODULE=on"],
-        goos: ["darwin", "windows", "linux"],
+        goos: ["darwin", "linux"],
         goarch: ["amd64", "arm64"],
         ignore: ignores,
         main: `./cmd/pulumi-resource-${opts.provider}/`,
         ldflags: ldflags,
         binary: `pulumi-resource-${opts.provider}`,
+      },
+      {
+        id: "build-provider-sign-windows",
+        dir: "provider",
+        env: ["CGO_ENABLED=0", "GO111MODULE=on"],
+        goos: ["windows"],
+        goarch: ["amd64", "arm64"],
+        ignore: ignores,
+        main: `./cmd/pulumi-resource-${opts.provider}/`,
+        ldflags: ldflags,
+        binary: `pulumi-resource-${opts.provider}`,
+        hooks: { post: ["make sign-goreleaser-exe-{{ .Arch }}"] },
       },
     ];
     // Don't disable CGO for azure-native and aws-native to support mac users
