@@ -70,6 +70,11 @@ jobs:
         runner: ["ubuntu-latest"]
 #{{- end }}#
     runs-on: ${{ matrix.runner }}
+#{{- if and .Config.ReleaseVerification .Config.GCP }}#
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+#{{- end }}#
     steps:
       - name: Configure Git to checkout files with long names
         run: git config --global core.longpaths true
