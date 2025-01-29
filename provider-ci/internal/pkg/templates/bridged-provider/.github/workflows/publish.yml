@@ -206,6 +206,10 @@ jobs:
   verify_release:
     name: verify_release
     needs: publish_sdk
+    #{{- if .Config.GCP }}#
+    permissions:
+      id-token: write
+    #{{- end }}#
     uses: ./.github/workflows/verify-release.yml
     secrets: inherit
     with:
