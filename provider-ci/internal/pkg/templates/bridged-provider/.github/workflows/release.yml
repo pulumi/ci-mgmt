@@ -52,6 +52,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      #{{- if .Config.GCP }}#
+      id-token: write
+      #{{- end }}#
     needs:
       - prerequisites
       - build_provider
