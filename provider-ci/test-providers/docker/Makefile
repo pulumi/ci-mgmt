@@ -15,11 +15,13 @@ PULUMI_PROVIDER_BUILD_PARALLELISM ?=
 PULUMI_CONVERT := 1
 PULUMI_MISSING_DOCS_ERROR := true
 
-PULUMICTL_VERSION := v0.0.46
+PULUMICTL_VERSION := v0.0.48
 PULUMICTL := $(shell which pulumictl || \
 	(test ! -e $(WORKING_DIR)/bin/pulumictl && \
-		GOPATH="$(WORKING_DIR)" go install "github.com/pulumi/pulumictl/cmd/pulumictl@$(PULUMICTL_VERSION)"; \
-	echo "$(WORKING_DIR)/bin/pulumictl"))
+		go install "github.com/pulumi/pulumictl/cmd/pulumictl@$(PULUMICTL_VERSION)" && \
+		mkdir -p "$(WORKING_DIR)/bin" && \
+		cp "$(shell go env GOPATH)/bin/pulumictl" "$(WORKING_DIR)/bin/pulumictl"; \
+		echo "$(WORKING_DIR)/bin/pulumictl"))
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
