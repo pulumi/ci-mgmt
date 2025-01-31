@@ -1,5 +1,5 @@
 package pkg
 
 const (
-	defaultPulumiCTLVersion = "v0.0.46"
+	defaultPulumiCTLVersion = "v0.0.48"
 )
