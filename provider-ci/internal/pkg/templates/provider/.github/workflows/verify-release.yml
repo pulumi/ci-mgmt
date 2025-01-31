@@ -70,7 +70,7 @@ jobs:
         runner: ["ubuntu-latest"]
 #{{- end }}#
     runs-on: ${{ matrix.runner }}
-#{{- if and .Config.ReleaseVerification .Config.GCP }}#
+#{{- if .Config.ReleaseVerification }}#
     permissions:
       contents: 'read'
       id-token: 'write'

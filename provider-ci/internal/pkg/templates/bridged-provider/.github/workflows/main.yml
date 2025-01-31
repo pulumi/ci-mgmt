@@ -87,9 +87,7 @@ jobs:
     name: publish
     permissions:
       contents: write
-      #{{- if .Config.GCP }}#
       id-token: write
-      #{{- end }}#
     needs:
       - prerequisites
       - build_provider
