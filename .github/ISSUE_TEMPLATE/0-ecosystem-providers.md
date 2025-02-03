@@ -11,13 +11,13 @@ assignees: ''
 
 ## Native Providers
 
-- [ ] [aws-apigateway](https://github.com/pulumi/pulumi-aws-apigateway) (not managed)
+- [ ] [aws-apigateway](https://github.com/pulumi/pulumi-aws-apigateway)
 - [ ] [aws-native](https://github.com/pulumi/pulumi-aws-native)
-- [ ] [awsx](https://github.com/pulumi/pulumi-awsx) (not managed)
+- [ ] [awsx](https://github.com/pulumi/pulumi-awsx)
 - [ ] [azure-native](https://github.com/pulumi/pulumi-azure-native) (not managed)
 - [ ] [command](https://github.com/pulumi/pulumi-command)
 - [ ] [docker-build](https://github.com/pulumi/pulumi-docker-build)
-- [ ] [eks](https://github.com/pulumi/pulumi-eks) (not managed)
+- [ ] [eks](https://github.com/pulumi/pulumi-eks)
 - [ ] [google-native](https://github.com/pulumi/pulumi-google-native) (deprecated)
 - [ ] [kubernetes](https://github.com/pulumi/pulumi-kubernetes)
 - [ ] [kubernetes-cert-manager](https://github.com/pulumi/pulumi-kubernetes-cert-manager)
