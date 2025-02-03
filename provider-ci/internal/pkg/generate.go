@@ -120,7 +120,7 @@ func getDeletedFiles(templateName string) []string {
 	}
 }
 
-func renderTemplateDir(template string, opts GenerateOpts) error {
+func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 	// Template context is global and loaded from the file at opts.configPath
 	// The embedded filesystem templateFS should contain a subdirectory with the name of opts.templateName
 	// For each file in the subdirectory, apply templating and write to opts.outDir with the same relative path
@@ -144,7 +144,7 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 		Config:      config,
 	}
 
-	templateDir := filepath.Join("templates", template)
+	templateDir := filepath.Join("templates", string(template))
 
 	var err error
 	ctx.Splices, err = collectSplices(templateDir, ctx)
@@ -220,21 +220,21 @@ func collectSplices(templateDir string, tc templateContext) (map[string]string, 
 	return splices, nil
 }
 
-func ListTemplates() ([]string, error) {
+func ListTemplates() ([]TemplateDir, error) {
 	dirEntries, err := templateFS.ReadDir("templates")
 	if err != nil {
 		return nil, err
 	}
-	var templateNames []string
+	var templateNames []TemplateDir
 	for _, dirEntry := range dirEntries {
 		if dirEntry.IsDir() {
-			templateNames = append(templateNames, dirEntry.Name())
+			templateNames = append(templateNames, TemplateDir(dirEntry.Name()))
 		}
 	}
 	return templateNames, nil
 }
 
-func HasTemplate(name string) bool {
+func HasTemplate(name TemplateDir) bool {
 	templates, err := ListTemplates()
 	if err != nil {
 		return false

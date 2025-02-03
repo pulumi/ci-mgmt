@@ -17,7 +17,7 @@ var listTemplatesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		out, err := yaml.Marshal(struct{ Templates []string }{Templates: templates})
+		out, err := yaml.Marshal(struct{ Templates []pkg.TemplateDir }{Templates: templates})
 		if err != nil {
 			return err
 		}
