@@ -18,7 +18,9 @@ const (
 	pulumiProvider TemplateDir = "pulumi-provider"
 	// ci-mgmt pull-based updates workflow
 	externalProvider TemplateDir = "external-provider"
-	// CI and Makefile for bridged providers (internal & external)
+	// Generic provider CI templates
+	providerCi = "provider-ci"
+	// Makefile for bridged providers (internal & external)
 	bridgedProvider TemplateDir = "bridged-provider"
 )
 
@@ -32,13 +34,13 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{devContainer, provider, pulumiProvider, bridgedProvider}, nil
+		return []TemplateDir{devContainer, provider, pulumiProvider, providerCi, bridgedProvider}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{devContainer, provider, externalProvider, bridgedProvider}, nil
+		return []TemplateDir{devContainer, provider, externalProvider, providerCi, bridgedProvider}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
-		return []TemplateDir{provider, pulumiProvider, bridgedProvider}, nil
+		return []TemplateDir{provider, pulumiProvider, providerCi, bridgedProvider}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
