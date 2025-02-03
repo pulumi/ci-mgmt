@@ -309,6 +309,9 @@ type Config struct {
 	// TestFolder defines where the test directory for integration tests is located.
 	// Defaults to "examples" if not set.
 	TestFolder string `yaml:"test-folder"`
+
+	// AutoMergeProviderUpgrades controls whether we automatically merge upstream provider upgrades.
+	AutoMergeProviderUpgrades bool `yaml:"autoMergeProviderUpgrades"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
