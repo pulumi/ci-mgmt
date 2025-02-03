@@ -19,7 +19,7 @@ const (
 	// Generic provider CI templates
 	providerCi = "provider-ci"
 	// Makefile for bridged providers (internal & external)
-	bridgedProvider TemplateDir = "bridged-provider"
+	bridged TemplateDir = "bridged"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -32,13 +32,13 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, internal, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, internal, providerCi, bridged}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, external, providerCi, bridged}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
-		return []TemplateDir{base, internal, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, internal, providerCi, bridged}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
