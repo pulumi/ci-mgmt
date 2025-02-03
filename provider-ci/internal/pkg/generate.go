@@ -99,29 +99,6 @@ func GeneratePackage(opts GenerateOpts) error {
 	return nil
 }
 
-// getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
-// Each directory is rendered into the same output directory.
-// Care should be taken to ensure that the template files do not conflict with each other.
-func getTemplateDirs(templateName string) ([]string, error) {
-	// Available templates:
-	// - provider: the main template for any provider repository
-	// - pulumi-provider: a template for a Pulumi-managed provider. This folder consolidates files not needed for external providers.
-	// - bridged-provider: a template for a provider repository that uses tf-bridge & follows the boilerplate structure.
-	// - dev-container: a dev-container setup for any pulumi related project.
-	switch templateName {
-	case "bridged-provider":
-		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "pulumi-provider", "bridged-provider"}, nil
-	case "external-bridged-provider":
-		// Render more specific templates last to allow them to override more general templates.
-		return []string{"dev-container", "provider", "external-provider", "bridged-provider"}, nil
-	case "generic":
-		return []string{"provider", "pulumi-provider", "bridged-provider"}, nil
-	default:
-		return nil, fmt.Errorf("unknown template: %s", templateName)
-	}
-}
-
 func getDeletedFiles(templateName string) []string {
 	switch templateName {
 	case "bridged-provider":
@@ -143,7 +120,7 @@ func getDeletedFiles(templateName string) []string {
 	}
 }
 
-func renderTemplateDir(template string, opts GenerateOpts) error {
+func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 	// Template context is global and loaded from the file at opts.configPath
 	// The embedded filesystem templateFS should contain a subdirectory with the name of opts.templateName
 	// For each file in the subdirectory, apply templating and write to opts.outDir with the same relative path
@@ -167,7 +144,7 @@ func renderTemplateDir(template string, opts GenerateOpts) error {
 		Config:      config,
 	}
 
-	templateDir := filepath.Join("templates", template)
+	templateDir := filepath.Join("templates", string(template))
 
 	var err error
 	ctx.Splices, err = collectSplices(templateDir, ctx)
@@ -243,21 +220,21 @@ func collectSplices(templateDir string, tc templateContext) (map[string]string, 
 	return splices, nil
 }
 
-func ListTemplates() ([]string, error) {
+func ListTemplates() ([]TemplateDir, error) {
 	dirEntries, err := templateFS.ReadDir("templates")
 	if err != nil {
 		return nil, err
 	}
-	var templateNames []string
+	var templateNames []TemplateDir
 	for _, dirEntry := range dirEntries {
 		if dirEntry.IsDir() {
-			templateNames = append(templateNames, dirEntry.Name())
+			templateNames = append(templateNames, TemplateDir(dirEntry.Name()))
 		}
 	}
 	return templateNames, nil
 }
 
-func HasTemplate(name string) bool {
+func HasTemplate(name TemplateDir) bool {
 	templates, err := ListTemplates()
 	if err != nil {
 		return false

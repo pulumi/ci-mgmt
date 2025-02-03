@@ -1,5 +1,5 @@
 # The default template name to apply
-# Possible template names can be found in the getTemplateDirs function in provider-ci/internal/pkg/generate.go file
+# Possible template names can be found in ../templates.go
 template: bridged-provider
 
 # provider is the name of the provider without the pulumi-prefix e.g. "aws"
