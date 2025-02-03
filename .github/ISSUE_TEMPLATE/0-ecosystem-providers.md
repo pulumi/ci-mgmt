@@ -54,7 +54,6 @@ assignees: ''
 - [ ] [archive](https://github.com/pulumi/pulumi-archive)
 - [ ] [artifactory](https://github.com/pulumi/pulumi-artifactory)
 - [ ] [azuredevops](https://github.com/pulumi/pulumi-azuredevops)
-- [ ] [civo](https://github.com/pulumi/pulumi-civo)
 - [ ] [cloudamqp](https://github.com/pulumi/pulumi-cloudamqp)
 - [ ] [cloudinit](https://github.com/pulumi/pulumi-cloudinit)
 - [ ] [cloudngfwaws](https://github.com/pulumi/pulumi-cloudngfwaws)
