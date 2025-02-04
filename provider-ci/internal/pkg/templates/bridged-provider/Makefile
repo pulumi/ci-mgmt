@@ -31,12 +31,6 @@ PULUMI_CONVERT := 0
 #{{- end }}#
 PULUMI_MISSING_DOCS_ERROR := true
 
-PULUMICTL_VERSION := #{{ .Config.ToolVersions.PulumiCTL }}#
-PULUMICTL := $(shell which pulumictl || \
-	(test ! -e $(WORKING_DIR)/bin/pulumictl && \
-		GOPATH="$(WORKING_DIR)" go install "github.com/pulumi/pulumictl/cmd/pulumictl@$(PULUMICTL_VERSION)"; \
-	echo "$(WORKING_DIR)/bin/pulumictl"))
-
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
 PROVIDER_VERSION ?= #{{ .Config.MajorVersion }}#.0.0-alpha.0+dev
@@ -340,8 +334,12 @@ endif
 #{{- end }}#
 .PHONY: upstream
 
-bin/pulumi-java-gen: .pulumi-java-gen.version
-	$(PULUMICTL) download-binary -n pulumi-language-java -v v$(shell cat .pulumi-java-gen.version) -r pulumi/pulumi-java
+bin/pulumi-java-gen: PULUMI_JAVA_VERSION := $(shell cat .pulumi-java-gen.version)
+bin/pulumi-java-gen: PLAT := $(shell go version | sed -En "s/go version go.* (.*)\/(.*)/\1-\2/p")
+bin/pulumi-java-gen: PULUMI_JAVA_URL := "https://github.com/pulumi/pulumi-java/releases/download/v$(PULUMI_JAVA_VERSION)/pulumi-language-java-v$(PULUMI_JAVA_VERSION)-$(PLAT).tar.gz"
+bin/pulumi-java-gen:
+	wget -q -O - "$(PULUMI_JAVA_URL)" | tar -xzf - -C $(WORKING_DIR)/bin pulumi-java-gen
+	@touch bin/pulumi-language-java
 
 # To make an immediately observable change to .ci-mgmt.yaml:
 #
