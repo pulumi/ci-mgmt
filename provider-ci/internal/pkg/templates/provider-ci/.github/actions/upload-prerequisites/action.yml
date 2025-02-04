@@ -1,0 +1,23 @@
+name: Upload SDK asset
+description: Upload the SDK for a specific language as an asset for the workflow.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Capture executable permissions
+      shell: bash
+      run: find bin -type f -executable > bin/executables.txt
+
+    - name: Upload prerequisites bin
+      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
+      with:
+        name: prerequisites-bin
+        path: bin/*
+        retention-days: 30
+
+    - name: Upload schema-embed.json
+      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
+      with:
+        name: schema-embed.json
+        path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
+        retention-days: 30

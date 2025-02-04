@@ -125,21 +125,5 @@ jobs:
         fi
 #{{- end }}#
 
-    - name: Upload codegen binary for #{{ .Config.Provider }}#
-      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
-      with:
-        #{{- if .Config.NoUpstream }}#
-        name: pulumi-gen-#{{ .Config.Provider }}#
-        path: ${{ github.workspace }}/bin/pulumi-gen-#{{ .Config.Provider }}#
-        #{{- else }}#
-        name: pulumi-tfgen-#{{ .Config.Provider }}#
-        path: ${{ github.workspace }}/bin/pulumi-tfgen-#{{ .Config.Provider }}#
-        #{{- end }}#
-        retention-days: 30
-
-    - name: Upload schema-embed.json
-      uses: #{{ .Config.ActionVersions.UploadArtifact }}#
-      with:
-        name: schema-embed.json
-        path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
-        retention-days: 30
+    - name: Upload artifacts
+      uses: ./.github/actions/upload-prerequisites
