@@ -91,6 +91,7 @@ jobs:
           username: pulumi-bot
           automerge: #{{ .Config.AutoMergeProviderUpgrades }}#
           target-version: ${{ steps.target_version.outputs.version }}
+          allow-missing-docs: #{{ .Config.AllowMissingDocs }}#
           #{{- if .Config.JavaGenVersion }}#
           target-java-version: #{{ .Config.JavaGenVersion }}#
           #{{- end }}#
