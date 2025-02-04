@@ -57,7 +57,7 @@ jobs:
     - name: Prepare local workspace
       run: make prepare_local_workspace
     - name: Download bin
-      uses: ./.github/actions/download-bin
+      uses: ./.github/actions/download-provider
     #{{- if not .Config.Shards }}#
     - name: Download SDK
       uses: ./.github/actions/download-sdk
