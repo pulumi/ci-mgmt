@@ -12,7 +12,7 @@ runs:
 
     - name: Restore executable permissions
       shell: bash
-      run: chomod +x $(< bin/executables.txt)
+      run: chmod +x $(< bin/executables.txt)
 
     - name: Remove executables list
       shell: bash
