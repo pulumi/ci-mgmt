@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Capture executable permissions
       shell: bash
-      run: find bin -type f -perm +111 > bin/executables.txt
+      run: find bin -type f -executable > bin/executables.txt
 
     - name: Upload prerequisites bin
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
