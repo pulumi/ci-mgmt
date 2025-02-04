@@ -60,15 +60,10 @@ jobs:
           tools: pulumictl, go
       - name: Prepare local workspace before restoring previously built
         run: make prepare_local_workspace
-      - name: Download schema-embed.json
-        uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
-        with:
-          # Use a pattern to avoid failing if the artifact doesn't exist
-          pattern: schema-embed.*
-          # Avoid creating directories for each artifact
-          merge-multiple: true
-          path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#
+      - name: Restore prerequisites
+        uses: ./.github/actions/download-prerequisites
       - name: Restore makefile progress
+        # This mirrors the targets completed in the prerequisites job
         run: make --touch provider schema
 
       - name: Build provider
