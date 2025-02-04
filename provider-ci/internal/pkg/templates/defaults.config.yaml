@@ -231,3 +231,6 @@ checkUpstreamUpgrade: true
 # (e.g. `aws-*`) which are considered provider-specific workflows. This will likely change to false in the future once
 # we've made the process of cleaning up removed and renamed workflows more reliable.
 clean-github-workflows: true
+
+# Whether we automatically merge upstream provider upgrades.
+autoMergeProviderUpgrades: false
