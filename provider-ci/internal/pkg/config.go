@@ -1,9 +1,8 @@
 package pkg
 
 import (
-	_ "embed" // For embedding action versions.
-
 	"bytes"
+	_ "embed" // For embedding action versions.
 	"fmt"
 	"os"
 	"path/filepath"
@@ -312,6 +311,10 @@ type Config struct {
 
 	// AutoMergeProviderUpgrades controls whether we automatically merge upstream provider upgrades.
 	AutoMergeProviderUpgrades bool `yaml:"autoMergeProviderUpgrades"`
+
+	// AllowMissingDocs controls whether we allow missing docs in the provider.
+	// Defaults to false.
+	AllowMissingDocs bool `yaml:"allowMissingDocs"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
