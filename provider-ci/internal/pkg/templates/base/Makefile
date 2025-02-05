@@ -43,7 +43,7 @@ endif
 # Strips debug information from the provider binary to reduce its size and speed up builds
 LDFLAGS_STRIP_SYMBOLS=-s -w
 LDFLAGS_PROJ_VERSION=-X $(PROJECT)/$(VERSION_PATH)=$(PROVIDER_VERSION)#{{if .Config.ProviderVersion}}# -X #{{ .Config.ProviderVersion }}#=$(PROVIDER_VERSION)#{{end}}#
-#{{- if and (not (eq .Config.ProviderVersion "")) (not .Config.NoUpstream) }}#
+#{{- if not (eq .Config.ProviderVersion "") }}#
 LDFLAGS_UPSTREAM_VERSION=-X #{{ .Config.ProviderVersion }}#=v$(PROVIDER_VERSION)
 #{{- else }}#
 LDFLAGS_UPSTREAM_VERSION=
