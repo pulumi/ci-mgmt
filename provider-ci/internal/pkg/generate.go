@@ -119,6 +119,10 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 		}
+	case "generic":
+		return []string{
+			".upgrade-config.yml", // Previously accidentally generated empty file.
+		}
 	default:
 		return nil
 	}
