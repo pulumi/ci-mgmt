@@ -312,15 +312,11 @@ tfgen_build_only: bin/$(CODEGEN)
 bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
-#{{ if .Config.NoUpstream }}#
-upstream: .make/upstream
-.make/upstream:
-	@touch $@
-#{{- else }}#
+
 # Apply patches to the upstream submodule, if it exists
 upstream: .make/upstream
-# Re-run if the upstream commit or the patches change
-.make/upstream: $(wildcard patches/*) $(shell ./upstream.sh file_target)
+# Re-run if the upstream commit or the patches change. Only call upstream.sh if it exists.
+.make/upstream: $(wildcard patches/*) $(shell type ./upstream.sh &>/dev/null && ./upstream.sh file_target)
 ifneq ("$(wildcard upstream)","")
 	./upstream.sh init
 endif
@@ -331,7 +327,6 @@ endif
 	cd upstream-tools && yarn --silent run apply
 #{{- end }}#
 	@touch $@
-#{{- end }}#
 .PHONY: upstream
 
 bin/pulumi-java-gen: PULUMI_JAVA_VERSION := $(shell cat .pulumi-java-gen.version)

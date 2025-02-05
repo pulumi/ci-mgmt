@@ -257,8 +257,13 @@ bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
+# Apply patches to the upstream submodule, if it exists
 upstream: .make/upstream
-.make/upstream:
+# Re-run if the upstream commit or the patches change. Only call upstream.sh if it exists.
+.make/upstream: $(wildcard patches/*) $(shell type ./upstream.sh &>/dev/null && ./upstream.sh file_target)
+ifneq ("$(wildcard upstream)","")
+	./upstream.sh init
+endif
 	@touch $@
 .PHONY: upstream
 
