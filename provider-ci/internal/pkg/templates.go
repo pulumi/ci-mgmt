@@ -37,8 +37,8 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		// third-party bridged providers
 		return []TemplateDir{base, external, bridged}, nil
 	case "generic":
-		// currently almost identical to the bridged-provider template
-		return []TemplateDir{base, internal, bridged}, nil
+		// Pulumi-owned providers not based on tf-bridge
+		return []TemplateDir{base, internal}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
