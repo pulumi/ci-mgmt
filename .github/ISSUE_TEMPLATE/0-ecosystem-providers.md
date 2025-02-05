@@ -94,7 +94,6 @@ assignees: ''
 - [ ] [pagerduty](https://github.com/pulumi/pulumi-pagerduty)
 - [ ] [rabbitmq](https://github.com/pulumi/pulumi-rabbitmq)
 - [ ] [rancher2](https://github.com/pulumi/pulumi-rancher2)
-- [ ] [rke](https://github.com/pulumi/pulumi-rke)
 - [ ] [scm](https://github.com/pulumi/pulumi-scm)
 - [ ] [sdwan](https://github.com/pulumi/pulumi-sdwan)
 - [ ] [signalfx](https://github.com/pulumi/pulumi-signalfx)
