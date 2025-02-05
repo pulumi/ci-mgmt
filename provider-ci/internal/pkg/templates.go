@@ -15,7 +15,7 @@ const (
 	// CoC, upgrade-provider config, issue templates, command dispatch workflows
 	internal TemplateDir = "internal"
 	// ci-mgmt pull-based updates workflow
-	externalProvider TemplateDir = "external-provider"
+	external TemplateDir = "external"
 	// Makefile for bridged providers (internal & external)
 	bridgedProvider TemplateDir = "bridged-provider"
 )
@@ -33,7 +33,7 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		return []TemplateDir{base, internal, bridgedProvider}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, externalProvider, bridgedProvider}, nil
+		return []TemplateDir{base, external, bridgedProvider}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
 		return []TemplateDir{base, internal, bridgedProvider}, nil
