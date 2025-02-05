@@ -9,11 +9,7 @@ PROVIDER_PATH := provider/v#{{ .Config.MajorVersion }}#
 PROVIDER_PATH := provider
 #{{- end }}#
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
-#{{- if .Config.NoUpstream }}#
-CODEGEN := pulumi-gen-$(PACK)
-#{{- else }}#
-CODEGEN := pulumi-tfgen-$(PACK)
-#{{- end }}#
+CODEGEN := pulumi-#{{ .Config.GenName }}#-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 JAVA_GEN := pulumi-java-gen
 TESTPARALLELISM := 10

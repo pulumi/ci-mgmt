@@ -45,9 +45,15 @@ func GeneratePackage(opts GenerateOpts) error {
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
 	}
-	if opts.Config.Template == "generic" {
-		opts.Config.NoUpstream = true
-		opts.Config.CheckUpstreamUpgrade = false
+
+	// GenName defaults to "tfgen" for bridged providers and "gen" for others
+	if opts.Config.GenName == "" {
+		switch opts.TemplateName {
+		case "generic":
+			opts.Config.GenName = "gen"
+		default:
+			opts.Config.GenName = "tfgen"
+		}
 	}
 
 	if opts.Config.ToolVersions.PulumiCTL == "" {
