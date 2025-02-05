@@ -10,14 +10,12 @@ type TemplateDir string
 
 // Template directories
 const (
-	// git attributes, go config, CI reusable workflows, dev container
+	// git attributes, go config, CI reusable workflows, dev container, generic CI
 	base TemplateDir = "base"
 	// CoC, upgrade-provider config, issue templates, command dispatch workflows
 	pulumiProvider TemplateDir = "pulumi-provider"
 	// ci-mgmt pull-based updates workflow
 	externalProvider TemplateDir = "external-provider"
-	// Generic provider CI templates
-	providerCi = "provider-ci"
 	// Makefile for bridged providers (internal & external)
 	bridgedProvider TemplateDir = "bridged-provider"
 )
@@ -32,13 +30,13 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, pulumiProvider, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, pulumiProvider, bridgedProvider}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, externalProvider, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, externalProvider, bridgedProvider}, nil
 	case "generic":
 		// currently almost identical to the bridged-provider template
-		return []TemplateDir{base, pulumiProvider, providerCi, bridgedProvider}, nil
+		return []TemplateDir{base, pulumiProvider, bridgedProvider}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
