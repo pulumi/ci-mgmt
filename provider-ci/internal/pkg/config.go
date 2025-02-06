@@ -268,9 +268,9 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22makeTemplate%3A%22&type=code
 	MakeTemplate string `yaml:"makeTemplate"`
 
-	// NoUpstream is a temporary hack to disable bridge-specific workflow steps
-	// as part of the work to consolidate these with native providers.
-	NoUpstream bool
+	// Customizes the name of the "gen" program.
+	// Defaults to "tfgen" for bridged providers and "gen" for generic providers.
+	GenName string `yaml:"genName"`
 
 	// Customizes the Make function build_provider_cmd.
 	//
