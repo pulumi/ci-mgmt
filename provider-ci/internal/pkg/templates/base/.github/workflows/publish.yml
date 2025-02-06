@@ -66,6 +66,14 @@ jobs:
         path: dist
         # Don't create a directory for each artifact
         merge-multiple: true
+    - name: Download schema
+      uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
+      with:
+        # Use a pattern to avoid failing if the artifact doesn't exist
+        pattern: schema-embed.*
+        # Avoid creating directories for each artifact
+        merge-multiple: true
+        path: dist
     - name: Calculate checksums
       working-directory: dist
       run: shasum ./*.tar.gz > "pulumi-#{{ .Config.Provider }}#_${{ inputs.version }}_checksums.txt"
