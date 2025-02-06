@@ -313,9 +313,7 @@ bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
 upstream: .make/upstream
 # Re-run if the upstream commit or the patches change.
 .make/upstream: $(wildcard patches/*) $(shell ./scripts/upstream.sh file_target)
-ifneq ("$(wildcard upstream)","")
 	./scripts/upstream.sh init
-endif
 #{{- if .Config.XrunUpstreamTools }}#
 	# Ensure tool is installed
 	cd upstream-tools && yarn install --frozen-lockfile
