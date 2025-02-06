@@ -75,7 +75,6 @@ assignees: ''
 - [ ] [kafka](https://github.com/pulumi/pulumi-kafka)
 - [ ] [keycloak](https://github.com/pulumi/pulumi-keycloak)
 - [ ] [kong](https://github.com/pulumi/pulumi-kong)
-- [ ] [libvirt](https://github.com/pulumi/pulumi-libvirt)
 - [ ] [linode](https://github.com/pulumi/pulumi-linode)
 - [ ] [local](https://github.com/pulumi/pulumi-local)
 - [ ] [mailgun](https://github.com/pulumi/pulumi-mailgun)
