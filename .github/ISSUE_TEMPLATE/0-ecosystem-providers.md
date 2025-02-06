@@ -76,7 +76,6 @@ assignees: ''
 - [ ] [keycloak](https://github.com/pulumi/pulumi-keycloak)
 - [ ] [kong](https://github.com/pulumi/pulumi-kong)
 - [ ] [linode](https://github.com/pulumi/pulumi-linode)
-- [ ] [local](https://github.com/pulumi/pulumi-local)
 - [ ] [mailgun](https://github.com/pulumi/pulumi-mailgun)
 - [ ] [meraki](https://github.com/pulumi/pulumi-meraki)
 - [ ] [minio](https://github.com/pulumi/pulumi-minio)

@@ -40,7 +40,6 @@
     "keycloak",
     "kong",
     "linode",
-    "local",
     "mailgun",
     "meraki",
     "minio",
