@@ -237,7 +237,7 @@ checkUpstreamUpgrade: true
 clean-github-workflows: true
 
 # Whether we automatically merge upstream provider upgrades.
-autoMergeProviderUpgrades: false
+autoMergeProviderUpgrades: true
 
 # Whether we allow missing docs in the provider.
 allowMissingDocs: false
