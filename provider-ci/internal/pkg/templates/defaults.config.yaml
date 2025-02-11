@@ -240,4 +240,4 @@ clean-github-workflows: true
 autoMergeProviderUpgrades: false
 
 # Whether we allow missing docs in the provider.
-allowMissingDocs: false
+allowMissingDocs: true
