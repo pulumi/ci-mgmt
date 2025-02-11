@@ -86,7 +86,7 @@ jobs:
           username: pulumi-bot
           automerge: false
           target-version: ${{ steps.target_version.outputs.version }}
-          allow-missing-docs: true
+          allow-missing-docs: false
       - name: Comment on upgrade issue if automated PR failed
         if: steps.upgrade_provider.outcome == 'failure'
         shell: bash
