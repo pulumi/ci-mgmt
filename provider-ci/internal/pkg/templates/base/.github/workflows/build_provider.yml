@@ -67,6 +67,7 @@ jobs:
         # This mirrors the targets completed in the prerequisites job
         run: make --touch provider schema
       #{{- end }}#
+
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
         env:
