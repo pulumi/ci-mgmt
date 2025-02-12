@@ -19,6 +19,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
+  #{{- if not .Config.NoSchema }}#
   build_sdk:
     name: build_sdk
     needs: prerequisites
@@ -26,6 +27,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+  #{{- end }}#
 
   test:
     uses: ./.github/workflows/test.yml

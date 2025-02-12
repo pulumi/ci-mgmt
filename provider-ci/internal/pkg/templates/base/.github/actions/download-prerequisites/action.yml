@@ -18,6 +18,7 @@ runs:
       shell: bash
       run: rm bin/executables.txt
 
+    #{{- if not .Config.NoSchema }}#
     - name: Download schema-embed.json
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
@@ -26,3 +27,4 @@ runs:
         # Avoid creating directories for each artifact
         merge-multiple: true
         path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#
+    #{{- end }}#
