@@ -40,7 +40,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
-  #{{- if not .Config.NoSchema }}#
+  #{{ if not .Config.NoSchema -}}#
   build_sdk:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
