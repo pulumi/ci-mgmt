@@ -45,7 +45,7 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		// Pulumi-owned providers not based on tf-bridge
 		return []TemplateDir{base, bridgedMakefile, internal}, nil
 	case "parameterized-go":
-		return []TemplateDir{parameterizedGo}, nil
+		return []TemplateDir{base, parameterizedGo}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
