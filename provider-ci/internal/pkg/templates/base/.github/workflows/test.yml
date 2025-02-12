@@ -66,17 +66,22 @@ jobs:
     - name: Restore makefile progress
       run: make --touch provider schema build_${{ matrix.language }}
     #{{- else }}#
+    #{{- if not .Config.NoSchema }}#
     #{{- range $_, $language := .Config.Languages }}#
     - name: Download #{{ $language }}# SDK
       uses: ./.github/actions/download-sdk
       with:
         language: #{{ $language }}#
     #{{- end }}#
+    #{{- end }}#
+#{{- if not .Config.NoSchema }}#
     - name: Restore makefile progress
       run: make --touch provider schema build_sdks
+#{{- end }}#
     #{{- end }}#
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+    #{{- if not .Config.NoSchema }}#
     - name: Install Python deps
     #{{- if not .Config.Shards }}#
       if: matrix.language == 'python'
@@ -84,6 +89,7 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    #{{- end }}#
     #{{- if .Config.Docker }}#
     - name: Run docker compose
       run: docker compose -f testing/docker-compose.yml up --build -d
@@ -121,7 +127,7 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
-#{{- if .Config.Shards }}#
+#{{- if and .Config.Shards (not .Config.NoSchema) }}#
     - name: Install prebuilt SDKs
       run: make install_sdks
 #{{- end }}#

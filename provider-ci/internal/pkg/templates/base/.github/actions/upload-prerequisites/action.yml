@@ -15,9 +15,11 @@ runs:
         path: bin/*
         retention-days: 30
 
+    #{{ if not .Config.NoSchema -}}#
     - name: Upload schema-embed.json
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
       with:
         name: schema-embed.json
         path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
         retention-days: 30
+    #{{- end }}#

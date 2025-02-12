@@ -50,12 +50,14 @@ jobs:
       with:
         major-version: #{{ .Config.MajorVersion }}#
         set-env: 'PROVIDER_VERSION'
+    #{{- if not .Config.NoSchema }}#
     - name: Cache examples generation
       uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4
       with:
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+    #{{- end }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -65,8 +67,10 @@ jobs:
 #{{- if .Config.Actions.PreBuild }}#
 #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
 #{{- end }}#
+    #{{- if not .Config.NoSchema }}#
     - name: Generate schema
       run: make schema
+    #{{- end }}#
     #{{- if .Config.RegistryDocs }}#
     - name: Build registry docs
       run: make build_registry_docs
@@ -79,6 +83,7 @@ jobs:
       uses: #{{ .Config.ActionVersions.Codecov }}#
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#{{- if not .Config.NoSchema }}#
     - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
@@ -124,6 +129,7 @@ jobs:
         echo 'Details about them can be found in either the upstream docs or `schema.json`.'
         exit 1
         fi
+#{{- end }}#
 #{{- end }}#
 
     - name: Upload artifacts
