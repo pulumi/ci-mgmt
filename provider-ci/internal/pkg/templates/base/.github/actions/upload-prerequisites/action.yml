@@ -15,9 +15,8 @@ runs:
         path: bin/*
         retention-days: 30
 
-    #{{- if not .Config.NoSchema }}#
+    #{{ if not .Config.NoSchema -}}#
     - name: Upload schema-embed.json
-      if: inputs.schema != 'disabled'
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
       with:
         name: schema-embed.json
