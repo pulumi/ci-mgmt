@@ -27,7 +27,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
-  #{{- if not .Config.NoSchema }}#
+  #{{ if not .Config.NoSchema -}}#
   build_sdk:
     name: build_sdk
     needs: prerequisites
