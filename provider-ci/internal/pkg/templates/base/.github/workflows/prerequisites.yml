@@ -50,13 +50,14 @@ jobs:
       with:
         major-version: #{{ .Config.MajorVersion }}#
         set-env: 'PROVIDER_VERSION'
+    #{{- if not .Config.NoSchema }}#
     - name: Cache examples generation
-      if: env.PULUMI_BUILD_SCHEMA != 'disabled'
       uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4
       with:
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+    #{{- end }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -66,9 +67,10 @@ jobs:
 #{{- if .Config.Actions.PreBuild }}#
 #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
 #{{- end }}#
+    #{{- if not .Config.NoSchema }}#
     - name: Generate schema
-      if: env.PULUMI_BUILD_SCHEMA != 'disabled'
       run: make schema
+    #{{- end }}#
     #{{- if .Config.RegistryDocs }}#
     - name: Build registry docs
       run: make build_registry_docs
@@ -81,7 +83,8 @@ jobs:
       uses: #{{ .Config.ActionVersions.Codecov }}#
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - if: inputs.is_pr && (env.PULUMI_BUILD_SCHEMA != 'disabled')
+#{{- if not .Config.NoSchema }}#
+    - if: inputs.is_pr
       name: Check Schema is Valid
       run: |
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
@@ -90,7 +93,7 @@ jobs:
           schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
           echo "$EOF";
         } >> "$GITHUB_ENV"
-    - if: inputs.is_pr && (env.PULUMI_BUILD_SCHEMA != 'disabled') && inputs.is_automated == false && github.actor != 'dependabot[bot]'
+    - if: inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
@@ -103,7 +106,7 @@ jobs:
           Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
 
 #{{- if .Config.EnableConfigurationCheck }}#
-    - if: inputs.is_pr && (env.PULUMI_BUILD_SCHEMA != 'disabled')
+    - if: inputs.is_pr
       name: Check Configuration section
       run: |
         sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
@@ -115,7 +118,7 @@ jobs:
           echo "$EOF";
         } >> "$GITHUB_ENV"
 
-    - if: inputs.is_pr && (env.PULUMI_BUILD_SCHEMA != 'disabled') && inputs.is_automated == false
+    - if: inputs.is_pr && inputs.is_automated == false
       name: Check for missing config
       run: |
         if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
@@ -127,8 +130,7 @@ jobs:
         exit 1
         fi
 #{{- end }}#
+#{{- end }}#
 
     - name: Upload artifacts
       uses: ./.github/actions/upload-prerequisites
-      with:
-        schema: ${{ env.PULUMI_BUILD_SCHEMA }}

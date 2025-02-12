@@ -315,6 +315,10 @@ type Config struct {
 	// AllowMissingDocs controls whether we allow missing docs in the provider.
 	// Defaults to false.
 	AllowMissingDocs bool `yaml:"allowMissingDocs"`
+
+	// NoSchema is useful for providers such as parameterized providers that do not check in
+	// a fixed schema into the repository.
+	NoSchema bool `yaml:"noSchema"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
