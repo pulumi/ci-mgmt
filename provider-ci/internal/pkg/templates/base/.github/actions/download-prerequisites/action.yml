@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: rm bin/executables.txt
 
-    #{{- if not .Config.NoSchema }}#
+    #{{ if not .Config.NoSchema -}}#
     - name: Download schema-embed.json
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
