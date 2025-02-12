@@ -72,8 +72,10 @@ jobs:
       with:
         language: #{{ $language }}#
     #{{- end }}#
+#{{- if not .Config.NoSchema }}#
     - name: Restore makefile progress
       run: make --touch provider schema build_sdks
+#{{- end }}#
     #{{- end }}#
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
