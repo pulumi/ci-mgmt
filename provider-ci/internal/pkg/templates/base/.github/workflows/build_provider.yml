@@ -62,10 +62,11 @@ jobs:
         run: make prepare_local_workspace
       - name: Restore prerequisites
         uses: ./.github/actions/download-prerequisites
+      #{{- if not .Config.NoSchema }}#
       - name: Restore makefile progress
         # This mirrors the targets completed in the prerequisites job
         run: make --touch provider schema
-
+      #{{- end }}#
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
         env:

@@ -1,12 +1,6 @@
 name: Upload SDK asset
 description: Upload the SDK for a specific language as an asset for the workflow.
 
-inputs:
-  schema:
-    required: false
-    description: Set to 'disabled' to avoid uploading schema
-    default: enabled
-
 runs:
   using: "composite"
   steps:
@@ -21,6 +15,7 @@ runs:
         path: bin/*
         retention-days: 30
 
+    #{{- if not .Config.NoSchema }}#
     - name: Upload schema-embed.json
       if: inputs.schema != 'disabled'
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
@@ -28,3 +23,4 @@ runs:
         name: schema-embed.json
         path: provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema-embed.json
         retention-days: 30
+    #{{- end }}#
