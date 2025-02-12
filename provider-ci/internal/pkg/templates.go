@@ -16,6 +16,8 @@ const (
 	internal TemplateDir = "internal"
 	// ci-mgmt pull-based updates workflow
 	external TemplateDir = "external"
+	// The original Makefile used in bridged providers and reused in native providers like eks.
+	bridgedMakefile TemplateDir = "bridged-makefile"
 	// Makefile for bridged providers (internal & external)
 	bridged TemplateDir = "bridged"
 	// Upgrade config
@@ -35,13 +37,13 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, internal, bridged, internalBridged}, nil
+		return []TemplateDir{base, bridgedMakefile, internal, bridged, internalBridged}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, bridged}, nil
+		return []TemplateDir{base, bridgedMakefile, external, bridged}, nil
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
-		return []TemplateDir{base, internal}, nil
+		return []TemplateDir{base, bridgedMakefile, internal}, nil
 	case "parameterized-go":
 		return []TemplateDir{parameterizedGo}, nil
 	default:
