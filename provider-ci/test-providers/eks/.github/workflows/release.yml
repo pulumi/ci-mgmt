@@ -45,6 +45,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+
   build_sdk:
     name: build_sdk
     needs: prerequisites
