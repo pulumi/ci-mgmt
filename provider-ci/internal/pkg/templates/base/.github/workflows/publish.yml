@@ -66,6 +66,7 @@ jobs:
         path: dist
         # Don't create a directory for each artifact
         merge-multiple: true
+#{{- if not .Config.NoSchema }}#
     - name: Download schema
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
@@ -74,9 +75,11 @@ jobs:
         # Avoid creating directories for each artifact
         merge-multiple: true
         path: dist
+#{{- end }}#
     - name: Calculate checksums
       working-directory: dist
       run: shasum ./*.tar.gz > "pulumi-#{{ .Config.Provider }}#_${{ inputs.version }}_checksums.txt"
+#{{- if not .Config.NoSchema }}#
     - name: Get Schema Change Summary
       id: schema-summary
       shell: bash
@@ -90,6 +93,7 @@ jobs:
           fi
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
+#{{- end }}#
 #{{- if .Config.Publish.CDN }}#
     - name: Upload Provider Binaries
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
@@ -107,7 +111,7 @@ jobs:
         files: dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+#{{ if not .Config.NoSchema }}#
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -164,8 +168,9 @@ jobs:
         pip install toml-cli==0.7.0
         version=$(toml get --toml-path pyproject.toml project.version)
         echo "version=${version}" >> "$GITHUB_OUTPUT"
+#{{- end }}#
 
-#{{- if .Config.PublishRegistry }}#
+#{{- if and .Config.PublishRegistry (not .Config.NoSchema) }}#
   create_docs_build:
     name: create_docs_build
     needs: publish_sdk
@@ -213,7 +218,11 @@ jobs:
 
   verify_release:
     name: verify_release
+#{{- if not .Config.NoSchema }}#
     needs: publish_sdk
+#{{- else }}#
+    needs: publish
+#{{- end }}#
     permissions:
       contents: write
       id-token: write
