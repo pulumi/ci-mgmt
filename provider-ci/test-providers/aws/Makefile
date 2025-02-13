@@ -197,24 +197,6 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
-# Install Pulumi plugins required for CODEGEN to resolve references
-install_plugins: .make/install_plugins
-.make/install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
-.make/install_plugins: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
-.make/install_plugins: .pulumi/bin/pulumi
-	.pulumi/bin/pulumi plugin install resource archive 0.0.1
-	.pulumi/bin/pulumi plugin install resource tls 4.10.0
-	.pulumi/bin/pulumi plugin install resource github 4.10.0
-	.pulumi/bin/pulumi plugin install resource kubernetes 4.11.0
-	.pulumi/bin/pulumi plugin install resource null 0.0.3
-	.pulumi/bin/pulumi plugin install resource local 0.1.0
-	.pulumi/bin/pulumi plugin install resource random 4.8.2
-	.pulumi/bin/pulumi plugin install resource github 5.14.0
-	.pulumi/bin/pulumi plugin install resource std 1.6.2
-	.pulumi/bin/pulumi plugin install converter terraform 1.0.17
-	@touch $@
-.PHONY: install_plugins
-
 lint_provider: provider
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
 # `lint_provider.fix` is a utility target meant to be run manually
@@ -295,30 +277,12 @@ ci-mgmt: .ci-mgmt.yaml
 	go run github.com/pulumi/ci-mgmt/provider-ci@master generate
 .PHONY: ci-mgmt
 
-# Because some codegen depends on the version of the CLI used, we install a local CLI
-# version pinned to the same version as `provider/go.mod`.
-#
-# This logic compares the version of .pulumi/bin/pulumi already installed. If it matches
-# the desired version, we just print. Otherwise we (re)install pulumi at the desired
-# version.
-.pulumi/bin/pulumi: .pulumi/version
-	@if [ -x .pulumi/bin/pulumi ] && [ "v$$(cat .pulumi/version)" = "$$(.pulumi/bin/pulumi version)" ]; then \
-		echo "pulumi/bin/pulumi version: v$$(cat .pulumi/version)"; \
-		touch $@; \
-	else \
-		curl -fsSL https://get.pulumi.com | \
-			HOME=$(WORKING_DIR) sh -s -- --version "$$(cat .pulumi/version)"; \
-	fi
-
-# Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
-.pulumi/version: provider/go.mod
-	cd provider && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
-
 # Start debug server for tfgen
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(CODEGEN) -- schema --out provider/cmd/$(PROVIDER)
 .PHONY: debug_tfgen
 
+include scripts/plugins.mk
 include scripts/crossbuild.mk
 
 # Permit providers to extend the Makefile with provider-specific Make includes.
