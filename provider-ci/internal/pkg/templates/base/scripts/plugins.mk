@@ -25,5 +25,5 @@ install_plugins: .make/install_plugins
 	fi
 
 # Compute the version of Pulumi to use by inspecting the Go dependencies of the provider.
-.pulumi/version: provider/go.mod
-	cd #{{ .Config.ModulePath }}# && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3 | tee ../$@
+.pulumi/version: #{{ .Config.ModulePath }}#/go.mod
+	(cd #{{ .Config.ModulePath }}# && go list -f "{{slice .Version 1}}" -m github.com/pulumi/pulumi/pkg/v3) | tee $@
