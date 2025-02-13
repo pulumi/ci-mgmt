@@ -113,16 +113,11 @@ build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                      GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
 #{{- end }}#
 
+.PHONY: provider
 provider: bin/$(PROVIDER)
 
-# `make provider_no_deps` builds the provider binary directly, without ensuring that
-# `cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json` is valid and up to date.
-# To create a release ready binary, you should use `make provider`.
-provider_no_deps:
-	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 bin/$(PROVIDER):
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
-.PHONY: provider provider_no_deps
 
 test:
 	cd #{{ .Config.TestFolder }}# && go test -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
