@@ -30,8 +30,7 @@ endif
 # Strips debug information from the provider binary to reduce its size and speed up builds
 LDFLAGS_STRIP_SYMBOLS=-s -w
 LDFLAGS_PROJ_VERSION=-X $(GO_MODULE)/pkg/version.Version=$(PROVIDER_VERSION)#{{if .Config.ProviderVersion}}# -X #{{ .Config.ProviderVersion }}#=$(PROVIDER_VERSION)#{{end}}#
-LDFLAGS_EXTRAS=#{{- range .Config.ExtraLDFlags }}# #{{ . }}# #{{- end }}#
-LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS) $(LDFLAGS_STRIP_SYMBOLS)
+LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_STRIP_SYMBOLS)
 
 # Create a `.make` directory for tracking targets which don't generate a single file output. This should be ignored by git.
 # For targets which either don't generate a single file output, or the output file is committed, we use a "sentinel"
