@@ -197,7 +197,7 @@ jobs:
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
     #{{ if .Config.PublishRegistry -}}#
-    needs: create_docs_build
+    needs: #{{ if not .Config.NoSchema }}#create_docs_build#{{ else }}#publish#{{ end }}#
     #{{ else }}#
     needs: publish_sdk
     #{{- end }}#
