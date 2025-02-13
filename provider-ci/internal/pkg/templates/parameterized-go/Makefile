@@ -2,7 +2,7 @@
 
 PACK := #{{ .Config.Provider }}#
 ORG := #{{ .Config.Organization }}#
-PROJECT := github.com/$(ORG)/pulumi-$(PACK)-provider
+PROJECT := github.com/$(ORG)/pulumi-$(PACK)
 #{{- if ge .Config.MajorVersion 2 }}#
 GO_MODULE := $(PROJECT)/v#{{ .Config.MajorVersion }}#/
 #{{- else }}#
