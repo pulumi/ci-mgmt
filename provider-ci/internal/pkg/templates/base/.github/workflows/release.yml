@@ -71,7 +71,9 @@ jobs:
     needs:
       - prerequisites
       - build_provider
+#{{- if not .Config.NoSchema }}#
       - build_sdk
+#{{- end }}#
     permissions:
       contents: read
       id-token: write
