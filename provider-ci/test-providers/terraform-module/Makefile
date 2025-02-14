@@ -83,11 +83,9 @@ lint_provider.fix:
 .PHONY: lint_provider lint_provider.fix
 build_provider_cmd = GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
 
+provider:
+	@$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider
-provider: bin/$(PROVIDER)
-
-bin/$(PROVIDER):
-	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 
 test:
 	cd tests && go test -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
