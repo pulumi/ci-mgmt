@@ -102,11 +102,9 @@ build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                      GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
 #{{- end }}#
 
+provider:
+	@$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider
-provider: bin/$(PROVIDER)
-
-bin/$(PROVIDER):
-	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 
 test:
 	cd #{{ .Config.TestFolder }}# && go test -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
