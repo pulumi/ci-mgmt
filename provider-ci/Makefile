@@ -37,7 +37,7 @@ format:
 # files for other bridged provider repositories should be ephemeral.
 .PHONY: test-providers test-provider/%
 
-test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/acme test-provider/eks
+test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/acme test-provider/eks test-provider/terraform-module
 
 # 1. Delete all files except the .ci-mgmt.yaml file and run the provider-ci generate command.
 # 2. Copy the generated provider repository to a temporary git repo and run actionlint on it.
@@ -57,4 +57,3 @@ update-provider-configs:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws/master/.ci-mgmt.yaml" > ./test-providers/aws/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-cloudflare/master/.ci-mgmt.yaml" > ./test-providers/cloudflare/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-docker/master/.ci-mgmt.yaml" > ./test-providers/docker/.ci-mgmt.yaml
-

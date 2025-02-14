@@ -27,6 +27,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
+  #{{ if not .Config.NoSchema -}}#
   build_sdk:
     name: build_sdk
     needs: prerequisites
@@ -34,6 +35,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+  #{{- end }}#
 
   #{{ if .Config.Lint -}}#
   lint:
@@ -69,7 +71,9 @@ jobs:
     needs:
       - prerequisites
       - build_provider
+#{{- if not .Config.NoSchema }}#
       - build_sdk
+#{{- end }}#
     permissions:
       contents: read
       id-token: write

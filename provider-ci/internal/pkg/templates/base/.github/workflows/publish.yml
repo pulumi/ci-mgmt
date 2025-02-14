@@ -66,6 +66,7 @@ jobs:
         path: dist
         # Don't create a directory for each artifact
         merge-multiple: true
+#{{- if not .Config.NoSchema }}#
     - name: Download schema
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
@@ -74,9 +75,11 @@ jobs:
         # Avoid creating directories for each artifact
         merge-multiple: true
         path: dist
+#{{- end }}#
     - name: Calculate checksums
       working-directory: dist
       run: shasum ./*.tar.gz > "pulumi-#{{ .Config.Provider }}#_${{ inputs.version }}_checksums.txt"
+#{{- if not .Config.NoSchema }}#
     - name: Get Schema Change Summary
       id: schema-summary
       shell: bash
@@ -90,6 +93,7 @@ jobs:
           fi
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
+#{{- end }}#
 #{{- if .Config.Publish.CDN }}#
     - name: Upload Provider Binaries
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
@@ -102,12 +106,17 @@ jobs:
         prerelease: ${{ inputs.isPrerelease }}
         # We keep pre-releases as drafts so they're not visible until we manually publish them.
         draft: ${{ inputs.isPrerelease }}
+#{{- if not .Config.NoSchema }}#
         body: ${{ steps.schema-summary.outputs.summary }}
+#{{- else }}#
+        body: |
+          Release v${{ inputs.version }}
+#{{- end }}#
         generate_release_notes: true
         files: dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+#{{ if not .Config.NoSchema }}#
   publish_sdk:
     name: publish_sdk
     needs: publish
@@ -164,8 +173,9 @@ jobs:
         pip install toml-cli==0.7.0
         version=$(toml get --toml-path pyproject.toml project.version)
         echo "version=${version}" >> "$GITHUB_OUTPUT"
+#{{- end }}#
 
-#{{- if .Config.PublishRegistry }}#
+#{{- if and .Config.PublishRegistry (not .Config.NoSchema) }}#
   create_docs_build:
     name: create_docs_build
     needs: publish_sdk
@@ -192,7 +202,7 @@ jobs:
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
     #{{ if .Config.PublishRegistry -}}#
-    needs: create_docs_build
+    needs: #{{ if not .Config.NoSchema }}#create_docs_build#{{ else }}#publish#{{ end }}#
     #{{ else }}#
     needs: publish_sdk
     #{{- end }}#
@@ -213,7 +223,11 @@ jobs:
 
   verify_release:
     name: verify_release
+#{{- if not .Config.NoSchema }}#
     needs: publish_sdk
+#{{- else }}#
+    needs: publish
+#{{- end }}#
     permissions:
       contents: write
       id-token: write
@@ -224,4 +238,6 @@ jobs:
       # Prelease is run often but we only have 5 concurrent macos runners, so we only test after the stable release.
       enableMacRunner: ${{ inputs.isPrerelease == false }}
       skipGoSdk: ${{ inputs.skipGoSdk }}
+#{{- if not .Config.NoSchema }}#
       pythonVersion: ${{ needs.publish_sdk.outputs.python_version }}
+#{{- end }}#

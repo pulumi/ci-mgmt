@@ -27,7 +27,7 @@ jobs:
         continue-on-error: true
       - uses: pulumi/license-check-action@main
         with:
-          module-path: provider
+          module-path: #{{ .Config.ModulePath }}#
           ignore-modules: >-
             #{{ range $ignore := .Config.License.Ignore }}#
             #{{- $ignore -}}#,

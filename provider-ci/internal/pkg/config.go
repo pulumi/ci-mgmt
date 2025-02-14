@@ -315,6 +315,14 @@ type Config struct {
 	// AllowMissingDocs controls whether we allow missing docs in the provider.
 	// Defaults to false.
 	AllowMissingDocs bool `yaml:"allowMissingDocs"`
+
+	// NoSchema is useful for providers such as parameterized providers that do not check in
+	// a fixed schema into the repository.
+	NoSchema bool `yaml:"noSchema"`
+
+	// ModulePath tells the scripts where to find the go.mod entry point for the provider code.
+	// Historically this is defaulting to "provider" but for newer providers may be ".".
+	ModulePath string `yaml:"modulePath"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
@@ -336,6 +344,11 @@ func LoadLocalConfig(path string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+
+	if config.ModulePath == "" {
+		config.ModulePath = "provider"
+	}
+
 	return config, nil
 }
 
@@ -460,6 +473,11 @@ func loadDefaultConfig() (Config, error) {
 	if err != nil {
 		return Config{}, fmt.Errorf("error parsing embedded defaults config file: %w", err)
 	}
+
+	if config.ModulePath == "" {
+		config.ModulePath = "provider"
+	}
+
 	return config, nil
 }
 

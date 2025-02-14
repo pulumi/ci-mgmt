@@ -20,6 +20,9 @@ const (
 	bridged TemplateDir = "bridged"
 	// Upgrade config
 	internalBridged TemplateDir = "internal-bridged"
+	// A simple parameterized provider implemented in Go.
+	// This provider has no SDKs to worry about and has a single top-level go.mod.
+	parameterizedGo = "parameterized-go"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -39,6 +42,8 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
 		return []TemplateDir{base, internal}, nil
+	case "parameterized-go":
+		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
