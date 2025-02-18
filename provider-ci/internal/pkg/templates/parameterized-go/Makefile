@@ -90,17 +90,10 @@ lint_provider.fix:
 
 .PHONY: lint_provider lint_provider.fix
 
-#{{- if .Config.BuildProviderCmd }}#
-build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
-                         #{{ .Config.BuildProviderPre }}#;
-                     #{{- end -}}#
-                     #{{ .Config.BuildProviderCmd }}#
-#{{- else }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                          #{{ .Config.BuildProviderPre }}#;
                      #{{- end -}}#
                      GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
-#{{- end }}#
 
 .PHONY: provider
 provider: bin/$(PROVIDER)

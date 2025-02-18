@@ -272,22 +272,9 @@ type Config struct {
 	// Defaults to "tfgen" for bridged providers and "gen" for generic providers.
 	GenName string `yaml:"genName"`
 
-	// Customizes the Make function build_provider_cmd.
-	//
-	// This function is responsible for creating a provider binary for the desired platform.
-	//
-	// "$(1)" refers to the desired OS, in the same format as GOOS in the Go toolchain
-	// "$(2)" refers to the desired architecture, in the same format as GOARCH in the Go toolchain
-	// "$(3)" refers to the desired destination path for the binary
-	//
-	// An example value for the command is:
-	//
-	//     cd provider && GOOS=$(1) GOARCH=$(2) go build -o "$(3)" ...
-	//
-	// Customizing this value allows providers implemented in Node or other languages.
-	BuildProviderCmd string `yaml:"buildProviderCmd"`
-
-	// Customizes a hook to run right before BuildProviderCmd.
+	// Customizes a hook to run right before build_provider_cmd.
+	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22buildProviderPre%22&type=code
+	// Only used by AWS for the minimal schema hack.
 	BuildProviderPre string `yaml:"buildProviderPre"`
 
 	// Customizes the Make function test_provider_cmd.
