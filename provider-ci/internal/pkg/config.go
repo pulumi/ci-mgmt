@@ -272,6 +272,10 @@ type Config struct {
 	// Defaults to "tfgen" for bridged providers and "gen" for generic providers.
 	GenName string `yaml:"genName"`
 
+	// The directory of the provider source code for Typescript providers
+	// in which `yarn build` will be run.
+	TypescriptProviderDir string `yaml:"typescriptProviderDir"`
+
 	// Customizes a hook to run right before build_provider_cmd.
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22buildProviderPre%22&type=code
 	// Only used by AWS for the minimal schema hack.
