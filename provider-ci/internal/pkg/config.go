@@ -284,6 +284,7 @@ type Config struct {
 	// Customizes the Make function test_provider_cmd.
 	//
 	// This function is called without arguments to run unit tests for the provider binary.
+	// Deprecated: only used for awsx: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22TestProviderCmd%22&type=code
 	TestProviderCmd string `yaml:"testProviderCmd"`
 
 	// Customizes the Make function renovate_cmd.

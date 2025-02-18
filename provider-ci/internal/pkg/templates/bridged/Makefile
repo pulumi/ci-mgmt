@@ -237,7 +237,6 @@ lint_provider: provider
 lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
 .PHONY: lint_provider lint_provider.fix
-
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                          #{{ .Config.BuildProviderPre }}#;
                      #{{- end -}}#
@@ -258,16 +257,11 @@ test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd #{{ .Config.TestFolder }}# && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
-
-#{{- if .Config.TestProviderCmd }}#
-test_provider_cmd = #{{ .Config.TestProviderCmd }}#
-#{{- else }}#
 test_provider_cmd = cd provider && go test -v -short \
 	-coverprofile="coverage.txt" \
 	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
 	-parallel $(TESTPARALLELISM) \
 	./...
-#{{- end }}#
 test_provider:
 	$(call test_provider_cmd)
 .PHONY: test_provider
