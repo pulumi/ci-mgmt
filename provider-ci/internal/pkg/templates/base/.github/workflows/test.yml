@@ -131,12 +131,12 @@ jobs:
     - name: Install prebuilt SDKs
       run: make install_sdks
 #{{- end }}#
-#{{- if not .Config.Shards }}#
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
+#{{- if not .Config.Shards }}#
+    - name: Install dependencies
+      run: make install_${{ matrix.language}}_sdk
     #{{- if .Config.IntegrationTestProvider }}#
     - name: Run provider tests
       if: matrix.testTarget == 'local'
