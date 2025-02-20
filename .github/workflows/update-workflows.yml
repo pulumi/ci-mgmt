@@ -39,10 +39,26 @@ jobs:
   update_workflows:
     runs-on: ubuntu-latest
     steps:
+      - name: Clone pulumi-${{ inputs.provider_name }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: pulumi/pulumi-${{ inputs.provider_name }}
+          path: pulumi-${{ inputs.provider_name }}
+          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+      - name: Get Go version to install
+        id: go-version
+        run: |
+          # Get the .toolVersions.go field from the .ci-mgmt.yaml file
+          GO_VERSION="$(yq '.toolVersions.go' pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml)"
+          # If the field is equal to "null", set it to "stable".
+          if [ "$GO_VERSION" = "null" ]; then
+            GO_VERSION="stable"
+          fi
+          echo "go-version=$GO_VERSION" >> "$GITHUB_OUTPUT"
       - name: Install Go
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5
         with:
-          go-version: stable
+          go-version: ${{ steps.go-version.outputs.go-version }}
       - name: Setup Python
         uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
         with:
@@ -58,12 +74,6 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           path: ci-mgmt
-      - name: Clone pulumi-${{ inputs.provider_name }}
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          repository: pulumi/pulumi-${{ inputs.provider_name }}
-          path: pulumi-${{ inputs.provider_name }}
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
       - name: Initialize submodule in pulumi-${{ inputs.provider_name }}
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
