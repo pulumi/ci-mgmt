@@ -68,7 +68,7 @@
     "spotinst",
     "sumologic",
     "tailscale",
-    "terraform-module",
+     "terraform-module",
     "tf-provider-boilerplate",
     "tls",
     "vault",
