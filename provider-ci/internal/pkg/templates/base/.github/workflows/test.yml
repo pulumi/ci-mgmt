@@ -131,12 +131,12 @@ jobs:
     - name: Install prebuilt SDKs
       run: make install_sdks
 #{{- end }}#
-#{{- if .Config.Actions.PreTest }}#
-#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
-#{{- end }}#
 #{{- if not .Config.Shards }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
+#{{- if .Config.Actions.PreTest }}#
+#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
+#{{- end }}#
     #{{- if .Config.IntegrationTestProvider }}#
     - name: Run provider tests
       if: matrix.testTarget == 'local'
@@ -150,6 +150,9 @@ jobs:
       if: matrix.testTarget == 'pulumiExamples'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -run TestPulumiExamples -parallel 4 .
 #{{- else }}#
+#{{- if .Config.Actions.PreTest }}#
+#{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
+#{{- end }}#
     - name: Generate test shards
       run: |-
         cd #{{ .Config.TestFolder }}#

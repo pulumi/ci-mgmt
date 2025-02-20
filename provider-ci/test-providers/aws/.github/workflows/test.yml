@@ -81,6 +81,8 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
+    - name: Install dependencies
+      run: make install_${{ matrix.language}}_sdk
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -90,8 +92,6 @@ jobs:
         role-duration-seconds: 7200
         role-session-name: aws@githubActions
         role-to-assume: ${{ secrets.AWS_CI_ROLE_ARN }}
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
     - name: Run tests
       if: matrix.testTarget == 'local'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .
