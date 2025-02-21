@@ -48,7 +48,13 @@ jobs:
       - name: Get Go version to install
         id: go-version
         run: |
-          # Get the .toolVersions.go field from the .ci-mgmt.yaml file
+          # Use the default value of "stable" if the .ci-mgmt.yaml file does not exist.
+          if [ ! -f pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml ]; then
+            echo "go-version=stable" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Get the .toolVersions.go field from the .ci-mgmt.yaml file if it exists.
           GO_VERSION="$(yq '.toolVersions.go' pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml)"
           # If the field is equal to "null", set it to "stable".
           if [ "$GO_VERSION" = "null" ]; then
