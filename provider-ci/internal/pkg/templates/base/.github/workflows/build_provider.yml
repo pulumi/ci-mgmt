@@ -76,7 +76,7 @@ jobs:
           path: |
             ${{ steps.gocache.outputs.path }}
             ${{ steps.gomodcache.outputs.path }}
-          key: go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-${{ hashFiles('provider/go.sum') }}
+          key: go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-${{ hashFiles('#{{ .Config.ModulePath }}#/go.sum') }}
           restore-keys: |
             go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-
       - name: Prepare local workspace before restoring previously built
