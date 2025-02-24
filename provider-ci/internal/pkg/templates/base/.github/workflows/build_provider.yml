@@ -58,6 +58,7 @@ jobs:
         uses: ./.github/actions/setup-tools
         with:
           tools: pulumictl, go
+          # use per-platform/arch caches instead since we are doing cross-builds
           cache-go: false
       # Based on https://github.com/actions/cache/blob/main/examples.md#go---modules
       - name: Get GOCACHE
