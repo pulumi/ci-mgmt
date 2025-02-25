@@ -45,6 +45,7 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumicli, go, schema-tools
+        cache-go: false
 #{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
       uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
