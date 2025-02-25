@@ -5,7 +5,7 @@
     "nodejs@latest",
     "pulumictl@latest",
     "yarn@latest",
-    "dotnet-sdk@6.0."
+    "dotnet-sdk@8.0."
   ],
   "shell": {
     "init_hook": [],
