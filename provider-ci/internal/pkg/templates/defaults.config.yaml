@@ -80,7 +80,7 @@ freeDiskSpaceBeforeSdkBuild: false
 # Used for centrally managing tool versions.
 # This is not currently overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22toolVersions%22&type=code
 toolVersions:
-  dotnet: "6.0.x"
+  dotnet: "8.0.x"
   go: "1.21.x"
   java: "11"
   gradle: "7.6"
