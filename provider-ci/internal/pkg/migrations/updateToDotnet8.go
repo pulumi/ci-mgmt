@@ -1,8 +1,10 @@
 package migrations
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -40,11 +42,18 @@ func (updateToDotnet8) Migrate(templateName, outDir string) error {
 	}
 
 	for _, file := range csprojFiles {
-		// sed -i '' -E 's/<TargetFramework>net6.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/' examples/dotnet/provider-xyz-native.csproj
-		sed := exec.Command("sed", "-i", "", "-E", `s/<TargetFramework>net6.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/`, file)
-		sed.Dir = outDir
-		_, err := sed.Output()
+
+		origBytes, err := os.ReadFile(file)
 		if err != nil {
+			return fmt.Errorf("error reading file %q: %w", file, err)
+		}
+
+		oldBytes := []byte(`<TargetFramework>net6.0</TargetFramework>`)
+		newBytes := []byte(`<TargetFramework>net8.0</TargetFramework>`)
+
+		updatedBytes := bytes.ReplaceAll(origBytes, oldBytes, newBytes)
+
+		if err := os.WriteFile(file, updatedBytes, 0655); err != nil {
 			return fmt.Errorf("error writing to %q: %w", file, err)
 		}
 	}
