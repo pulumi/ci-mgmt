@@ -33,6 +33,7 @@ jobs:
             **Note for the maintainer:** To run the acceptance tests, go to the 
             [run-acceptance-tests workflow in the Actions tab](${{ github.server_url }}/${{ github.repository }}/actions/workflows/run-acceptance-tests.yml)
             and click the "Run workflow" button. Make sure to select the `${{ github.head_ref }}` branch.
+            Alternatively, run `gh workflow run acceptance-test.yml --repo "${{ github.repository }}" --ref "${{ github.head_ref }}" on your local machine.`
 name: pull-request
 on:
   pull_request_target: {}
