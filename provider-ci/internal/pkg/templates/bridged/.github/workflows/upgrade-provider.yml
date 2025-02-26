@@ -86,7 +86,7 @@ jobs:
         continue-on-error: true
         uses: #{{ .Config.ActionVersions.UpgradeProviderAction }}#
         with:
-          kind: all
+          kind: upstream
           email: bot@pulumi.com
           username: pulumi-bot
           automerge: #{{ .Config.AutoMergeProviderUpgrades }}#
