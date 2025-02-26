@@ -18,7 +18,7 @@ func (updateToDotnet8) ShouldRun(templateName string) bool {
 func (updateToDotnet8) Migrate(templateName, outDir string) error {
 
 	// Find modified .go files and run gofumpt on them
-	ls := exec.Command("git", "ls-files", "examples")
+	ls := exec.Command("git", "ls-files", "examples", "tests")
 	ls.Dir = outDir
 	lsOutput, err := ls.Output()
 	if err != nil {
