@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func (updateToDotnet8) ShouldRun(templateName string) bool {
 func (updateToDotnet8) Migrate(templateName, outDir string) error {
 
 	// Find modified .go files and run gofumpt on them
-	ls := exec.Command("git", "ls-files", "examples")
+	ls := exec.Command("git", "ls-files", "examples/**/*.csproj")
 	ls.Dir = outDir
 	lsOutput, err := ls.Output()
 	if err != nil {
@@ -30,22 +31,15 @@ func (updateToDotnet8) Migrate(templateName, outDir string) error {
 		return nil
 	}
 
-	allFiles := strings.Split(string(lsOutput), "\n")
-	csprojFiles := []string{}
-	for _, line := range allFiles {
-		if strings.HasSuffix(line, ".csproj") {
-			csprojFiles = append(csprojFiles, line)
-		}
-	}
-	if len(csprojFiles) == 0 {
-		return nil
-	}
+	csprojFiles := strings.Split(strings.TrimSpace(string(lsOutput)), "\n")
 
-	for _, file := range csprojFiles {
+	for _, csprojFile := range csprojFiles {
+		// Resolve relative path against `outDir`.
+		file := filepath.Join(outDir, csprojFile)
 
 		origBytes, err := os.ReadFile(file)
 		if err != nil {
-			return fmt.Errorf("error reading file %q: %w", file, err)
+			return fmt.Errorf("error reading file %q from %q: %w", file, lsOutput, err)
 		}
 
 		oldBytes := []byte(`<TargetFramework>net6.0</TargetFramework>`)
