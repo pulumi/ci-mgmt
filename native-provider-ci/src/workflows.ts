@@ -6,7 +6,7 @@ import { Step } from "./steps";
 const pythonVersion = "3.11";
 const goVersion = "1.21.x";
 const nodeVersion = "20.x";
-const dotnetVersion = "6.0.x\n3.1.301\n";
+const dotnetVersion = "8.0.x";
 const javaVersion = "11";
 
 type WorkflowOpts = z.infer<typeof WorkflowOpts>;
