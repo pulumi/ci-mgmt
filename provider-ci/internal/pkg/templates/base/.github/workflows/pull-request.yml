@@ -8,21 +8,16 @@ jobs:
     name: comment-on-pr
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
-    - name: Checkout Repo
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        #{{- if .Config.CheckoutSubmodules }}#
-        submodules: #{{ .Config.CheckoutSubmodules }}#
-        #{{- end }}#
-        persist-credentials: false
-    - name: Comment PR
-      uses: #{{ .Config.ActionVersions.PrComment }}#
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        message: >
-          PR is now waiting for a maintainer to run the acceptance tests.
+      - name: Comment PR
+        uses: #{{ .Config.ActionVersions.PrComment }}#
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          message: >
+            PR is now waiting for a maintainer to run the acceptance tests.
 
-          **Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR
+            **Note for the maintainer:** To run the acceptance tests, go to the 
+            [run-acceptance-tests workflow in the Actions tab](${{ github.server_url }}/${{ github.repository }}/actions/workflows/run-acceptance-tests.yml)
+            and click the "Run workflow" button. Make sure to select the `${{ github.head_ref }}` branch.
 name: pull-request
 on:
   pull_request_target: {}
