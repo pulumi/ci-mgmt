@@ -57,8 +57,8 @@ permissions:
 
 env:
   GH_TOKEN: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_TOKEN || secrets.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+#{{ .Config.Env | toYaml | indent 2 }}#
+
 jobs:
   upgrade_provider:
     name: upgrade-provider
