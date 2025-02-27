@@ -17,6 +17,7 @@ func Migrate(templateName, outDir string) error {
 		fixupBridgeImports{},
 		removeExplicitSDKDependency{},
 		ignoreMakeDir{},
+		updateToDotnet8{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
