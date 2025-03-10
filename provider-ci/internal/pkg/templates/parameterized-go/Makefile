@@ -89,18 +89,10 @@ lint_provider.fix:
 	golangci-lint run -c .golangci.yml --fix
 
 .PHONY: lint_provider lint_provider.fix
-
-#{{- if .Config.BuildProviderCmd }}#
-build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
-                         #{{ .Config.BuildProviderPre }}#;
-                     #{{- end -}}#
-                     #{{ .Config.BuildProviderCmd }}#
-#{{- else }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                          #{{ .Config.BuildProviderPre }}#;
                      #{{- end -}}#
                      GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
-#{{- end }}#
 
 .PHONY: provider
 provider: bin/$(PROVIDER)
@@ -111,16 +103,11 @@ bin/$(PROVIDER):
 test:
 	cd #{{ .Config.TestFolder }}# && go test -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
-
-#{{- if .Config.TestProviderCmd }}#
-test_provider_cmd = #{{ .Config.TestProviderCmd }}#
-#{{- else }}#
 test_provider_cmd = go test \
 	-coverprofile="coverage.txt" \
 	-coverpkg="./..." \
 	-parallel $(TESTPARALLELISM) \
 	./pkg/...
-#{{- end }}#
 test_provider:
 	$(call test_provider_cmd)
 .PHONY: test_provider
