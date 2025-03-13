@@ -237,18 +237,10 @@ lint_provider: provider
 lint_provider.fix:
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
 .PHONY: lint_provider lint_provider.fix
-
-#{{- if .Config.BuildProviderCmd }}#
-build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
-                         #{{ .Config.BuildProviderPre }}#;
-                     #{{- end -}}#
-                     #{{ .Config.BuildProviderCmd }}#
-#{{- else }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                          #{{ .Config.BuildProviderPre }}#;
                      #{{- end -}}#
                      cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
-#{{- end }}#
 
 provider: bin/$(PROVIDER)
 
@@ -265,16 +257,11 @@ test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd #{{ .Config.TestFolder }}# && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
-
-#{{- if .Config.TestProviderCmd }}#
-test_provider_cmd = #{{ .Config.TestProviderCmd }}#
-#{{- else }}#
 test_provider_cmd = cd provider && go test -v -short \
 	-coverprofile="coverage.txt" \
 	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
 	-parallel $(TESTPARALLELISM) \
 	./...
-#{{- end }}#
 test_provider:
 	$(call test_provider_cmd)
 .PHONY: test_provider
