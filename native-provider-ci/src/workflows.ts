@@ -998,9 +998,16 @@ export class NightlySdkGeneration implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
+  permissions: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
+    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(opts.aws);
+    if (awsCredentialSteps.length > 0) {
+      this.permissions = {
+        'id-token': 'write',
+      };
+    }
     this.steps = [
       steps.CheckoutRepoStep(),
       // Do not calculate version here since we only want version embedded during releases.
@@ -1008,7 +1015,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
-      ...steps.ConfigureAwsCredentialsForTests(opts.aws),
+      ...awsCredentialSteps,
       steps.AzureLogin(opts.provider),
       steps.MakeClean(),
       steps.PrepareGitBranchForSdkGeneration(),
