@@ -26,6 +26,8 @@ export const installGhRelease = defaults["jaxxstorm/action-install-gh-release"];
 export const installPulumiCli = defaults["pulumi/actions"];
 export const codecov = defaults["codecov/codecov-action"];
 export const providerVersion = defaults["pulumi/provider-version-action"];
+export const escAuth = defaults["pulumi/auth-actions"]
+export const escAction = defaults["pulumi/esc-action"]
 
 // GHA Utilities
 export const addAndCommit = defaults["EndBug/add-and-commit"];
