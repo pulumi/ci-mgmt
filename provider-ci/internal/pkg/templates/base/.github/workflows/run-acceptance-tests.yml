@@ -39,12 +39,6 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
-      matrix: |
-        {
-          "platform": [
-            {"os": "linux", "arch": "amd64"},
-          ]
-        }
 
   #{{ if not .Config.NoSchema -}}#
   build_sdk:
