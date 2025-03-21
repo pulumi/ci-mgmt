@@ -515,10 +515,17 @@ export class PrerequisitesJob implements NormalJob {
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
-    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native");
+    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(
+      opts.provider == "aws-native"
+    );
     if (awsCredentialSteps.length > 0) {
+      // If you specify _any_ permissions then by default the rest of the permissions
+      // that you don't specify will be set to "none"
       this.permissions = {
-        'id-token': 'write',
+        // Pulumi esc auth requires 'id-token' permission
+        "id-token": "write",
+        // commont-on-pr requires 'pull-requests' permission
+        "pull-requests": "write",
       };
     }
     this.steps = [
@@ -1005,7 +1012,7 @@ export class NightlySdkGeneration implements NormalJob {
     const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(opts.aws);
     if (awsCredentialSteps.length > 0) {
       this.permissions = {
-        'id-token': 'write',
+        "id-token": "write",
       };
     }
     this.steps = [
