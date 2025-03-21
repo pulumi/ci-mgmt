@@ -209,7 +209,8 @@ export function ConfigureAwsCredentialsForTests(requiresAws?: boolean): Step[] {
         uses: action.escAuth,
         with: {
           organization: "pulumi",
-          "requested-token-type": "urn:pulumi:token-type:access_token:organization",
+          "requested-token-type":
+            "urn:pulumi:token-type:access_token:organization",
           "export-environment-variables": false, // don't want to overwrite the existing token set in env
         },
       },
@@ -217,7 +218,8 @@ export function ConfigureAwsCredentialsForTests(requiresAws?: boolean): Step[] {
         name: "Export AWS Credentials",
         uses: action.escAction,
         env: {
-          PULUMI_ACCESS_TOKEN: "${{ steps.generate_pulumi_token.outputs.pulumi-access-token }}",
+          PULUMI_ACCESS_TOKEN:
+            "${{ steps.generate_pulumi_token.outputs.pulumi-access-token }}",
         },
         with: {
           environment: "logins/pulumi-ci",
