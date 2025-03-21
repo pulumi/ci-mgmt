@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GithubWorkflow, NormalJob } from "./github-workflow";
+import { GithubWorkflow, NormalJob, PermissionsEvent } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
 
@@ -511,9 +511,16 @@ export class PrerequisitesJob implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
+  permissions?: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
+    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native");
+    if (awsCredentialSteps.length > 0) {
+      this.permissions = {
+        'id-token': 'write',
+      };
+    }
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
@@ -536,7 +543,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
-      ...steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native"),
+      ...awsCredentialSteps,
       steps.TestProviderLibrary(),
       steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
