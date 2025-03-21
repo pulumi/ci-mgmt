@@ -200,22 +200,34 @@ export function SetupGCloud(requiresGcp?: boolean): Step {
   return {};
 }
 
-export function ConfigureAwsCredentialsForTests(requiresAws?: boolean): Step {
+export function ConfigureAwsCredentialsForTests(requiresAws?: boolean): Step[] {
   if (requiresAws) {
-    return {
-      name: "Configure AWS Credentials",
-      uses: action.configureAwsCredentials,
-      with: {
-        "aws-access-key-id": "${{ secrets.AWS_ACCESS_KEY_ID }}",
-        "aws-region": "${{ env.AWS_REGION }}",
-        "aws-secret-access-key": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
-        "role-duration-seconds": 3600,
-        "role-session-name": "${{ env.PROVIDER }}@githubActions",
-        "role-to-assume": "${{ secrets.AWS_CI_ROLE_ARN }}",
+    return [
+      {
+        name: "Generate Pulumi Access Token",
+        id: "generate_pulumi_token",
+        uses: action.escAuth,
+        with: {
+          organization: "pulumi",
+          "requested-token-type":
+            "urn:pulumi:token-type:access_token:organization",
+          "export-environment-variables": false, // don't want to overwrite the existing token set in env
+        },
       },
-    };
+      {
+        name: "Export AWS Credentials",
+        uses: action.escAction,
+        env: {
+          PULUMI_ACCESS_TOKEN:
+            "${{ steps.generate_pulumi_token.outputs.pulumi-access-token }}",
+        },
+        with: {
+          environment: "logins/pulumi-ci",
+        },
+      },
+    ];
   }
-  return {};
+  return [];
 }
 
 export function ConfigureAwsCredentialsForPublish(): Step {

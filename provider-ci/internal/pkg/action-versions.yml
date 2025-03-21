@@ -67,6 +67,12 @@ jobs:
       - name: pulumi/provider-version-action
         uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
 
+      - name: pulumi/auth-actions
+        uses: pulumi/auth-actions@80dec0d5e009a11565cbf87d9ef9103fc7d24198 # v1.0.0
+
+      - name: pulumi/esc-action
+        uses: pulumi/esc-action@41fd832f44f4820124b5350b5f84a00f741f234e # v1.3.0
+
       # GHA Utilities
 
       - name: actions-ecosystem/action-add-labels
