@@ -5,7 +5,7 @@
     },
     "dependencies": {
         "@pulumi/github": "6.7.0",
-        "@pulumi/pulumi": "3.156.0",
+        "@pulumi/pulumi": "3.157.0",
         "yaml": "^2.2.2"
     }
 }
