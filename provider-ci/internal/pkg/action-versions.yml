@@ -50,6 +50,12 @@ jobs:
       - name: google-github-actions/auth
         uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.8
 
+      - name: pulumi/auth-actions
+        uses: pulumi/auth-actions@80dec0d5e009a11565cbf87d9ef9103fc7d24198 # v1.0.0
+
+      - name: pulumi/esc-action
+        uses: pulumi/esc-action@41fd832f44f4820124b5350b5f84a00f741f234e # v1.3.0
+
       # Tools
 
       - name: goreleaser/goreleaser-action

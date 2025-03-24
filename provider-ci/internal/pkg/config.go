@@ -365,6 +365,8 @@ type actions struct {
 
 type actionVersions struct {
 	ConfigureAwsCredentials string `yaml:"configureAwsCredentials"`
+	ESCAuth                 string `yaml:"escAuth"`
+	ESCAction               string `yaml:"escAction"`
 	SetupGcloud             string `yaml:"setupGcloud"`
 	GoogleAuth              string `yaml:"googleAuth"`
 	Checkout                string `yaml:"checkout"`
@@ -433,6 +435,10 @@ func loadDefaultConfig() (Config, error) {
 						switch name {
 						case "aws-actions/configure-aws-credentials":
 							config.ActionVersions.ConfigureAwsCredentials = uses
+						case "pulumi/auth-actions":
+							config.ActionVersions.ESCAuth = uses
+						case "pulumi/esc-action":
+							config.ActionVersions.ESCAction = uses
 						case "google-github-actions/setup-gcloud":
 							config.ActionVersions.SetupGcloud = uses
 						case "google-github-actions/auth":
