@@ -524,7 +524,7 @@ export class PrerequisitesJob implements NormalJob {
       this.permissions = {
         // Pulumi esc auth requires 'id-token' permission
         "id-token": "write",
-        // commont-on-pr requires 'pull-requests' permission
+        // comment-on-pr requires 'pull-requests' permission
         "pull-requests": "write",
       };
     }
