@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GithubWorkflow, NormalJob } from "./github-workflow";
+import { GithubWorkflow, NormalJob, PermissionsEvent } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
 
@@ -511,9 +511,23 @@ export class PrerequisitesJob implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
+  permissions?: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
+    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(
+      opts.provider == "aws-native"
+    );
+    if (awsCredentialSteps.length > 0) {
+      // If you specify _any_ permissions then by default the rest of the permissions
+      // that you don't specify will be set to "none"
+      this.permissions = {
+        // Pulumi esc auth requires 'id-token' permission
+        "id-token": "write",
+        // comment-on-pr requires 'pull-requests' permission
+        "pull-requests": "write",
+      };
+    }
     this.steps = [
       steps.CheckoutRepoStep(),
       steps.SetProviderVersionStep(),
@@ -536,7 +550,7 @@ export class PrerequisitesJob implements NormalJob {
       steps.Porcelain(),
       steps.TarProviderBinaries(opts.hasGenBinary),
       steps.UploadProviderBinaries(),
-      steps.ConfigureAwsCredentialsForTests(opts.provider == "aws-native"),
+      ...awsCredentialSteps,
       steps.TestProviderLibrary(),
       steps.Codecov(),
       steps.NotifySlack("Failure in building provider prerequisites"),
@@ -616,7 +630,7 @@ export class TestsJob implements NormalJob {
       steps.InstallSDKDeps(),
       steps.MakeKubeDir(opts.provider, workflowName),
       steps.DownloadKubeconfig(opts.provider, workflowName),
-      steps.ConfigureAwsCredentialsForTests(opts.aws),
+      ...steps.ConfigureAwsCredentialsForTests(opts.aws),
       steps.GoogleAuth(opts.gcp),
       steps.SetupGCloud(opts.gcp),
       steps.InstallKubectl(opts.provider),
@@ -991,9 +1005,16 @@ export class NightlySdkGeneration implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   if: NormalJob["if"];
+  permissions: NormalJob["permissions"];
 
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
+    const awsCredentialSteps = steps.ConfigureAwsCredentialsForTests(opts.aws);
+    if (awsCredentialSteps.length > 0) {
+      this.permissions = {
+        "id-token": "write",
+      };
+    }
     this.steps = [
       steps.CheckoutRepoStep(),
       // Do not calculate version here since we only want version embedded during releases.
@@ -1001,7 +1022,7 @@ export class NightlySdkGeneration implements NormalJob {
       steps.InstallGo(goVersion),
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
-      steps.ConfigureAwsCredentialsForTests(opts.aws),
+      ...awsCredentialSteps,
       steps.AzureLogin(opts.provider),
       steps.MakeClean(),
       steps.PrepareGitBranchForSdkGeneration(),
