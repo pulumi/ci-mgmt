@@ -1013,6 +1013,8 @@ export class NightlySdkGeneration implements NormalJob {
     if (awsCredentialSteps.length > 0) {
       this.permissions = {
         "id-token": "write",
+        "pull-requests": "write",
+        contents: "write",
       };
     }
     this.steps = [
