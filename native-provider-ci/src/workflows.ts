@@ -1014,7 +1014,7 @@ export class NightlySdkGeneration implements NormalJob {
       this.permissions = {
         "id-token": "write",
         "pull-requests": "write",
-        "contents": "write",
+        contents: "write",
       };
     }
     this.steps = [
