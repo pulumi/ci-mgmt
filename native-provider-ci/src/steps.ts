@@ -61,9 +61,6 @@ export function CreateCommentsUrlStep(): Step {
 
 export function SetGitSubmoduleCommitHash(provider: string): Step {
   let dir;
-  if (provider === "azure-native") {
-    dir = "azure-rest-api-specs";
-  }
   if (provider === "aws-native") {
     dir = "aws-cloudformation-user-guide";
   }
@@ -80,9 +77,6 @@ export function SetGitSubmoduleCommitHash(provider: string): Step {
 
 export function CommitAutomatedSDKUpdates(provider: string): Step {
   let dir;
-  if (provider === "azure-native") {
-    dir = "azure-rest-api-specs";
-  }
   if (provider === "aws-native") {
     dir = "aws-cloudformation-user-guide";
   }
@@ -458,18 +452,7 @@ export function UploadSDKs(tag: boolean): Step {
   };
 }
 
-export function DownloadProviderBinaries(provider: string, job: string): Step {
-  if (provider === "azure-native" && job === "build_sdks") {
-    return {
-      name: "Download provider + tfgen binaries",
-      if: "${{ matrix.language != 'dotnet' }}",
-      uses: action.downloadArtifact,
-      with: {
-        name: "pulumi-${{ env.PROVIDER }}-provider.tar.gz",
-        path: "${{ github.workspace }}/bin",
-      },
-    };
-  }
+export function DownloadProviderBinaries(): Step {
   return {
     name: "Download provider + tfgen binaries",
     uses: action.downloadArtifact,
@@ -602,9 +585,6 @@ export function PullRequestSdkGeneration(
   branch: string
 ): Step {
   let dir;
-  if (provider === "azure-native") {
-    dir = "azure-rest-api-specs";
-  }
   if (provider === "aws-native") {
     dir = "aws-cloudformation-user-guide";
   }
@@ -757,14 +737,7 @@ export function TestProviderLibrary(): Step {
   };
 }
 
-export function RestoreBinaryPerms(provider: string, job: string): Step {
-  if (provider === "azure-native" && job === "build_sdks") {
-    return {
-      name: "Restore Binary Permissions",
-      if: "${{ matrix.language != 'dotnet' }}",
-      run: 'find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \\;',
-    };
-  }
+export function RestoreBinaryPerms(): Step {
   return {
     name: "Restore Binary Permissions",
     run: 'find ${{ github.workspace }} -name "pulumi-*-${{ env.PROVIDER }}" -print -exec chmod +x {} \\;',
@@ -917,14 +890,7 @@ export function TarProviderBinaries(hasGenBinary: boolean): Step {
   };
 }
 
-export function UnTarProviderBinaries(provider: string, job: string): Step {
-  if (provider === "azure-native" && job === "build_sdks") {
-    return {
-      name: "UnTar provider binaries",
-      if: "${{ matrix.language != 'dotnet' }}",
-      run: "tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin",
-    };
-  }
+export function UnTarProviderBinaries(): Step {
   return {
     name: "UnTar provider binaries",
     run: "tar -zxf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace}}/bin",
@@ -987,17 +953,6 @@ export function GolangciLint(): Step[] {
   };
 
   return [disarmGoEmbed, lintStep];
-}
-
-export function CodegenDuringSDKBuild(provider: string) {
-  if (provider === "azure-native") {
-    return {
-      name: "Build Codegen",
-      if: "${{ matrix.language == 'dotnet' }}",
-      run: "make codegen",
-    };
-  }
-  return {};
 }
 
 export function UpdatePulumi(): Step {
@@ -1199,33 +1154,6 @@ export function ChocolateyPackageDeployment(): Step {
   };
 }
 
-export function AzureLogin(provider: string): Step {
-  if (provider === "azure-native") {
-    return {
-      uses: action.azureLogin,
-      with: {
-        creds: "${{ secrets.AZURE_RBAC_SERVICE_PRINCIPAL }}",
-      },
-    };
-  }
-  return {};
-}
-
-export function AwsCredentialsForArmCoverageReport(): Step {
-  return {
-    name: "Configure AWS Credentials",
-    uses: action.configureAwsCredentials,
-    with: {
-      "aws-access-key-id": "${{ secrets.AWS_ACCESS_KEY_ID }}",
-      "aws-region": "us-west-2",
-      "aws-secret-access-key": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
-      "role-duration-seconds": 3600,
-      "role-session-name": "arm2pulumiCvg@githubActions",
-      "role-to-assume": "${{ secrets.AWS_CI_ROLE_ARN }}",
-    },
-  };
-}
-
 export function MakeClean(): Step {
   return {
     name: "Cleanup SDK Folder",
@@ -1254,13 +1182,6 @@ export function TestResultsJSON(): Step {
   };
 }
 
-export function UploadArmCoverageToS3(): Step {
-  return {
-    name: "Upload results to S3",
-    run: "cd provider/pkg/arm2pulumi/internal/test && bash s3-upload-script.sh",
-  };
-}
-
 export function PrepareGitBranchForSdkGeneration(): Step {
   return {
     name: "Preparing Git Branch",
@@ -1268,16 +1189,6 @@ export function PrepareGitBranchForSdkGeneration(): Step {
       'git config --local user.email "bot@pulumi.com"\n' +
       'git config --local user.name "pulumi-bot"\n' +
       "git checkout -b generate-sdk/${{ github.run_id }}-${{ github.run_number }}\n",
-  };
-}
-
-export function UpdateSubmodules(provider: string): Step {
-  if (provider !== "azure-native") {
-    return {};
-  }
-  return {
-    name: "Update Submodules",
-    run: "make update_submodules",
   };
 }
 
