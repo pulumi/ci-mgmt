@@ -90,22 +90,6 @@ export const buildProviderFiles = (provider: string): ProviderFile[] => {
       }
     );
   }
-  if (config.provider === "azure-native") {
-    files.push(
-      {
-        path: path.join(githubWorkflowsDir, "arm2pulumi-release.yml"),
-        data: wf.Arm2PulumiReleaseWorkflow("arm2pulumi-release", config),
-      },
-      {
-        path: path.join(githubWorkflowsDir, "arm2pulumi-coverage-report.yml"),
-        data: wf.Arm2PulumiCoverageReportWorkflow("generate-coverage", config),
-      },
-      {
-        path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),
-        data: wf.NightlySdkGenerationWorkflow("nightly-sdk-generation", config),
-      }
-    );
-  }
   if (config.provider === "google-native") {
     files.push({
       path: path.join(githubWorkflowsDir, "nightly-sdk-generation.yml"),

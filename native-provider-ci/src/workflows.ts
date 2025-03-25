@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GithubWorkflow, NormalJob, PermissionsEvent } from "./github-workflow";
+import { GithubWorkflow, NormalJob } from "./github-workflow";
 import * as steps from "./steps";
 import { Step } from "./steps";
 
@@ -153,9 +153,11 @@ export function RunAcceptanceTestsWorkflow(
         "prerequisites",
         opts
       ).addDispatchConditional(true),
-      build_sdks: new BuildSdkJob("build_sdks", opts, false)
-        .addDispatchConditional(true)
-        .addRunsOn(opts.provider),
+      build_sdks: new BuildSdkJob(
+        "build_sdks",
+        opts,
+        false
+      ).addDispatchConditional(true),
       test: new TestsJob(name, "test", opts).addDispatchConditional(true),
       sentinel: new EmptyJob("sentinel")
         .addPermissions({ statuses: "write" })
@@ -210,9 +212,7 @@ export function BuildWorkflow(
     env: azureEnv(env(opts)),
     jobs: {
       prerequisites: new PrerequisitesJob("prerequisites", opts),
-      build_sdks: new BuildSdkJob("build_sdks", opts, false).addRunsOn(
-        opts.provider
-      ),
+      build_sdks: new BuildSdkJob("build_sdks", opts, false),
       test: new TestsJob(name, "test", opts),
       publish: new PublishPrereleaseJob("publish", opts),
       publish_sdk: new PublishSDKJob("publish_sdk"),
@@ -382,57 +382,6 @@ export function Cf2PulumiReleaseWorkflow(
   };
 }
 
-// creates arm2pulumi-coverage-report.yml
-export function Arm2PulumiCoverageReportWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
-  return {
-    name: name,
-    on: {
-      schedule: [
-        {
-          cron: "35 17 * * *",
-        },
-      ],
-      workflow_dispatch: {},
-    },
-    env: env(opts),
-    jobs: {
-      "generate-coverage": new Arm2PulumiCoverageReport("coverage-report"),
-    },
-  };
-}
-
-// creates arm2pulumi-release.yml
-export function Arm2PulumiReleaseWorkflow(
-  name: string,
-  opts: WorkflowOpts
-): GithubWorkflow {
-  return {
-    name: name,
-    on: {
-      push: {
-        tags: ["v*.*.*", "!v*.*.*-**"],
-      },
-      workflow_dispatch: {
-        inputs: {
-          version: {
-            description:
-              "The version of the binary to deploy - do not include the pulumi prefix in the name.",
-            required: true,
-            type: "string",
-          },
-        },
-      },
-    },
-    env: env(opts),
-    jobs: {
-      release: new Arm2PulumiRelease("release"),
-    },
-  };
-}
-
 // This section represents sub-jobs that may be used in more than one workflow
 
 export class BuildSdkJob implements NormalJob {
@@ -451,10 +400,7 @@ export class BuildSdkJob implements NormalJob {
   if: NormalJob["if"];
 
   constructor(name: string, opts: WorkflowOpts, tag: boolean) {
-    if (opts.provider === "azure-native") {
-      this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
-    } else if (opts.provider === "command") {
+    if (opts.provider === "command") {
       this["runs-on"] = "ubuntu-latest";
     }
     this.name = name;
@@ -469,10 +415,9 @@ export class BuildSdkJob implements NormalJob {
       steps.InstallPython(),
       steps.InstallJava(),
       steps.InstallGradle("7.6"),
-      steps.DownloadProviderBinaries(opts.provider, name),
-      steps.UnTarProviderBinaries(opts.provider, name),
-      steps.RestoreBinaryPerms(opts.provider, name),
-      steps.CodegenDuringSDKBuild(opts.provider),
+      steps.DownloadProviderBinaries(),
+      steps.UnTarProviderBinaries(),
+      steps.RestoreBinaryPerms(),
       steps.InitializeSubModules(opts.submodules),
       steps.GenerateSDKs(opts.provider, opts.hasGenBinary),
       steps.BuildSDKs(opts.provider, opts.hasGenBinary),
@@ -493,14 +438,6 @@ export class BuildSdkJob implements NormalJob {
 
       this.steps = this.steps?.filter((step) => step.name !== "Checkout Repo");
       this.steps?.unshift(steps.CheckoutRepoStepAtPR());
-    }
-    return this;
-  }
-
-  addRunsOn(provider: string) {
-    if (provider === "azure-native") {
-      this["runs-on"] =
-        "${{ matrix.language == 'dotnet' && 'macos-latest' || 'ubuntu-latest' }}";
     }
     return this;
   }
@@ -618,9 +555,9 @@ export class TestsJob implements NormalJob {
       steps.InstallPython(),
       steps.InstallJava(),
       steps.InstallGradle("7.6"),
-      steps.DownloadProviderBinaries(opts.provider, jobName),
-      steps.UnTarProviderBinaries(opts.provider, jobName),
-      steps.RestoreBinaryPerms(opts.provider, jobName),
+      steps.DownloadProviderBinaries(),
+      steps.UnTarProviderBinaries(),
+      steps.RestoreBinaryPerms(),
       steps.DownloadSDKs(),
       steps.UnzipSDKs(),
       steps.UpdatePath(),
@@ -776,7 +713,7 @@ export class PublishPrereleaseJob implements NormalJob {
   steps: NormalJob["steps"];
   name: string;
   constructor(name: string, opts: WorkflowOpts) {
-    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
+    if (opts.provider === "aws-native") {
       this["runs-on"] = "macos-latest";
     }
     this.name = name;
@@ -806,7 +743,7 @@ export class PublishJob implements NormalJob {
   constructor(name: string, opts: WorkflowOpts) {
     this.name = name;
     Object.assign(this, { name });
-    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
+    if (opts.provider === "aws-native") {
       this["runs-on"] = "macos-latest";
     }
     this.steps = [
@@ -931,51 +868,6 @@ export class Cf2PulumiRelease implements NormalJob {
   }
 }
 
-export class Arm2PulumiRelease implements NormalJob {
-  "runs-on" = "macos-latest";
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.SetProviderVersionStep(),
-    steps.InstallPulumiCtl(),
-    steps.InstallGo(goVersion),
-    steps.RunGoReleaserWithArgs(
-      "-p 1 -f .goreleaser.arm2pulumi.yml release --clean --timeout 60m0s"
-    ),
-  ];
-  name: string;
-
-  constructor(name: string) {
-    this.name = name;
-    Object.assign(this, { name });
-  }
-}
-
-export class Arm2PulumiCoverageReport implements NormalJob {
-  "runs-on" = "ubuntu-latest";
-  steps = [
-    steps.CheckoutRepoStep(),
-    steps.InstallGo(goVersion),
-    steps.InstallPulumiCtl(),
-    steps.InstallPulumiCli(),
-    steps.AzureLogin("azure-native"),
-    steps.MakeClean(),
-    steps.InitializeSubModules(true),
-    steps.BuildCodegenBinaries("azure-native"),
-    steps.MakeLocalGenerate(),
-    steps.BuildProvider("azure-native"),
-    steps.GenerateCoverageReport(),
-    steps.TestResultsJSON(),
-    steps.AwsCredentialsForArmCoverageReport(),
-    steps.UploadArmCoverageToS3(),
-  ];
-  name: string;
-
-  constructor(name: string) {
-    this.name = name;
-    Object.assign(this, { name });
-  }
-}
-
 export class WeeklyPulumiUpdate implements NormalJob {
   "runs-on" = "ubuntu-latest";
   steps: NormalJob["steps"];
@@ -1025,11 +917,9 @@ export class NightlySdkGeneration implements NormalJob {
       steps.InstallPulumiCtl(),
       steps.InstallPulumiCli(opts.pulumiCLIVersion, opts.pulumiVersionFile),
       ...awsCredentialSteps,
-      steps.AzureLogin(opts.provider),
       steps.MakeClean(),
       steps.PrepareGitBranchForSdkGeneration(),
       steps.CommitEmptySDK(),
-      steps.UpdateSubmodules(opts.provider),
       steps.MakeDiscovery(opts.provider),
       steps.BuildCodegenBinaries(opts.provider),
       steps.MakeLocalGenerate(),

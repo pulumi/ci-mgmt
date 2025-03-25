@@ -147,11 +147,7 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
           ],
         };
       }
-      if (
-        opts.provider === "aws-native" ||
-        opts.provider === "azure-native" ||
-        opts.provider === "google-native"
-      ) {
+      if (opts.provider === "aws-native" || opts.provider === "google-native") {
         this.before = {
           hooks: [
             "make init_submodules",
@@ -186,8 +182,8 @@ export class PulumiGoreleaserPreConfig implements GoreleaserConfig {
         hooks: { post: ["make sign-goreleaser-exe-{{ .Arch }}"] },
       },
     ];
-    // Don't disable CGO for azure-native and aws-native to support mac users
-    if (opts.provider === "azure-native" || opts.provider === "aws-native") {
+    // Don't disable CGO for aws-native to support mac users
+    if (opts.provider === "aws-native") {
       this.builds = [
         {
           dir: "provider",
