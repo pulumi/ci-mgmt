@@ -9,6 +9,7 @@ TESTPARALLELISM := 10
 GOTESTARGS := ""
 WORKING_DIR := $(shell pwd)
 PULUMI_PROVIDER_BUILD_PARALLELISM ?=
+HELP_MAKE_GO := github.com/iwahbe/helpmakego@v0.1.0
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
@@ -86,7 +87,7 @@ build_provider_cmd = GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVI
 .PHONY: provider
 provider: bin/$(PROVIDER)
 
-bin/$(PROVIDER):
+bin/$(PROVIDER): $(shell go run $(HELP_MAKE_GO) $(GO_MODULE)/cmd/$(PROVIDER))
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 
 test:
