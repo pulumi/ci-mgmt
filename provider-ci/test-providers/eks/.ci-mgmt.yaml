@@ -1,4 +1,5 @@
 provider: eks
+template: typescript-component
 major-version: 3
 aws: true
 env:
@@ -21,7 +22,6 @@ env:
   SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   PULUMI_ENABLE_RESOURCE_REFERENCES: 1
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-template: generic
 freeDiskSpaceBeforeTest: true # TODO: https://github.com/pulumi/pulumi/issues/17718
 buildProviderPre: echo building-provider
 shards: 3
