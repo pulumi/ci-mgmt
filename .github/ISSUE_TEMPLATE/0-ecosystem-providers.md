@@ -86,7 +86,6 @@ assignees: ''
 - [ ] [null](https://github.com/pulumi/pulumi-null)
 - [ ] [oci](https://github.com/pulumi/pulumi-oci)
 - [ ] [okta](https://github.com/pulumi/pulumi-okta)
-- [ ] [onelogin](https://github.com/pulumi/pulumi-onelogin)
 - [ ] [openstack](https://github.com/pulumi/pulumi-openstack)
 - [ ] [opsgenie](https://github.com/pulumi/pulumi-opsgenie)
 - [ ] [pagerduty](https://github.com/pulumi/pulumi-pagerduty)
