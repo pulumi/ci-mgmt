@@ -66,20 +66,9 @@ func GeneratePackage(opts GenerateOpts) error {
 
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
-		workflows, err := os.ReadDir(filepath.Join(opts.OutDir, ".github", "workflows"))
+		err := cleanGithubWorkflows(opts.OutDir, opts.Config.Provider)
 		if err != nil {
-			return fmt.Errorf("error reading .github/workflows directory: %w", err)
-		}
-		providerName := opts.Config.Provider
-		for _, workflow := range workflows {
-			// Skip provider-specific workflows which are prefixed with the provider name
-			if strings.HasPrefix(workflow.Name(), providerName+"-") {
-				continue
-			}
-			err = os.Remove(filepath.Join(opts.OutDir, ".github", "workflows", workflow.Name()))
-			if err != nil {
-				return fmt.Errorf("error deleting workflow %s: %w", workflow.Name(), err)
-			}
+			return err
 		}
 	}
 	// Clean up files which are marked for deletion
@@ -100,6 +89,29 @@ func GeneratePackage(opts GenerateOpts) error {
 		err = migrations.Migrate(opts.TemplateName, opts.OutDir)
 		if err != nil {
 			return fmt.Errorf("error running migrations: %w", err)
+		}
+	}
+	return nil
+}
+
+func cleanGithubWorkflows(outDir string, providerName string) error {
+	workflows, err := os.ReadDir(filepath.Join(outDir, ".github", "workflows"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			// No workflows to clean up
+			return nil
+		}
+		return fmt.Errorf("error reading .github/workflows directory: %w", err)
+	}
+
+	for _, workflow := range workflows {
+		// Skip provider-specific workflows which are prefixed with the provider name
+		if strings.HasPrefix(workflow.Name(), providerName+"-") {
+			continue
+		}
+		err = os.Remove(filepath.Join(outDir, ".github", "workflows", workflow.Name()))
+		if err != nil {
+			return fmt.Errorf("error deleting workflow %s: %w", workflow.Name(), err)
 		}
 	}
 	return nil
