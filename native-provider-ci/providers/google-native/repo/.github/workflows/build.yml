@@ -185,7 +185,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3.16.2
+      uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
       with:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
@@ -326,7 +326,7 @@ jobs:
         retention-days: 30
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3.16.2
+      uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
       with:
         author_name: Failure while building SDKs
         fields: repo,commit,author,action
@@ -446,7 +446,7 @@ jobs:
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3.16.2
+      uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
       with:
         author_name: Failure in SDK tests
         fields: repo,commit,author,action
@@ -504,7 +504,7 @@ jobs:
         version: latest
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3.16.2
+      uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
       with:
         author_name: Failure in publishing binaries
         fields: repo,commit,author,action
@@ -586,7 +586,7 @@ jobs:
         PYPI_PUBLISH_ARTIFACTS: all
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3.16.2
+      uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
       with:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
