@@ -100,7 +100,7 @@ jobs:
         uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
 
       - name: 8398a7/action-slack
-        uses: 8398a7/action-slack@81cf33be7afd53f17fcd90faab001577731bf6dd # v3.17.0
+        uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
 
       - name: dorny/paths-filter
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
