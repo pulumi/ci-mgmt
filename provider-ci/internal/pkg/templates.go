@@ -23,6 +23,10 @@ const (
 	// A simple parameterized provider implemented in Go.
 	// This provider has no SDKs to worry about and has a single top-level go.mod.
 	parameterizedGo = "parameterized-go"
+	// workflows for native providers
+	native = "native"
+	// workflows for aws-native provider
+	awsNative = "aws-native"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -44,6 +48,10 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		return []TemplateDir{base, internal}, nil
 	case "parameterized-go":
 		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
+	case "native":
+		return []TemplateDir{native}, nil // Can't use base because it has a Makefile that would conflict
+	case "aws-native":
+		return []TemplateDir{native, awsNative}, nil // AWS native has 2 extra workflows
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}

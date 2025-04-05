@@ -5,7 +5,18 @@ import * as fs from 'fs';
 
 // grab all the providers from their directory listing
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
-const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/")
+
+// Temporarily add some native providers explicitly here since they are no longer in the native-provider-ci directory
+const nativeProviders = [
+  ...fs.readdirSync("../../native-provider-ci/providers/"),
+  "aws-native",
+  "command",
+  "docker-build",
+  "kubernetes",
+  "kubernetes-cert-manager",
+  "kubernetes-coredns",
+  "kubernetes-ingress-nginx",
+];
 
 function hasManagedBranchProtection(provider: string): boolean {
     // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to

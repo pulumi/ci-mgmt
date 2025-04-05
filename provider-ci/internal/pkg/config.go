@@ -117,6 +117,9 @@ type Config struct {
 	// might only be used for very specific purposes.
 	Env map[string]string `yaml:"env"`
 
+	// Overrides the default env rather than appending to it.
+	EnvOverride map[string]string `yaml:"envOverride"`
+
 	// Actions can contain preBuild and preTest additional steps to be spliced
 	// into workflows. The use of these hooks vary - quite a few just build
 	// upstream and run provider tests. Usage:
@@ -242,6 +245,18 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22enableConfigurationCheck%3A%22&type=code
 	EnableConfigurationCheck bool `yaml:"enableConfigurationCheck"`
 
+	// SetupKind controls whether to setup a KinD cluster. (only used in kubernetes-coredns)
+	SetupKind bool `yaml:"setupKind"`
+
+	// PulumiVersionFile specifies the file to read the Pulumi version from.
+	PulumiVersionFile string `yaml:"pulumiVersionFile"`
+
+	// SDKModuleDir specifies the directory to find the SDK go.mod
+	SDKModuleDir string `yaml:"sdkModuleDir"`
+
+	// EnableChangelog controls whether the changelog is generated. (only used by aws-native)
+	EnableChangelog string `yaml:"enableChangelog"`
+
 	// Deprecated configs
 
 	// Parallel has no effect but is set by some providers.
@@ -343,6 +358,10 @@ func LoadLocalConfig(path string) (Config, error) {
 	err = dec.Decode(&config)
 	if err != nil {
 		return Config{}, err
+	}
+
+	if config.EnvOverride != nil {
+		config.Env = config.EnvOverride
 	}
 
 	if config.ModulePath == "" {
