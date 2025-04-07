@@ -23,6 +23,8 @@ const (
 	// A simple parameterized provider implemented in Go.
 	// This provider has no SDKs to worry about and has a single top-level go.mod.
 	parameterizedGo = "parameterized-go"
+	// Typescript based component providers
+	typescript = "typescript"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -37,12 +39,18 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		// Any Pulumi-owned bridged provider
 		return []TemplateDir{base, internal, bridged, internalBridged}, nil
 	case "external-bridged-provider":
-		// third-party bridged providers
+		// third-party bridged providers: https://github.com/search?q=path%3A.ci-mgmt.yaml+%22template%3A+external-bridged-provider%22&type=code
 		return []TemplateDir{base, external, bridged}, nil
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
+		// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22template%3A+generic%22&type=code
 		return []TemplateDir{base, internal}, nil
+	case "typescript-component":
+		// Pulumi-owned providers based on the TypeScript SDK
+		// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22template%3A+typescript%22&type=code
+		return []TemplateDir{base, internal, typescript}, nil
 	case "parameterized-go":
+		// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22template%3A+parameterized-go%22&type=code
 		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)

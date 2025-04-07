@@ -49,7 +49,7 @@ func GeneratePackage(opts GenerateOpts) error {
 	// GenName defaults to "tfgen" for bridged providers and "gen" for others
 	if opts.Config.GenName == "" {
 		switch opts.TemplateName {
-		case "generic":
+		case "generic", "typescript-component":
 			opts.Config.GenName = "gen"
 		default:
 			opts.Config.GenName = "tfgen"
