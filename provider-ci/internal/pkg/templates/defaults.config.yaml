@@ -241,3 +241,6 @@ autoMergeProviderUpgrades: true
 
 # Whether we allow missing docs in the provider.
 allowMissingDocs: true
+
+# Where the go.mod file for the skd lives
+sdkModuleDir: "sdk"

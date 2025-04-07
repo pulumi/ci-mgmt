@@ -1,8 +1,0 @@
-provider: command
-major-version: 0
-aws: true
-hasGenBinary: false
-pulumiVersionFile: .pulumi.version
-env:
-  AWS_REGION: us-west-2
-  PULUMI_API: "https://api.pulumi-staging.io"
