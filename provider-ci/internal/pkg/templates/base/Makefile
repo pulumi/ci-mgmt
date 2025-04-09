@@ -25,7 +25,11 @@ PULUMI_CONVERT := 1
 #{{- else }}#
 PULUMI_CONVERT := 0
 #{{- end }}#
+#{{- if .Config.AllowMissingDocs }}#
+PULUMI_MISSING_DOCS_ERROR := false
+#{{- else }}#
 PULUMI_MISSING_DOCS_ERROR := true
+#{{- end }}#
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
