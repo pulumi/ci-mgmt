@@ -103,7 +103,7 @@ jobs:
     - name: Make Kubernetes provider
       run: make k8sprovider
     #{{- end }}#
-    #{{- if ne .Config.Provider "command" }}#
+    #{{- if and (ne .Config.Provider "command") (ne .Config.Provider "terraform") }}#
     - if: github.event_name == 'pull_request'
       name: Check Schema is Valid
       run: >-
@@ -114,8 +114,6 @@ jobs:
         echo 'EOF' >> $GITHUB_ENV
       env:
         GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-    #{{- end }}#
-    #{{- if ne .Config.Provider "command" }}#
     - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
@@ -124,8 +122,6 @@ jobs:
           ${{ env.SCHEMA_CHANGES }}
         comment-tag: schemaCheck
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    #{{- end }}#
-    #{{- if ne .Config.Provider "command" }}#
     - if: contains(env.SCHEMA_CHANGES, 'Looking good! No breaking changes found.') &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes
@@ -194,7 +190,7 @@ jobs:
     - name: Tar provider binaries
       run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{
         github.workspace}}/bin/ pulumi-resource-${{ env.PROVIDER }}
-        #{{- if ne .Config.Provider "command" }}#
+        #{{- if and (ne .Config.Provider "command") (ne .Config.Provider "terraform") }}#
         pulumi-gen-${{ env.PROVIDER}}
         #{{- end }}#
     - name: Upload artifacts
