@@ -55,7 +55,9 @@ builds:
   - amd64
   - arm64
   ignore: &a1 []
+#{{- if ne .Config.Provider "terraform" }}#
   main: ./cmd/pulumi-resource-#{{ .Config.Provider }}#/
+#{{- end }}#
   ldflags: &a2
     - -s
     - -w
@@ -83,7 +85,9 @@ builds:
   - amd64
   - arm64
   ignore: *a1
+#{{- if ne .Config.Provider "terraform" }}#
   main: ./cmd/pulumi-resource-#{{ .Config.Provider }}#/
+#{{- end }}#
   ldflags: *a2
   binary: pulumi-resource-#{{ .Config.Provider }}#
   hooks:
