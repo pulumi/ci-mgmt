@@ -788,7 +788,7 @@ export function LoginGoogleCloudRegistry(provider: string): Step {
   if (provider === "kubernetes") {
     return {
       name: "Login to Google Cloud Registry",
-      run: "gcloud --quiet auth configure-docker",
+      run: "gcloud --quiet auth configure-docker gcr.io us-central1-docker.pkg.dev",
     };
   }
   return {};
