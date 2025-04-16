@@ -125,7 +125,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.GCPRegistry }}#
     - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker gcr.io us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
+      run: gcloud --quiet auth configure-docker gcr.io,us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
     #{{- end }}#
     #{{- if index .Config.SetupScript }}#
     - name: Run setup script

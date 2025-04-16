@@ -901,7 +901,7 @@ jobs:
 
         sudo mv kubectl /usr/local/bin
     - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker gcr.io us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
+      run: gcloud --quiet auth configure-docker gcr.io,us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
     - name: Set stack name in output
       id: stackname
       run: echo 'stack-name=${{ env.PULUMI_TEST_OWNER }}/${{ github.sha }}-${{
@@ -976,7 +976,7 @@ jobs:
 
         sudo mv kubectl /usr/local/bin
     - name: Login to Google Cloud Registry
-      run: gcloud --quiet auth configure-docker gcr.io us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
+      run: gcloud --quiet auth configure-docker gcr.io,us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
     - name: Destroy test infra
       run: ./scripts/ci-cluster-destroy.sh ${{
         needs.build-test-cluster.outputs.stack-name }}
