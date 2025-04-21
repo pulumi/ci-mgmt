@@ -838,7 +838,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Dispatch Event
-      run: pulumictl create docs-build pulumi-${{ env.PROVIDER }}
+      run: pulumictl create docs-build #{{- if eq .Config.Provider "terraform" }}# --schema-path schema.json #{{- end }}# pulumi-${{ env.PROVIDER }}
         ${GITHUB_REF#refs/tags/}
       env:
         GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}

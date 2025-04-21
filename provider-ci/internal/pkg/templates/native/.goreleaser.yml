@@ -44,7 +44,9 @@ builds:
   binary: pulumi-resource-#{{ .Config.Provider }}#
 #{{- else }}#
 - id: build-provider
+#{{- if ne .Config.Provider "terraform" }}#
   dir: provider
+#{{- end }}#
   env:
   - CGO_ENABLED=0
   - GO111MODULE=on
@@ -61,7 +63,10 @@ builds:
   ldflags: &a2
     - -s
     - -w
-#{{- if ge .Config.MajorVersion 2 }}#
+#{{- if eq .Config.Provider "terraform" }}#
+    - -X
+      github.com/pulumi/pulumi-terraform/v6/provider/version.version={{.Tag}}
+#{{- else if ge .Config.MajorVersion 2 }}#
     - -X
       github.com/pulumi/pulumi-#{{ .Config.Provider }}#/provider/v#{{ .Config.MajorVersion }}#/pkg/version.Version={{.Tag}}
 #{{- else if eq .Config.Provider "command" }}#
@@ -75,7 +80,9 @@ builds:
 #{{- end }}#
   binary: pulumi-resource-#{{ .Config.Provider }}#
 - id: build-provider-sign-windows
+#{{- if ne .Config.Provider "terraform" }}#
   dir: provider
+#{{- end }}#
   env:
   - CGO_ENABLED=0
   - GO111MODULE=on
