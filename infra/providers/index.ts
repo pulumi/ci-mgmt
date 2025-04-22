@@ -7,8 +7,7 @@ import * as fs from 'fs';
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
 
 // Temporarily add some native providers explicitly here since they are no longer in the native-provider-ci directory
-const nativeProviders = [...fs.readdirSync("../../native-provider-ci/providers/"),
-];
+const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/");
 
 function hasManagedBranchProtection(provider: string): boolean {
   // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to

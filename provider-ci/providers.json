@@ -18,10 +18,11 @@
     "cloudngfwaws",
     "confluentcloud",
     "consul",
+    "command", 
     "databricks",
     "datadog",
     "dbtcloud",
-    "command", 
+
     "digitalocean",
     "dnsimple",
     "docker",
