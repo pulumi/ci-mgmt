@@ -15,10 +15,6 @@ on:
         description: "Mark created PRs for auto-merging?"
         required: true
         type: boolean
-      bridged:
-        description: "Whether the provider is bridged or native"
-        type: boolean
-        required: true
       downstream_test:
         description: "Whether the upgrade is a downstream test"
         type: boolean
@@ -84,22 +80,15 @@ jobs:
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
       - name: Delete existing workflows
-        # Curiously, native providers do not wipe all the workflows currently. This is a bit suspect and needs revisiting.
-        if: ${{ inputs.bridged != true }}
         run: |
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
-        if: inputs.bridged
         run: |
           cd ci-mgmt/provider-ci && go run ./... generate \
                 --config ../../pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml \
                 --out ../../pulumi-${{ inputs.provider_name }}
-      - name: Copy files from ci-mgmt to pulumi-${{ inputs.provider_name }}
-        if: ${{ inputs.bridged != true }}
-        run: |
-          cp -r ci-mgmt/native-provider-ci/providers/${{ inputs.provider_name }}/repo/. pulumi-${{ inputs.provider_name }}/.
       - name: Close obsolete PRs started by this workflow
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         if: ${{ !inputs.skip_closing_prs }}

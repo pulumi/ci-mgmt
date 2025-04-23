@@ -2,7 +2,7 @@
 # Pulumi provider. Note that this workflow does not generate any files -
 # workflows must already be generated and committed to this repo when this
 # workflow is run.
-name: Update GH workflows, single bridged provider
+name: Update GH workflows, single provider
 "on":
   workflow_dispatch:
     inputs:
@@ -22,7 +22,6 @@ jobs:
     uses: ./.github/workflows/update-workflows.yml
     secrets: inherit
     with:
-      bridged: true
       provider_name: ${{ github.event.inputs.provider_name }}
       automerge: ${{ github.event.inputs.automerge == 'true' }}
       caller_workflow: "update-workflows-single-bridged-provider"

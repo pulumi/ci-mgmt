@@ -6,7 +6,6 @@
     fileMatch: [".*/action-versions\\.ya?ml$"],
     ignorePaths: [
       "provider-ci/test-providers/**",
-      "native-provider-ci/providers/**",
     ],
   },
   packageRules: [
