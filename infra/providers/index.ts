@@ -104,8 +104,10 @@ class ProviderLabels extends pulumi.ComponentResource {
       }, {
         parent: this,
         // Recreating labels will drop them from any issues they are attached
-        // to. To avoid this, we protect our labels.
+        // to. To avoid this, we protect our labels. We also generally don't want to delete Labels
+        // when we remove a repo from management, so we set retainOnDelete to true.
         protect: true,
+        retainOnDelete: true,
       })
     }
   }
