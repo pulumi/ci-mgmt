@@ -37,7 +37,6 @@ jobs:
     uses: ./.github/workflows/update-workflows.yml
     secrets: inherit
     with:
-      bridged: true
       provider_name: xyz
       automerge: ${{ github.event_name == 'merge_group' }}
       downstream_test: true

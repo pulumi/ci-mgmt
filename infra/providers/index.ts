@@ -6,45 +6,6 @@ import * as fs from 'fs';
 // grab all the providers from their directory listing
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
 
-// Temporarily add some native providers explicitly here since they are no longer in the native-provider-ci directory
-const nativeProviders = fs.readdirSync("../../native-provider-ci/providers/");
-
-function hasManagedBranchProtection(provider: string): boolean {
-  // Some, but not all of the providers under @pulumi/providers team have ad-hoc workflow names and do not want to
-  // manage branch protections in this stack. This list might grow as needed.
-  return !provider.includes("azure-native");
-}
-
-function nativeProviderProtection(buildSdkJobName: string, provider: string) {
-  const requiredChecks: string[] = [
-    "Update Changelog",
-    "Sentinel",
-  ];
-
-  const repo = `pulumi-${provider}`;
-
-  new github.BranchProtection(`${provider}-default`, {
-    repositoryId: repo,
-    pattern: github.BranchDefault.get(provider, repo).branch,
-    enforceAdmins: true,
-    requiredPullRequestReviews: [{
-      // pullRequestBypassers allows pulumi-bot to push directly to the
-      // protected branch, but it does not allow PRs from pulumi-bot to ignore
-      // requiredApprovingReviewCount.
-      pullRequestBypassers: ["/pulumi-bot"],
-      requiredApprovingReviewCount: 1,
-    }],
-    requiredStatusChecks: [{
-      strict: false,
-      contexts: requiredChecks,
-    }]
-  }, {
-    deleteBeforeReplace: true,
-  });
-
-  new ProviderLabels(provider);
-}
-
 function tfProviderProtection(provider: string) {
   const requiredChecks: string[] = [
     "Update Changelog",
@@ -104,8 +65,10 @@ class ProviderLabels extends pulumi.ComponentResource {
       }, {
         parent: this,
         // Recreating labels will drop them from any issues they are attached
-        // to. To avoid this, we protect our labels.
+        // to. To avoid this, we protect our labels. We also generally don't want to delete Labels
+        // when we remove a repo from management, so we set retainOnDelete to true.
         protect: true,
+        retainOnDelete: true,
       })
     }
   }
@@ -127,8 +90,4 @@ class BridgedProviderLabels extends ProviderLabels {
 
 for (let bridgedProvider of tfProviders) {
   tfProviderProtection(bridgedProvider);
-}
-
-for (let nativeProvider of [...nativeProviders].filter(hasManagedBranchProtection)) {
-  nativeProviderProtection("build_sdks", nativeProvider);
 }
