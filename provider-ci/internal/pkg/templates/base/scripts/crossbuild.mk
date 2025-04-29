@@ -19,6 +19,8 @@ bin/darwin-arm64/$(PROVIDER): GOOS := darwin
 bin/darwin-arm64/$(PROVIDER): GOARCH := arm64
 bin/windows-amd64/$(PROVIDER).exe: GOOS := windows
 bin/windows-amd64/$(PROVIDER).exe: GOARCH := amd64
+bin/windows-arm64/$(PROVIDER).exe: GOOS := windows
+bin/windows-arm64/$(PROVIDER).exe: GOARCH := arm64
 bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe: bin/jsign-6.0.jar
 	$(call build_provider_cmd,$(GOOS),$(GOARCH),$(WORKING_DIR)/$@)
 
@@ -58,13 +60,15 @@ provider-linux-arm64: bin/linux-arm64/$(PROVIDER)
 provider-darwin-amd64: bin/darwin-amd64/$(PROVIDER)
 provider-darwin-arm64: bin/darwin-arm64/$(PROVIDER)
 provider-windows-amd64: bin/windows-amd64/$(PROVIDER).exe
-.PHONY: provider-linux-amd64 provider-linux-arm64 provider-darwin-amd64 provider-darwin-arm64 provider-windows-amd64
+provider-windows-arm64: bin/windows-arm64/$(PROVIDER).exe
+.PHONY: provider-linux-amd64 provider-linux-arm64 provider-darwin-amd64 provider-darwin-arm64 provider-windows-amd64 provider-windows-arm64
 
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-linux-amd64.tar.gz: bin/linux-amd64/$(PROVIDER)
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-linux-arm64.tar.gz: bin/linux-arm64/$(PROVIDER)
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-darwin-amd64.tar.gz: bin/darwin-amd64/$(PROVIDER)
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-darwin-arm64.tar.gz: bin/darwin-arm64/$(PROVIDER)
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-windows-amd64.tar.gz: bin/windows-amd64/$(PROVIDER).exe
+bin/$(PROVIDER)-v$(PROVIDER_VERSION)-windows-arm64.tar.gz: bin/windows-arm64/$(PROVIDER).exe
 bin/$(PROVIDER)-v$(PROVIDER_VERSION)-%.tar.gz:
 	@mkdir -p dist
 	@# $< is the last dependency (the binary path from above) e.g. bin/linux-amd64/pulumi-resource-xyz
@@ -76,5 +80,6 @@ provider_dist-linux-arm64: bin/$(PROVIDER)-v$(PROVIDER_VERSION)-linux-arm64.tar.
 provider_dist-darwin-amd64: bin/$(PROVIDER)-v$(PROVIDER_VERSION)-darwin-amd64.tar.gz
 provider_dist-darwin-arm64: bin/$(PROVIDER)-v$(PROVIDER_VERSION)-darwin-arm64.tar.gz
 provider_dist-windows-amd64: bin/$(PROVIDER)-v$(PROVIDER_VERSION)-windows-amd64.tar.gz
+provider_dist-windows-arm64: bin/$(PROVIDER)-v$(PROVIDER_VERSION)-windows-arm64.tar.gz
 provider_dist: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64
 .PHONY: provider_dist-linux-amd64 provider_dist-linux-arm64 provider_dist-darwin-amd64 provider_dist-darwin-arm64 provider_dist-windows-amd64 provider_dist
