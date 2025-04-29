@@ -28,7 +28,7 @@ bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe: bin/jsign-6.0.jar
 	@# Test variables set by joining with | between and looking for || showing at least one variable is empty.
 	@# Move the binary to a temporary location and sign it there to avoid the target being up-to-date if signing fails.
 	@set -e; \
-	if [[ "${GOOS}-${GOARCH}" = "windows-amd64" && "${SKIP_SIGNING}" != "true" ]]; then \
+	if [[ "${GOOS}" = "windows" && "${SKIP_SIGNING}" != "true" ]]; then \
 		if [[ "|${AZURE_SIGNING_CLIENT_ID}|${AZURE_SIGNING_CLIENT_SECRET}|${AZURE_SIGNING_TENANT_ID}|${AZURE_SIGNING_KEY_VAULT_URI}|" == *"||"* ]]; then \
 			echo "Can't sign windows binaries as required configuration not set: AZURE_SIGNING_CLIENT_ID, AZURE_SIGNING_CLIENT_SECRET, AZURE_SIGNING_TENANT_ID, AZURE_SIGNING_KEY_VAULT_URI"; \
 			echo "To rebuild with signing delete the unsigned $@ and rebuild with the fixed configuration"; \
