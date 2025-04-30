@@ -1,3 +1,4 @@
+permissions: write-all # Equivalent to default permissions plus id-token: write
 name: update-workflows
 
 on:
@@ -29,18 +30,25 @@ on:
         description: "Whether a PR was created"
 
 env:
-  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: imports/github-secrets
+  ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN
 
 jobs:
   update_workflows:
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - name: Clone pulumi-${{ inputs.provider_name }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       - name: Get Go version to install
         id: go-version
         run: |
@@ -70,7 +78,7 @@ jobs:
         with:
           repo: pulumi/pulumictl
           tag: v0.0.46
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -93,7 +101,7 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         if: ${{ !inputs.skip_closing_prs }}
         with:
-          github-token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          github-token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
             const octokit = github.rest;
@@ -127,18 +135,16 @@ jobs:
           labels: "impact/no-changelog-required"
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ secrets.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       - name: "Set PR to auto-merge"
-        if:
-          steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
-          # Not all providers have auto-merge enabled, and we don't want to fail providers
-          # that don't have auto-merge enabled.
-          #
-          # After https://github.com/pulumi/home/issues/3140 is closed, we should remove
-          # `continue-on-error: true`.
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
+        # Not all providers have auto-merge enabled, and we don't want to fail providers
+        # that don't have auto-merge enabled.
+        #
+        # After https://github.com/pulumi/home/issues/3140 is closed, we should remove
+        # `continue-on-error: true`.
         continue-on-error: true
         run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-url }}"
-      # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
     outputs:
