@@ -4,7 +4,7 @@
         "@types/node": "^18"
     },
     "dependencies": {
-        "@pulumi/github": "6.7.1",
+        "@pulumi/github": "6.7.2",
         "@pulumi/pulumi": "3.166.0",
         "yaml": "^2.2.2"
     }
