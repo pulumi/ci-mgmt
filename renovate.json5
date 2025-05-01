@@ -29,5 +29,11 @@
       matchPackageNames: ["goreleaser/goreleaser-action"],
       allowedVersions: "^5",
     },
+    {
+      // v7 only supports golangci-lint version 2.0 which requires config migration.
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["golangci/golangci-lint-action"],
+      allowedVersions: "^6",
+    },
   ],
 }
