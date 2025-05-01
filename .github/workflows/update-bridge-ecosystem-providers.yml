@@ -1,3 +1,4 @@
+permissions: write-all # Equivalent to default permissions plus id-token: write
 # This is the version of update-bridge=all-providers.yml scoped down to Ecosystem team owned providers.
 #
 # Generates a PR for the files in provider-ci/providers/* to each corresponding Pulumi provider.
@@ -15,11 +16,18 @@ on:
         default: false
 
 env:
-  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: imports/github-secrets
+  ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN
 jobs:
   generate-providers-list:
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
@@ -39,13 +47,16 @@ jobs:
       matrix:
         provider: ${{ fromJson(needs.generate-providers-list.outputs.providers ) }}
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
         uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
         continue-on-error: true
         with:
             workflow: upgrade-bridge.yml
-            token: ${{ secrets.PULUMI_BOT_TOKEN }} 
+            token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
             inputs: '{ "automerge": true }'
             ref: main
@@ -55,11 +66,9 @@ jobs:
         uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
         with:
             workflow: upgrade-bridge.yml
-            token: ${{ secrets.PULUMI_BOT_TOKEN }} 
+            token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
             ref: master
             inputs: '{ "automerge": true }'
-      # See: https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
-        

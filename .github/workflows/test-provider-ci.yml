@@ -1,3 +1,4 @@
+permissions: write-all # Equivalent to default permissions plus id-token: write
 name: Test Provider CI
 on:
   pull_request:
@@ -7,7 +8,11 @@ on:
   workflow_dispatch: {}
 
 env:
-  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: imports/github-secrets
+  ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,6 +23,9 @@ jobs:
     name: Verify against testdata
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - name: Checkout Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install golangci-lint
@@ -50,10 +58,13 @@ jobs:
     needs: deploy
     if: needs.deploy.outputs.pull_request_created == 'true'
     env:
-      GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+      ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN,GITHUB_TOKEN=PULUMI_BOT_TOKEN
     strategy:
       fail-fast: false
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - name: Await PR opened for pulumi-xyz
         run: |
           echo Await PR opened for pulumi-xyz
@@ -87,6 +98,9 @@ jobs:
     needs: downstream
     if: github.event_name == 'merge_group'
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@v1
       - name: Await PR merged
         run: while [[ $(gh pr view --repo "pulumi/pulumi-xyz" "${{ needs.downstream.outputs.pr_number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
         timeout-minutes: 5
