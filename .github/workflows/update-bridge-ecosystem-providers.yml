@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@856b315abd3bf3849c64670704fbbcf275f386a2 # v1
+        uses: pulumi/esc-action@11866f8e76fcb062d3b39c935a7c648bfb264289 # v1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
@@ -49,7 +49,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@856b315abd3bf3849c64670704fbbcf275f386a2 # v1
+        uses: pulumi/esc-action@11866f8e76fcb062d3b39c935a7c648bfb264289 # v1
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
         uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
