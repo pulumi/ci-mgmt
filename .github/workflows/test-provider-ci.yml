@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@f35d6eab1b7f37a95fe1f9117ee1d4900183dc86 # v1
+        uses: pulumi/esc-action@856b315abd3bf3849c64670704fbbcf275f386a2 # v1
       - name: Checkout Repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install golangci-lint
@@ -64,7 +64,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@f35d6eab1b7f37a95fe1f9117ee1d4900183dc86 # v1
+        uses: pulumi/esc-action@856b315abd3bf3849c64670704fbbcf275f386a2 # v1
       - name: Await PR opened for pulumi-xyz
         run: |
           echo Await PR opened for pulumi-xyz
@@ -100,7 +100,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@f35d6eab1b7f37a95fe1f9117ee1d4900183dc86 # v1
+        uses: pulumi/esc-action@856b315abd3bf3849c64670704fbbcf275f386a2 # v1
       - name: Await PR merged
         run: while [[ $(gh pr view --repo "pulumi/pulumi-xyz" "${{ needs.downstream.outputs.pr_number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
         timeout-minutes: 5
