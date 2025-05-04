@@ -54,7 +54,7 @@ jobs:
         uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
 
       - name: pulumi/esc-action
-        uses: pulumi/esc-action@41fd832f44f4820124b5350b5f84a00f741f234e # v1.3.0
+        uses: pulumi/esc-action@efb0bc8946938f0dfbfa00e829196ec95f0d0ea7 # v1.4.0
 
       # Tools
 
@@ -77,7 +77,7 @@ jobs:
         uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
 
       - name: pulumi/esc-action
-        uses: pulumi/esc-action@41fd832f44f4820124b5350b5f84a00f741f234e # v1.3.0
+        uses: pulumi/esc-action@efb0bc8946938f0dfbfa00e829196ec95f0d0ea7 # v1.4.0
 
       # GHA Utilities
 
