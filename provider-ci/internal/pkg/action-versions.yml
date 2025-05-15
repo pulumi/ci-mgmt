@@ -65,7 +65,7 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
 
       - name: pulumi/actions
-        uses: pulumi/actions@9519177da243fd32cab35cdbf19cce1ab7472fcc # v6.2.0
+        uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
 
       - name: codecov/codecov-action
         uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
