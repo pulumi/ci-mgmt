@@ -42,7 +42,7 @@ jobs:
       # Cloud Auth
 
       - name: aws-actions/configure-aws-credentials
-        uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
 
       - name: google-github-actions/setup-gcloud
         uses: google-github-actions/setup-gcloud@77e7a554d41e2ee56fc945c52dfd3f33d12def9a # v2.1.4
