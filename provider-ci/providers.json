@@ -62,6 +62,7 @@
     "opsgenie",
     "pagerduty",
     "postgresql",
+    "provider-boilerplate",
     "rabbitmq",
     "rancher2",
     "random",
