@@ -397,6 +397,7 @@ type actionVersions struct {
 	FreeDiskSpace           string `yaml:"freeDiskSpace"`
 	ProviderVersionAction   string `yaml:"providerVersionAction"`
 	Codecov                 string `yaml:"codeCov"`
+	VerifyProviderRelease   string `yaml:"verifyProviderRelease"`
 }
 
 type toolVersions struct {
@@ -478,6 +479,8 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.FreeDiskSpace = uses
 						case "pulumi/provider-version-action":
 							config.ActionVersions.ProviderVersionAction = uses
+						case "pulumi/verify-provider-release":
+							config.ActionVersions.VerifyProviderRelease = uses
 						case "codecov/codecov-action":
 							config.ActionVersions.Codecov = uses
 						}

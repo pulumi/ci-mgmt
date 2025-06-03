@@ -79,6 +79,9 @@ jobs:
       - name: pulumi/esc-action
         uses: pulumi/esc-action@efb0bc8946938f0dfbfa00e829196ec95f0d0ea7 # v1.4.0
 
+      - name: pulumi/verify-provider-release
+        uses: pulumi/verify-provider-release@679d5e6838ac4f68696bfa1bf9e2c5da94509dd6 # v1.3.1
+
       # GHA Utilities
 
       - name: actions-ecosystem/action-add-labels

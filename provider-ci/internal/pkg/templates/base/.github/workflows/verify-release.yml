@@ -124,7 +124,7 @@ jobs:
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Nodejs }}#
       - name: Verify nodejs release
-        uses: pulumi/verify-provider-release@v1
+        uses: #{{ .Config.ActionVersions.VerifyProviderRelease }}#
         with:
           runtime: nodejs
           directory: #{{ .Config.ReleaseVerification.Nodejs }}#
@@ -133,7 +133,7 @@ jobs:
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Python }}#
       - name: Verify python release
-        uses: pulumi/verify-provider-release@v1
+        uses: #{{ .Config.ActionVersions.VerifyProviderRelease }}#
         with:
           runtime: python
           directory: #{{ .Config.ReleaseVerification.Python }}#
@@ -143,7 +143,7 @@ jobs:
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Dotnet }}#
       - name: Verify dotnet release
-        uses: pulumi/verify-provider-release@v1
+        uses: #{{ .Config.ActionVersions.VerifyProviderRelease }}#
         with:
           runtime: dotnet
           directory: #{{ .Config.ReleaseVerification.Dotnet }}#
@@ -152,7 +152,7 @@ jobs:
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Go }}#
       - name: Verify go release
-        uses: pulumi/verify-provider-release@v1
+        uses: #{{ .Config.ActionVersions.VerifyProviderRelease }}#
         if: inputs.skipGoSdk == false
         with:
           runtime: go
