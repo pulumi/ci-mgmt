@@ -59,7 +59,6 @@ jobs:
     name: Test and release provider (${{ matrix.repo }})
     runs-on: ubuntu-latest
     needs: deploy
-    if: needs.deploy.outputs.pull_request_created == 'true'
     env:
       ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN,GITHUB_TOKEN=PULUMI_BOT_TOKEN
     strategy:
@@ -97,10 +96,18 @@ jobs:
         timeout-minutes: 60
         run: gh pr checks --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
 
+        # The following steps are only run in the merge queue and confirm we
+        # were able to successfully release.
+      - name: Await PR merged
+        if: github.event_name == 'merge_group'
+        run: while [[ $(gh pr view --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
+        timeout-minutes: 5
+
       - name: Get merge commit
         id: merge_commit
+        if: github.event_name == 'merge_group'
         run: |
-          merge_commit_oid=$(gh pr view --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.pr_number }}" --json "mergeCommit" --jq ".mergeCommit.oid")
+          merge_commit_oid=$(gh pr view --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --json "mergeCommit" --jq ".mergeCommit.oid")
           if [[ -z "${merge_commit_oid}" ]]; then
             echo "Failed to get merge commit"
             exit 1
@@ -109,6 +116,7 @@ jobs:
           echo "oid=${merge_commit_oid}" >> "${GITHUB_OUTPUT}"
 
       - name: Await main build start
+        if: github.event_name == 'merge_group'
         id: main_build
         run: |
           until (gh run list --repo "${{ matrix.repo }}" --workflow main --json headSha | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
@@ -118,10 +126,12 @@ jobs:
         timeout-minutes: 5
 
       - name: Await main build success
+        if: github.event_name == 'merge_group'
         timeout-minutes: 60
         run: gh run watch --repo "${{ matrix.repo }}" "${{ steps.main_build.outputs.id }}" --exit-status
 
       - name: Get tag for release
+        if: github.event_name == 'merge_group'
         id: release_tag
         timeout-minutes: 5
         run: |
@@ -132,6 +142,7 @@ jobs:
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
 
       - name: Await release workflow run
+        if: github.event_name == 'merge_group'
         id: release_workflow
         timeout-minutes: 5
         run: |
@@ -141,5 +152,6 @@ jobs:
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
 
       - name: Await release workflow success
+        if: github.event_name == 'merge_group'
         timeout-minutes: 60
         run: gh run watch --repo "${{ matrix.repo }}" "${{ steps.release_workflow.outputs.id }}" --exit-status
