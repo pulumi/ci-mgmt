@@ -91,7 +91,7 @@ jobs:
           echo "number=${number}" >> "${GITHUB_OUTPUT}"
 
       - name: Add needs-release label
-        if: steps.pr_opened.outputs.pull_request_created == 'true'
+        if: github.event_name == 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
         run: gh pr edit --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --add-label "needs-release/patch"
 
       - name: Await first checks start
