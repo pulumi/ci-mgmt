@@ -75,7 +75,7 @@ jobs:
 
       - name: Await PR opened for ${{ matrix.repo }}
         id: pr_opened
-        timeout-minutes: 5
+        timeout-minutes: 1
         continue-on-error: true # Fall through if a PR wasn't created.
         run: |
           echo Await PR opened for ${{ matrix.repo }}
@@ -105,6 +105,10 @@ jobs:
         if: steps.pr_opened.outputs.pull_request_created == 'true'
         timeout-minutes: 60
         run: gh pr checks --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
+
+      - name: Close test PR
+        if: github.event_name != 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
+        run: gh pr close --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}"
 
         # The following steps are only run in the merge queue and confirm we
         # were able to successfully release.
