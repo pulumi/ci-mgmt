@@ -43,15 +43,17 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	case "external-bridged-provider":
 		// third-party bridged providers
 		return []TemplateDir{base, external, bridged}, nil
+	case "external-native-provider":
+		return []TemplateDir{native, external}, nil // Can't use base because it has a Makefile that would conflict
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
 		return []TemplateDir{base, internal}, nil
 	case "parameterized-go":
 		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
 	case "native":
-		return []TemplateDir{native}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, internal}, nil // Can't use base because it has a Makefile that would conflict
 	case "aws-native":
-		return []TemplateDir{native, awsNative}, nil // AWS native has 2 extra workflows
+		return []TemplateDir{native, internal, awsNative}, nil // AWS native has 2 extra workflows
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
