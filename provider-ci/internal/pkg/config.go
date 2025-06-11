@@ -338,6 +338,10 @@ type Config struct {
 	// ModulePath tells the scripts where to find the go.mod entry point for the provider code.
 	// Historically this is defaulting to "provider" but for newer providers may be ".".
 	ModulePath string `yaml:"modulePath"`
+
+	// ESC allows the provider to extend our ESC integration, e.g. by using a
+	// custom environment or exporting specific variables.
+	ESC escConfig `yaml:"esc"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
@@ -410,6 +414,14 @@ type toolVersions struct {
 	Python string `yaml:"python"`
 
 	PulumiCTL string `yaml:"pulumictl"`
+}
+
+type escConfig struct {
+	Enabled              bool     `yaml:"enabled"`
+	Environment          string   `yaml:"environment"`
+	Organization         string   `yaml:"organization"`
+	RequestedTokenType   string   `yaml:"requestedTokenType"`
+	EnvironmentVariables []string `yaml:"environmentVariables"`
 }
 
 type releaseVerification struct {
