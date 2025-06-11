@@ -244,3 +244,10 @@ allowMissingDocs: true
 
 # Where the go.mod file for the skd lives
 sdkModuleDir: "sdk"
+
+esc:
+  enabled: false
+  environment: imports/github-secrets
+  organization: pulumi
+  requestedTokenType: urn:pulumi:token-type:access_token:organization
+  environmentVariables: []
