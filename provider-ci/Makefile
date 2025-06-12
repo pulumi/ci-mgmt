@@ -3,7 +3,7 @@ PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
 # These targets are versioned to cause Make to rebuild them when the version changes.
-ACTIONLINT_VERSION := 1.6.24
+ACTIONLINT_VERSION := 1.7.7
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
 .PHONY: all test gen ensure
@@ -16,7 +16,7 @@ bin/provider-ci: $(shell find internal -type f)
 	go build -o bin/provider-ci
 
 $(ACTIONLINT):
-	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.6.24
+	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 	mv bin/actionlint $(ACTIONLINT)
 
 # Basic helper targets.
@@ -58,7 +58,7 @@ test-provider/%: bin/provider-ci $(ACTIONLINT)
 	rm -rf bin/test-provider/$(PROVIDER_NAME)
 	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
 	cd bin/test-provider/$(PROVIDER_NAME) && git init
-	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml
+	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
