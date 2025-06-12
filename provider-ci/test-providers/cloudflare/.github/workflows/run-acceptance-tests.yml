@@ -83,7 +83,7 @@ jobs:
     steps:
     - name: Fetch secrets from ESC
       id: esc-secrets
-      uses: pulumi/esc-action@v1
+      uses: ./.github/actions/esc-action
     - id: run-url
       name: Create URL to the run output
       run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"

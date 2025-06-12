@@ -3,9 +3,63 @@ self-hosted-runner:
     - pulumi-ubuntu-8core
 
 paths:
-  "**/*/build_provider.yml":
+  ".github/workflows/build_provider.yml":
     ignore:
       - 'property "azure_signing_client_id" is not defined in object type'
       - 'property "azure_signing_client_secret" is not defined in object type'
       - 'property "azure_signing_key_vault_uri" is not defined in object type'
       - 'property "azure_signing_tenant_id" is not defined in object type'
+
+  ".github/workflows/build_sdk.yml":
+    ignore:
+      - 'property "pulumi_bot_token" is not defined in object type'
+
+  ".github/workflows/command-dispatch.yml":
+    ignore:
+      - 'property "github_token" is not defined in object type'
+      - 'property "pulumi_bot_token" is not defined in object type'
+
+  ".github/workflows/community-moderation.yml":
+    ignore:
+      - 'property "github_token" is not defined in object type'
+
+  ".github/workflows/main-post-build.yml":
+    ignore:
+      - 'property "aws_corp_s3_upload_access_key_id" is not defined in object type'
+      - 'property "aws_corp_s3_upload_secret_access_key" is not defined in object type'
+      - 'property "s3_coverage_bucket_name" is not defined in object typ'
+
+  ".github/workflows/master.yml":
+    ignore:
+      - 'property "release_ops_slack_channel" is not defined in object type'
+      - 'property "release_bot_endpoint" is not defined in object type'
+      - 'property "release_bot_key" is not defined in object type'
+      - 'property "github_token" is not defined in object type'
+
+  ".github/workflows/prerequisites.yml":
+    ignore:
+      - 'property "codecov_token" is not defined in object type'
+      - 'property "github_token" is not defined in object type'
+
+  ".github/workflows/publish.yml":
+    ignore:
+      - 'property "aws_access_key_id" is not defined in object type'
+      - 'property "aws_secret_access_key" is not defined in object type'
+      - 'property "aws_upload_role_arn" is not defined in object type'
+      - 'property "github_token" is not defined in object type'
+      - 'property "pulumi_bot_token" is not defined in object type'
+
+  ".github/workflows/pull-request.yml":
+    ignore:
+      - 'property "github_token" is not defined in object type'
+
+  ".github/workflows/release_command.yml":
+    ignore:
+      - 'property "release_ops_staging_slack_channel" is not defined in object type'
+      - 'property "release_bot_endpoint" is not defined in object type'
+      - 'property "release_bot_key" is not defined in object type'
+      - 'property "github_token" is not defined in object type'
+
+  ".github/workflows/run-acceptance-tests.yml":
+    ignore:
+      - 'property "github_token" is not defined in object type'

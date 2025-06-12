@@ -52,7 +52,7 @@ jobs:
       run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1
     - name: Fetch secrets from ESC
       id: esc-secrets
-      uses: pulumi/esc-action@v1
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
@@ -112,7 +112,7 @@ jobs:
     steps:
     - name: Fetch secrets from ESC
       id: esc-secrets
-      uses: pulumi/esc-action@v1
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
