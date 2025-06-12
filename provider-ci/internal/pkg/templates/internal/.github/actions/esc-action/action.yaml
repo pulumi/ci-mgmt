@@ -1,4 +1,4 @@
-name: "Export Env Vars as Outputs"
+name: "Load secrets"
 description: |
   This is a temporary action which assists with our migration to ESC. Instead
   of surrounding every step that references secrets with an "if ESC" block, we
