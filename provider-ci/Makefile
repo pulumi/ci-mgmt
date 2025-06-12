@@ -58,7 +58,7 @@ test-provider/%: bin/provider-ci $(ACTIONLINT)
 	rm -rf bin/test-provider/$(PROVIDER_NAME)
 	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
 	cd bin/test-provider/$(PROVIDER_NAME) && git init
-	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../actionlint.yml
+	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
