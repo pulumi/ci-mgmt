@@ -21,9 +21,9 @@ jobs:
           release
         issue-type: pull-request
         permission: write
-        reaction-token: ${{ secrets.GITHUB_TOKEN }}
+        reaction-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         repository: #{{ .Repository }}#
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
 name: command-dispatch
 on:
   issue_comment:

@@ -75,7 +75,7 @@ jobs:
         body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
   #{{ if .Config.Lint -}}#
   lint:
     if: github.event_name == 'repository_dispatch' ||

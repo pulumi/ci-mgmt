@@ -30,7 +30,7 @@ jobs:
       name: Send codegen warning as comment on PR
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         message: >
           Hello and thank you for your pull request! :heart: :sparkles:
 
