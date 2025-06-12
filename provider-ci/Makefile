@@ -3,7 +3,7 @@ PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
 # These targets are versioned to cause Make to rebuild them when the version changes.
-ACTIONLINT_VERSION := 1.6.24
+ACTIONLINT_VERSION := 1.7.7
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
 .PHONY: all test gen ensure
@@ -16,7 +16,7 @@ bin/provider-ci: $(shell find internal -type f)
 	go build -o bin/provider-ci
 
 $(ACTIONLINT):
-	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.6.24
+	GOBIN=$(abspath bin) go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
 	mv bin/actionlint $(ACTIONLINT)
 
 # Basic helper targets.
