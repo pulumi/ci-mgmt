@@ -15,8 +15,6 @@ env:
 jobs:
   generate_coverage_data:
     continue-on-error: true
-    env:
-      COVERAGE_OUTPUT_DIR: ${{ steps.esc-secrets.outputs.COVERAGE_OUTPUT_DIR }}
     name: generate_coverage_data
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
@@ -25,6 +23,9 @@ jobs:
         with:
           tool-cache: false
           swap-storage: false
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: ./.github/actions/esc-action
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -46,6 +47,8 @@ jobs:
         run: 'echo "Coverage output directory: ${{ env.COVERAGE_OUTPUT_DIR }}"'
       - name: Generate Coverage Data
         run: PULUMI_MISSING_DOCS_ERROR=true make tfgen
+        env:
+          COVERAGE_OUTPUT_DIR: ${{ runner.temp }}/cov
       - name: Summarize Provider Coverage Results
         run: cat ${{ env.COVERAGE_OUTPUT_DIR }}/shortSummary.txt
       - name: Upload coverage data to S3
@@ -55,3 +58,5 @@ jobs:
           s3FullURI="s3://${{ steps.esc-secrets.outputs.S3_COVERAGE_BUCKET_NAME }}/summaries/${summaryName}"
 
           aws s3 cp "${{ env.COVERAGE_OUTPUT_DIR }}/summary.json" "${s3FullURI}" --acl bucket-owner-full-control
+        env:
+          COVERAGE_OUTPUT_DIR: ${{ runner.temp }}/cov

@@ -34,6 +34,9 @@ jobs:
     - name: Validate skipGoSdk
       if: inputs.skipGoSdk && inputs.isPrerelease == false
       run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1
+    - name: Fetch secrets from ESC
+      id: esc-secrets
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -185,6 +188,9 @@ jobs:
     if: inputs.isPrerelease == false
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: ./.github/actions/esc-action
       - name: Dispatch Metadata build
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
@@ -210,6 +216,9 @@ jobs:
     #{{- end }}#
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    - name: Fetch secrets from ESC
+      id: esc-secrets
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:

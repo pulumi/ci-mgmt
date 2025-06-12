@@ -29,6 +29,9 @@ jobs:
     name: command-dispatch-for-testing
     runs-on: ubuntu-latest
     steps:
+    - name: Fetch secrets from ESC
+      id: esc-secrets
+      uses: pulumi/esc-action@v1
     - name: Checkout Repo
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
@@ -40,9 +43,9 @@ jobs:
           release
         issue-type: pull-request
         permission: write
-        reaction-token: ${{ secrets.GITHUB_TOKEN }}
+        reaction-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         repository: pulumi/pulumi-eks
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
 name: command-dispatch
 on:
   issue_comment:

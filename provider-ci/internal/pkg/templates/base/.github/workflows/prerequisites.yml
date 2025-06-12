@@ -38,6 +38,9 @@ jobs:
         swap-storage: false
         dotnet: false
 #{{- end }}#
+    - name: Fetch secrets from ESC
+      id: esc-secrets
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:

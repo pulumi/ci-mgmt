@@ -108,7 +108,7 @@ jobs:
       uses: repo-sync/pull-request@7e79a9f5dc3ad0ce53138f01df2fad14a04831c5 # v2.12.1
       with:
         destination_branch: master
-        github_token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
         pr_body: "*Automated PR*"
         pr_title: Automated SDK generation @ aws-cloudformation-user-guide ${{
           steps.vars.outputs.commit-hash }}

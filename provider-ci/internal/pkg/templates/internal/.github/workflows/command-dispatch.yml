@@ -7,6 +7,9 @@ jobs:
     name: command-dispatch-for-testing
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    - name: Fetch secrets from ESC
+      id: esc-secrets
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:

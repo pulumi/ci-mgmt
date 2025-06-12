@@ -1,3 +1,11 @@
 self-hosted-runner:
   labels:
     - pulumi-ubuntu-8core
+
+paths:
+  "**/*/build_provider.yml":
+    ignore:
+      - 'property "azure_signing_client_id" is not defined in object type'
+      - 'property "azure_signing_client_secret" is not defined in object type'
+      - 'property "azure_signing_key_vault_uri" is not defined in object type'
+      - 'property "azure_signing_tenant_id" is not defined in object type'
