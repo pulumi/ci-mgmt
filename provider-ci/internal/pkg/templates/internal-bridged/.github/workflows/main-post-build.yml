@@ -23,9 +23,7 @@ jobs:
         with:
           tool-cache: false
           swap-storage: false
-      - name: Fetch secrets from ESC
-        id: esc-secrets
-        uses: ./.github/actions/esc-action
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
