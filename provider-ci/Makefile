@@ -37,7 +37,7 @@ format:
 # files for other bridged provider repositories should be ephemeral.
 .PHONY: test-providers test-provider/%
 
-test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/acme test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx
+test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/acme test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx test-provider/xyz test-provider/pulumi-provider-boilerplate
 
 # 1. Delete all files except the .ci-mgmt.yaml file and run the provider-ci generate command.
 # 2. Copy the generated provider repository to a temporary git repo and run actionlint on it.
