@@ -884,6 +884,7 @@ jobs:
       with:
         name: config
         path: ~/.kube/config
+        if-no-files-found: error
     #{{- end }}#
   destroy-test-cluster:
     runs-on: ubuntu-latest
