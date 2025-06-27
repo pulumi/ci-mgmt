@@ -98,7 +98,6 @@ assignees: ''
 - [ ] [snowflake](https://github.com/pulumi/pulumi-snowflake)
 - [ ] [splunk](https://github.com/pulumi/pulumi-splunk)
 - [ ] [spotinst](https://github.com/pulumi/pulumi-spotinst)
-- [ ] [sumologic](https://github.com/pulumi/pulumi-sumologic)
 - [ ] [tailscale](https://github.com/pulumi/pulumi-tailscale)
 - [ ] [vault](https://github.com/pulumi/pulumi-vault)
 - [ ] [venafi](https://github.com/pulumi/pulumi-venafi)
