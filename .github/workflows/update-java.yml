@@ -73,6 +73,8 @@ jobs:
           repository: pulumi/pulumi-${{matrix.provider}}
           path: provider
 
+      - uses: actions/setup-go@v5 # also adds GOBIN to PATH so `go install` works
+
       - name: Install upgrade-provider
         run: go install github.com/pulumi/upgrade-provider@main
         shell: bash
@@ -95,6 +97,8 @@ jobs:
           P: pulumi/pulumi-${{matrix.provider}}
           V: ${{inputs.pulumi-java-version}}
         run: |
+          GOPATH=$(go env GOPATH)
+          export PATH=$GOPATH/bin:$PATH
           cd provider
           upgrade-provider "$P" --kind=java --java-version="$V"
 
