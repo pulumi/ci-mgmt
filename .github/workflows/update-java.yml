@@ -70,7 +70,7 @@ jobs:
       - name: Checkout provider sources
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
-          repository: pulumi/pulumi-${matrix.provider}
+          repository: pulumi/pulumi-${{matrix.provider}}
           path: provider
 
       - name: Install upgrade-provider
