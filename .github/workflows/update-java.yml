@@ -1,6 +1,5 @@
+# Update pulumi/pulumi-java used in all providers to a target version.
 name: update-java
-
-description: Update pulumi/pulumi-java used in all providers to a target version.
 
 permissions: write-all # Equivalent to default permissions plus id-token: write
 
