@@ -97,8 +97,6 @@ jobs:
           P: pulumi/pulumi-${{matrix.provider}}
           V: ${{inputs.pulumi-java-version}}
         run: |
-          GOPATH=$(go env GOPATH)
-          export PATH=$GOPATH/bin:$PATH
           cd provider
           upgrade-provider "$P" --kind=java --java-version="$V"
 
