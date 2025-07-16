@@ -10,6 +10,11 @@ on:
         description: Desired version of pulumi/pulumi-java to ugprade to.
         required: true
         type: string
+      provider:
+        description: |
+          A single provider, such as 'aws', to update. If 'all' all providers are updated.
+        required: false
+        default: all
 
 env:
   ESC_ACTION_OIDC_AUTH: true
@@ -28,7 +33,19 @@ jobs:
         uses: pulumi/esc-action@cf5b30703ffd5ad60cc3a880c09b3a9592b9372d # v1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - id: get-providers
-        run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
+        shell: bash
+        env:
+          PROVIDER: ${{inputs.provider}}
+        run: |
+            case "$PROVIDER" in
+                all)
+                    echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
+                    ;;
+
+                *)
+                    echo "providers=[\"${PROVIDER}\"]" >> "$GITHUB_OUTPUT"
+                    ;;
+            esac
         working-directory: provider-ci
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
