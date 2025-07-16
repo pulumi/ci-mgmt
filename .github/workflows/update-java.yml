@@ -66,6 +66,14 @@ jobs:
       - name: Fetch secrets from ESC
         id: esc-secrets
         uses: pulumi/esc-action@cf5b30703ffd5ad60cc3a880c09b3a9592b9372d # v1
+      - name: Format inputs
+        shell: bash
+        id: format-inputs
+        env:
+          V: ${{ inputs.pulumi-java-version }}
+        run: |
+          INPUTS_JSON=$(jq -n --arg v "$V" '{version: $v}')
+          echo "json=$INPUTS_JSON" >> "$GITHUB_OUTPUT"
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
         uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
@@ -74,7 +82,7 @@ jobs:
             workflow: upgrade-java.yml
             token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
-            inputs: ${{ format('{{"version": "{0}"}}', inputs.version) }}
+            inputs: ${{ steps.format-inputs.outputs.json }}
             ref: main
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
@@ -85,6 +93,6 @@ jobs:
             token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
             ref: master
-            inputs: ${{ format('{{"version": "{0}"}}', inputs.version) }}
+            inputs: ${{ steps.format-inputs.outputs.json }}
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
