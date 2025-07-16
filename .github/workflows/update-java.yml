@@ -76,7 +76,7 @@ jobs:
       - uses: actions/setup-go@v5 # also adds GOBIN to PATH so `go install` works
 
       - name: Install upgrade-provider
-        run: go install github.com/pulumi/upgrade-provider@t0yv0/shed-light-on-failing-commands
+        run: go install github.com/pulumi/upgrade-provider@cf3854a08477767226e99ce1985bbff4d083d0ba
         shell: bash
 
       - name: Install pulumictl
