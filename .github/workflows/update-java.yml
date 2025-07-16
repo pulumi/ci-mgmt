@@ -74,7 +74,7 @@ jobs:
             workflow: upgrade-java.yml
             token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
-            inputs: format('{{"version": "{0}"}}', inputs.version)
+            inputs: ${{ format('{{"version": "{0}"}}', inputs.version) }}
             ref: main
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
@@ -85,6 +85,6 @@ jobs:
             token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
             repo: pulumi/pulumi-${{ matrix.provider }}
             ref: master
-            inputs: format('{{"version": "{0}"}}', inputs.version)
+            inputs: ${{ format('{{"version": "{0}"}}', inputs.version) }}
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
