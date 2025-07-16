@@ -72,7 +72,7 @@ jobs:
         env:
           V: ${{ inputs.pulumi-java-version }}
         run: |
-          INPUTS_JSON=$(jq -n --arg v "$V" '{version: $v}')
+          INPUTS_JSON=$(jq -c -n --arg v "$V" '{version: $v}')
           echo "json=$INPUTS_JSON" >> "$GITHUB_OUTPUT"
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
