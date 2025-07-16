@@ -10,6 +10,11 @@ on:
         description: Desired version of pulumi/pulumi-java to ugprade to.
         required: true
         type: string
+      provider:
+        description: |
+          A single provider, such as 'aws', to update. If 'all' all providers are updated.
+        required: false
+        default: all
 
 env:
   ESC_ACTION_OIDC_AUTH: true
@@ -28,7 +33,19 @@ jobs:
         uses: pulumi/esc-action@cf5b30703ffd5ad60cc3a880c09b3a9592b9372d # v1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - id: get-providers
-        run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
+        shell: bash
+        env:
+          PROVIDER: ${{inputs.provider}}
+        run: |
+            case "$PROVIDER" in
+                all)
+                    echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
+                    ;;
+
+                *)
+                    echo "providers=[\"${PROVIDER}\"]" >> "$GITHUB_OUTPUT"
+                    ;;
+            esac
         working-directory: provider-ci
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
@@ -49,37 +66,33 @@ jobs:
       - name: Fetch secrets from ESC
         id: esc-secrets
         uses: pulumi/esc-action@cf5b30703ffd5ad60cc3a880c09b3a9592b9372d # v1
-
-      - name: Checkout provider sources
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-        with:
-          repository: pulumi/pulumi-${matrix.provider}
-          path: provider
-
-      - name: Install upgrade-provider
-        run: go install github.com/pulumi/upgrade-provider@main
+      - name: Format inputs
         shell: bash
-
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@v1.10.0
-        with:
-          repo: pulumi/pulumictl
-
-      - name: Install Pulumi CLI
-        uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6
-
-      - name: "Set up git identity: name"
-        run: git config --global user.name '${{ github.actor }}'
-        shell: bash
-
-      - name: Upgrade Java
-        shell: bash
+        id: format-inputs
         env:
-          P: pulumi/pulumi-${{matrix.provider}}
-          V: ${{inputs.pulumi-java-version}}
+          V: ${{ inputs.pulumi-java-version }}
         run: |
-          cd provider
-          upgrade-provider "$P" --kind=java --java-version="$V"
-
+          INPUTS_JSON=$(jq -n --arg v "$V" '{version: $v}')
+          echo "json=$INPUTS_JSON" >> "$GITHUB_OUTPUT"
+      - name: pulumi-${{ matrix.provider }} main
+        id: upgrade-on-main
+        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
+        continue-on-error: true
+        with:
+            workflow: upgrade-java.yml
+            token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+            repo: pulumi/pulumi-${{ matrix.provider }}
+            inputs: ${{ steps.format-inputs.outputs.json }}
+            ref: main
+      - name: pulumi-${{ matrix.provider }} master
+        id: upgrade-on-master
+        if: steps.upgrade-on-main.outcome == 'failure'
+        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
+        with:
+            workflow: upgrade-java.yml
+            token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+            repo: pulumi/pulumi-${{ matrix.provider }}
+            ref: master
+            inputs: ${{ steps.format-inputs.outputs.json }}
       - name: Sleep to prevent hitting secondary rate limits
         run: sleep 1
