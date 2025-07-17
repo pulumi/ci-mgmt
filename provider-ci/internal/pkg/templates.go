@@ -27,6 +27,8 @@ const (
 	native = "native"
 	// workflows for aws-native provider
 	awsNative = "aws-native"
+	// mise.toml file generation
+	mise = "mise"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -39,21 +41,21 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, internal, bridged, internalBridged}, nil
+		return []TemplateDir{base, internal, bridged, internalBridged, mise}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, bridged}, nil
+		return []TemplateDir{base, external, bridged, mise}, nil
 	case "external-native-provider":
-		return []TemplateDir{native, external}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, external, mise}, nil // Can't use base because it has a Makefile that would conflict
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
-		return []TemplateDir{base, internal}, nil
+		return []TemplateDir{base, internal, mise}, nil
 	case "parameterized-go":
-		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
+		return []TemplateDir{base, parameterizedGo, mise /* overrides Makefile */}, nil
 	case "native":
-		return []TemplateDir{native, internal}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, internal, mise}, nil // Can't use base because it has a Makefile that would conflict
 	case "aws-native":
-		return []TemplateDir{native, internal, awsNative}, nil // AWS native has 2 extra workflows
+		return []TemplateDir{native, internal, awsNative, mise}, nil // AWS native has 2 extra workflows
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}

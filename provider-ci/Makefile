@@ -51,6 +51,9 @@ test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
 	cd bin/test-provider/$(PROVIDER_NAME) && git init
 	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml
+	# Experimental mise flag required to support building golang binaries (e.g. pulumictl)
+	mise settings experimental=true
+	cd bin/test-provider/$(PROVIDER_NAME) && mise trust && mise install && mise env
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
