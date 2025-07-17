@@ -12,6 +12,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/migrations"
 	"gopkg.in/yaml.v3"
 )
@@ -293,7 +294,7 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 	if err != nil {
 		return err
 	}
-	defer outFile.Close()
+	defer contract.IgnoreError(outFile.Close)
 
 	_, err = io.Copy(outFile, &outData)
 	if err != nil {

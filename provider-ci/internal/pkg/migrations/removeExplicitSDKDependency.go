@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
 //go:embed removeExplicitSDKDependency.patch
@@ -23,7 +25,7 @@ func (removeExplicitSDKDependency) Migrate(templateName, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("error writing patch file: %w", err)
 	}
-	defer cleanup()
+	defer contract.IgnoreError(cleanup)
 
 	patchCmd := exec.Command("go", "run", "github.com/uber-go/gopatch@v0.4.0", "-p", path, "./provider/resources.go")
 	patchCmd.Stdout = os.Stdout
