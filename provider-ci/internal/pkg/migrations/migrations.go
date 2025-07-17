@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
 type Migration interface {
@@ -34,7 +36,7 @@ func Migrate(templateName, outDir string) error {
 }
 
 // Returns the path to the temporary file and a function to clean it up, or an error.
-func writeTempFile(name, content string) (string, func(), error) {
+func writeTempFile(name, content string) (string, func() error, error) {
 	dir, err := os.MkdirTemp(os.TempDir(), "pulumi-provider-ci-migration-files")
 	if err != nil {
 		return "", nil, err
@@ -44,7 +46,7 @@ func writeTempFile(name, content string) (string, func(), error) {
 	if err != nil {
 		return "", nil, err
 	}
-	defer f.Close()
+	defer contract.IgnoreError(f.Close)
 	_, err = f.WriteString(content)
-	return path, func() { os.Remove(f.Name()) }, err
+	return path, func() error { return os.Remove(f.Name()) }, err
 }

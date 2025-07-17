@@ -25,10 +25,12 @@ This repository has the following components:
 
 The following tools are required for generating and deploying GitHub Actions workflows:
 
-- [Make](https://www.gnu.org/software/make/)
-- [npm](https://www.npmjs.com/)
-- [golangci-lint](https://golangci-lint.run/)
-- [shellcheck](https://github.com/koalaman/shellcheck)
+* [Mise](https://mise.jdx.dev/)
+
+Dependencies required are modeled on `mise.toml`. Run `mise install` and `mise
+settings experimental=true` (required for Go binaries such as `golangci-lint`
+and `pulumictl`) to fetch and install them. Finally, run `mise env` to check if
+env variables are being set correctly.
 
 ## Building
 

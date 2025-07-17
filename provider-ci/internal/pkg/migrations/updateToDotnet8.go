@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/bitfield/script"
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
 type updateToDotnet8 struct{}
@@ -44,7 +45,7 @@ func (updateToDotnet8) Migrate(templateName, outDir string) error {
 // This is useful for reading the content of a file and then writing back to that same file.
 func FileContent(path string) *script.Pipe {
 	p := script.File(path)
-	defer p.Close()
+	defer contract.IgnoreError(p.Close)
 	s, err := p.String()
 	if err != nil {
 		r := script.NewPipe()

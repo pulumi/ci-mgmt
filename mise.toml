@@ -1,0 +1,9 @@
+[tools]
+
+go = '1.21'
+golangci-lint = '2.2.2'
+node = 'latest'
+pulumi = 'latest'
+yarn = '1.22.22'
+dotnet = '8'
+shellcheck = '0.10.0'
