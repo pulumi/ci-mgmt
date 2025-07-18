@@ -36,6 +36,10 @@ jobs:
         # Set the default branch to silence the warnings about the default branch name changing
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
         run: git config --global init.defaultBranch master
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2025.7.12
       - name: Build & test
         run: cd provider-ci && make all
       - name: Check worktree clean
