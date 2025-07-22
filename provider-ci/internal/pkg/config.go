@@ -342,6 +342,9 @@ type Config struct {
 	// ESC allows the provider to extend our ESC integration, e.g. by using a
 	// custom environment or exporting specific variables.
 	ESC escConfig `yaml:"esc"`
+
+	// ActuallyCommentOnStaleIssues controls whether we comment on stale issues
+	ActuallyCommentOnStaleIssues bool `yaml:"actuallyCommentOnStaleIssues"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
