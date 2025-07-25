@@ -38,3 +38,8 @@ jobs:
 
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         loglevel: DEBUG
+
+        #{{- if not .Config.ActuallyCommentOnStaleIssues }}#
+        # Set dry-run to true to not perform label or close actions.
+        dry-run: true
+        #{{- end }}#
