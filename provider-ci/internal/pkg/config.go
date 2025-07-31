@@ -68,11 +68,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-missing-mapping%3A%22&type=code
 	FailOnMissingMapping bool `yaml:"fail-on-missing-mapping"`
 
-	// FailOnExtraMapping sets PULUMI_EXTRA_MAPPING_ERROR in resync-build and
-	// defaults to true. It is not used:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-extra-mapping%3A%22&type=code
-	FailOnExtraMapping bool `yaml:"fail-on-extra-mapping"`
-
 	// PublishRegistry decides if create_docs_build happens during release This
 	// can be overridden to false to not publish updates. This is disabled in 5
 	// repos:
