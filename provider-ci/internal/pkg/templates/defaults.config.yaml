@@ -48,12 +48,6 @@ lint: true
 # Currently set in around 17 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22providerDefaultBranch%3A%22&type=code
 providerDefaultBranch: master
 
-# Sets PULUMI_MISSING_MAPPING_ERROR in resync-build
-# Used in alicloud only: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-missing-mapping%3A%22&type=code
-fail-on-missing-mapping: true
-# Not used: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22fail-on-extra-mapping%3A%22&type=code
-fail-on-extra-mapping: true
-
 # publishRegistry decides if create_docs_build happens during release
 # This can be overridden to false to not publish updates.
 # This is disabled in 5 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publishRegistry%3A%22&type=code
