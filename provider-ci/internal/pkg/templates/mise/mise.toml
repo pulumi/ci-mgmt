@@ -14,3 +14,6 @@ java = 'corretto-#{{trimSuffix ".x" .Config.ToolVersions.Java }}#'
 pulumi = 'latest'
 "go:github.com/pulumi/pulumictl/cmd/pulumictl" = 'latest'
 gradle = '#{{ trimSuffix ".x" .Config.ToolVersions.Gradle }}#'
+
+[settings]
+experimental = true # Required for Go binaries (e.g. pulumictl).
