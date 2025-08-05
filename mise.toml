@@ -1,7 +1,7 @@
 [tools]
 go = '1.21'
 golangci-lint = '2.2.2'
-node = 'latest'
+node = '24.1.0'
 pulumi = 'latest'
 yarn = '1.22.22'
 dotnet = '8'
