@@ -94,31 +94,11 @@ languages:
 # Additional entries are added by individual providers for different reasons.
 # All jobs currently get the same env for all steps but values might only be used for very specific purposes.
 env:
-  # Use custom token so we've got full access to GitHub
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # Used by pulumi-package-publisher
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Appears obsolete - was used by old ci-scripts
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Used by pulumi-package-publisher
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  # Used indirectly by gradle in pulumi-package-publisher?
-  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-  # Used to access staging API for tests
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   # Allows tests to resolve the local SDK - should be set in test setup or makefile instead
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   # Should be set in test setup or makefile instead
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  # Used by pulumi-package-publisher
-  PYPI_USERNAME: __token__
-  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-  # Used indirectly by Java publishing in pulumi-package-publisher?
-  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
 
