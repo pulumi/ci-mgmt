@@ -94,8 +94,6 @@ languages:
 # Additional entries are added by individual providers for different reasons.
 # All jobs currently get the same env for all steps but values might only be used for very specific purposes.
 env:
-  # Use custom token so we've got full access to GitHub
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Used by pulumi-package-publisher
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   # Appears obsolete - was used by old ci-scripts
