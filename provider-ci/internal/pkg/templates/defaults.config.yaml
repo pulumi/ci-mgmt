@@ -113,8 +113,6 @@ env:
   # Should be set in test setup or makefile instead
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   # Used by pulumi-package-publisher
-  PYPI_USERNAME: __token__
-  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   # Used indirectly by Java publishing in pulumi-package-publisher?
   SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
   SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
