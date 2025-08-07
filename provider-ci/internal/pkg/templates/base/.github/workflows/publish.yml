@@ -156,12 +156,6 @@ jobs:
       with:
         sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}
-      env:
-        SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-        SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-        SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
-        PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:
