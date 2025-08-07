@@ -143,12 +143,16 @@ jobs:
       with:
         sdk: all
         version: ${{ inputs.version }}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
       uses: pulumi/pulumi-package-publisher@c1672c7928591d563dccb12729e05e315c21f8c2 # v0.0.22
       with:
         sdk: all,!java
         version: ${{ inputs.version }}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:
