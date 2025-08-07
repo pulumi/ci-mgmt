@@ -335,6 +335,8 @@ func toYAML(v interface{}) (string, error) {
 	return strings.TrimSuffix(string(data), "\n"), nil
 }
 
+// renderESCStep generates either the real ESC action or our shim action which
+// re-exports the existing environment.
 func renderESCStep(v any) (string, error) {
 	config, ok := v.(Config)
 	if !ok {
