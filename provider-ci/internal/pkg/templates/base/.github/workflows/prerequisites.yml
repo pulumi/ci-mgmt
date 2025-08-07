@@ -26,6 +26,9 @@ jobs:
   prerequisites:
     name: prerequisites
     runs-on: #{{ .Config.Runner.Prerequisites }}#
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
     steps:
