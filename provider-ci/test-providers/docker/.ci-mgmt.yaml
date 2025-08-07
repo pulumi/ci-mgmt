@@ -39,3 +39,6 @@ actions:
         ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY_FOR_DIGITALOCEAN }}
 pulumiConvert: 1
 registryDocs: true
+
+esc:
+  environment: github-secrets/pulumi-pulumi-docker
