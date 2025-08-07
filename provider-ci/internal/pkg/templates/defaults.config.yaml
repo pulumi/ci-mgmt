@@ -102,9 +102,6 @@ env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   # Used by pulumi-package-publisher
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  # Used indirectly by gradle in pulumi-package-publisher?
-  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   # Used to access staging API for tests
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
