@@ -24,10 +24,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -141,8 +139,12 @@ jobs:
         sdk: all
         version: ${{ inputs.version }}
       env:
+<<<<<<< HEAD
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+=======
+        NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+>>>>>>> da4825dc0cd29b59c7440298f508a51ca59208a7
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
       uses: pulumi/pulumi-package-publisher@c1672c7928591d563dccb12729e05e315c21f8c2 # v0.0.22
@@ -150,8 +152,12 @@ jobs:
         sdk: all,!java
         version: ${{ inputs.version }}
       env:
+<<<<<<< HEAD
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+=======
+        NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
+>>>>>>> da4825dc0cd29b59c7440298f508a51ca59208a7
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:
