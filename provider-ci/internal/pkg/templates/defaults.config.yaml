@@ -100,8 +100,6 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   # Appears obsolete - was used by old ci-scripts
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Used by pulumi-package-publisher
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   # Used indirectly by gradle in pulumi-package-publisher?
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
