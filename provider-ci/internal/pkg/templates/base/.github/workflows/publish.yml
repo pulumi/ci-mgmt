@@ -145,6 +145,8 @@ jobs:
         sdk: #{{ .Config.Publish.SDK }}#
         version: ${{ inputs.version }}
       env:
+        PYPI_USERNAME: __token__
+        PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
@@ -153,6 +155,8 @@ jobs:
         sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}
       env:
+        PYPI_USERNAME: __token__
+        PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
