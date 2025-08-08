@@ -97,9 +97,6 @@ env:
   # Use custom token so we've got full access to GitHub
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Used by pulumi-package-publisher
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Appears obsolete - was used by old ci-scripts
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   # Used indirectly by gradle in pulumi-package-publisher?
   PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -112,9 +109,6 @@ env:
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   # Used indirectly by Java publishing in pulumi-package-publisher?
-  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
 
