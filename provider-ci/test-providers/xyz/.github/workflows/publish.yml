@@ -139,12 +139,9 @@ jobs:
         sdk: all
         version: ${{ inputs.version }}
       env:
-<<<<<<< HEAD
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-=======
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
->>>>>>> da4825dc0cd29b59c7440298f508a51ca59208a7
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
       uses: pulumi/pulumi-package-publisher@c1672c7928591d563dccb12729e05e315c21f8c2 # v0.0.22
@@ -152,12 +149,9 @@ jobs:
         sdk: all,!java
         version: ${{ inputs.version }}
       env:
-<<<<<<< HEAD
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-=======
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
->>>>>>> da4825dc0cd29b59c7440298f508a51ca59208a7
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:
