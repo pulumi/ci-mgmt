@@ -14,7 +14,6 @@ env:
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   TRAVIS_OS_NAME: linux
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   GOVERSION: 1.21.x
   NODEVERSION: 20.x
@@ -114,3 +113,5 @@ jobs:
         author_name: Failure during automated SDK generation
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -30,7 +30,6 @@ env:
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   TRAVIS_OS_NAME: linux
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   GOVERSION: #{{ .Config.ToolVersions.Go | quote }}#
   NODEVERSION: #{{ .Config.ToolVersions.Nodejs | quote }}#
@@ -240,6 +239,8 @@ jobs:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   build_sdks:
     needs: prerequisites
     runs-on: #{{ if eq .Config.Provider "command" }}#ubuntu-latest#{{ else }}#pulumi-ubuntu-8core#{{ end }}#
@@ -402,6 +403,8 @@ jobs:
         author_name: Failure while building SDKs
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   tag_release_if_labeled_needs_release:
     name: Tag release if labeled as needs-release
@@ -629,6 +632,8 @@ jobs:
         author_name: Failure in SDK tests
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   publish:
     runs-on: #{{ if eq .Config.Provider "aws-native" }}#macos-latest#{{ else
       }}#ubuntu-latest#{{ end }}#
@@ -697,6 +702,8 @@ jobs:
         author_name: Failure in publishing binaries
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   publish_sdk:
     runs-on: ubuntu-latest
     needs: publish
@@ -785,6 +792,8 @@ jobs:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
         status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #{{- if .Config.Lint }}#
   lint:
     runs-on: ubuntu-latest
