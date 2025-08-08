@@ -24,9 +24,7 @@ env:
     == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PROVIDER: kubernetes-ingress-nginx
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   TRAVIS_OS_NAME: linux
@@ -615,6 +613,7 @@ jobs:
     - name: Publish SDKs
       run: ./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
       env:
+        NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         PYPI_PUBLISH_ARTIFACTS: all
         SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}

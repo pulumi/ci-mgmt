@@ -15,9 +15,7 @@ env:
     == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PROVIDER: kubernetes
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   TRAVIS_OS_NAME: linux
@@ -453,7 +451,7 @@ jobs:
       with:
         environment: logins/pulumi-ci
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -628,6 +626,7 @@ jobs:
     - name: Publish SDKs
       run: ./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
       env:
+        NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         PYPI_PUBLISH_ARTIFACTS: all
     - if: failure() && github.event_name == 'push'
@@ -755,7 +754,7 @@ jobs:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -819,7 +818,7 @@ jobs:
         node-version: ${{ env.NODEVERSION }}
         registry-url: https://registry.npmjs.org
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{

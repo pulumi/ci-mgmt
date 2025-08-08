@@ -8,9 +8,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PROVIDER: kubernetes-cert-manager
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
   PYPI_USERNAME: __token__
   PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   TRAVIS_OS_NAME: linux
