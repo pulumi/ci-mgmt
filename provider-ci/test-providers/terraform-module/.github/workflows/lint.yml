@@ -8,7 +8,6 @@ on:
 
 env:
   AWS_REGION: us-west-2
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
@@ -41,6 +40,8 @@ jobs:
     - name: prepare workspace
       continue-on-error: true
       run: make prepare_local_workspace
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: golangci-lint
       uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6
       with:

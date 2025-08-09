@@ -10,7 +10,6 @@ on:
         type: string
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
@@ -52,6 +51,8 @@ jobs:
           tools: pulumictl, pulumicli, ${{ matrix.language }}
       - name: Prepare local workspace
         run: make prepare_local_workspace
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download prerequisites
         uses: ./.github/actions/download-prerequisites
       - name: Update path
