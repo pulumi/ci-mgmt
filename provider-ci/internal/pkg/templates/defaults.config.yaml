@@ -100,9 +100,6 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   # Appears obsolete - was used by old ci-scripts
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Used indirectly by gradle in pulumi-package-publisher?
-  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   PULUMI_API: https://api.pulumi-staging.io
   # Allows tests to resolve the local SDK - should be set in test setup or makefile instead
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
@@ -110,9 +107,6 @@ env:
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   # Used by pulumi-package-publisher
   # Used indirectly by Java publishing in pulumi-package-publisher?
-  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
 
