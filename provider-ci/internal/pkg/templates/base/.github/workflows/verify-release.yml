@@ -130,6 +130,8 @@ jobs:
           directory: #{{ .Config.ReleaseVerification.Nodejs }}#
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Python }}#
       - name: Verify python release
