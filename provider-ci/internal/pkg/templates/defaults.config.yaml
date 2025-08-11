@@ -97,9 +97,6 @@ env:
   # Use custom token so we've got full access to GitHub
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Used by pulumi-package-publisher
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  # Appears obsolete - was used by old ci-scripts
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
   # Allows tests to resolve the local SDK - should be set in test setup or makefile instead
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..

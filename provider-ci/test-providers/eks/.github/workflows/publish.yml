@@ -147,6 +147,7 @@ jobs:
         sdk: all
         version: ${{ inputs.version }}
       env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
         SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
@@ -160,6 +161,10 @@ jobs:
         sdk: all,!java
         version: ${{ inputs.version }}
       env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
+        SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
+        SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
