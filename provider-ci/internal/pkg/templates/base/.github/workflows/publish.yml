@@ -149,6 +149,8 @@ jobs:
         SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
         SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
+        PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
