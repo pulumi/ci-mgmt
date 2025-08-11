@@ -103,8 +103,6 @@ env:
   # Should be set in test setup or makefile instead
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   # Used by pulumi-package-publisher
-  PYPI_USERNAME: __token__
-  PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
   # Used indirectly by Java publishing in pulumi-package-publisher?
   # Bridge-related - could be set in makefile instead?
   TF_APPEND_USER_AGENT: pulumi
