@@ -85,6 +85,8 @@ jobs:
           directory: examples/bucket
           provider: aws
           providerVersion: ${{ inputs.providerVersion }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Verify python release
         uses: pulumi/verify-provider-release@679d5e6838ac4f68696bfa1bf9e2c5da94509dd6 # v1.3.1
         with:
