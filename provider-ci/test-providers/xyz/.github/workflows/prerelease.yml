@@ -22,6 +22,9 @@ env:
   XYZ_REGION: us-west-2
 jobs:
   prerequisites:
+    permissions:
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
