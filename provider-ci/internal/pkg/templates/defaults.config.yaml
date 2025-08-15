@@ -224,7 +224,7 @@ sdkModuleDir: "sdk"
 
 esc:
   enabled: false
-  environment: imports/github-secrets
+  environment: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
   organization: pulumi
   requestedTokenType: urn:pulumi:token-type:access_token:organization
   environmentVariables: []
