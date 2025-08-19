@@ -83,10 +83,9 @@ jobs:
         id: generate_pulumi_token
         uses: #{{ .Config.ActionVersions.ESCAuth }}#
         with:
-          organization: ${{ env.PULUMI_TEST_OWNER || moolumi }}
+          organization: pulumi
           requested-token-type: urn:pulumi:token-type:access_token:organization
           export-environment-variables: false
-          cloud-url: ${{ env.PULUMI_API }}
       # workaround for https://github.com/pulumi/esc-action/issues/10
       - name: Install esc on Windows
         if: ${{ matrix.runner == 'windows-latest' }}
