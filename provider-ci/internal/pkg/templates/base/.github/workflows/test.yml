@@ -101,9 +101,10 @@ jobs:
       id: generate_pulumi_token
       uses: #{{ .Config.ActionVersions.ESCAuth }}#
       with:
-        organization: pulumi
+        organization: ${{ env.PULUMI_TEST_OWNER || 'pulumi' }}
         requested-token-type: urn:pulumi:token-type:access_token:organization
         export-environment-variables: false
+        cloud-url: ${{ env.PULUMI_API }}
     - name: Export AWS Credentials
       uses: #{{ .Config.ActionVersions.ESCAction }}#
       env:
