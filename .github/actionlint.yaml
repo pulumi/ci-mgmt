@@ -59,6 +59,7 @@ paths:
       - 'property "codecov_token" is not defined in object type {}'
       - 'property "github_token" is not defined in object type {}'
       - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
 
   ".github/workflows/build.yml":
     ignore:
@@ -164,3 +165,20 @@ paths:
   ".github/workflows/verify-release.yml":
     ignore:
       - 'property "npm_token" is not defined in object type {}'
+
+  ".github/workflows/upgrade-provider.yml":
+    ignore:
+      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
+      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
+      - 'property "pulumi_bot_token" is not defined in object type {}'
+
+  ".github/workflows/upgrade-bridge.yml":
+    ignore:
+      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
+      - 'property "pulumi_bot_token" is not defined in object type {}'
+
+  ".github/workflows/upgrade-java.yml":
+    ignore:
+      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
+      - 'property "pulumi_bot_token" is not defined in object type {}'

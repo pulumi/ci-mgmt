@@ -201,7 +201,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
   build_sdks:
@@ -358,7 +358,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
   test:
@@ -486,7 +486,7 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
   sentinel:
