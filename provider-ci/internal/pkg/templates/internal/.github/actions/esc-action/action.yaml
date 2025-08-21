@@ -5,10 +5,8 @@ description: |
   instead modify those steps to consume their secrets from this step's outputs.
   Then, later, we can replace this action with esc-action to actually load
   secrets from ESC.
-#{{ if not .Config.ESC.Enabled -}}#
 inputs: {}
 outputs: {}
 runs:
   using: "node20"
   main: "index.js"
-#{{- end }}#
