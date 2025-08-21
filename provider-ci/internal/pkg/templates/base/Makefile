@@ -70,8 +70,8 @@ only_build: build
 prepare_local_workspace: install_plugins upstream
 # Creates all generated files which need to be committed
 generate: generate_sdks schema#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
-generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}#
-build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}#
+generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
+build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
 .PHONY: development only_build build generate generate_sdks build_sdks install_sdks
 
