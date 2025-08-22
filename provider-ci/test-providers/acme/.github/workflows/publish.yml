@@ -36,7 +36,10 @@ jobs:
       run: echo "Can't publish a prerelease version as a stable release. This is likely a bug in the calling workflow." && exit 1
     - name: Validate skipGoSdk
       if: inputs.skipGoSdk && inputs.isPrerelease == false
-      run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1
+      run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1    
+    - id: esc-secrets
+      name: Map environment to ESC outputs
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -91,7 +94,7 @@ jobs:
         generate_release_notes: true
         files: dist/*
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
 
   publish_sdk:
     name: publish_sdk
@@ -173,7 +176,10 @@ jobs:
     
     needs: publish_sdk
     runs-on: ubuntu-latest
-    steps:
+    steps:    
+    - id: esc-secrets
+      name: Map environment to ESC outputs
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -185,7 +191,7 @@ jobs:
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
 
   verify_release:
     name: verify_release

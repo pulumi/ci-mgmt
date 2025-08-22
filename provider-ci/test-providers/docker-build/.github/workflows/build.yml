@@ -45,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     name: prerequisites
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -85,7 +88,7 @@ jobs:
           echo 'EOF';
         } >> "$GITHUB_ENV"
       env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
     - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
@@ -93,7 +96,7 @@ jobs:
         message: |
           ${{ env.SCHEMA_CHANGES }}
         comment-tag: schemaCheck
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - if: contains(env.SCHEMA_CHANGES, 'Looking good! No breaking changes found.') &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes
@@ -101,7 +104,7 @@ jobs:
       with:
         labels: impact/no-changelog-required
         number: ${{ github.event.issue.number }}
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - name: Build Provider
       run: make provider
     - name: Check worktree clean
@@ -160,7 +163,7 @@ jobs:
 
         # workflow. https://github.com/orgs/community/discussions/25702
 
-        git push https://pulumi-bot:${{ secrets.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
+        git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
       env:
         HEAD_REF: ${{ github.head_ref }}
     - run: git status --porcelain
@@ -178,7 +181,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
@@ -202,6 +205,9 @@ jobs:
         - java
     name: build_sdks
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -316,7 +322,7 @@ jobs:
 
         # workflow. https://github.com/orgs/community/discussions/25702
 
-        git push https://pulumi-bot:${{ secrets.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
+        git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
       env:
         HEAD_REF: ${{ github.head_ref }}
     - run: git status --porcelain
@@ -343,6 +349,9 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: check if this commit needs release
       if: ${{ env.RELEASE_BOT_ENDPOINT != '' }}
       uses: pulumi/action-release-by-pr-label@main
@@ -350,11 +359,11 @@ jobs:
         command: "release-if-needed"
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
-        slack_channel: ${{ secrets.RELEASE_OPS_SLACK_CHANNEL }}
+        slack_channel: ${{ steps.esc-secrets.outputs.RELEASE_OPS_SLACK_CHANNEL }}
       env:
-        RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
-        RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_BOT_ENDPOINT: ${{ steps.esc-secrets.outputs.RELEASE_BOT_ENDPOINT }}
+        RELEASE_BOT_KEY: ${{ steps.esc-secrets.outputs.RELEASE_BOT_KEY }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
 
   test:
     runs-on: pulumi-ubuntu-8core
@@ -375,6 +384,9 @@ jobs:
       contents: read
       id-token: write
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -480,7 +492,7 @@ jobs:
       uses: GoTestTools/gotestfmt-action@v2
       with:
         version: v2.5.0
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - name: Run tests
       run: >-
         set -euo pipefail
@@ -500,6 +512,9 @@ jobs:
     needs: test
     name: publish
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -532,13 +547,13 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-access-key-id: ${{ steps.esc-secrets.outputs.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-secret-access-key: ${{ steps.esc-secrets.outputs.AWS_SECRET_ACCESS_KEY }}
         role-duration-seconds: 7200
         role-session-name: ${{ env.PROVIDER }}@githubActions
         role-external-id: upload-pulumi-release
-        role-to-assume: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
+        role-to-assume: ${{ steps.esc-secrets.outputs.AWS_UPLOAD_ROLE_ARN }}
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@5742e2a039330cbb23ebf35f046f814d4c6ff811 # v5.1.0
       env:
@@ -566,6 +581,9 @@ jobs:
     needs: publish
     name: publish_sdk
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -634,8 +652,12 @@ jobs:
     - name: Publish SDKs
       run: ./ci-scripts/ci/publish-tfgen-package ${{ github.workspace }}
       env:
+<<<<<<< HEAD
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+=======
+        NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+>>>>>>> b062f0899 (Update steps to reference the ESC step)
         PYPI_PUBLISH_ARTIFACTS: all
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}

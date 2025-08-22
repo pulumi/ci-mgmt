@@ -7,6 +7,7 @@ jobs:
     name: command-dispatch-for-testing
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -21,9 +22,9 @@ jobs:
           release
         issue-type: pull-request
         permission: write
-        reaction-token: ${{ secrets.GITHUB_TOKEN }}
+        reaction-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         repository: #{{ .Repository }}#
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
 name: command-dispatch
 on:
   issue_comment:

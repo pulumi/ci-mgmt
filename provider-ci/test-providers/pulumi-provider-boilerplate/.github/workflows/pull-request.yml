@@ -19,7 +19,15 @@ jobs:
   comment-on-pr:
     runs-on: ubuntu-latest
     name: comment-on-pr
-    steps:
+    steps:    
+    - env:
+        ESC_ACTION_ENVIRONMENT: imports/github-secrets
+        ESC_ACTION_OIDC_AUTH: "true"
+        ESC_ACTION_OIDC_ORGANIZATION: pulumi
+        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+      id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: pulumi/esc-action@v1
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -31,5 +39,5 @@ jobs:
           PR is now waiting for a maintainer to run the acceptance tests.
 
           **Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     if: github.event.pull_request.head.repo.full_name != github.repository

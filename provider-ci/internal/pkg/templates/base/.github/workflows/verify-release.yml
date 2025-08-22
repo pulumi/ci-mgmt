@@ -131,7 +131,7 @@ jobs:
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Python }}#
       - name: Verify python release

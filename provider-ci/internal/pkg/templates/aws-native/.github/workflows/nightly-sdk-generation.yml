@@ -25,6 +25,9 @@ jobs:
       pull-requests: write
       contents: write
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -94,7 +97,7 @@ jobs:
       uses: repo-sync/pull-request@7e79a9f5dc3ad0ce53138f01df2fad14a04831c5 # v2.12.1
       with:
         destination_branch: #{{ .Config.ProviderDefaultBranch }}#
-        github_token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
         pr_body: "*Automated PR*"
         pr_title: Automated SDK generation @ aws-cloudformation-user-guide ${{
           steps.vars.outputs.commit-hash }}
@@ -108,4 +111,4 @@ jobs:
         fields: repo,commit,author,action
         status: ${{ job.status }}
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}

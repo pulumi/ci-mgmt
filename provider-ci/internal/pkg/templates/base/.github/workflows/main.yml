@@ -74,6 +74,7 @@ jobs:
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: check if this commit needs release
       if: ${{ env.RELEASE_BOT_ENDPOINT != '' }}
       uses: pulumi/action-release-by-pr-label@main
@@ -81,11 +82,11 @@ jobs:
         command: "release-if-needed"
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
-        slack_channel: ${{ secrets.RELEASE_OPS_SLACK_CHANNEL }}
+        slack_channel: ${{ steps.esc-secrets.outputs.RELEASE_OPS_SLACK_CHANNEL }}
       env:
-        RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
-        RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_BOT_ENDPOINT: ${{ steps.esc-secrets.outputs.RELEASE_BOT_ENDPOINT }}
+        RELEASE_BOT_KEY: ${{ steps.esc-secrets.outputs.RELEASE_BOT_KEY }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
 
   test:
     uses: ./.github/workflows/test.yml

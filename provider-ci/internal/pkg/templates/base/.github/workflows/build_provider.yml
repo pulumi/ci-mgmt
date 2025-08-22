@@ -45,6 +45,7 @@ jobs:
           dotnet: false
           large-packages: false
       #{{- end }}#
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -98,11 +99,11 @@ jobs:
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
         env:
-          AZURE_SIGNING_CLIENT_ID: ${{ secrets.AZURE_SIGNING_CLIENT_ID }}
-          AZURE_SIGNING_CLIENT_SECRET: ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}
-          AZURE_SIGNING_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
-          AZURE_SIGNING_KEY_VAULT_URI: ${{ secrets.AZURE_SIGNING_KEY_VAULT_URI }}
-          SKIP_SIGNING: ${{ secrets.AZURE_SIGNING_CLIENT_ID == '' && secrets.AZURE_SIGNING_CLIENT_SECRET == '' && secrets.AZURE_SIGNING_TENANT_ID == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}
+          AZURE_SIGNING_CLIENT_ID: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_CLIENT_ID }}
+          AZURE_SIGNING_CLIENT_SECRET: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_CLIENT_SECRET }}
+          AZURE_SIGNING_TENANT_ID: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_TENANT_ID }}
+          AZURE_SIGNING_KEY_VAULT_URI: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_KEY_VAULT_URI }}
+          SKIP_SIGNING: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_CLIENT_ID == '' && secrets.AZURE_SIGNING_CLIENT_SECRET == '' && secrets.AZURE_SIGNING_TENANT_ID == '' && secrets.AZURE_SIGNING_KEY_VAULT_URI == '' }}
 
       - name: Package provider
         run: make provider_dist-${{ matrix.platform.os }}-${{ matrix.platform.arch }}

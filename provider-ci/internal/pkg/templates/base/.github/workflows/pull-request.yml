@@ -8,6 +8,7 @@ jobs:
     name: comment-on-pr
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -18,7 +19,7 @@ jobs:
     - name: Comment PR
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         message: >
           PR is now waiting for a maintainer to run the acceptance tests.
 

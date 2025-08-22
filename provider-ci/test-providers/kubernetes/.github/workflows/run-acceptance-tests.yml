@@ -32,6 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     name: comment-notification
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Create URL to the run output
       id: vars
       run: echo
@@ -40,7 +43,7 @@ jobs:
     - name: Update with Result
       uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
       with:
-        token: ${{ secrets.PULUMI_BOT_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         body: "Please view the PR build: ${{ steps.vars.outputs.run-url }}"
@@ -49,6 +52,9 @@ jobs:
     runs-on: ubuntu-latest
     name: prerequisites
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -97,7 +103,7 @@ jobs:
           echo 'EOF';
         } >> "$GITHUB_ENV"
       env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
     - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
@@ -105,7 +111,7 @@ jobs:
         message: |
           ${{ env.SCHEMA_CHANGES }}
         comment-tag: schemaCheck
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - if: contains(env.SCHEMA_CHANGES, 'Looking good! No breaking changes found.') &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes
@@ -113,7 +119,7 @@ jobs:
       with:
         labels: impact/no-changelog-required
         number: ${{ github.event.issue.number }}
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - name: Check worktree clean
       id: worktreeClean
       uses: pulumi/git-status-check-action@54000b91124a8dd9fd6a872cb41f5dd246a46e7c # v1.1.1
@@ -170,7 +176,7 @@ jobs:
 
         # workflow. https://github.com/orgs/community/discussions/25702
 
-        git push https://pulumi-bot:${{ secrets.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
+        git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
       env:
         HEAD_REF: ${{ github.head_ref }}
     - run: git status --porcelain
@@ -188,7 +194,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
@@ -214,6 +220,9 @@ jobs:
         - java
     name: build_sdks
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -329,7 +338,7 @@ jobs:
 
         # workflow. https://github.com/orgs/community/discussions/25702
 
-        git push https://pulumi-bot:${{ secrets.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
+        git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }}     "HEAD:$HEAD_REF"
       env:
         HEAD_REF: ${{ github.head_ref }}
     - run: git status --porcelain
@@ -371,6 +380,9 @@ jobs:
       contents: read
       id-token: write
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -496,7 +508,7 @@ jobs:
       uses: GoTestTools/gotestfmt-action@v2
       with:
         version: v2.5.0
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
     - name: Setup KinD cluster
       uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
       with:
@@ -520,10 +532,13 @@ jobs:
     runs-on: ubuntu-latest
     name: sentinel
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Mark workflow as successful
       uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
       with:
-        authToken: ${{ secrets.GITHUB_TOKEN }}
+        authToken: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
         context: Sentinel
         state: success
         description: Sentinel checks passed

@@ -69,7 +69,10 @@ jobs:
     permissions:
       pull-requests: write
     runs-on: ubuntu-latest
-    steps:
+    steps:    
+    - id: esc-secrets
+      name: Map environment to ESC outputs
+      uses: ./.github/actions/esc-action
     - id: run-url
       name: Create URL to the run output
       run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
@@ -79,7 +82,7 @@ jobs:
         body: "Please view the PR build: ${{ steps.run-url.outputs.run-url }}"
         issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
         repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
   sentinel:
     name: sentinel
     if: github.event_name == 'repository_dispatch' ||
