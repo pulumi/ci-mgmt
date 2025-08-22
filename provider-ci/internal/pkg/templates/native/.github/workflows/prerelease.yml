@@ -779,6 +779,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         lfs: true
+    #{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
