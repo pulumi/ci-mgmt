@@ -124,7 +124,10 @@ jobs:
       with:
         submodules: true
         # Persist credentials so we can push back to the repo
-        persist-credentials: true
+        persist-credentials: true    
+    - id: esc-secrets
+      name: Map environment to ESC outputs
+      uses: ./.github/actions/esc-action
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:

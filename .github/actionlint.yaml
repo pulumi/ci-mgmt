@@ -43,14 +43,6 @@ paths:
       - 'property "codecov_token" is not defined in object type {}'
       - 'property "github_token" is not defined in object type {}'
 
-  ".github/workflows/publish.yml":
-    ignore:
-      - 'property "aws_access_key_id" is not defined in object type {}'
-      - 'property "aws_secret_access_key" is not defined in object type {}'
-      - 'property "aws_upload_role_arn" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-
   ".github/workflows/pull-request.yml":
     ignore:
       - 'property "github_token" is not defined in object type {}'
@@ -75,11 +67,19 @@ paths:
       - 'property "aws_upload_role_arn" is not defined in object type {}'
       - 'property "codecov_token" is not defined in object type {}'
       - 'property "github_token" is not defined in object type {}'
+      - 'property "java_signing_key_id" is not defined in object type {}'
+      - 'property "java_signing_key" is not defined in object type {}'
+      - 'property "java_signing_password" is not defined in object type {}'
       - 'property "npm_token" is not defined in object type {}'
+      - 'property "nuget_publish_key" is not defined in object type {}'
+      - 'property "ossrh_password" is not defined in object type {}'
+      - 'property "ossrh_username" is not defined in object type {}'
       - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "pypi_api_token" is not defined in object type {}'
       - 'property "release_bot_endpoint" is not defined in object type {}'
       - 'property "release_bot_key" is not defined in object type {}'
       - 'property "release_ops_slack_channel" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
 
   ".github/workflows/prerelease.yml":
     ignore:
@@ -88,8 +88,19 @@ paths:
       - 'property "aws_upload_role_arn" is not defined in object type {}'
       - 'property "codecov_token" is not defined in object type {}'
       - 'property "github_token" is not defined in object type {}'
+      - 'property "java_signing_key_id" is not defined in object type {}'
+      - 'property "java_signing_key" is not defined in object type {}'
+      - 'property "java_signing_password" is not defined in object type {}'
       - 'property "npm_token" is not defined in object type {}'
+      - 'property "nuget_publish_key" is not defined in object type {}'
+      - 'property "ossrh_password" is not defined in object type {}'
+      - 'property "ossrh_username" is not defined in object type {}'
       - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "pypi_api_token" is not defined in object type {}'
+      - 'property "release_bot_endpoint" is not defined in object type {}'
+      - 'property "release_bot_key" is not defined in object type {}'
+      - 'property "release_ops_slack_channel" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
 
   ".github/workflows/release.yml":
     ignore:
@@ -98,8 +109,40 @@ paths:
       - 'property "aws_upload_role_arn" is not defined in object type {}'
       - 'property "codecov_token" is not defined in object type {}'
       - 'property "github_token" is not defined in object type {}'
+      - 'property "java_signing_key_id" is not defined in object type {}'
+      - 'property "java_signing_key" is not defined in object type {}'
+      - 'property "java_signing_password" is not defined in object type {}'
       - 'property "npm_token" is not defined in object type {}'
+      - 'property "nuget_publish_key" is not defined in object type {}'
+      - 'property "ossrh_password" is not defined in object type {}'
+      - 'property "ossrh_username" is not defined in object type {}'
       - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "pypi_api_token" is not defined in object type {}'
+      - 'property "release_bot_endpoint" is not defined in object type {}'
+      - 'property "release_bot_key" is not defined in object type {}'
+      - 'property "release_ops_slack_channel" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
+
+  ".github/workflows/publish.yml":
+    ignore:
+      - 'property "aws_access_key_id" is not defined in object type {}'
+      - 'property "aws_secret_access_key" is not defined in object type {}'
+      - 'property "aws_upload_role_arn" is not defined in object type {}'
+      - 'property "codecov_token" is not defined in object type {}'
+      - 'property "github_token" is not defined in object type {}'
+      - 'property "java_signing_key_id" is not defined in object type {}'
+      - 'property "java_signing_key" is not defined in object type {}'
+      - 'property "java_signing_password" is not defined in object type {}'
+      - 'property "npm_token" is not defined in object type {}'
+      - 'property "nuget_publish_key" is not defined in object type {}'
+      - 'property "ossrh_password" is not defined in object type {}'
+      - 'property "ossrh_username" is not defined in object type {}'
+      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "pypi_api_token" is not defined in object type {}'
+      - 'property "release_bot_endpoint" is not defined in object type {}'
+      - 'property "release_bot_key" is not defined in object type {}'
+      - 'property "release_ops_slack_channel" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
 
   ".github/workflows/weekly-pulumi-update.yml":
     ignore:
@@ -108,6 +151,7 @@ paths:
   ".github/workflows/nightly-sdk-generation.yml":
     ignore:
       - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property "slack_webhook_url" is not defined in object type {}'
 
   ".github/workflows/main.yml":
     ignore:
@@ -116,3 +160,7 @@ paths:
       - 'property "release_bot_key" is not defined in object type {}'
       - 'property "release_ops_slack_channel" is not defined in object type {}'
       - 'property "release_ops_staging_slack_channel" is not defined in object type {}'
+
+  ".github/workflows/verify-release.yml":
+    ignore:
+      - 'property "npm_token" is not defined in object type {}'

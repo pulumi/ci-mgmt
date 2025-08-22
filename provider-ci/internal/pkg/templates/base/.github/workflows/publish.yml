@@ -134,6 +134,7 @@ jobs:
         #{{- end }}#
         # Persist credentials so we can push back to the repo
         persist-credentials: true
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:

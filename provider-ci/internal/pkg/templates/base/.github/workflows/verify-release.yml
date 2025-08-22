@@ -73,6 +73,7 @@ jobs:
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
           persist-credentials: false
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Setup tools
         uses: ./.github/actions/setup-tools
         with:
