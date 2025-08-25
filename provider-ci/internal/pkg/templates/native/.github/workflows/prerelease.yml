@@ -47,12 +47,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     #{{- if ne .Config.Provider "command" }}#
     - if: github.event_name == 'pull_request'
@@ -252,12 +252,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -422,12 +422,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -627,12 +627,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
@@ -696,7 +696,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
@@ -778,7 +778,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     - name: Setup Java
       uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
       with:
@@ -870,12 +870,12 @@ jobs:
         cache-dependency-path: "**/*.sum"
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -953,12 +953,12 @@ jobs:
         cache-dependency-path: "**/*.sum"
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
