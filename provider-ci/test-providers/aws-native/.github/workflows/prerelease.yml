@@ -27,7 +27,7 @@ jobs:
       pull-requests: write
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -201,7 +201,7 @@ jobs:
     name: build_sdks
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -358,7 +358,7 @@ jobs:
       id-token: write
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -473,7 +473,7 @@ jobs:
     name: publish
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -532,7 +532,7 @@ jobs:
     name: publish_sdk
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -541,7 +541,7 @@ jobs:
       with:
         set-env: PROVIDER_VERSION
     - name: Checkout Scripts Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -620,7 +620,7 @@ jobs:
     name: publish_java_sdk
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
@@ -676,7 +676,7 @@ jobs:
     needs: publish_sdk
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       with:
         lfs: true
     - id: version
