@@ -318,7 +318,8 @@ func parseTemplate(fsys fs.FS, inPath string) (*template.Template, error) {
 	}
 
 	tmpl, err := template.New(inPath).Funcs(template.FuncMap{
-		"toYaml": toYAML,
+		"toYaml":        toYAML,
+		"renderEscStep": renderESCStep,
 	}).Funcs(sprig.FuncMap()).Delims("#{{", "}}#").Parse(string(inData))
 	if err != nil {
 		return nil, err
@@ -332,4 +333,47 @@ func toYAML(v interface{}) (string, error) {
 		return "", err
 	}
 	return strings.TrimSuffix(string(data), "\n"), nil
+}
+
+// renderESCStep generates either the real ESC action or our shim action which
+// re-exports the existing environment.
+func renderESCStep(v any) (string, error) {
+	config, ok := v.(Config)
+	if !ok {
+		return "", fmt.Errorf("expected Config input, got %+v", v)
+	}
+
+	yaml := func(v any) (string, error) {
+		s, err := toYAML([]any{v})
+		return "\n" + s, err
+	}
+
+	if config.ESC.Enabled {
+		env := map[string]string{
+			"ESC_ACTION_OIDC_AUTH":                 "true",
+			"ESC_ACTION_OIDC_ORGANIZATION":         "pulumi",
+			"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE": "urn:pulumi:token-type:access_token:organization",
+			"ESC_ACTION_ENVIRONMENT":               config.ESC.Environment,
+		}
+		if len(config.ESC.EnvironmentVariables) > 0 {
+			env["ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES"] = strings.Join(config.ESC.EnvironmentVariables, ",\n")
+
+		}
+		step := map[string]any{
+			"name": "Fetch secrets from ESC",
+			"id":   "esc-secrets",
+			"uses": "pulumi/esc-action@v1",
+			"env":  env,
+		}
+		return yaml(step)
+	}
+
+	// If ESC is disabled, we use a shim action which pipes environment
+	// variables to the action's outputs. This way our steps stay the same
+	// regardless of whether ESC is enabled or not.
+	return yaml(map[string]any{
+		"name": "Map environment to ESC outputs",
+		"id":   "esc-secrets",
+		"uses": "./.github/actions/esc-action",
+	})
 }
