@@ -27,7 +27,7 @@ jobs:
           release
         issue-type: pull-request
         permission: write
-        reaction-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        reaction-token: ${{ secrets.GITHUB_TOKEN }}
         repository: pulumi/pulumi-kubernetes
         token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
 name: command-dispatch

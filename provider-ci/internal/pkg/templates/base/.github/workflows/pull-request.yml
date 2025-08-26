@@ -19,7 +19,7 @@ jobs:
     - name: Comment PR
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         message: >
           PR is now waiting for a maintainer to run the acceptance tests.
 

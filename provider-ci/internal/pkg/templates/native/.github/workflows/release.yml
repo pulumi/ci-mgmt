@@ -106,7 +106,7 @@ jobs:
         message: |
           ${{ env.SCHEMA_CHANGES }}
         comment-tag: schemaCheck
-        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - if: contains(env.SCHEMA_CHANGES, 'Looking good! No breaking changes found.') &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes
@@ -114,7 +114,7 @@ jobs:
       with:
         labels: impact/no-changelog-required
         number: ${{ github.event.issue.number }}
-        github_token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     #{{- end }}#
     #{{- if ne .Config.Provider "kubernetes" }}#
     - name: Build Provider
@@ -560,7 +560,7 @@ jobs:
       uses: GoTestTools/gotestfmt-action@v2
       with:
         version: v2.5.0
-        token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
     #{{- if eq .Config.Provider "kubernetes-cert-manager" }}#
     - name: Setup KinD cluster
       uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0

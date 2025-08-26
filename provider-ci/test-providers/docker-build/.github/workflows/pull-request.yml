@@ -49,5 +49,5 @@ jobs:
           PR is now waiting for a maintainer to run the acceptance tests.
 
           **Note for the maintainer:** To run the acceptance tests, please comment */run-acceptance-tests* on the PR
-        github-token: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     if: github.event.pull_request.head.repo.full_name != github.repository

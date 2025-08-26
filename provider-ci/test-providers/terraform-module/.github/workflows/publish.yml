@@ -87,7 +87,7 @@ jobs:
         generate_release_notes: true
         files: dist/*
       env:
-        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   clean_up_release_labels:
@@ -112,7 +112,7 @@ jobs:
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
       env:
-        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   verify_release:
     name: verify_release
