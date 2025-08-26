@@ -35,6 +35,7 @@ jobs:
           swap-storage: false
           dotnet: false
       #{{- end }}#
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -108,7 +109,7 @@ jobs:
 
           # Push with pulumi-bot credentials to trigger a re-run of the
           # workflow. https://github.com/orgs/community/discussions/25702
-          git push https://pulumi-bot:${{ secrets.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }} \
+          git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }} \
               "HEAD:$HEAD_REF"
         env:
           # head_ref is untrusted so it's recommended to pass via env var to
