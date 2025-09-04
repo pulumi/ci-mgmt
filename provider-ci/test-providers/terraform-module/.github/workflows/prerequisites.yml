@@ -45,20 +45,3 @@ jobs:
       with:
         major-version: 0
         set-env: 'PROVIDER_VERSION'
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: go, pulumictl, pulumicli, schema-tools
-    - name: Prepare local workspace before restoring previously built files
-      run: make prepare_local_workspace
-    - name: Build provider binary
-      run: make provider
-    - name: Unit-test provider code
-      run: make test_provider
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Upload artifacts
-      uses: ./.github/actions/upload-prerequisites

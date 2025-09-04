@@ -87,9 +87,9 @@ jobs:
         run: make prepare_local_workspace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #{{- if not .Config.NoSchema }}#
       - name: Restore prerequisites
         uses: ./.github/actions/download-prerequisites
-      #{{- if not .Config.NoSchema }}#
       - name: Restore makefile progress
         # This mirrors the targets completed in the prerequisites job
         run: make --touch provider schema

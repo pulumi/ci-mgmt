@@ -47,12 +47,158 @@ jobs:
           ]
         }
 
+  test_provider:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: #{{ .Config.Runner.Prerequisites }}#
+    needs: prerequisites
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+#{{- if .Config.FreeDiskSpaceBeforeBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+          dotnet: false
+#{{- end }}#
+      - name: Checkout Repo
+        uses: #{{ .Config.ActionVersions.Checkout }}#
+        with:
+          #{{- if .Config.CheckoutSubmodules }}#
+          submodules: #{{ .Config.CheckoutSubmodules }}#
+          #{{- end }}#
+          persist-credentials: false
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        with:
+          tools: go, pulumictl, pulumicli
+      #{{- if not .Config.NoSchema }}#
+      - name: Restore prerequisites
+        uses: ./.github/actions/download-prerequisites
+      #{{- end }}#
+      - name: Prepare local workspace
+        run: make prepare_local_workspace
+      - name: Unit-test provider code
+        run: make test_provider
+      - name: Upload coverage reports to Codecov
+        uses: #{{ .Config.ActionVersions.Codecov }}#
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build_schema:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: #{{ .Config.Runner.Prerequisites }}#
+    needs: prerequisites
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+#{{- if .Config.FreeDiskSpaceBeforeBuild }}#
+      # Run as first step so we don't delete things that have just been installed
+      - name: Free Disk Space (Ubuntu)
+        uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+        with:
+          tool-cache: false
+          swap-storage: false
+          dotnet: false
+#{{- end }}#
+      - name: Checkout Repo
+        uses: #{{ .Config.ActionVersions.Checkout }}#
+        with:
+          #{{- if .Config.CheckoutSubmodules }}#
+          submodules: #{{ .Config.CheckoutSubmodules }}#
+          #{{- end }}#
+          persist-credentials: false
+    #{{- if not .Config.NoSchema }}#
+      - name: Cache examples generation
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        with:
+          path: |
+            .pulumi/examples-cache
+          key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+    #{{- end }}#
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        with:
+          tools: go, pulumictl, pulumicli, schema-tools
+      - name: Prepare local workspace before restoring previously built files
+        run: make prepare_local_workspace
+  #{{- if .Config.Actions.PreBuild }}#
+  #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
+  #{{- end }}#
+      #{{- if not .Config.NoSchema }}#
+      - name: Restore prerequisites
+        uses: ./.github/actions/download-prerequisites
+      - name: Restore makefile progress
+        # This mirrors the targets completed in the prerequisites job
+        run: make --touch provider
+      - name: Generate schema
+        run: make schema
+        env:
+          PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
+      #{{- end }}#
+#{{- if not .Config.NoSchema }}#
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Check Schema is Valid
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          {
+            echo "SCHEMA_CHANGES<<$EOF";
+            schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ github.event.pull_request.base.ref }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
+            echo "$EOF";
+          } >> "$GITHUB_ENV"
+      - if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' == false && github.actor != 'dependabot[bot]'
+        name: Comment on PR with Details of Schema Check
+        uses: #{{ .Config.ActionVersions.PrComment }}#
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-tag: schemaCheck
+          message: >+
+            ${{ env.SCHEMA_CHANGES }}
+
+
+            Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+#{{- if .Config.EnableConfigurationCheck }}#
+      - if: github.event_name == 'pull_request'
+        name: Check Configuration section
+        run: |
+          sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
+          jq -r '.config | select(.variables) | .variables | keys[]' < provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json >> keys.txt
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          {
+            echo "MISSING_CONFIG<<$EOF";
+            xargs -I {} sh -c "grep -q {} config_section.txt || echo \\\`{}\\\` not found in Configuration section" < keys.txt
+            echo "$EOF";
+          } >> "$GITHUB_ENV"
+
+      - if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' == false
+        name: Check for missing config
+        run: |
+          if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
+          cat <<EOF
+          ${{ env.MISSING_CONFIG }}
+          EOF
+          echo 'Please add a description for each of these options to `README.md`.'
+          echo 'Details about them can be found in either the upstream docs or `schema.json`.'
+          exit 1
+          fi
+#{{- end }}#
+#{{- end }}#
+
   #{{ if not .Config.NoSchema -}}#
   build_sdk:
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     name: build_sdk
-    needs: prerequisites
+    needs: 
+      - prerequisites
+      - build_provider
     uses: ./.github/workflows/build_sdk.yml
     secrets: inherit
     with:
@@ -120,6 +266,7 @@ jobs:
     needs:
       - prerequisites
       - build_provider
+      - test_provider
 #{{- if not .Config.NoSchema }}#
       - build_sdk
 #{{- end }}#

@@ -4,6 +4,7 @@ description: Downloads the code generator binary to `bin/`.
 runs:
   using: "composite"
   steps:
+    #{{ if not .Config.NoSchema -}}#
     - name: Download the prerequisites bin
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:
@@ -18,7 +19,6 @@ runs:
       shell: bash
       run: rm bin/executables.txt
 
-    #{{ if not .Config.NoSchema -}}#
     - name: Download schema-embed.json
       uses: #{{ .Config.ActionVersions.DownloadArtifact }}#
       with:

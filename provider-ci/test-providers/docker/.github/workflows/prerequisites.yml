@@ -59,50 +59,9 @@ jobs:
       with:
         major-version: 4
         set-env: 'PROVIDER_VERSION'
-    - name: Cache examples generation
-      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
-      with:
-        path: |
-          .pulumi/examples-cache
-        key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      with:
-        tools: go, pulumictl, pulumicli, schema-tools
-    - name: Prepare local workspace before restoring previously built files
-      run: make prepare_local_workspace
-    - name: Generate schema
-      run: make schema
-    - name: Build registry docs
-      run: make build_registry_docs
-    - name: Build provider binary
-      run: make provider
-    - name: Unit-test provider code
-      run: make test_provider
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    - if: inputs.is_pr
-      name: Check Schema is Valid
-      run: |
-        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-        {
-          echo "SCHEMA_CHANGES<<$EOF";
-          schema-tools compare -r github://api.github.com/pulumi -p docker -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-docker/schema.json;
-          echo "$EOF";
-        } >> "$GITHUB_ENV"
-    - if: inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
-      name: Comment on PR with Details of Schema Check
-      uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        comment-tag: schemaCheck
-        message: >+
-          ${{ env.SCHEMA_CHANGES }}
-
-
-          Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
-
+    - name: Generate schema-embed
+      run: make schema_embed
+    - name: Build tfgen
+      run: make tfgen_build_only
     - name: Upload artifacts
       uses: ./.github/actions/upload-prerequisites

@@ -4,6 +4,7 @@ description: Upload the SDK for a specific language as an asset for the workflow
 runs:
   using: "composite"
   steps:
+    #{{ if not .Config.NoSchema -}}#
     - name: Capture executable permissions
       shell: bash
       run: find bin -type f -executable > bin/executables.txt
@@ -15,7 +16,6 @@ runs:
         path: bin/*
         retention-days: 30
 
-    #{{ if not .Config.NoSchema -}}#
     - name: Upload schema-embed.json
       uses: #{{ .Config.ActionVersions.UploadArtifact }}#
       with:
