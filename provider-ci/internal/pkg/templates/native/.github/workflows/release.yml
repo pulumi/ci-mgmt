@@ -582,12 +582,16 @@ jobs:
     - name: Run tests
       run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
         2h -parallel 4 ./...
+      env:
+        GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #{{- else }}#
     - name: Run tests
       run: >-
         set -euo pipefail
 
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      env:
+        GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #{{- end }}#
     - if: failure() && github.event_name == 'push'
       name: Notify Slack

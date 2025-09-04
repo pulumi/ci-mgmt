@@ -511,6 +511,8 @@ jobs:
     - name: Run tests
       run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
         2h -parallel 4 ./...
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
       uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
