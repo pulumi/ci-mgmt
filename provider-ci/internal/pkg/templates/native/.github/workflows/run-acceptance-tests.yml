@@ -72,12 +72,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     #{{- if ne .Config.Provider "command" }}#
     - if: github.event_name == 'pull_request'
@@ -283,12 +283,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -455,12 +455,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
