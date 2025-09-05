@@ -15,6 +15,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Comment PR
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
