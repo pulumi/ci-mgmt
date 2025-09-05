@@ -185,9 +185,9 @@ build_python: .make/build_python
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
 		rm ./bin/go.mod && \
 		python3 -m venv venv && \
-		./venv/bin/python -m pip install build==1.2.1 && \
+		./venv/bin/python -m pip install build==1.2.1 wheel && \
 		cd ./bin && \
-		../venv/bin/python -m build .
+		../venv/bin/python -m build . --no-isolation
 	@touch $@
 .PHONY: generate_python build_python
 
