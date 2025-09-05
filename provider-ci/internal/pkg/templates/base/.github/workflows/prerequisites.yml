@@ -41,7 +41,6 @@ jobs:
         swap-storage: false
         dotnet: false
 #{{- end }}#
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -49,6 +48,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - uses: #{{ .Config.ActionVersions.ProviderVersionAction }}#
       id: provider-version
       with:

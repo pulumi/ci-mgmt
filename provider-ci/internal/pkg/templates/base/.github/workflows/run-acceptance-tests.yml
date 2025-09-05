@@ -66,6 +66,10 @@ jobs:
       pull-requests: write
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    - name: Checkout Repo
+      uses: #{{ .Config.ActionVersions.Checkout }}#
+      with:
+        persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
     - id: run-url
       name: Create URL to the run output

@@ -74,6 +74,10 @@ jobs:
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+    - name: Checkout Repo
+      uses: #{{ .Config.ActionVersions.Checkout }}#
+      with:
+        persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
     - name: check if this commit needs release
       if: ${{ env.RELEASE_BOT_ENDPOINT != '' }}

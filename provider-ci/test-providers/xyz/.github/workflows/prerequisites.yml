@@ -36,14 +36,14 @@ jobs:
       pull-requests: write
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
-    steps:    
-    - id: esc-secrets
-      name: Map environment to ESC outputs
-      uses: ./.github/actions/esc-action
+    steps:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        persist-credentials: false
+        persist-credentials: false    
+    - id: esc-secrets
+      name: Map environment to ESC outputs
+      uses: ./.github/actions/esc-action
     - uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       id: provider-version
       with:

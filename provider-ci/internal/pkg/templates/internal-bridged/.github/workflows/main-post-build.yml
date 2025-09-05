@@ -23,7 +23,6 @@ jobs:
         with:
           tool-cache: false
           swap-storage: false
-      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -31,6 +30,7 @@ jobs:
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
           persist-credentials: false
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Configure AWS Credentials
         uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
         with:

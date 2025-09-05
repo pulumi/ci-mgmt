@@ -34,7 +34,6 @@ jobs:
     - name: Validate skipGoSdk
       if: inputs.skipGoSdk && inputs.isPrerelease == false
       run: echo "Can't skip Go SDK for stable releases. This is likely a bug in the calling workflow." && exit 1
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -42,6 +41,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -205,6 +205,10 @@ jobs:
     if: inputs.isPrerelease == false
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
+      - name: Checkout Repo
+        uses: #{{ .Config.ActionVersions.Checkout }}#
+        with:
+          persist-credentials: false
       #{{- .Config | renderEscStep | indent 6 }}#
       - name: Dispatch Metadata build
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
@@ -231,11 +235,11 @@ jobs:
     #{{- end }}#
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:

@@ -45,7 +45,6 @@ jobs:
           dotnet: false
           large-packages: false
       #{{- end }}#
-      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -53,6 +52,7 @@ jobs:
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
           persist-credentials: false
+      #{{- .Config | renderEscStep | indent 6 }}#
       # Without ldid cross-compiling Node binaries on a Linux worker intended to work on darwin-arm64 fails to sign the
       # binaries properly and they do not work as expected. See https://github.com/pulumi/pulumi-awsx/issues/1490
       - uses: MOZGIII/install-ldid-action@v1

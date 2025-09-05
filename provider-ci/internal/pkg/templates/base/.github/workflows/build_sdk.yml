@@ -35,7 +35,6 @@ jobs:
           swap-storage: false
           dotnet: false
       #{{- end }}#
-      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -43,6 +42,7 @@ jobs:
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
           persist-credentials: false
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Cache examples generation
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:

@@ -5,7 +5,6 @@ jobs:
     name: warn_codegen
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -13,6 +12,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - id: schema_changed
       name: Check for diff in schema
       uses: #{{ .Config.ActionVersions.PathsFilter }}#

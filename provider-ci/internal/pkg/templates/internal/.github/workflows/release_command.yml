@@ -10,11 +10,11 @@ jobs:
     name: Should release PR
     runs-on: ubuntu-latest
     steps:
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Should release PR
       uses: pulumi/action-release-by-pr-label@main
       with:

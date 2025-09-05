@@ -8,7 +8,6 @@ jobs:
     name: comment-on-pr
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -16,6 +15,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Comment PR
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
