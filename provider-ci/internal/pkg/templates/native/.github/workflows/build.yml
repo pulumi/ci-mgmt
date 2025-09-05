@@ -47,6 +47,8 @@ jobs:
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       with:
         set-env: PROVIDER_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
       with:
@@ -58,12 +60,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     #{{- if ne .Config.Provider "command" }}#
     - if: github.event_name == 'pull_request'
@@ -220,7 +222,7 @@ jobs:
     - name: Test Provider Library
       run: make test_provider
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+      uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
       env:
         CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     - if: failure() && github.event_name == 'push'
@@ -258,6 +260,8 @@ jobs:
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       with:
         set-env: PROVIDER_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
       with:
@@ -269,12 +273,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -290,7 +294,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+      uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
       with:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
@@ -459,6 +463,8 @@ jobs:
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       with:
         set-env: PROVIDER_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
       with:
@@ -470,12 +476,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -491,7 +497,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHONVERSION }}
     - name: Setup Java
-      uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+      uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
       with:
         java-version: ${{ env.JAVAVERSION }}
         distribution: temurin
@@ -559,7 +565,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.GCP }}#
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -569,7 +575,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.GCP }}#
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@cb1e50a9932213ecece00a606661ae9ca44f3397 # v2.2.0
+      uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       with:
         install_components: gke-gcloud-auth-plugin
     #{{- end }}#
@@ -622,12 +628,16 @@ jobs:
     - name: Run tests
       run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
         2h -parallel 4 ./...
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #{{- else }}#
     - name: Run tests
       run: >-
         set -euo pipefail
 
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #{{- end }}#
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
@@ -656,6 +666,8 @@ jobs:
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       with:
         set-env: PROVIDER_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
       with:
@@ -678,12 +690,12 @@ jobs:
         repo: pulumi/pulumictl
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
@@ -734,6 +746,8 @@ jobs:
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       with:
         set-env: PROVIDER_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout Scripts Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -750,7 +764,7 @@ jobs:
       with:
         repo: pulumi/pulumictl
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
@@ -861,12 +875,12 @@ jobs:
         cache-dependency-path: "**/*.sum"
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -875,7 +889,7 @@ jobs:
         registry-url: https://registry.npmjs.org
     #{{- if .Config.GCP }}#
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -883,7 +897,7 @@ jobs:
           env.GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GOOGLE_CI_SERVICE_ACCOUNT_EMAIL }}
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@cb1e50a9932213ecece00a606661ae9ca44f3397 # v2.2.0
+      uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       with:
         install_components: gke-gcloud-auth-plugin
     #{{- end }}#
@@ -944,12 +958,12 @@ jobs:
         cache-dependency-path: "**/*.sum"
     #{{- if .Config.PulumiVersionFile }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
       with:
         pulumi-version-file: #{{ .Config.PulumiVersionFile }}#
     #{{- else }}#
     - name: Install Pulumi CLI
-      uses: pulumi/actions@df5a93ad715135263c732ba288301bd044c383c0 # v6.3.0
+      uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
     #{{- end }}#
     - name: Setup Node
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -958,7 +972,7 @@ jobs:
         registry-url: https://registry.npmjs.org
     #{{- if .Config.GCP }}#
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@b7593ed2efd1c1617e1b0254da33b86225adb2a5 # v2.1.12
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: projects/${{ env.GOOGLE_PROJECT_NUMBER
           }}/locations/global/workloadIdentityPools/${{
@@ -968,7 +982,7 @@ jobs:
     #{{- end }}#
     #{{- if .Config.GCP }}#
     - name: Setup gcloud auth
-      uses: google-github-actions/setup-gcloud@cb1e50a9932213ecece00a606661ae9ca44f3397 # v2.2.0
+      uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       with:
         install_components: gke-gcloud-auth-plugin
     #{{- end }}#
