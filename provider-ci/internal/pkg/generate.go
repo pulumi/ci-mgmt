@@ -318,8 +318,11 @@ func parseTemplate(fsys fs.FS, inPath string) (*template.Template, error) {
 	}
 
 	tmpl, err := template.New(inPath).Funcs(template.FuncMap{
-		"toYaml":        toYAML,
-		"renderEscStep": renderESCStep,
+		"toYaml":           toYAML,
+		"renderEscStep":    renderESCStep,
+		"renderGlobalEnv":  renderGlobalEnv,
+		"renderLocalEnv":   renderLocalEnv,
+		"renderPublishEnv": renderPublishEnv,
 	}).Funcs(sprig.FuncMap()).Delims("#{{", "}}#").Parse(string(inData))
 	if err != nil {
 		return nil, err
@@ -376,4 +379,115 @@ func renderESCStep(v any) (string, error) {
 		"id":   "esc-secrets",
 		"uses": "./.github/actions/esc-action",
 	})
+}
+
+// renderGlobalEnv is used to generate environment variables shared by all
+// jobs/steps in a non-publishing workflow.
+//
+// If ESC is disabled, the environment from ci-mgmt.yml is returned as-is. This
+// preserves pre-ESC behavior where secrets were (over-)exposed to all steps.
+//
+// If ESC is enabled, then this will return only non-secret env vars.
+// renderLocalEnv is then responsible for consuming those secrets from ESC and
+// referencing them from test steps.
+//
+// Refs https://github.com/pulumi/ci-mgmt/issues/1481.
+func renderGlobalEnv(v any) (string, error) {
+	config, ok := v.(Config)
+	if !ok {
+		return "", fmt.Errorf("expected Config input, got %+v", v)
+	}
+
+	env := map[string]string{}
+
+	for k, v := range config.Env {
+		if config.ESC.Enabled && strings.Contains(v, "secrets.") {
+			continue // Omit secrets from the global env.
+		}
+		env[k] = v
+	}
+
+	return toYAML(env)
+}
+
+// renderPublishEnv is used to generate environment variables shared by all
+// jobs/steps in a publishing workflow.
+//
+// It differs from renderGlobalEnv only in that additional publishing secrets
+// are included by default when ESC is disabled.
+//
+// Refs https://github.com/pulumi/ci-mgmt/issues/1481.
+func renderPublishEnv(v any) (string, error) {
+	config, ok := v.(Config)
+	if !ok {
+		return "", fmt.Errorf("expected Config input, got %+v", v)
+	}
+
+	env := map[string]string{}
+
+	if !config.ESC.Enabled {
+		env = map[string]string{
+			"AWS_ACCESS_KEY_ID":                    "${{ secrets.AWS_ACCESS_KEY_ID }}",
+			"AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID":     "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
+			"AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY": "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
+			"AWS_SECRET_ACCESS_KEY":                "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+			"AWS_UPLOAD_ROLE_ARN":                  "${{ secrets.AWS_UPLOAD_ROLE_ARN }}",
+			"CODECOV_TOKEN":                        "${{ secrets.CODECOV_TOKEN }}",
+			"JAVA_SIGNING_KEY_ID":                  "${{ secrets.JAVA_SIGNING_KEY_ID }}",
+			"JAVA_SIGNING_KEY":                     "${{ secrets.JAVA_SIGNING_KEY }}",
+			"JAVA_SIGNING_PASSWORD":                "${{ secrets.JAVA_SIGNING_PASSWORD }}",
+			"NPM_TOKEN":                            "${{ secrets.NPM_TOKEN }}",
+			"NUGET_PUBLISH_KEY":                    "${{ secrets.NUGET_PUBLISH_KEY }}",
+			"OSSRH_PASSWORD":                       "${{ secrets.OSSRH_PASSWORD }}",
+			"OSSRH_USERNAME":                       "${{ secrets.OSSRH_USERNAME }}",
+			"PYPI_API_TOKEN":                       "${{ secrets.PYPI_API_TOKEN }}",
+			"S3_COVERAGE_BUCKET_NAME":              "${{ secrets.S3_COVERAGE_BUCKET_NAME }}",
+		}
+	}
+
+	for k, v := range config.Env {
+		if config.ESC.Enabled && strings.Contains(v, "secrets.") {
+			continue // Omit secrets from the global env.
+		}
+		env[k] = v
+	}
+
+	return toYAML(env)
+}
+
+// renderLocalEnv is responsible for generating more targeted environment variables for use in e.g. test steps.
+
+// If ESC is enabled, environment variables from ci-mgmt.yml are rendered with secrets replaced by
+// ESC outputs. Plaintext values are omitted since they are already contained in the global environment.
+//
+// If ESC is disabled this only passes GITHUB_TOKEN to the step.
+//
+// Refs https://github.com/pulumi/ci-mgmt/issues/1481.
+func renderLocalEnv(v any) (string, error) {
+	config, ok := v.(Config)
+	if !ok {
+		return "", fmt.Errorf("expected Config input, got %+v", v)
+	}
+
+	env := map[string]string{
+		"GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}",
+	}
+
+	if !config.ESC.Enabled {
+		toYAML(env)
+	}
+
+	for k, v := range config.Env {
+		if !strings.Contains(v, "secrets.") {
+			continue // Omit plaintext values already in the global env.
+		}
+		if strings.HasPrefix(v, "${{secrets.") || strings.HasPrefix(v, "${{ secrets.") {
+			fixed := strings.Replace(v, "secrets.", "steps.esc-secrets.outputs.", 1)
+			fmt.Fprintf(os.Stderr, "warning: ESC is enabled, correcting '%s: %s' to be '%s: %s'\n", k, v, k, fixed)
+			v = fixed
+		}
+		env[k] = v
+	}
+
+	return toYAML(env)
 }
