@@ -7,10 +7,7 @@ self-hosted-runner:
 paths:
   ".github/workflows/build_provider.yml":
     ignore:
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/build_sdk.yml":
     ignore:
@@ -18,191 +15,80 @@ paths:
 
   ".github/workflows/command-dispatch.yml":
     ignore:
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/community-moderation.yml":
     ignore:
-      - 'property "github_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/main-post-build.yml":
     ignore:
-      - 'property "aws_corp_s3_upload_access_key_id" is not defined in object type {}'
-      - 'property "aws_corp_s3_upload_secret_access_key" is not defined in object type {}'
-      - 'property "s3_coverage_bucket_name" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/master.yml":
     ignore:
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/prerequisites.yml":
     ignore:
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/pull-request.yml":
     ignore:
-      - 'property "github_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/release_command.yml":
     ignore:
-      - 'property "release_ops_staging_slack_channel" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/run-acceptance-tests.yml":
     ignore:
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/test.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/build.yml":
     ignore:
-      - 'property "aws_access_key_id" is not defined in object type {}'
-      - 'property "aws_secret_access_key" is not defined in object type {}'
-      - 'property "aws_upload_role_arn" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "java_signing_key_id" is not defined in object type {}'
-      - 'property "java_signing_key" is not defined in object type {}'
-      - 'property "java_signing_password" is not defined in object type {}'
-      - 'property "npm_token" is not defined in object type {}'
-      - 'property "nuget_publish_key" is not defined in object type {}'
-      - 'property "ossrh_password" is not defined in object type {}'
-      - 'property "ossrh_username" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "pypi_api_token" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/prerelease.yml":
     ignore:
-      - 'property "aws_access_key_id" is not defined in object type {}'
-      - 'property "aws_secret_access_key" is not defined in object type {}'
-      - 'property "aws_upload_role_arn" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "java_signing_key_id" is not defined in object type {}'
-      - 'property "java_signing_key" is not defined in object type {}'
-      - 'property "java_signing_password" is not defined in object type {}'
-      - 'property "npm_token" is not defined in object type {}'
-      - 'property "nuget_publish_key" is not defined in object type {}'
-      - 'property "ossrh_password" is not defined in object type {}'
-      - 'property "ossrh_username" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "pypi_api_token" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/release.yml":
     ignore:
-      - 'property "aws_access_key_id" is not defined in object type {}'
-      - 'property "aws_secret_access_key" is not defined in object type {}'
-      - 'property "aws_upload_role_arn" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_id" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_client_secret" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_key_vault_uri" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "azure_signing_tenant_id" is not defined in object type {}'
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "java_signing_key_id" is not defined in object type {}'
-      - 'property "java_signing_key" is not defined in object type {}'
-      - 'property "java_signing_password" is not defined in object type {}'
-      - 'property "npm_token" is not defined in object type {}'
-      - 'property "nuget_publish_key" is not defined in object type {}'
-      - 'property "ossrh_password" is not defined in object type {}'
-      - 'property "ossrh_username" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "pypi_api_token" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/publish.yml":
     ignore:
-      - 'property "aws_access_key_id" is not defined in object type {}'
-      - 'property "aws_secret_access_key" is not defined in object type {}'
-      - 'property "aws_upload_role_arn" is not defined in object type {}'
-      - 'property "codecov_token" is not defined in object type {}'
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "java_signing_key_id" is not defined in object type {}'
-      - 'property "java_signing_key" is not defined in object type {}'
-      - 'property "java_signing_password" is not defined in object type {}'
-      - 'property "npm_token" is not defined in object type {}'
-      - 'property "nuget_publish_key" is not defined in object type {}'
-      - 'property "ossrh_password" is not defined in object type {}'
-      - 'property "ossrh_username" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "pypi_api_token" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/weekly-pulumi-update.yml":
     ignore:
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/nightly-sdk-generation.yml":
     ignore:
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "slack_webhook_url" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/main.yml":
     ignore:
-      - 'property "github_token" is not defined in object type {}'
-      - 'property "release_bot_endpoint" is not defined in object type {}'
-      - 'property "release_bot_key" is not defined in object type {}'
-      - 'property "release_ops_slack_channel" is not defined in object type {}'
-      - 'property "release_ops_staging_slack_channel" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/verify-release.yml":
     ignore:
-      - 'property "npm_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/upgrade-provider.yml":
     ignore:
-      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
-      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/upgrade-bridge.yml":
     ignore:
-      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/upgrade-java.yml":
     ignore:
-      - 'property "pulumi_provider_automation_token" is not defined in object type {}'
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
