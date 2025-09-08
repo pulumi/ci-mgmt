@@ -10,7 +10,7 @@ on:
         required: true
 
 env:
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
 
 jobs:
   generate_coverage_data:

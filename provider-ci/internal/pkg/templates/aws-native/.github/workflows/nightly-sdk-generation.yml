@@ -15,7 +15,7 @@ env:
   PYTHONVERSION: "3.11"
   DOTNETVERSION: 8.0.x
   JAVAVERSION: "11"
-#{{.Config.Env | toYaml | indent 2 }}##{{ if eq 1 2 }}#: #{{ end }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
 jobs:
   generate-sdk:
     runs-on: ubuntu-latest

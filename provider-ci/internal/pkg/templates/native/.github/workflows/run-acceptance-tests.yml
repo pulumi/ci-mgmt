@@ -19,7 +19,7 @@ env:
   PYTHONVERSION: #{{ .Config.ToolVersions.Python | quote }}#
   DOTNETVERSION: #{{ .Config.ToolVersions.Dotnet | quote }}#
   JAVAVERSION: #{{ .Config.ToolVersions.Java | quote }}#
-#{{.Config.Env | toYaml | indent 2 }}##{{ if eq 1 2 }}#: #{{ end }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
   PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
 jobs:
   comment-notification:
@@ -242,6 +242,8 @@ jobs:
     #{{- end }}#
     - name: Test Provider Library
       run: make test_provider
+      env:
+#{{ .Config | renderLocalEnv | indent 8 }}#
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
       env:

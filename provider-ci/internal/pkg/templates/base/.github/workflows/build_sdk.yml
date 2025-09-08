@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
   PROVIDER_VERSION: ${{ inputs.version }}
 
 jobs:

@@ -474,7 +474,7 @@ func renderLocalEnv(v any) (string, error) {
 	}
 
 	if !config.ESC.Enabled {
-		toYAML(env)
+		return toYAML(env)
 	}
 
 	for k, v := range config.Env {

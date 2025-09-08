@@ -16,7 +16,8 @@ env:
   PYTHONVERSION: #{{ .Config.ToolVersions.Python | quote }}#
   DOTNETVERSION: #{{ .Config.ToolVersions.Dotnet | quote }}#
   JAVAVERSION: #{{ .Config.ToolVersions.Java | quote }}#
-#{{.Config.Env | toYaml | indent 2 }}##{{ if eq 1 2 }}#: #{{ end }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
+
 jobs:
   weekly-pulumi-update:
     runs-on: ubuntu-latest

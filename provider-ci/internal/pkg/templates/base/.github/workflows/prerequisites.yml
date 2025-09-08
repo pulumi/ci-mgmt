@@ -20,7 +20,7 @@ on:
         value: ${{ jobs.prerequisites.outputs.version }}
 
 env:
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
 
 jobs:
   prerequisites:
@@ -83,6 +83,8 @@ jobs:
       run: make provider
     - name: Unit-test provider code
       run: make test_provider
+      env:
+#{{ .Config | renderLocalEnv | indent 8 }}#
     - name: Upload coverage reports to Codecov
       uses: #{{ .Config.ActionVersions.Codecov }}#
       env:

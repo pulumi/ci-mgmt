@@ -21,7 +21,7 @@ on:
 
 env:
   IS_PRERELEASE: ${{ inputs.isPrerelease }}
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderPublishEnv | indent 2 }}#
 
 jobs:
   publish:
