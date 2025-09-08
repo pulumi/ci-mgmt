@@ -210,6 +210,8 @@ jobs:
         environment: logins/pulumi-ci
     - name: Test Provider Library
       run: make test_provider
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
       env:

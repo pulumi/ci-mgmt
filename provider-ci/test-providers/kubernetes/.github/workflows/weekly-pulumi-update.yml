@@ -23,6 +23,7 @@ env:
   GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
   GOOGLE_PROJECT_NUMBER: "637339343727"
   PULUMI_TEST_OWNER: moolumi
+
 jobs:
   weekly-pulumi-update:
     runs-on: ubuntu-latest

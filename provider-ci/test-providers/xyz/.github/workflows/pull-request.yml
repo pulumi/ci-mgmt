@@ -7,6 +7,7 @@ env:
   PULUMI_MISSING_DOCS_ERROR: "true"
   TF_APPEND_USER_AGENT: pulumi
   XYZ_REGION: us-west-2
+
 jobs:
   comment-on-pr:
     if: github.event.pull_request.head.repo.full_name != github.repository

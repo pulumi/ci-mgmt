@@ -15,6 +15,7 @@ env:
   DOTNETVERSION: "8.0.x"
   JAVAVERSION: "11"
   FOO: BAR
+
 jobs:
   comment-on-pr:
     runs-on: ubuntu-latest
