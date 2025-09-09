@@ -55,7 +55,6 @@ env:
   PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
   RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
   RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
-  RELEASE_OPS_SLACK_CHANNEL: ${{ secrets.RELEASE_OPS_SLACK_CHANNEL }}
 
 jobs:
   prerequisites:
@@ -386,7 +385,7 @@ jobs:
         command: "release-if-needed"
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
-        slack_channel: ${{ steps.esc-secrets.outputs.RELEASE_OPS_SLACK_CHANNEL }}
+        slack_channel: C02MGR8JVST
       env:
         RELEASE_BOT_ENDPOINT: ${{ steps.esc-secrets.outputs.RELEASE_BOT_ENDPOINT }}
         RELEASE_BOT_KEY: ${{ steps.esc-secrets.outputs.RELEASE_BOT_KEY }}
