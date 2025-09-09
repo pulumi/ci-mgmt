@@ -426,7 +426,7 @@ jobs:
         command: "release-if-needed"
         repo: ${{ github.repository }}
         commit: ${{ github.sha }}
-        slack_channel: ${{ steps.esc-secrets.outputs.RELEASE_OPS_SLACK_CHANNEL }}
+        slack_channel: C02MGR8JVST
       env:
         RELEASE_BOT_ENDPOINT: ${{ steps.esc-secrets.outputs.RELEASE_BOT_ENDPOINT }}
         RELEASE_BOT_KEY: ${{ steps.esc-secrets.outputs.RELEASE_BOT_KEY }}
