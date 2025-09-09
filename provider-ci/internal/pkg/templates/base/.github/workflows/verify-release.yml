@@ -37,7 +37,7 @@ on:
         required: false
 
 env:
-#{{ .Config | renderGlobalEnv | indent 2 }}#
+#{{ .Config | renderPublishEnv | indent 2 }}#
 
 jobs:
   verify-release:
