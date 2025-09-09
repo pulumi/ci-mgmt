@@ -400,6 +400,20 @@ func renderGlobalEnv(v any) (string, error) {
 
 	env := map[string]string{}
 
+	if !config.ESC.Enabled {
+		env = map[string]string{
+			"AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID":     "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
+			"AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY": "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
+			"CODECOV_TOKEN":                        "${{ secrets.CODECOV_TOKEN }}",
+			"PULUMI_BOT_TOKEN":                     "${{ secrets.PULUMI_BOT_TOKEN }}",
+			"RELEASE_BOT_ENDPOINT":                 "${{ secrets.RELEASE_BOT_ENDPOINT }}",
+			"RELEASE_BOT_KEY":                      "${{ secrets.RELEASE_BOT_KEY }}",
+			"RELEASE_OPS_SLACK_CHANNEL":            "${{ secrets.RELEASE_OPS_SLACK_CHANNEL }}",
+			"S3_COVERAGE_BUCKET_NAME":              "${{ secrets.S3_COVERAGE_BUCKET_NAME }}",
+			"SLACK_WEBHOOK_URL":                    "${{ secrets.SLACK_WEBHOOK_URL }}",
+		}
+	}
+
 	for k, v := range config.Env {
 		if config.ESC.Enabled && strings.Contains(v, "secrets.") {
 			continue // Omit secrets from the global env.
@@ -427,21 +441,22 @@ func renderPublishEnv(v any) (string, error) {
 
 	if !config.ESC.Enabled {
 		env = map[string]string{
-			"AWS_ACCESS_KEY_ID":                    "${{ secrets.AWS_ACCESS_KEY_ID }}",
-			"AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID":     "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
-			"AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY": "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
-			"AWS_SECRET_ACCESS_KEY":                "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
-			"AWS_UPLOAD_ROLE_ARN":                  "${{ secrets.AWS_UPLOAD_ROLE_ARN }}",
-			"CODECOV_TOKEN":                        "${{ secrets.CODECOV_TOKEN }}",
-			"JAVA_SIGNING_KEY_ID":                  "${{ secrets.JAVA_SIGNING_KEY_ID }}",
-			"JAVA_SIGNING_KEY":                     "${{ secrets.JAVA_SIGNING_KEY }}",
-			"JAVA_SIGNING_PASSWORD":                "${{ secrets.JAVA_SIGNING_PASSWORD }}",
-			"NPM_TOKEN":                            "${{ secrets.NPM_TOKEN }}",
-			"NUGET_PUBLISH_KEY":                    "${{ secrets.NUGET_PUBLISH_KEY }}",
-			"OSSRH_PASSWORD":                       "${{ secrets.OSSRH_PASSWORD }}",
-			"OSSRH_USERNAME":                       "${{ secrets.OSSRH_USERNAME }}",
-			"PYPI_API_TOKEN":                       "${{ secrets.PYPI_API_TOKEN }}",
-			"S3_COVERAGE_BUCKET_NAME":              "${{ secrets.S3_COVERAGE_BUCKET_NAME }}",
+			"AWS_ACCESS_KEY_ID":         "${{ secrets.AWS_ACCESS_KEY_ID }}",
+			"AWS_SECRET_ACCESS_KEY":     "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+			"AWS_UPLOAD_ROLE_ARN":       "${{ secrets.AWS_UPLOAD_ROLE_ARN }}",
+			"CODECOV_TOKEN":             "${{ secrets.CODECOV_TOKEN }}",
+			"JAVA_SIGNING_KEY_ID":       "${{ secrets.JAVA_SIGNING_KEY_ID }}",
+			"JAVA_SIGNING_KEY":          "${{ secrets.JAVA_SIGNING_KEY }}",
+			"JAVA_SIGNING_PASSWORD":     "${{ secrets.JAVA_SIGNING_PASSWORD }}",
+			"NPM_TOKEN":                 "${{ secrets.NPM_TOKEN }}",
+			"NUGET_PUBLISH_KEY":         "${{ secrets.NUGET_PUBLISH_KEY }}",
+			"OSSRH_PASSWORD":            "${{ secrets.OSSRH_PASSWORD }}",
+			"OSSRH_USERNAME":            "${{ secrets.OSSRH_USERNAME }}",
+			"PULUMI_BOT_TOKEN":          "${{ secrets.PULUMI_BOT_TOKEN }}",
+			"PYPI_API_TOKEN":            "${{ secrets.PYPI_API_TOKEN }}",
+			"RELEASE_BOT_ENDPOINT":      "${{ secrets.RELEASE_BOT_ENDPOINT }}",
+			"RELEASE_BOT_KEY":           "${{ secrets.RELEASE_BOT_KEY }}",
+			"RELEASE_OPS_SLACK_CHANNEL": "${{ secrets.RELEASE_OPS_SLACK_CHANNEL }}",
 		}
 	}
 
