@@ -165,9 +165,9 @@ build_python: .make/build_python
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
 		rm ./bin/go.mod && \
 		python3 -m venv venv && \
-		./venv/bin/python -m pip install build==1.2.1 wheel && \
+		./venv/bin/python -m pip install build==1.2.1 && \
 		cd ./bin && \
-		../venv/bin/python -m build . --no-isolation
+		../venv/bin/python -m build .
 	@touch $@
 .PHONY: generate_python build_python
 # Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
