@@ -20,8 +20,11 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
   ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
+  AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
+  AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY: ${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
   AWS_REGION: us-west-2
   AZURE_LOCATION: westus
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
@@ -32,10 +35,19 @@ env:
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_BOT_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+  RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
+  RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
+  S3_COVERAGE_BUCKET_NAME: ${{ secrets.S3_COVERAGE_BUCKET_NAME }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 jobs:
   weekly-pulumi-update:
     runs-on: ubuntu-latest
     steps:
+    - id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: ./.github/actions/esc-action
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
@@ -132,5 +144,5 @@ jobs:
 
         gh pr create -t "$msg" -b "$msg" --head "$(git branch --show-current)"
       env:
-        GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
     name: weekly-pulumi-update

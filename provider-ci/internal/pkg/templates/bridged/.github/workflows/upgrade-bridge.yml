@@ -61,8 +61,7 @@ permissions:
   pull-requests: write
 
 env:
-  GH_TOKEN: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_TOKEN || secrets.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
 
 jobs:
   upgrade_provider:
@@ -85,6 +84,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+      #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -120,3 +120,5 @@ jobs:
         pr-description: ${{ github.event.client_payload.pr-description }}
         pr-title-prefix: ${{ github.event.client_payload.pr-title-prefix }}
         patch-release: ${{ github.event.client_payload.patch-release }}
+      env:
+        GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}

@@ -8,3 +8,5 @@ parallel: 3
 sdkModuleDir: sdk/go/pulumi-provider-boilerplate
 envOverride:
   FOO: BAR # TODO: https://github.com/pulumi/ci-mgmt/issues/1583
+esc:
+  enabled: true

@@ -1,3 +1,94 @@
 self-hosted-runner:
   labels:
     - pulumi-ubuntu-8core
+
+# Most of these ignores are in place because our esc-secrets action has dynamic
+# outputs, and actionlint assumes all outputs are explicit.
+paths:
+  ".github/workflows/build_provider.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/build_sdk.yml":
+    ignore:
+      - 'property "pulumi_bot_token" is not defined in object type {}'
+
+  ".github/workflows/command-dispatch.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/community-moderation.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/main-post-build.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/master.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/prerequisites.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/pull-request.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/release_command.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/run-acceptance-tests.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/test.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/build.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/prerelease.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/release.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/publish.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/weekly-pulumi-update.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/nightly-sdk-generation.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/main.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/verify-release.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/upgrade-provider.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/upgrade-bridge.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/upgrade-java.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'

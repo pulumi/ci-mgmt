@@ -20,7 +20,7 @@ on:
         value: ${{ jobs.prerequisites.outputs.version }}
 
 env:
-#{{ .Config.Env | toYaml | indent 2 }}#
+#{{ .Config | renderGlobalEnv | indent 2 }}#
 
 jobs:
   prerequisites:
@@ -48,6 +48,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+    #{{- .Config | renderEscStep | indent 4 }}#
     - uses: #{{ .Config.ActionVersions.ProviderVersionAction }}#
       id: provider-version
       with:
@@ -82,10 +83,12 @@ jobs:
       run: make provider
     - name: Unit-test provider code
       run: make test_provider
+      env:
+#{{ .Config | renderLocalEnv | indent 8 }}#
     - name: Upload coverage reports to Codecov
       uses: #{{ .Config.ActionVersions.Codecov }}#
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
 #{{- if not .Config.NoSchema }}#
     - if: inputs.is_pr
       name: Check Schema is Valid
