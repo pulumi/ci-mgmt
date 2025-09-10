@@ -25,6 +25,9 @@ jobs:
       matrix:
         language:
 #{{ .Config.Languages | toYaml | indent 8 }}#
+    permissions:
+      contents: write # For Renovate SDKs.
+      id-token: write # For ESC secrets.
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeSdkBuild }}#
       # Run as first step so we don't delete things that have just been installed

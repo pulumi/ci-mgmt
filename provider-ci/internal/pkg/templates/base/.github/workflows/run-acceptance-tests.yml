@@ -70,7 +70,6 @@ jobs:
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
         persist-credentials: false
-    #{{- .Config | renderEscStep | indent 4 }}#
     - id: run-url
       name: Create URL to the run output
       run: echo "run-url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
