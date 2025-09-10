@@ -45,9 +45,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true
+        lfs: true    
     - id: esc-secrets
-      name: Fetch secrets from ESC
+      name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
     - id: version
       name: Set Provider Version
@@ -226,9 +226,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true
+        lfs: true    
     - id: esc-secrets
-      name: Fetch secrets from ESC
+      name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
     - id: version
       name: Set Provider Version
@@ -388,9 +388,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true
+        lfs: true    
     - id: esc-secrets
-      name: Fetch secrets from ESC
+      name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
     - id: version
       name: Set Provider Version
@@ -510,9 +510,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true
+        lfs: true    
     - id: esc-secrets
-      name: Fetch secrets from ESC
+      name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
     - id: version
       name: Set Provider Version
@@ -574,9 +574,9 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true
+        lfs: true    
     - id: esc-secrets
-      name: Fetch secrets from ESC
+      name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
     - id: version
       name: Set Provider Version

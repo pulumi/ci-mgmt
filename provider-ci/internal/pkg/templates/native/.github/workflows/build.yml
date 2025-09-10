@@ -40,9 +40,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
@@ -255,9 +253,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
@@ -416,9 +412,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - name: check if this commit needs release
       if: ${{ env.RELEASE_BOT_ENDPOINT != '' }}
       uses: pulumi/action-release-by-pr-label@main
@@ -458,9 +452,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
@@ -661,9 +653,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
@@ -741,9 +731,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    - id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: ./.github/actions/esc-action
+#{{- .Config | renderEscStep | indent 4 }}#
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
