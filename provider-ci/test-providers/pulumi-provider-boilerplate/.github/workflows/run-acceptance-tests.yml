@@ -25,6 +25,9 @@ jobs:
   comment-notification:
     runs-on: ubuntu-latest
     name: comment-notification
+    permissions:
+      id-token: write # For ESC secrets.
+      pull-requests: write # For comment.
     steps:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -56,6 +59,9 @@ jobs:
   prerequisites:
     runs-on: ubuntu-latest
     name: prerequisites
+    permissions:
+      id-token: write # For ESC secrets.
+      pull-requests: write # For schema check comment.
     steps:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -229,6 +235,9 @@ jobs:
         - go
         - java
     name: build_sdks
+    permissions:
+      contents: read
+      id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -536,6 +545,7 @@ jobs:
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
     permissions:
       statuses: write
+      id-token: write # For ESC secrets.
     if: github.event_name == 'repository_dispatch' ||
       github.event.pull_request.head.repo.full_name == github.repository
     needs:
