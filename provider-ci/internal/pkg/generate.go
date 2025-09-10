@@ -167,6 +167,7 @@ func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 
 	if projName == "pulumi-provider-boilerplate" {
 		config.ESC.Enabled = true // Temporarily forcing ESC to test workflows.
+		config.ESC.Environment = "imports/github-secrets"
 	}
 
 	ctx := templateContext{

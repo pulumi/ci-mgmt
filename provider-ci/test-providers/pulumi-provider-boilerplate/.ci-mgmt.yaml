@@ -10,3 +10,4 @@ envOverride:
   FOO: BAR # TODO: https://github.com/pulumi/ci-mgmt/issues/1583
 esc:
   enabled: true
+  environment: "imports/github-secrets" # This provider has no custom secrets.
