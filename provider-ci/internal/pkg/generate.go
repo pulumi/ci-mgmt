@@ -169,6 +169,9 @@ func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 		config.ESC.Enabled = true // Temporarily forcing ESC to test workflows.
 		config.ESC.Environment = "imports/github-secrets"
 	}
+	if projName == "pulumi-xyz" {
+		config.ESC.Enabled = true // Temporarily forcing ESC to test workflows.
+	}
 
 	ctx := templateContext{
 		Repository:  opts.RepositoryName,
