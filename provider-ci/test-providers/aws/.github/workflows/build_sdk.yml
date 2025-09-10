@@ -94,7 +94,6 @@ jobs:
             sdk/go/**/pulumiUtilities.go
             sdk/nodejs/package.json
             sdk/python/pyproject.toml
-            coverage
       - name: Commit ${{ matrix.language }} SDK changes for Renovate
         # If the worktree is dirty and this is a Renovate PR to bump
         # dependencies, commit the updated SDK and push it back to the PR. The
@@ -123,8 +122,7 @@ jobs:
               sdk/dotnet/Pulumi.*.csproj \
               sdk/go/*/pulumi-plugin.json \
               sdk/go/*/internal/pulumiUtilities.go \
-              sdk/nodejs/package.json \
-              coverage
+              sdk/nodejs/package.json
           git commit -m 'Commit ${{ matrix.language }} SDK for Renovate'
 
           # Push with pulumi-bot credentials to trigger a re-run of the
