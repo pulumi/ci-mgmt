@@ -104,10 +104,9 @@ jobs:
           github-token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
-            const octokit = github.rest;
             const repo = 'pulumi-${{ inputs.provider_name }}'
             console.log('Checking ' + repo);
-            const { data: pullRequests } = await octokit.pulls.list({
+            const { data: pullRequests } = await octokit.rest.pulls.list({
               owner: 'pulumi',
               repo: repo,
               state: 'open',
@@ -115,7 +114,7 @@ jobs:
             for (const pullRequest of pullRequests) {
               if (regex.test(pullRequest.title)) {
                 console.log('Closing obsolete PR ' + pullRequest.number);
-                await octokit.pulls.update({
+                await octokit.rest.pulls.update({
                   owner: 'pulumi',
                   repo: repo,
                   pull_number: pullRequest.number,
