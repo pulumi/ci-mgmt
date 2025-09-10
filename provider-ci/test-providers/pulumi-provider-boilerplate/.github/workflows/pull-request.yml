@@ -3,18 +3,6 @@
 name: pull-request
 on:
   pull_request_target: {}
-env:
-  PROVIDER: provider-boilerplate
-  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  TRAVIS_OS_NAME: linux
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  GOVERSION: "1.21.x"
-  NODEVERSION: "20.x"
-  PYTHONVERSION: "3.11.8"
-  DOTNETVERSION: "8.0.x"
-  JAVAVERSION: "11"
-  FOO: BAR
 
 jobs:
   comment-on-pr:
@@ -24,15 +12,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
-        lfs: true    
-    - env:
-        ESC_ACTION_ENVIRONMENT: imports/github-secrets
-        ESC_ACTION_OIDC_AUTH: "true"
-        ESC_ACTION_OIDC_ORGANIZATION: pulumi
-        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
-      id: esc-secrets
-      name: Fetch secrets from ESC
-      uses: pulumi/esc-action@v1
+        lfs: true
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
       with:

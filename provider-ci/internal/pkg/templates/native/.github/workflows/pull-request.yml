@@ -3,18 +3,6 @@
 name: pull-request
 on:
   pull_request_target: {}
-env:
-  PROVIDER: #{{ .Config.Provider }}#
-  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  TRAVIS_OS_NAME: linux
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  GOVERSION: #{{ .Config.ToolVersions.Go | quote }}#
-  NODEVERSION: #{{ .Config.ToolVersions.Nodejs | quote }}#
-  PYTHONVERSION: #{{ .Config.ToolVersions.Python | quote }}#
-  DOTNETVERSION: #{{ .Config.ToolVersions.Dotnet | quote }}#
-  JAVAVERSION: #{{ .Config.ToolVersions.Java | quote }}#
-#{{ .Config | renderGlobalEnv | indent 2 }}#
 
 jobs:
   comment-on-pr:
@@ -25,7 +13,6 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         lfs: true
-    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Comment PR
       uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
       with:
