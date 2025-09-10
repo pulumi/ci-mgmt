@@ -12,7 +12,6 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
-    #{{- .Config | renderEscStep | indent 4 }}#
     - id: schema_changed
       name: Check for diff in schema
       uses: #{{ .Config.ActionVersions.PathsFilter }}#
