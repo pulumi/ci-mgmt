@@ -7,6 +7,8 @@ aws: true
 gcp: true
 sdkModuleDir: sdk/go/dockerbuild
 parallel: 3
+esc:
+  enabled: true
 envOverride:
   AWS_REGION: us-west-2
   PULUMI_API: "https://api.pulumi-staging.io"
