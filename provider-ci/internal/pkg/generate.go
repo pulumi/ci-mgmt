@@ -361,14 +361,11 @@ func renderESCStep(v any) (string, error) {
 
 	if config.ESC.Enabled {
 		env := map[string]string{
-			"ESC_ACTION_OIDC_AUTH":                 "true",
-			"ESC_ACTION_OIDC_ORGANIZATION":         "pulumi",
-			"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE": "urn:pulumi:token-type:access_token:organization",
-			"ESC_ACTION_ENVIRONMENT":               config.ESC.Environment,
-		}
-		if len(config.ESC.EnvironmentVariables) > 0 {
-			env["ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES"] = strings.Join(config.ESC.EnvironmentVariables, ",\n")
-
+			"ESC_ACTION_OIDC_AUTH":                    "true",
+			"ESC_ACTION_OIDC_ORGANIZATION":            "pulumi",
+			"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE":    "urn:pulumi:token-type:access_token:organization",
+			"ESC_ACTION_ENVIRONMENT":                  config.ESC.Environment,
+			"ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES": "false",
 		}
 		step := map[string]any{
 			"name": "Fetch secrets from ESC",
