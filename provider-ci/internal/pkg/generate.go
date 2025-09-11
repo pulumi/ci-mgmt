@@ -165,6 +165,14 @@ func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 
 	projName := strings.TrimPrefix(opts.RepositoryName, "pulumi/")
 
+	if projName == "pulumi-provider-boilerplate" {
+		config.ESC.Enabled = true // Temporarily forcing ESC to test workflows.
+		config.ESC.Environment = "imports/github-secrets"
+	}
+	if projName == "pulumi-xyz" {
+		config.ESC.Enabled = true // Temporarily forcing ESC to test workflows.
+	}
+
 	ctx := templateContext{
 		Repository:  opts.RepositoryName,
 		ProjectName: projName,
@@ -365,7 +373,7 @@ func renderESCStep(v any) (string, error) {
 		step := map[string]any{
 			"name": "Fetch secrets from ESC",
 			"id":   "esc-secrets",
-			"uses": "pulumi/esc-action@v1",
+			"uses": "pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b",
 			"env":  env,
 		}
 		return yaml(step)

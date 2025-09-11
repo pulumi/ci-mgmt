@@ -55,6 +55,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      id-token: write # For ESC secrets.
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
     steps:

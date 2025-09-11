@@ -7,6 +7,9 @@ jobs:
   command-dispatch-for-testing:
     name: command-dispatch-for-testing
     runs-on: #{{ .Config.Runner.Default }}#
+    permissions:
+      contents: read
+      id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
