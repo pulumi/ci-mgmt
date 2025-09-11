@@ -373,7 +373,7 @@ func renderESCStep(v any) (string, error) {
 		step := map[string]any{
 			"name": "Fetch secrets from ESC",
 			"id":   "esc-secrets",
-			"uses": "pulumi/esc-action@v1",
+			"uses": "pulumi/esc-action@f93f6337967c9937a15826438a6f817d6bc7f872",
 			"env":  env,
 		}
 		return yaml(step)
