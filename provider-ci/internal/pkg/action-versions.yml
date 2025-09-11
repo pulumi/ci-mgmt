@@ -71,7 +71,7 @@ jobs:
         uses: pulumi/actions@cc7494be991dba0978f7ffafaf995b0449a0998e # v6.5.0
 
       - name: codecov/codecov-action
-        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
 
       - name: pulumi/provider-version-action
         uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
