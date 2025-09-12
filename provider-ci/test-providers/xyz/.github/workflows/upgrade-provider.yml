@@ -22,6 +22,14 @@ on:
     # 3 AM UTC ~ 8 PM PDT / 7 PM PST daily. Time chosen to run during off hours.
     - cron: 0 3 * * *
 
+env:
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PULUMI_MISSING_DOCS_ERROR: "true"
+  TF_APPEND_USER_AGENT: pulumi
+  XYZ_REGION: us-west-2
+
 permissions:
   contents: write
   issues: write
