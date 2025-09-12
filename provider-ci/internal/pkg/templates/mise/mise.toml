@@ -11,6 +11,7 @@ dotnet = '#{{ trimSuffix ".x" .Config.ToolVersions.Dotnet }}#'
 java = 'corretto-#{{trimSuffix ".x" .Config.ToolVersions.Java }}#'
 
 # Executable tools
+golangci-lint = 'v2.4.0'
 pulumi = 'latest'
 "go:github.com/pulumi/pulumictl/cmd/pulumictl" = 'latest'
 gradle = '#{{ trimSuffix ".x" .Config.ToolVersions.Gradle }}#'
