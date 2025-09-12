@@ -30,12 +30,12 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  id-token: write # For ESC secrets.
 
 jobs:
   upgrade_provider:
     name: upgrade-provider
     runs-on: #{{ .Config.Runner.Default }}#
-    permissions: write-all
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed
