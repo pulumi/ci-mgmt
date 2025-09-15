@@ -84,7 +84,7 @@ jobs:
       - name: Build SDK
         run: make build_${{ matrix.language }}
       - name: Commit Java SDK changes for migration to pulumi package gen-sdk
-        if: contains(github.actor, 'pulumi-bot') && github.event_name == 'pull_request'
+        if: matrix.language == 'java' && contains(github.actor, 'pulumi-bot') && github.event_name == 'pull_request'
         shell: bash
         run: >
           git diff --quiet -- sdk/java && echo "no changes to sdk/java" && exit
@@ -108,6 +108,10 @@ jobs:
           git stash pop
 
           git add sdk/java
+
+          rm .pulumi-java-gen.version
+
+          git add .pulumi-java-gen.version
 
           git commit -m "Commit Java changes for pulumi package sdk-gen"
 
