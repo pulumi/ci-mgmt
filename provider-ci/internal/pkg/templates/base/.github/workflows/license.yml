@@ -18,11 +18,12 @@ jobs:
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
           persist-credentials: false
-      - name: Setup tools
-        uses: ./.github/actions/setup-tools
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          tools: go
-          cache-go: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
+          cache_save: false
       - run: make prepare_local_workspace
         continue-on-error: true
         env:

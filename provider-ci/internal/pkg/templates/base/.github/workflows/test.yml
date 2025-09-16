@@ -49,12 +49,12 @@ jobs:
       with:
         repository: pulumi/examples
         path: p-examples
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
-      #{{- if not .Config.Shards }}#
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, ${{ matrix.language }}
-      #{{- end }}#
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        cache_save: false
     - name: Prepare local workspace
       run: make prepare_local_workspace
       env:
@@ -62,6 +62,16 @@ jobs:
     - name: Download bin
       uses: ./.github/actions/download-provider
     #{{- if not .Config.Shards }}#
+    - name: Setup Go Cache
+      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
+      if: matrix.language == 'go' || contains(matrix.language, 'go')
+      with:
+        cache-dependency-path: |
+          provider/*.sum
+          upstream/*.sum
+          sdk/go/*.sum
+          sdk/*.sum
+          *.sum
     - name: Download SDK
       uses: ./.github/actions/download-sdk
       with:

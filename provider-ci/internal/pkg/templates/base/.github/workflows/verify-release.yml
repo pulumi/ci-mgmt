@@ -74,10 +74,12 @@ jobs:
         with:
           persist-credentials: false
       #{{- .Config | renderEscStep | indent 6 }}#
-      - name: Setup tools
-        uses: ./.github/actions/setup-tools
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          tools: pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
+          cache_save: false
 #{{- if .Config.ReleaseVerification }}#
       #{{- if .Config.AWS }}#
       - name: Generate Pulumi Access Token
