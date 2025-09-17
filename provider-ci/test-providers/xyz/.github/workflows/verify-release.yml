@@ -70,10 +70,12 @@ jobs:
         id: esc-secrets
         name: Fetch secrets from ESC
         uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
-      - name: Setup tools
-        uses: ./.github/actions/setup-tools
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          tools: pulumicli, nodejs, python, dotnet, go, java
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
+          cache_save: false
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@679d5e6838ac4f68696bfa1bf9e2c5da94509dd6 # v1.3.1
         with:

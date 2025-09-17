@@ -69,8 +69,12 @@ jobs:
       with:
         repository: pulumi/examples
         path: p-examples
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        cache_save: false
     - name: Prepare local workspace
       run: make prepare_local_workspace
       env:

@@ -41,17 +41,17 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, internal, bridged, internalBridged, mise}, nil
+		return []TemplateDir{base, internal, bridged, internalBridged}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, bridged, mise}, nil
+		return []TemplateDir{base, external, bridged}, nil
 	case "external-native-provider":
 		return []TemplateDir{native, external, mise}, nil // Can't use base because it has a Makefile that would conflict
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
-		return []TemplateDir{base, internal, mise}, nil
+		return []TemplateDir{base, internal}, nil
 	case "parameterized-go":
-		return []TemplateDir{base, parameterizedGo, mise /* overrides Makefile */}, nil
+		return []TemplateDir{base, parameterizedGo /* overrides Makefile */}, nil
 	case "native":
 		return []TemplateDir{native, internal, mise}, nil // Can't use base because it has a Makefile that would conflict
 	case "aws-native":
