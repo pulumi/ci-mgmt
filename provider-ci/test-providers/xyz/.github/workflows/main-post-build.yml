@@ -22,6 +22,9 @@ jobs:
     continue-on-error: true
     name: generate_coverage_data
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # For ESC secrets.
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -34,14 +37,15 @@ jobs:
           persist-credentials: false      
       - env:
           ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
           ESC_ACTION_OIDC_AUTH: "true"
           ESC_ACTION_OIDC_ORGANIZATION: pulumi
           ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
         id: esc-secrets
         name: Fetch secrets from ESC
-        uses: pulumi/esc-action@v1
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
         with:
           aws-access-key-id: ${{ steps.esc-secrets.outputs.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
           aws-region: us-west-2

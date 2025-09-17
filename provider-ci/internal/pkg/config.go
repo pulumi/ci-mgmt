@@ -410,11 +410,10 @@ type toolVersions struct {
 }
 
 type escConfig struct {
-	Enabled              bool     `yaml:"enabled"`
-	Environment          string   `yaml:"environment"`
-	Organization         string   `yaml:"organization"`
-	RequestedTokenType   string   `yaml:"requestedTokenType"`
-	EnvironmentVariables []string `yaml:"environmentVariables"`
+	Enabled            bool   `yaml:"enabled"`
+	Environment        string `yaml:"environment"`
+	Organization       string `yaml:"organization"`
+	RequestedTokenType string `yaml:"requestedTokenType"`
 }
 
 type releaseVerification struct {

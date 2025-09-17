@@ -227,4 +227,3 @@ esc:
   environment: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
   organization: pulumi
   requestedTokenType: urn:pulumi:token-type:access_token:organization
-  environmentVariables: []

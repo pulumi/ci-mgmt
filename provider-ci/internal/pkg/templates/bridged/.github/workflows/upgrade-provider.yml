@@ -23,10 +23,14 @@ on:
     # 3 AM UTC ~ 8 PM PDT / 7 PM PST daily. Time chosen to run during off hours.
     - cron: 0 3 * * *
 
+env:
+#{{ .Config | renderGlobalEnv | indent 2 }}#
+
 permissions:
   contents: write
   issues: write
   pull-requests: write
+  id-token: write # For ESC secrets.
 
 jobs:
   upgrade_provider:

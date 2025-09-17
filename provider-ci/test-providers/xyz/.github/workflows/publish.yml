@@ -45,19 +45,20 @@ jobs:
         persist-credentials: false    
     - env:
         ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
         ESC_ACTION_OIDC_AUTH: "true"
         ESC_ACTION_OIDC_ORGANIZATION: pulumi
         ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
       id: esc-secrets
       name: Fetch secrets from ESC
-      uses: pulumi/esc-action@v1
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
         tools: pulumictl, pulumicli, go, schema-tools
         cache-go: false
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+      uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
       with:
         aws-access-key-id: ${{ steps.esc-secrets.outputs.AWS_ACCESS_KEY_ID }}
         aws-region: us-east-2
@@ -129,12 +130,13 @@ jobs:
         persist-credentials: true    
     - env:
         ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
         ESC_ACTION_OIDC_AUTH: "true"
         ESC_ACTION_OIDC_ORGANIZATION: pulumi
         ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
       id: esc-secrets
       name: Fetch secrets from ESC
-      uses: pulumi/esc-action@v1
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
     - name: Setup tools
       uses: ./.github/actions/setup-tools
       with:
@@ -208,12 +210,13 @@ jobs:
           persist-credentials: false      
       - env:
           ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
           ESC_ACTION_OIDC_AUTH: "true"
           ESC_ACTION_OIDC_ORGANIZATION: pulumi
           ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
         id: esc-secrets
         name: Fetch secrets from ESC
-        uses: pulumi/esc-action@v1
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
       - name: Dispatch Metadata build
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
@@ -241,12 +244,13 @@ jobs:
         persist-credentials: false    
     - env:
         ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
         ESC_ACTION_OIDC_AUTH: "true"
         ESC_ACTION_OIDC_ORGANIZATION: pulumi
         ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
       id: esc-secrets
       name: Fetch secrets from ESC
-      uses: pulumi/esc-action@v1
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:
