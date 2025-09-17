@@ -129,6 +129,7 @@ func getDeletedFiles(templateName string) []string {
 			"upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
+			".github/actions/setup-tools",
 		}
 	case "external-bridged-provider":
 		return []string{
@@ -137,10 +138,16 @@ func getDeletedFiles(templateName string) []string {
 			"upstream.sh",
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
+			".github/actions/setup-tools",
 		}
 	case "generic":
 		return []string{
 			".upgrade-config.yml", // Previously accidentally generated empty file.
+			".github/actions/setup-tools",
+		}
+	case "parameterized-go":
+		return []string{
+			".github/actions/setup-tools",
 		}
 	default:
 		return nil
