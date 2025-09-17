@@ -58,7 +58,7 @@ jobs:
       #{{- .Config | renderEscStep | indent 6 }}#
       # Without ldid cross-compiling Node binaries on a Linux worker intended to work on darwin-arm64 fails to sign the
       # binaries properly and they do not work as expected. See https://github.com/pulumi/pulumi-awsx/issues/1490
-      - uses: MOZGIII/install-ldid-action@v1
+      - uses: MOZGIII/install-ldid-action@d5ab465f3a66a4d60a59882b935eb30e18e8d043 # v1
         with:
           tag: v2.1.5-procursus2
       - name: Setup tools
@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "path=$(go env GOMODCACHE)" >> "${GITHUB_OUTPUT}"
       - name: Go Cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: |
             ${{ steps.gocache.outputs.path }}
