@@ -97,6 +97,13 @@ jobs:
           cd ci-mgmt/provider-ci && go run ./... generate \
                 --config ../../pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml \
                 --out ../../pulumi-${{ inputs.provider_name }}
+
+      # regenerate SDKs in case the workflows changed the results
+      - name: skip provider and schema rebuild
+        run: make --touch provider schema
+      - name: Build SDKs
+        run: make build_sdk
+
       - name: Close obsolete PRs started by this workflow
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         if: ${{ !inputs.skip_closing_prs }}
