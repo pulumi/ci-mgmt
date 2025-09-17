@@ -83,3 +83,4 @@ jobs:
           providerVersion: ${{ inputs.providerVersion }}
         env:
           NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

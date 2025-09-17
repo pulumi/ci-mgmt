@@ -133,6 +133,7 @@ jobs:
           providerVersion: ${{ inputs.providerVersion }}
         env:
           NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+#{{ .Config | renderLocalEnv | indent 10 }}#
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Python }}#
       - name: Verify python release
@@ -143,6 +144,8 @@ jobs:
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
           packageVersion: ${{ inputs.pythonVersion || inputs.providerVersion }}
+        env:
+#{{ .Config | renderLocalEnv | indent 10 }}#
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Dotnet }}#
       - name: Verify dotnet release
@@ -152,6 +155,8 @@ jobs:
           directory: #{{ .Config.ReleaseVerification.Dotnet }}#
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
+        env:
+#{{ .Config | renderLocalEnv | indent 10 }}#
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Go }}#
       - name: Verify go release
@@ -162,5 +167,7 @@ jobs:
           directory: #{{ .Config.ReleaseVerification.Go }}#
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
+        env:
+#{{ .Config | renderLocalEnv | indent 10 }}#
 #{{- end }}#
 #{{- end }}#
