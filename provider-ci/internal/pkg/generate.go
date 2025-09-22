@@ -397,7 +397,7 @@ func renderGlobalEnv(v any) (string, error) {
 
 	env := map[string]string{}
 
-	if !config.ESC.Enabled {
+	if config.Organization == "pulumi" && !config.ESC.Enabled {
 		env = map[string]string{
 			"AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID":     "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
 			"AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY": "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
@@ -435,7 +435,7 @@ func renderPublishEnv(v any) (string, error) {
 
 	env := map[string]string{}
 
-	if !config.ESC.Enabled {
+	if config.Organization == "pulumi" && !config.ESC.Enabled {
 		env = map[string]string{
 			"AWS_ACCESS_KEY_ID":     "${{ secrets.AWS_ACCESS_KEY_ID }}",
 			"AWS_SECRET_ACCESS_KEY": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
