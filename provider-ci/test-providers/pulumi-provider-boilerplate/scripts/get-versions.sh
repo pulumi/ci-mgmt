@@ -2,7 +2,7 @@
 set -euo pipefail
 
 module_path="github.com/pulumi/pulumi/pkg/v3"
-gomod="provider/go.mod"
+gomod="./go.mod"
 
 if [[ ! -f "$gomod" ]]; then
   echo "missing $gomod" >&2

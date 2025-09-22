@@ -6,6 +6,7 @@ publishRegistry: false
 providerVersion: github.com/pulumi/pulumi-provider-boilerplate/provider.Version
 parallel: 3
 sdkModuleDir: sdk/go/pulumi-provider-boilerplate
+modulePath: .
 envOverride:
   FOO: BAR # TODO: https://github.com/pulumi/ci-mgmt/issues/1583
 esc:
