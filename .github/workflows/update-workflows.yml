@@ -94,8 +94,6 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Install mise
         uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3
-        with:
-          install: false
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         run: |
           cd ci-mgmt/provider-ci && go run ./... generate \
