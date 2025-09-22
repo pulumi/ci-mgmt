@@ -3,6 +3,7 @@
 
 [env]
 _.source = "{{config_root}}/scripts/get-versions.sh"
+GOTOOLCHAIN = "local"
 
 [tools]
 

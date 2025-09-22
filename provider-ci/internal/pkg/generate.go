@@ -175,6 +175,7 @@ func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 	if projName == "pulumi-provider-boilerplate" {
 		config.ModulePath = "."
 	}
+
 	ctx := templateContext{
 		Repository:  opts.RepositoryName,
 		ProjectName: projName,
