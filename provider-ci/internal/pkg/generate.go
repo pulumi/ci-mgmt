@@ -172,6 +172,9 @@ func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
 
 	projName := strings.TrimPrefix(opts.RepositoryName, "pulumi/")
 
+	if projName == "pulumi-provider-boilerplate" {
+		config.ModulePath = "."
+	}
 	ctx := templateContext{
 		Repository:  opts.RepositoryName,
 		ProjectName: projName,
