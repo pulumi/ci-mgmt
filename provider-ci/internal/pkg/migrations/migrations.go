@@ -21,7 +21,8 @@ func Migrate(templateName, outDir string) error {
 		ignoreMakeDir{},
 		updateToDotnet8{},
 		ignoreMiseLocal{},
-		deleteMiseConfig{},
+		migrateMiseConfig{},
+		createMiseLock{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
