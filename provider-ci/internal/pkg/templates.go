@@ -10,6 +10,8 @@ type TemplateDir string
 
 // Template directories
 const (
+	// files used by all providers
+	all TemplateDir = "all"
 	// git attributes, go config, CI reusable workflows, dev container, generic CI
 	base TemplateDir = "base"
 	// CoC, upgrade-provider config, issue templates, command dispatch workflows
@@ -27,8 +29,6 @@ const (
 	native = "native"
 	// workflows for aws-native provider
 	awsNative = "aws-native"
-	// mise.toml file generation
-	mise = "mise"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -41,21 +41,21 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 	switch templateName {
 	case "bridged-provider":
 		// Any Pulumi-owned bridged provider
-		return []TemplateDir{base, internal, bridged, internalBridged, mise}, nil
+		return []TemplateDir{base, internal, bridged, internalBridged, all}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, bridged, mise}, nil
+		return []TemplateDir{base, external, bridged, all}, nil
 	case "external-native-provider":
-		return []TemplateDir{native, external, mise}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, external, all}, nil // Can't use base because it has a Makefile that would conflict
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
-		return []TemplateDir{base, internal, mise}, nil
+		return []TemplateDir{base, internal, all}, nil
 	case "parameterized-go":
-		return []TemplateDir{base, parameterizedGo, mise /* overrides Makefile */}, nil
+		return []TemplateDir{base, parameterizedGo, all /* overrides Makefile */}, nil
 	case "native":
-		return []TemplateDir{native, internal, mise}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, internal, all}, nil // Can't use base because it has a Makefile that would conflict
 	case "aws-native":
-		return []TemplateDir{native, internal, awsNative, mise}, nil // AWS native has 2 extra workflows
+		return []TemplateDir{native, internal, awsNative, all}, nil // AWS native has 2 extra workflows
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
