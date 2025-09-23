@@ -149,7 +149,7 @@ jobs:
       uses: jdx/mise-action@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
+        cache_key: "mise-{{platform}}-{{file_hash}}"
         cache_save: false
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false
