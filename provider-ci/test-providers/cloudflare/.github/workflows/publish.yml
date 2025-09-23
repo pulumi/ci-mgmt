@@ -150,6 +150,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_key: "mise-{{platform}}-{{file_hash}}"
+        # only saving the cache in the prerequisites job
         cache_save: false
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false

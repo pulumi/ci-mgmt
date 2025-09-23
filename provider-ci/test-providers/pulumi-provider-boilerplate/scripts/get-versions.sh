@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# This script can be simplified to use go when https://github.com/jdx/mise/discussions/6374 is fixed
+# e.g. go list -m -f '{{.GoVersion}}'
+
 module_path="github.com/pulumi/pulumi/pkg/v3"
 gomod="./go.mod"
 

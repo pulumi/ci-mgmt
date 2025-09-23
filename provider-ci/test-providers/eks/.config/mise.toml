@@ -7,6 +7,7 @@ _.source = "{{config_root}}/scripts/get-versions.sh"
 [tools]
 
 # Runtimes
+# TODO: we may not need `get_env` once https://github.com/jdx/mise/discussions/6339 is fixed
 go = "{{ get_env(name='GO_VERSION', default='latest') }}"
 node = '20'
 python = '3.11.8'

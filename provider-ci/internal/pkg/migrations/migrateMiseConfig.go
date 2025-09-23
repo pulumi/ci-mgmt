@@ -21,6 +21,9 @@ func (migrateMiseConfig) Name() string {
 func (migrateMiseConfig) ShouldRun(templateName string) bool {
 	return true
 }
+
+// This also migrates the tool overrides from .ci-mgmt.yaml to a root level
+// mise.toml
 func (migrateMiseConfig) Migrate(templateName, outDir string) error {
 	ciMgmtPath := filepath.Join(outDir, ".ci-mgmt.yaml")
 	ciMgmtFile, err := os.ReadFile(ciMgmtPath)
@@ -60,6 +63,10 @@ func (migrateMiseConfig) Migrate(templateName, outDir string) error {
 		builder.WriteString("# Overwrites mise configuration at .config/mise.toml\n")
 		builder.WriteString("[tools]\n")
 		for tool, version := range toolVersionsMap {
+			if tool == "go" {
+				// don't use go overrides anymore
+				continue
+			}
 			version = strings.TrimSuffix(version, ".x")
 			if tool == "java" {
 				version = fmt.Sprintf("corretto-%s", version)

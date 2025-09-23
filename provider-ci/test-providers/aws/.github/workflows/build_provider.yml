@@ -64,6 +64,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache_key: "mise-{{platform}}-{{file_hash}}"
+          # only saving the cache in the prerequisites job
           cache_save: false
       # Based on https://github.com/actions/cache/blob/main/examples.md#go---modules
       - name: Get GOCACHE
