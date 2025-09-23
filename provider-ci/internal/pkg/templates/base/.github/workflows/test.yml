@@ -11,6 +11,7 @@ on:
          description: Version of the provider to test
 
 env:
+  MISE_ENV: test
   PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
 #{{ .Config | renderGlobalEnv | indent 2 }}#
 

@@ -6,7 +6,9 @@ gomod="provider/go.mod"
 
 if [[ ! -f "$gomod" ]]; then
   echo "missing $gomod" >&2
-  exit 1
+  export GO_VERSION="latest"
+  export PULUMI_VERSION="latest"
+  exit 0
 fi
 
 raw_version=$(awk -v module="$module_path" '
