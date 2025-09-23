@@ -54,7 +54,7 @@ jobs:
       uses: jdx/mise-action@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-{{file_hash}}"
+        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
         cache_save: false
     - name: Prepare local workspace
       run: make prepare_local_workspace

@@ -23,7 +23,8 @@ raw_version=$(awk -v module="$module_path" '
 
 if [[ -z "${raw_version:-}" ]]; then
   echo "failed to determine Pulumi version from $gomod" >&2
-  exit 1
+  # default to latest
+  raw_version="latest"
 fi
 
 echo "PULUMI_VERSION=$raw_version"
@@ -40,7 +41,8 @@ fi
 
 if [[ -z "${go_version:-}" ]]; then
   echo "failed to determine Go version from $gomod" >&2
-  exit 1
+  # default to latest
+  go_version="latest"
 fi
 
 echo "GO_VERSION=$go_version"

@@ -81,7 +81,7 @@ jobs:
       uses: jdx/mise-action@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-{{file_hash}}"
+        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
     - name: Setup Go Cache
       uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
       with:
