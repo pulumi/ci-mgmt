@@ -29,8 +29,14 @@ fi
 echo "PULUMI_VERSION=$raw_version"
 export PULUMI_VERSION=$raw_version
 
-# Extract the Go toolchain version from go.mod (e.g., `go 1.23.11`)
-go_version=$(awk '/^go[[:space:]]+[0-9]/{ print $2; exit }' "$gomod")
+# Prefer the toolchain directive if present, otherwise fall back to the `go` version line
+go_toolchain=$(awk '/^toolchain[[:space:]]+go[0-9]/{ print $2; exit }' "$gomod")
+
+if [[ -n "${go_toolchain:-}" ]]; then
+  go_version=${go_toolchain#go}
+else
+  go_version=$(awk '/^go[[:space:]]+[0-9]/{ print $2; exit }' "$gomod")
+fi
 
 if [[ -z "${go_version:-}" ]]; then
   echo "failed to determine Go version from $gomod" >&2

@@ -21,7 +21,7 @@ func Migrate(templateName, outDir string) error {
 		ignoreMakeDir{},
 		updateToDotnet8{},
 		ignoreMiseLocal{},
-		removeGoToolchain{},
+		// removeGoToolchain{},
 		migrateMiseConfig{},
 		createMiseLock{},
 	}
