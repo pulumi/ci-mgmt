@@ -78,6 +78,10 @@ jobs:
         PULUMI_ACCESS_TOKEN: ${{ steps.generate_pulumi_token.outputs.pulumi-access-token }}
       with:
         environment: logins/pulumi-ci
+    - name: Install opentofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_wrapper: false
     - name: Generate test shards
       run: |-
         cd tests
@@ -94,7 +98,13 @@ jobs:
       fail-fast: false
       matrix:
         total-shards:
-          - 2
+          - 8
         current-shard:
           - 0
           - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7

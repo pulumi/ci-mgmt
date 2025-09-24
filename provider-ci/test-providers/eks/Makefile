@@ -3,7 +3,7 @@
 PACK := eks
 ORG := pulumi
 PROJECT := github.com/$(ORG)/pulumi-$(PACK)
-PROVIDER_PATH := provider/v3
+PROVIDER_PATH := provider/v4
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 CODEGEN := pulumi-gen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
@@ -16,7 +16,7 @@ PULUMI_MISSING_DOCS_ERROR := false
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
-PROVIDER_VERSION ?= 3.0.0-alpha.0+dev
+PROVIDER_VERSION ?= 4.0.0-alpha.0+dev
 
 # Check version doesn't start with a "v" - this is a common mistake
 ifeq ($(shell echo $(PROVIDER_VERSION) | cut -c1),v)
@@ -198,7 +198,7 @@ lint_provider: upstream
 lint_provider.fix: upstream
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
 .PHONY: lint_provider lint_provider.fix
-build_provider_cmd = echo building-provider;cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = OS=$(1) ARCH=$(2) OUT=$(3) yarn --cwd nodejs/eks build
 
 provider: bin/$(PROVIDER)
 
@@ -213,7 +213,7 @@ bin/$(PROVIDER): .make/schema
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
+	cd tests && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
 test_provider_cmd = cd provider && go test -v -short \
 	-coverprofile="coverage.txt" \
@@ -263,6 +263,10 @@ ci-mgmt: .ci-mgmt.yaml
 debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(CODEGEN) -- schema --out provider/cmd/$(PROVIDER)
 .PHONY: debug_tfgen
+renovate_cmd = ./scripts/renovate.sh
+renovate:
+	$(call renovate_cmd)
+.PHONY: renovate
 
 include scripts/plugins.mk
 include scripts/crossbuild.mk

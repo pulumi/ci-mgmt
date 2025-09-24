@@ -2,5 +2,6 @@
 install_plugins: .make/install_plugins
 .make/install_plugins: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
 .make/install_plugins:
+	pulumi plugin install converter terraform 1.0.19
 	@touch $@
 .PHONY: install_plugins
