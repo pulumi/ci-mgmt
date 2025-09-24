@@ -1,10 +1,23 @@
 provider: terraform-module
 template: parameterized-go
+providerDefaultBranch: main
 noSchema: true
 major-version: 0
 test-folder: tests
-shards: 2
+shards: 8
 aws: true
 modulePath: .
 env:
   AWS_REGION: "us-west-2"
+
+actions:
+  preTest:
+    - name: Install opentofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_wrapper: false
+  preBuild:
+    - name: Install opentofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_wrapper: false

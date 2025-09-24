@@ -5,6 +5,10 @@ major-version: 0
 providerDefaultBranch: main
 upstreamProviderOrg: vancluever
 publishRegistry: false
+plugins:
+  - name: terraform
+    version: "1.0.19"
+    kind: converter
 languages:
   - dotnet
   - go
@@ -17,3 +21,10 @@ license:
   ignore:
     # Package is licensed under Apache 2.0 but license is not picked up correctly by the license detector
     - github.com/OpenDNS/vegadns2client
+    - github.com/alibabacloud-go/endpoint-util
+    - github.com/nrdcg/oci-go-sdk
+    - github.com/cespare/xxhash
+    - github.com/envoyproxy/protoc-gen-validate
+    - github.com/go-acme/tencentclouddnspod
+    - github.com/go-acme/tencentedgdeone
+pulumiConvert: 1

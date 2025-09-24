@@ -3,6 +3,9 @@ provider: kubernetes-ingress-nginx
 pulumiVersionFile: .pulumi.version
 major-version: 0
 parallel: 3
+esc:
+  enabled: true
+  environment: imports/github-secrets # No repo-specific secrets.
 envOverride:
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi
