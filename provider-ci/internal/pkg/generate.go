@@ -435,12 +435,8 @@ func renderPublishEnv(v any) (string, error) {
 
 	env := map[string]string{}
 
-	if config.Organization == "pulumi" && !config.ESC.Enabled {
+	if !config.ESC.Enabled {
 		env = map[string]string{
-			"AWS_ACCESS_KEY_ID":     "${{ secrets.AWS_ACCESS_KEY_ID }}",
-			"AWS_SECRET_ACCESS_KEY": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
-			"AWS_UPLOAD_ROLE_ARN":   "${{ secrets.AWS_UPLOAD_ROLE_ARN }}",
-			"CODECOV_TOKEN":         "${{ secrets.CODECOV_TOKEN }}",
 			"JAVA_SIGNING_KEY_ID":   "${{ secrets.JAVA_SIGNING_KEY_ID }}",
 			"JAVA_SIGNING_KEY":      "${{ secrets.JAVA_SIGNING_KEY }}",
 			"JAVA_SIGNING_PASSWORD": "${{ secrets.JAVA_SIGNING_PASSWORD }}",
@@ -448,10 +444,17 @@ func renderPublishEnv(v any) (string, error) {
 			"NUGET_PUBLISH_KEY":     "${{ secrets.NUGET_PUBLISH_KEY }}",
 			"OSSRH_PASSWORD":        "${{ secrets.OSSRH_PASSWORD }}",
 			"OSSRH_USERNAME":        "${{ secrets.OSSRH_USERNAME }}",
-			"PULUMI_BOT_TOKEN":      "${{ secrets.PULUMI_BOT_TOKEN }}",
 			"PYPI_API_TOKEN":        "${{ secrets.PYPI_API_TOKEN }}",
-			"RELEASE_BOT_ENDPOINT":  "${{ secrets.RELEASE_BOT_ENDPOINT }}",
-			"RELEASE_BOT_KEY":       "${{ secrets.RELEASE_BOT_KEY }}",
+		}
+
+		if config.Organization == "pulumi" {
+			env["AWS_SECRET_ACCESS_KEY"] = "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+			env["AWS_ACCESS_KEY_ID"] = "${{ secrets.AWS_ACCESS_KEY_ID }}"
+			env["AWS_UPLOAD_ROLE_ARN"] = "${{ secrets.AWS_UPLOAD_ROLE_ARN }}"
+			env["CODECOV_TOKEN"] = "${{ secrets.CODECOV_TOKEN }}"
+			env["PULUMI_BOT_TOKEN"] = "${{ secrets.PULUMI_BOT_TOKEN }}"
+			env["RELEASE_BOT_ENDPOINT"] = "${{ secrets.RELEASE_BOT_ENDPOINT }}"
+			env["RELEASE_BOT_KEY"] = "${{ secrets.RELEASE_BOT_KEY }}"
 		}
 	}
 
