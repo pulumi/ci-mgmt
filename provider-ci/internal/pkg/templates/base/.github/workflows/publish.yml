@@ -48,10 +48,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
         cache_save: false
-    - name: Install Schema Tools
-      uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
-      with:
-        repo: pulumi/schema-tools
 #{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
       uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#

@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	_ "embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -21,24 +20,25 @@ func (createMiseLock) ShouldRun(templateName string) bool {
 func (createMiseLock) Migrate(templateName, outDir string) error {
 	miseLockPath := filepath.Join(outDir, ".config", "mise.lock")
 	_, err := os.Stat(miseLockPath)
-	if err != nil && os.IsNotExist(err) {
-		if _, err := os.Create(miseLockPath); err != nil {
-			return fmt.Errorf("error creating mise.lock: %w", err)
-		}
-		pulumiVersion, goVersion, err := getVersions(outDir)
-		if err != nil {
-			return fmt.Errorf("error getting go version from go.mod: %w", err)
-		}
-		cmd := exec.Command("mise", "install")
-		cmd.Dir = outDir
-		cmd.Env = append(os.Environ(),
-			fmt.Sprintf("PULUMI_VERSION=%s", pulumiVersion),
-			fmt.Sprintf("GO_VERSION=%s", goVersion),
-		)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return fmt.Errorf("error running mise install: %w\nOutput: %s", err, string(output))
-		}
+	if !os.IsNotExist(err) {
+		return nil
+	}
+	if _, err := os.Create(miseLockPath); err != nil {
+		return fmt.Errorf("error creating mise.lock: %w", err)
+	}
+	pulumiVersion, goVersion, err := getVersions(outDir)
+	if err != nil {
+		return fmt.Errorf("error getting go version from go.mod: %w", err)
+	}
+	cmd := exec.Command("mise", "install")
+	cmd.Dir = outDir
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("PULUMI_VERSION=%s", pulumiVersion),
+		fmt.Sprintf("GO_VERSION=%s", goVersion),
+	)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error running mise install: %w\nOutput: %s", err, string(output))
 	}
 
 	return nil

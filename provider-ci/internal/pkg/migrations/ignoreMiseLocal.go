@@ -16,7 +16,7 @@ func (ignoreMiseLocal) Name() string {
 	return "Add mise.local.toml to .gitignore"
 }
 func (ignoreMiseLocal) ShouldRun(templateName string) bool {
-	return templateName == "bridged-provider" || templateName == "mise"
+	return templateName == "bridged-provider" || templateName == "all"
 }
 func (ignoreMiseLocal) Migrate(templateName, outDir string) error {
 	gitignorePath := filepath.Join(outDir, ".gitignore")
