@@ -11,16 +11,10 @@ on:
 
 env:
   ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
   ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
-  AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
-  AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY: ${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
   AWS_REGION: us-west-2
   AZURE_LOCATION: westus
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
   GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
   GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
@@ -29,13 +23,8 @@ env:
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_BOT_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
-  RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
-  S3_COVERAGE_BUCKET_NAME: ${{ secrets.S3_COVERAGE_BUCKET_NAME }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   TF_APPEND_USER_AGENT: pulumi
   PROVIDER_VERSION: ${{ inputs.version }}
 
@@ -62,19 +51,38 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false      
-      - id: esc-secrets
-        name: Map environment to ESC outputs
-        uses: ./.github/actions/esc-action
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
       - name: Cache examples generation
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             .pulumi/examples-cache
           key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-      - name: Setup tools
-        uses: ./.github/actions/setup-tools
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          tools: pulumictl, pulumicli, ${{ matrix.language }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
+          # only saving the cache in the prerequisites job
+          cache_save: false
+      - name: Setup Go Cache
+        if: matrix.language == 'go' || contains(matrix.language, 'go')
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
+        with:
+          cache-dependency-path: |
+            provider/*.sum
+            upstream/*.sum
+            sdk/go/*.sum
+            sdk/*.sum
+            *.sum
       - name: Prepare local workspace
         run: make prepare_local_workspace
         env:

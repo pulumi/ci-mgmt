@@ -4,6 +4,7 @@ major-version: 0
 providerDefaultBranch: main
 providerVersion: github.com/pulumi/pulumi-docker-build/provider.Version
 aws: true
+modulePath: .
 gcp: true
 sdkModuleDir: sdk/go/dockerbuild
 parallel: 3

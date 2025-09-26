@@ -1,0 +1,14 @@
+name: Test Windows
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Test Mise On Windows
+    runs-on: windows-latest
+    steps:
+      - name: Install mise
+        uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+

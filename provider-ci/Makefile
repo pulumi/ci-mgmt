@@ -44,7 +44,7 @@ test-providers: test-provider/aws test-provider/docker test-provider/cloudflare 
 test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
-		find . -type f ! -name '.ci-mgmt.yaml' -delete && \
+		find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' -delete && \
 		../../bin/provider-ci generate --skip-migrations
 	mkdir -p bin/test-provider
 	rm -rf bin/test-provider/$(PROVIDER_NAME)
@@ -57,3 +57,15 @@ update-provider-configs:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws/master/.ci-mgmt.yaml" > ./test-providers/aws/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-cloudflare/master/.ci-mgmt.yaml" > ./test-providers/cloudflare/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-docker/master/.ci-mgmt.yaml" > ./test-providers/docker/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumiverse/pulumi-acme/main/.ci-mgmt.yaml" > ./test-providers/acme/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws-native/master/.ci-mgmt.yaml" > ./test-providers/aws-native/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-command/master/.ci-mgmt.yaml" > ./test-providers/command/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-eks/master/.ci-mgmt.yaml" > ./test-providers/eks/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-docker-build/master/.ci-mgmt.yaml" > ./test-providers/docker-build/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes/master/.ci-mgmt.yaml" > ./test-providers/kubernetes/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes-cert-manager/master/.ci-mgmt.yaml" > ./test-providers/kubernetes-cert-manager/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes-coredns/master/.ci-mgmt.yaml" > ./test-providers/kubernetes-coredns/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes-ingress-nginx/master/.ci-mgmt.yaml" > ./test-providers/kubernetes-ingress-nginx/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-provider-boilerplate/master/.ci-mgmt.yaml" > ./test-providers/pulumi-provider-boilerplate/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-terraform-module/master/.ci-mgmt.yaml" > ./test-providers/terraform-module/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-xyz/main/.ci-mgmt.yaml" > ./test-providers/xyz/.ci-mgmt.yaml

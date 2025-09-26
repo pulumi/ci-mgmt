@@ -20,32 +20,18 @@ on:
         value: ${{ jobs.prerequisites.outputs.version }}
 
 env:
-  ALT_AWS_ACCESS_KEY_ID: ${{ secrets.ALT_AWS_ACCESS_KEY_ID }}
-  ALT_AWS_SECRET_ACCESS_KEY: ${{ secrets.ALT_AWS_SECRET_ACCESS_KEY }}
-  AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID: ${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
-  AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY: ${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
   AWS_REGION: us-west-2
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
-  GOLANGCI_LINT_VERSION: v1.61.0
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  DOTNET_VERSION: 6.x
+  GO_VERSION: 1.21.x
+  GOLANGCI_LINT_VERSION: v1.64.8
+  JAVA_VERSION: "11"
+  NODE_VERSION: 20.x
   PROVIDER: eks
-  PUBLISH_REPO_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  PUBLISH_REPO_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_BOT_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PULUMI_ENABLE_RESOURCE_REFERENCES: "1"
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
-  RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
-  S3_COVERAGE_BUCKET_NAME: ${{ secrets.S3_COVERAGE_BUCKET_NAME }}
-  SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  PYTHON_VERSION: "3.9"
   TF_APPEND_USER_AGENT: pulumi
 
 jobs:
@@ -63,13 +49,19 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false    
-    - id: esc-secrets
-      name: Map environment to ESC outputs
-      uses: ./.github/actions/esc-action
+    - env:
+        ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+        ESC_ACTION_OIDC_AUTH: "true"
+        ESC_ACTION_OIDC_ORGANIZATION: pulumi
+        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+      id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
     - uses: pulumi/provider-version-action@f96d032a2758fdda7939e5728eff6c0d980ae894 # v1.6.0
       id: provider-version
       with:
-        major-version: 3
+        major-version: 4
         set-env: 'PROVIDER_VERSION'
     - name: Cache examples generation
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -77,14 +69,35 @@ jobs:
         path: |
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: go, pulumictl, pulumicli, schema-tools
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        # only saving the cache in the prerequisites job
+        cache_save: true
+    - name: Setup Go Cache
+      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
+      with:
+        cache-dependency-path: |
+          provider/*.sum
+          upstream/*.sum
+          sdk/go/*.sum
+          sdk/*.sum
+          *.sum
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ steps.esc-secrets.outputs.AWS_ACCESS_KEY_ID }}
+        aws-region: ${{ env.AWS_REGION }}
+        aws-secret-access-key: ${{ steps.esc-secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+        role-duration-seconds: 7200
+        role-session-name: aws@githubActions
+        role-to-assume: ${{ steps.esc-secrets.outputs.AWS_CI_ROLE_ARN }}
     - name: Generate schema
       run: make schema
     - name: Build provider binary
@@ -93,6 +106,14 @@ jobs:
       run: make test_provider
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+        PUBLISH_REPO_PASSWORD: ${{ steps.esc-secrets.outputs.OSSRH_PASSWORD }}
+        PUBLISH_REPO_USERNAME: ${{ steps.esc-secrets.outputs.OSSRH_USERNAME }}
+        PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+        SIGNING_KEY: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY }}
+        SIGNING_KEY_ID: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY_ID }}
+        SIGNING_PASSWORD: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_PASSWORD }}
+        SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
       env:

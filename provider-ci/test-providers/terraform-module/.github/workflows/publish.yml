@@ -60,11 +60,12 @@ jobs:
     - id: esc-secrets
       name: Map environment to ESC outputs
       uses: ./.github/actions/esc-action
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, go, schema-tools
-        cache-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
+        cache_save: false
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
       with:

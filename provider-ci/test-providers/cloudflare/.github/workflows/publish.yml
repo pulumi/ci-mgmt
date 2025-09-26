@@ -21,32 +21,15 @@ on:
 
 env:
   IS_PRERELEASE: ${{ inputs.isPrerelease }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_UPLOAD_ROLE_ARN: ${{ secrets.AWS_UPLOAD_ROLE_ARN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  JAVA_SIGNING_KEY: ${{ secrets.JAVA_SIGNING_KEY }}
-  JAVA_SIGNING_KEY_ID: ${{ secrets.JAVA_SIGNING_KEY_ID }}
-  JAVA_SIGNING_PASSWORD: ${{ secrets.JAVA_SIGNING_PASSWORD }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_BOT_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-  RELEASE_BOT_ENDPOINT: ${{ secrets.RELEASE_BOT_ENDPOINT }}
-  RELEASE_BOT_KEY: ${{ secrets.RELEASE_BOT_KEY }}
   TF_APPEND_USER_AGENT: pulumi
 
 jobs:
   publish:
     name: publish
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     steps:
     - name: Validate prerelease
       if: inputs.isPrerelease == false && (contains(inputs.version, '-') || contains(inputs.version, '+'))
@@ -58,14 +41,21 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false    
-    - id: esc-secrets
-      name: Map environment to ESC outputs
-      uses: ./.github/actions/esc-action
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - env:
+        ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+        ESC_ACTION_OIDC_AUTH: "true"
+        ESC_ACTION_OIDC_ORGANIZATION: pulumi
+        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+      id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, go, schema-tools
-        cache-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
+        cache_save: false
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
       with:
@@ -128,7 +118,7 @@ jobs:
   publish_sdk:
     name: publish_sdk
     needs: publish
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     outputs:
       python_version: ${{ steps.python_version.outputs.version }}
     steps:
@@ -137,14 +127,28 @@ jobs:
       with:
         # Persist credentials so we can push back to the repo
         persist-credentials: true    
-    - id: esc-secrets
-      name: Map environment to ESC outputs
-      uses: ./.github/actions/esc-action
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - env:
+        ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+        ESC_ACTION_OIDC_AUTH: "true"
+        ESC_ACTION_OIDC_ORGANIZATION: pulumi
+        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+      id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, nodejs, python, dotnet, go, java
-        cache-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        # only saving the cache in the prerequisites job
+        cache_save: false
+    - name: Setup Node
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      with:
+        # we don't set node-version because we install with mise.
+        # this step is needed to setup npm auth
+        registry-url: https://registry.npmjs.org
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false
       uses: pulumi/pulumi-package-publisher@c1672c7928591d563dccb12729e05e315c21f8c2 # v0.0.22
@@ -205,15 +209,21 @@ jobs:
     needs: publish_sdk
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     steps:
       - name: Checkout Repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false      
-      - id: esc-secrets
-        name: Map environment to ESC outputs
-        uses: ./.github/actions/esc-action
+      - env:
+          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+          ESC_ACTION_OIDC_AUTH: "true"
+          ESC_ACTION_OIDC_ORGANIZATION: pulumi
+          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+        id: esc-secrets
+        name: Fetch secrets from ESC
+        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
       - name: Dispatch Metadata build
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
@@ -233,15 +243,21 @@ jobs:
     if: inputs.isPrerelease == false
     needs: create_docs_build
     
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     steps:
     - name: Checkout Repo
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false    
-    - id: esc-secrets
-      name: Map environment to ESC outputs
-      uses: ./.github/actions/esc-action
+    - env:
+        ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
+        ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
+        ESC_ACTION_OIDC_AUTH: "true"
+        ESC_ACTION_OIDC_ORGANIZATION: pulumi
+        ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+      id: esc-secrets
+      name: Fetch secrets from ESC
+      uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
     - name: Clean up release labels
       uses: pulumi/action-release-by-pr-label@main
       with:

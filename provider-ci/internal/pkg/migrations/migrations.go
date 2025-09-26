@@ -20,6 +20,9 @@ func Migrate(templateName, outDir string) error {
 		removeExplicitSDKDependency{},
 		ignoreMakeDir{},
 		updateToDotnet8{},
+		ignoreMiseLocal{},
+		migrateMiseConfig{},
+		createMiseLock{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {

@@ -1,9 +1,9 @@
 provider: xyz
 esc:
-  enabled: true
+    enabled: true
 env:
-  PULUMI_MISSING_DOCS_ERROR: true
-  XYZ_REGION: "us-west-2"
+    PULUMI_MISSING_DOCS_ERROR: true
+    XYZ_REGION: "us-west-2"
 makeTemplate: bridged
 providerDefaultBranch: main
 pulumiConvert: 1
@@ -11,18 +11,18 @@ goBuildParallelism: 2
 major-version: 1
 testMasterAndReleaseWorkflows: false
 plugins:
-  - name: random
-    version: "4.8.2"
-  - name: std
-    version: "1.6.2"
-  - name: terraform
-    version: "1.0.15"
-    kind: converter
+    - name: random
+      version: "4.8.2"
+    - name: std
+      version: "1.6.2"
+    - name: terraform
+      version: "1.0.15"
+      kind: converter
 releaseVerification:
-  nodejs: examples/basic
+    nodejs: examples/basic
 checkUpstreamUpgrade: true
-
 # Enable these to test that the disk cleaning works correctly
 freeDiskSpaceBeforeBuild: false
 freeDiskSpaceBeforeTest: false
 freeDiskSpaceBeforeSdkBuild: false
+publishRegistry: false

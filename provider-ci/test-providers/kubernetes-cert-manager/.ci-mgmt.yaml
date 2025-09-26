@@ -3,6 +3,8 @@ provider: kubernetes-cert-manager
 pulumiVersionFile: .pulumi.version
 major-version: 0
 parallel: 3
+esc:
+  enabled: true
 envOverride:
   AWS_REGION: us-west-2
   PULUMI_TEST_OWNER: moolumi

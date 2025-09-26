@@ -4,6 +4,9 @@ major-version: 0
 pulumiVersionFile: .pulumi.version
 setupKind: true
 parallel: 3
+esc:
+  enabled: true
+  environment: imports/github-secrets # No repo-specific secrets.
 envOverride:
   AWS_REGION: us-west-2
   GOLANGCI_LINT_VERSION: v1.61.0

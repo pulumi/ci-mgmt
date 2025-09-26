@@ -52,11 +52,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, go, schema-tools
-        cache-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
+        cache_save: false
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
       with:
@@ -137,11 +138,19 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, nodejs, python, dotnet, go, java
-        cache-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        # only saving the cache in the prerequisites job
+        cache_save: false
+    - name: Setup Node
+      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      with:
+        # we don't set node-version because we install with mise.
+        # this step is needed to setup npm auth
+        registry-url: https://registry.npmjs.org
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false
       uses: pulumi/pulumi-package-publisher@c1672c7928591d563dccb12729e05e315c21f8c2 # v0.0.22
@@ -197,45 +206,13 @@ jobs:
         pip install toml-cli==0.7.0
         version=$(toml get --toml-path pyproject.toml project.version)
         echo "version=${version}" >> "$GITHUB_OUTPUT"
-  create_docs_build:
-    name: create_docs_build
-    needs: publish_sdk
-    # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
-    if: inputs.isPrerelease == false
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          persist-credentials: false      
-      - env:
-          ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
-          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
-          ESC_ACTION_OIDC_AUTH: "true"
-          ESC_ACTION_OIDC_ORGANIZATION: pulumi
-          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
-        id: esc-secrets
-        name: Fetch secrets from ESC
-        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
-      - name: Dispatch Metadata build
-        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
-        with:
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
-          repository: pulumi/registry
-          event-type: resource-provider
-          client-payload: |-
-            {
-              "project": "${{ github.repository }}",
-              "project-shortname": "xyz",
-              "ref": "${{ github.ref_name }}"
-            }
 
   clean_up_release_labels:
     name: Clean up release labels
     # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
     if: inputs.isPrerelease == false
-    needs: create_docs_build
     
+    needs: publish_sdk
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
