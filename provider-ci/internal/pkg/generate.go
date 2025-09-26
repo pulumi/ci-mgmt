@@ -408,16 +408,20 @@ func renderGlobalEnv(v any) (string, error) {
 
 	env := map[string]string{}
 
-	if config.Organization == "pulumi" && !config.ESC.Enabled {
+	if !config.ESC.Enabled {
 		env = map[string]string{
-			"AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID":     "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}",
-			"AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY": "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}",
-			"CODECOV_TOKEN":                        "${{ secrets.CODECOV_TOKEN }}",
-			"PULUMI_BOT_TOKEN":                     "${{ secrets.PULUMI_BOT_TOKEN }}",
-			"RELEASE_BOT_ENDPOINT":                 "${{ secrets.RELEASE_BOT_ENDPOINT }}",
-			"RELEASE_BOT_KEY":                      "${{ secrets.RELEASE_BOT_KEY }}",
-			"S3_COVERAGE_BUCKET_NAME":              "${{ secrets.S3_COVERAGE_BUCKET_NAME }}",
-			"SLACK_WEBHOOK_URL":                    "${{ secrets.SLACK_WEBHOOK_URL }}",
+			"PULUMI_PROVIDER_AUTOMATION_TOKEN": "${{ secrets.PULUMI_PROVIDER_AUTOMATION_TOKEN }}",
+		}
+
+		if config.Organization == "pulumi" {
+			env["AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID"] = "${{ secrets.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}"
+			env["AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY"] = "${{ secrets.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}"
+			env["CODECOV_TOKEN"] = "${{ secrets.CODECOV_TOKEN }}"
+			env["PULUMI_BOT_TOKEN"] = "${{ secrets.PULUMI_BOT_TOKEN }}"
+			env["RELEASE_BOT_ENDPOINT"] = "${{ secrets.RELEASE_BOT_ENDPOINT }}"
+			env["RELEASE_BOT_KEY"] = "${{ secrets.RELEASE_BOT_KEY }}"
+			env["S3_COVERAGE_BUCKET_NAME"] = "${{ secrets.S3_COVERAGE_BUCKET_NAME }}"
+			env["SLACK_WEBHOOK_URL"] = "${{ secrets.SLACK_WEBHOOK_URL }}"
 		}
 	}
 
