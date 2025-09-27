@@ -50,7 +50,7 @@ jobs:
         repository: pulumi/examples
         path: p-examples
     - name: Setup mise
-      uses: jdx/mise-action@v3
+      uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3
       env:
         MISE_ENV: test
       with:

@@ -41,7 +41,7 @@ jobs:
           aws-region: us-west-2
           aws-secret-access-key: ${{ steps.esc-secrets.outputs.AWS_CORP_S3_UPLOAD_SECRET_ACCESS_KEY }}
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache_key: "mise-{{platform}}-{{file_hash}}"
