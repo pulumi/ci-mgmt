@@ -2,10 +2,13 @@ package migrations
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
 // Need to create an initial mise.lock file
@@ -18,6 +21,7 @@ func (createMiseLock) ShouldRun(templateName string) bool {
 	return true
 }
 func (createMiseLock) Migrate(templateName, outDir string) error {
+	misePath := filepath.Join(outDir, ".config", "mise.toml")
 	miseLockPath := filepath.Join(outDir, ".config", "mise.lock")
 	_, err := os.Stat(miseLockPath)
 	if !os.IsNotExist(err) {
@@ -32,7 +36,53 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 	}
 	fmt.Printf("MISE_PULUMI_VERSION: %s\n", pulumiVersion)
 	fmt.Printf("MISE_GO_VERSION: %s\n", goVersion)
-	cmd := exec.Command("mise", "install")
+	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "install"); err != nil {
+		return err
+	}
+
+	if err := copyFile(misePath, misePath+".bkp"); err != nil {
+		return err
+	}
+
+	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "use", fmt.Sprintf("go@%s", goVersion)); err != nil {
+		return err
+	}
+	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "use", fmt.Sprintf("pulumi@%s", pulumiVersion)); err != nil {
+		return err
+	}
+
+	if err := copyFile(misePath+".bkp", misePath); err != nil {
+		return err
+	}
+
+	if err := os.Remove(misePath + ".bkp"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func copyFile(srcPath, dstPath string) error {
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer contract.IgnoreError(src.Close)
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer contract.IgnoreError(dst.Close)
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
+	}
+	return dst.Sync()
+}
+
+func runMiseCommand(pulumiVersion, goVersion, outDir string, args ...string) error {
+	cmd := exec.Command("mise", args...)
 	cmd.Dir = outDir
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("MISE_PULUMI_VERSION=%s", pulumiVersion),
@@ -43,7 +93,6 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("error running mise install: %w\nOutput: %s", err, string(output))
 	}
-
 	return nil
 }
 
