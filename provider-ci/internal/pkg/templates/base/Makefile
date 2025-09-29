@@ -11,6 +11,9 @@ PROVIDER_PATH := provider
 VERSION_PATH := $(PROVIDER_PATH)/pkg/version.Version
 CODEGEN := pulumi-#{{ .Config.GenName }}#-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
+#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+JAVA_GEN := pulumi-java-gen
+#{{- end }}#
 TESTPARALLELISM := 10
 GOTESTARGS := ""
 WORKING_DIR := $(shell pwd)
@@ -140,11 +143,20 @@ build_go: .make/build_go
 
 generate_java: .make/generate_java
 build_java: .make/build_java
+#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+.make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
+.make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
+.make/generate_java: .make/install_plugins bin/pulumi-java-gen .make/schema
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java --build gradle-nexus
+	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
+	@touch $@
+#{{- else }}#
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/generate_java: .make/install_plugins bin/$(CODEGEN)
 	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) java --out sdk/java/
 	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
 	@touch $@
+#{{- end }}#
 .make/build_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/build_java: .make/generate_java
 	cd sdk/java/ && \
@@ -308,6 +320,15 @@ upstream: .make/upstream
 #{{- end }}#
 	@touch $@
 .PHONY: upstream
+
+#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+bin/pulumi-java-gen: PULUMI_JAVA_VERSION := $(shell cat .pulumi-java-gen.version)
+bin/pulumi-java-gen: PLAT := $(shell go version | sed -En "s/go version go.* (.*)\/(.*)/\1-\2/p")
+bin/pulumi-java-gen: PULUMI_JAVA_URL := "https://github.com/pulumi/pulumi-java/releases/download/v$(PULUMI_JAVA_VERSION)/pulumi-language-java-v$(PULUMI_JAVA_VERSION)-$(PLAT).tar.gz"
+bin/pulumi-java-gen:
+	wget -q -O - "$(PULUMI_JAVA_URL)" | tar -xzf - -C $(WORKING_DIR)/bin pulumi-java-gen
+	@touch bin/pulumi-language-java
+#{{- end }}#
 
 # To make an immediately observable change to .ci-mgmt.yaml:
 #
