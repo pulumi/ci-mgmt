@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"

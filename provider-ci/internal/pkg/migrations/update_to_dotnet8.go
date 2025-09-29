@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	_ "embed"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -15,9 +14,11 @@ type updateToDotnet8 struct{}
 func (updateToDotnet8) Name() string {
 	return "Update TargetFramework to net8"
 }
+
 func (updateToDotnet8) ShouldRun(templateName string) bool {
 	return templateName == "bridged-provider" || templateName == "external-bridged-provider"
 }
+
 func (updateToDotnet8) Migrate(templateName, outDir string) error {
 	csprojFiles, err := script.
 		Exec(fmt.Sprintf("git -C %q ls-files examples tests", outDir)).
