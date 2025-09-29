@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -91,6 +92,18 @@ func GeneratePackage(opts GenerateOpts) error {
 		if err != nil {
 			return fmt.Errorf("error running migrations: %w", err)
 		}
+	}
+
+	fmt.Println("Installing dependencies")
+
+	// We need to run this to keep our mise lockfile up to date.
+	_ = exec.Command("mise", "trust", ".").Run()
+	cmd := exec.Command("mise", "install", "--yes")
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("Failed to install dependencies: %s\n", err)
 	}
 	return nil
 }
