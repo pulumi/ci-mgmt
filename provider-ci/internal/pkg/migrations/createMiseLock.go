@@ -40,6 +40,9 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 		return err
 	}
 
+	// Mise is not writing a version to the lockfile if you use an env var to set the version.
+	// Below is a workaround where we temporarily update mise.toml with the hardcoded version via `mise use`
+	// and then reset it once the version is updated
 	if err := copyFile(misePath, misePath+".bkp"); err != nil {
 		return err
 	}
