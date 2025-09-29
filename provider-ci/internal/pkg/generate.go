@@ -97,8 +97,12 @@ func GeneratePackage(opts GenerateOpts) error {
 	fmt.Println("Installing dependencies")
 
 	// We need to run this to keep our mise lockfile up to date.
-	_ = exec.Command("mise", "trust", ".").Run()
-	cmd := exec.Command("mise", "install", "--yes")
+	cmd := exec.Command("mise", "trust", ".")
+	cmd.Dir = opts.OutDir
+	_ = cmd.Run() // Error is ignored in case mise isn't present.
+
+	cmd = exec.Command("mise", "install", "--yes")
+	cmd.Dir = opts.OutDir
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	err = cmd.Run()
