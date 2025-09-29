@@ -47,7 +47,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -263,7 +263,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -465,7 +465,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -669,7 +669,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -756,7 +756,7 @@ jobs:
         repository: pulumi/scripts
     - run: echo "ci-scripts" >> .git/info/exclude
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -838,7 +838,7 @@ jobs:
         persist-credentials: false
         ref: ${{ env.PR_COMMIT_SHA }}
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -870,7 +870,7 @@ jobs:
       with:
         lfs: true
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
@@ -953,7 +953,7 @@ jobs:
       with:
         lfs: true
     - name: Install Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       with:
         go-version: ${{ env.GOVERSION }}
         cache-dependency-path: "**/*.sum"
