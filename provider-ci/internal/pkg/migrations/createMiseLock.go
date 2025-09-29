@@ -35,8 +35,8 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 	cmd := exec.Command("mise", "install")
 	cmd.Dir = outDir
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("PULUMI_VERSION=%s", pulumiVersion),
-		fmt.Sprintf("GO_VERSION=%s", goVersion),
+		fmt.Sprintf("MISE_PULUMI_VERSION=%s", pulumiVersion),
+		fmt.Sprintf("MISE_GO_VERSION=%s", goVersion),
 	)
 	output, err := cmd.CombinedOutput()
 	fmt.Println(string(output))
