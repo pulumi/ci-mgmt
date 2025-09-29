@@ -86,10 +86,13 @@ jobs:
         #{{- end }}#
         persist-credentials: false
       #{{- .Config | renderEscStep | indent 4 }}#
-    - name: Setup tools
-      uses: ./.github/actions/setup-tools
+    - name: Setup mise
+      uses: jdx/mise-action@v3
       with:
-        tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        cache_key: "mise-{{platform}}-{{file_hash}}"
+        # only saving the cache in the prerequisites job
+        cache_save: false
     - name: Call upgrade provider action
       if: github.event_name == 'workflow_dispatch'
       uses: #{{ .Config.ActionVersions.UpgradeProviderAction }}#

@@ -55,10 +55,13 @@ jobs:
           # Persist credentials so upgrade-provider can push a new branch.
           persist-credentials: true
       #{{- .Config | renderEscStep | indent 6 }}#
-      - name: Setup tools
-        uses: ./.github/actions/setup-tools
+      - name: Setup mise
+        uses: jdx/mise-action@v3
         with:
-          tools: pulumictl, pulumicli, #{{ range $index, $element := .Config.Languages }}##{{if $index}}#, #{{end}}##{{ $element }}##{{end}}#
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
+          # only saving the cache in the prerequisites job
+          cache_save: false
       - name: Install upgrade-provider
         run: go install github.com/pulumi/upgrade-provider@${{ inputs.upgradeProviderVersion || 'main' }}
         shell: bash
