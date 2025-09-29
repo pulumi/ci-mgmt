@@ -30,6 +30,8 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("error getting go version from go.mod: %w", err)
 	}
+	fmt.Printf("MISE_PULUMI_VERSION: %s\n", pulumiVersion)
+	fmt.Printf("MISE_GO_VERSION: %s\n", goVersion)
 	cmd := exec.Command("mise", "install")
 	cmd.Dir = outDir
 	cmd.Env = append(os.Environ(),
@@ -37,6 +39,7 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 		fmt.Sprintf("GO_VERSION=%s", goVersion),
 	)
 	output, err := cmd.CombinedOutput()
+	fmt.Println(string(output))
 	if err != nil {
 		return fmt.Errorf("error running mise install: %w\nOutput: %s", err, string(output))
 	}
