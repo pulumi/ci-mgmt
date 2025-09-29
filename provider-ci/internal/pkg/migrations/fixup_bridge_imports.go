@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	_ "embed"
+	_ "embed" // For fixup_bridge_imports.patch.
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
-//go:embed fixupBridgeImports.patch
+//go:embed fixup_bridge_imports.patch
 var fixupBridgeImportsPatch string
 
 type fixupBridgeImports struct{}

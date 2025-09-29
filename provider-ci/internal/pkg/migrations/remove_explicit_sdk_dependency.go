@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	_ "embed"
+	_ "embed" // For remove_explicit_sdk_dependency.patch.
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,7 +9,7 @@ import (
 	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
-//go:embed removeExplicitSDKDependency.patch
+//go:embed remove_explicit_sdk_dependency.patch
 var removeExplicitSDKDependencyPatch string
 
 type removeExplicitSDKDependency struct{}
