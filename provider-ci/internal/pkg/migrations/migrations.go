@@ -23,6 +23,7 @@ func Migrate(templateName, outDir string) error {
 		ignoreMiseLocal{},
 		migrateMiseConfig{},
 		createMiseLock{},
+		maintainGolangciConfig{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
