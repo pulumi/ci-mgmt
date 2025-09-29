@@ -57,10 +57,10 @@ func getVersions(outdir string) (string, string, error) {
 	var pulumiVersion string
 	for _, val := range res {
 		key, val, ok := strings.Cut(val, "=")
-		if ok && key == "PULUMI_VERSION" {
+		if ok && key == "MISE_PULUMI_VERSION" {
 			pulumiVersion = val
 		}
-		if ok && key == "GO_VERSION" {
+		if ok && key == "MISE_GO_VERSION" {
 			goVersion = val
 		}
 	}
