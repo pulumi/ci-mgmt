@@ -2,13 +2,10 @@ package migrations
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg/contract"
 )
 
 // Need to create an initial mise.lock file
@@ -21,7 +18,6 @@ func (createMiseLock) ShouldRun(templateName string) bool {
 	return true
 }
 func (createMiseLock) Migrate(templateName, outDir string) error {
-	misePath := filepath.Join(outDir, ".config", "mise.toml")
 	miseLockPath := filepath.Join(outDir, ".config", "mise.lock")
 	_, err := os.Stat(miseLockPath)
 	if !os.IsNotExist(err) {
@@ -34,62 +30,21 @@ func (createMiseLock) Migrate(templateName, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("error getting go version from go.mod: %w", err)
 	}
-	fmt.Printf("MISE_PULUMI_VERSION: %s\n", pulumiVersion)
-	fmt.Printf("MISE_GO_VERSION: %s\n", goVersion)
+	fmt.Printf("PULUMI_VERSION_MISE: %s\n", pulumiVersion)
+	fmt.Printf("GO_VERSION_MISE: %s\n", goVersion)
 	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "install"); err != nil {
-		return err
-	}
-
-	// Mise is not writing a version to the lockfile if you use an env var to set the version.
-	// Below is a workaround where we temporarily update mise.toml with the hardcoded version via `mise use`
-	// and then reset it once the version is updated
-	if err := copyFile(misePath, misePath+".bkp"); err != nil {
-		return err
-	}
-
-	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "use", fmt.Sprintf("go@%s", goVersion)); err != nil {
-		return err
-	}
-	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "use", fmt.Sprintf("pulumi@%s", pulumiVersion)); err != nil {
-		return err
-	}
-
-	if err := copyFile(misePath+".bkp", misePath); err != nil {
-		return err
-	}
-
-	if err := os.Remove(misePath + ".bkp"); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func copyFile(srcPath, dstPath string) error {
-	src, err := os.Open(srcPath)
-	if err != nil {
-		return err
-	}
-	defer contract.IgnoreError(src.Close)
-
-	dst, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer contract.IgnoreError(dst.Close)
-
-	if _, err = io.Copy(dst, src); err != nil {
-		return err
-	}
-	return dst.Sync()
-}
-
 func runMiseCommand(pulumiVersion, goVersion, outDir string, args ...string) error {
 	cmd := exec.Command("mise", args...)
 	cmd.Dir = outDir
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("MISE_PULUMI_VERSION=%s", pulumiVersion),
-		fmt.Sprintf("MISE_GO_VERSION=%s", goVersion),
+		fmt.Sprintf("PULUMI_VERSION_MISE=%s", pulumiVersion),
+		fmt.Sprintf("GO_VERSION_MISE=%s", goVersion),
 	)
 	output, err := cmd.CombinedOutput()
 	fmt.Println(string(output))
@@ -112,10 +67,10 @@ func getVersions(outdir string) (string, string, error) {
 	var pulumiVersion string
 	for _, val := range res {
 		key, val, ok := strings.Cut(val, "=")
-		if ok && key == "MISE_PULUMI_VERSION" {
+		if ok && key == "PULUMI_VERSION_MISE" {
 			pulumiVersion = val
 		}
-		if ok && key == "MISE_GO_VERSION" {
+		if ok && key == "GO_VERSION_MISE" {
 			goVersion = val
 		}
 	}
