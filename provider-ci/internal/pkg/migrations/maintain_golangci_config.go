@@ -65,8 +65,8 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Println(string(output))
-		return fmt.Errorf("problem migrating golangci-lint config: %w", err)
+		fmt.Printf("Problem migrating golangci-lint config:\n%s\n%s\n", err, string(output))
+		return nil
 	}
 
 	// Cleanup the backup config if all went well.
