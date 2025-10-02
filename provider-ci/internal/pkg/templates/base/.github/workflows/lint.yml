@@ -22,7 +22,7 @@ jobs:
         #{{- end }}#
         persist-credentials: false
     - name: Setup mise
-      uses: jdx/mise-action@v3
+      uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_save: false # A different job handles caching our tools.
