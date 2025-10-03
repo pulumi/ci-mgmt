@@ -22,7 +22,7 @@ func Migrate(templateName, outDir string) error {
 		updateToDotnet8{},
 		ignoreMiseLocal{},
 		migrateMiseConfig{},
-		createMiseLock{},
+		maintainMiseLock{},
 		maintainGolangciConfig{},
 	}
 	for i, migration := range migrations {

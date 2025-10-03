@@ -8,23 +8,22 @@ import (
 	"strings"
 )
 
-// Need to create an initial mise.lock file
-type createMiseLock struct{}
+// Always update the mise.lock file when we update ci-mgmt
+type maintainMiseLock struct{}
 
-func (createMiseLock) Name() string {
-	return "Create an initial mise.lock"
+func (maintainMiseLock) Name() string {
+	return "Update mise.lock"
 }
-func (createMiseLock) ShouldRun(templateName string) bool {
+func (maintainMiseLock) ShouldRun(templateName string) bool {
 	return true
 }
-func (createMiseLock) Migrate(templateName, outDir string) error {
+func (maintainMiseLock) Migrate(templateName, outDir string) error {
 	miseLockPath := filepath.Join(outDir, ".config", "mise.lock")
 	_, err := os.Stat(miseLockPath)
-	if !os.IsNotExist(err) {
-		return nil
-	}
-	if _, err := os.Create(miseLockPath); err != nil {
-		return fmt.Errorf("error creating mise.lock: %w", err)
+	if os.IsNotExist(err) {
+		if _, err := os.Create(miseLockPath); err != nil {
+			return fmt.Errorf("error creating mise.lock: %w", err)
+		}
 	}
 	pulumiVersion, goVersion, err := getVersions(outDir)
 	if err != nil {
