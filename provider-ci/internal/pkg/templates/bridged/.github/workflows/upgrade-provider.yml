@@ -46,6 +46,16 @@ jobs:
           swap-storage: false
           dotnet: false
       #{{- end }}#
+      #{{- if .Config.GhAppAuth }}#
+      - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
+        id: gh-app-token
+        with:
+          app-id: #{{ .Config.GhAppAuth.AppID }}#
+          private-key: #{{ .Config.GhAppAuth.PrivateKey }}#
+      - name: Set up GitHub App authentication
+        run: |
+          echo "PULUMI_PROVIDER_AUTOMATION_TOKEN=${{ steps.gh-app-token.outputs.token }}" >> $GITHUB_ENV
+      #{{- end }}#
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
@@ -110,5 +120,4 @@ jobs:
           gh issue comment "${issue_number}" --repo "${{ github.repository }}" --body "Failed to create automatic PR: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
         env:
           GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-
 #{{ end -}}#

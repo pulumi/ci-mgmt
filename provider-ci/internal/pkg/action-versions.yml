@@ -134,3 +134,6 @@ jobs:
 
       - name: guibranco/github-status-action-v2
         uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
+
+      - name: actions/create-github-app-token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
