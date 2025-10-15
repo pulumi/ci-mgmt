@@ -9,9 +9,9 @@ on:
   repository_dispatch:
     types:
     - run-acceptance-tests-command
+  workflow_dispatch: {}
 
 env:
-  PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
 #{{ .Config | renderGlobalEnv | indent 2 }}#
 
 # This should cancel any previous runs of the same workflow on the same branch which are still running.
@@ -27,9 +27,11 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write # For ESC secrets.
+      checks: write # For community PRs.
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}
       default_branch: ${{ github.event.pull_request.base.ref }}
       is_pr: ${{ github.event_name == 'pull_request' }}
       is_automated: ${{ github.actor == 'dependabot[bot]' }}
@@ -42,6 +44,7 @@ jobs:
       contents: read
       id-token: write # For ESC secrets.
     with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}
       version: ${{ needs.prerequisites.outputs.version }}
       matrix: |
         {
@@ -63,6 +66,7 @@ jobs:
       contents: write # For Renovate SDKs.
       id-token: write # For ESC secrets.
     with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}
       version: ${{ needs.prerequisites.outputs.version }}
   #{{- end }}#
 
@@ -94,6 +98,8 @@ jobs:
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
+    with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}
   #{{ end -}}#
 
   sentinel:
@@ -123,6 +129,52 @@ jobs:
         # otherwise use the current SHA for any other type of build.
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  start-community-pr:
+    if: github.event_name == 'repository_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      check_id: ${{ steps.create_check.outputs.check_id }}
+    permissions:
+      checks: write
+    steps:
+    - name: Create pending check run for community PR
+      id: create_check
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { data: check } = await github.rest.checks.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: "Sentinel",
+            head_sha: "${{ github.event.client_payload.pull_request.merge_commit_sha }}",
+            status: "in_progress",
+            details_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          });
+          core.setOutput("check_id", check.id);
+
+  finish-community-pr:
+    permissions:
+      checks: write
+    runs-on: ubuntu-latest
+    needs:
+      - start-community-pr
+      - sentinel
+    steps:
+    - name: Report success on community PR
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          await github.rest.checks.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            check_run_id: ${{ needs.start-community-pr.outputs.check_id }},
+            conclusion: "success",
+            status: "completed",
+            completed_at: new Date().toISOString(),
+          });
+
   test:
     # Don't run tests on PRs from forks.
     if: github.event_name == 'repository_dispatch' ||
@@ -139,9 +191,12 @@ jobs:
       id-token: write
     secrets: inherit
     with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}
       version: ${{ needs.prerequisites.outputs.version }}
 
   license_check:
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
+    with:
+      sha: ${{ github.event.client_payload.pull_request.merge_commit_sha }}

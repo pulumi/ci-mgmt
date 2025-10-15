@@ -9,6 +9,9 @@ on:
       version:
         required: true
         type: string
+      sha:
+        type: string
+        description: The commit to build, primarily for community PRs.
 
 env:
 #{{ .Config | renderGlobalEnv | indent 2 }}#
@@ -41,6 +44,7 @@ jobs:
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
+          ref: ${{ inputs.sha }}
           #{{- if .Config.CheckoutSubmodules }}#
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
