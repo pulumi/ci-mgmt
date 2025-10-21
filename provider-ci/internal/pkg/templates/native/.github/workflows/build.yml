@@ -16,9 +16,7 @@ on:
   workflow_dispatch: {}
 env:
   PROVIDER: #{{ .Config.Provider }}#
-  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
   TRAVIS_OS_NAME: linux
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   GOVERSION: #{{ .Config.ToolVersions.Go | quote }}#
   NODEVERSION: #{{ .Config.ToolVersions.Nodejs | quote }}#
   PYTHONVERSION: #{{ .Config.ToolVersions.Python | quote }}#
