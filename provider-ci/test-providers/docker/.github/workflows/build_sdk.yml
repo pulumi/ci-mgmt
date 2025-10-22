@@ -8,6 +8,9 @@ on:
       version:
         required: true
         type: string
+      sha:
+        type: string
+        description: The commit to build, primarily for community PRs.
 
 env:
   ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
@@ -50,6 +53,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
+          ref: ${{ inputs.sha }}
           persist-credentials: false      
       - env:
           ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
