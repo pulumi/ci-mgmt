@@ -66,7 +66,6 @@ _ := $(shell mkdir -p .make bin .pulumi/bin)
 # And then ensures the environment is setup for this make session
 mise_install:
 	@mise install -q
-	# send output to /dev/null because we don't need to see the entire env that mise exports
 	@mise env -q  > /dev/null
 
 # Build the provider and all SDKs and install ready for testing
