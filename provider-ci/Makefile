@@ -8,7 +8,7 @@ ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
 .PHONY: all test gen ensure
 all: ensure test format lint
-test: test-providers
+test: test-go test-providers
 gen: test-providers
 ensure:: bin/provider-ci $(ACTIONLINT)
 
@@ -20,7 +20,10 @@ $(ACTIONLINT):
 	mv bin/actionlint $(ACTIONLINT)
 
 # Basic helper targets.
-.PHONY: clean lint format
+.PHONY: test-go clean lint format
+test-go:
+	go test ./internal/pkg/migrations/...
+
 clean:
 	rm -rf bin
 
