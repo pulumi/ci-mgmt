@@ -351,7 +351,6 @@ renovate:
 .PHONY: renovate
 #{{- end }}#
 
-include scripts/plugins.mk
 include scripts/crossbuild.mk
 
 # Permit providers to extend the Makefile with provider-specific Make includes.

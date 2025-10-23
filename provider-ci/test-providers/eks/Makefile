@@ -276,7 +276,6 @@ renovate:
 	$(call renovate_cmd)
 .PHONY: renovate
 
-include scripts/plugins.mk
 include scripts/crossbuild.mk
 
 # Permit providers to extend the Makefile with provider-specific Make includes.
