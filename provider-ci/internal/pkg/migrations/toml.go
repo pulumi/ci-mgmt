@@ -13,9 +13,9 @@ type tomlFile struct {
 	path    string
 }
 
-type toolEntry struct {
-	name    string
-	version string
+type sectionEntry struct {
+	key   string
+	value string
 }
 
 // newTomlFile loads the TOML file at path, returning an empty document if the file does not exist.
@@ -45,45 +45,91 @@ func (t *tomlFile) writeFile() error {
 	return nil
 }
 
-// ensureToolsEntries guarantees that each provided tool entry is present in the [tools] section,
-// returning true when the document was mutated.
-func (t *tomlFile) ensureToolsEntries(entries []toolEntry) (bool, error) {
+func (t *tomlFile) ensureSectionEntries(section string, entries []sectionEntry) (bool, error) {
 	if len(entries) == 0 {
 		return false, nil
 	}
 
-	lines := strings.Split(string(t.content), "\n")
-	toolsIdx := -1
+	formatted := make([]struct {
+		key  string
+		line string
+	}, 0, len(entries))
+	for _, entry := range entries {
+		if entry.key == "" {
+			continue
+		}
+		formatted = append(formatted, struct {
+			key  string
+			line string
+		}{
+			key:  entry.key,
+			line: formatTomlAssignment(entry.key, entry.value),
+		})
+	}
+	if len(formatted) == 0 {
+		return false, nil
+	}
+
+	content := string(t.content)
+	lines := strings.Split(content, "\n")
+	sectionHeader := fmt.Sprintf("[%s]", section)
+	sectionIdx := -1
 	for i, line := range lines {
-		if strings.TrimSpace(line) == "[tools]" {
-			toolsIdx = i
+		if strings.TrimSpace(line) == sectionHeader {
+			sectionIdx = i
 			break
 		}
 	}
-	if toolsIdx == -1 {
-		return false, fmt.Errorf("could not find [tools] section in mise.toml")
+
+	if sectionIdx == -1 {
+		var builder strings.Builder
+		trimmed := strings.TrimSpace(content)
+		if trimmed != "" {
+			builder.WriteString(content)
+			if !strings.HasSuffix(content, "\n") {
+				builder.WriteString("\n")
+			}
+			builder.WriteString("\n")
+		}
+		builder.WriteString(sectionHeader)
+		builder.WriteString("\n")
+		for _, entry := range formatted {
+			builder.WriteString(entry.line)
+			builder.WriteString("\n")
+		}
+		t.content = []byte(builder.String())
+		return true, nil
 	}
 
-	existing := make(map[string]struct{})
 	insertionIdx := len(lines)
-	for i := toolsIdx + 1; i < len(lines); i++ {
+	existing := make(map[string]int)
+	for i := sectionIdx + 1; i < len(lines); i++ {
 		trimmed := strings.TrimSpace(lines[i])
 		if len(trimmed) > 0 && trimmed[0] == '[' && strings.HasSuffix(trimmed, "]") {
 			insertionIdx = i
 			break
 		}
-
+		if trimmed == "" {
+			continue
+		}
 		if key, ok := parseTomlKey(trimmed); ok {
-			existing[key] = struct{}{}
+			existing[key] = i
 		}
 	}
 
-	additions := make([]string, 0, len(entries))
-	for _, entry := range entries {
-		if _, ok := existing[entry.name]; ok {
+	seen := make(map[string]struct{}, len(formatted))
+	for _, entry := range formatted {
+		if _, ok := existing[entry.key]; ok {
+			seen[entry.key] = struct{}{}
+		}
+	}
+
+	additions := make([]string, 0, len(formatted))
+	for _, entry := range formatted {
+		if _, ok := seen[entry.key]; ok {
 			continue
 		}
-		additions = append(additions, fmt.Sprintf("\"%s\" = \"%s\"", entry.name, entry.version))
+		additions = append(additions, entry.line)
 	}
 
 	if len(additions) == 0 {
@@ -92,11 +138,8 @@ func (t *tomlFile) ensureToolsEntries(entries []toolEntry) (bool, error) {
 
 	newLines := make([]string, 0, len(lines)+len(additions)+1)
 	newLines = append(newLines, lines[:insertionIdx]...)
-	if insertionIdx > toolsIdx+1 {
-		prev := lines[insertionIdx-1]
-		if strings.TrimSpace(prev) != "" {
-			newLines = append(newLines, "")
-		}
+	for len(newLines) > 0 && strings.TrimSpace(newLines[len(newLines)-1]) == "" {
+		newLines = newLines[:len(newLines)-1]
 	}
 	newLines = append(newLines, additions...)
 	if insertionIdx < len(lines) && strings.TrimSpace(lines[insertionIdx]) != "" {
@@ -104,8 +147,50 @@ func (t *tomlFile) ensureToolsEntries(entries []toolEntry) (bool, error) {
 	}
 	newLines = append(newLines, lines[insertionIdx:]...)
 	t.content = []byte(strings.Join(newLines, "\n"))
-
 	return true, nil
+}
+
+func formatTomlAssignment(key, value string) string {
+	return fmt.Sprintf("%s = %s", formatTomlKey(key), formatTomlString(value))
+}
+
+func formatTomlKey(key string) string {
+	if key == "" {
+		return "" // caller filters empty keys
+	}
+	for _, r := range key {
+		if isTomlBareKeyChar(r) {
+			continue
+		}
+		return fmt.Sprintf("\"%s\"", escapeTomlString(key))
+	}
+	return key
+}
+
+func isTomlBareKeyChar(r rune) bool {
+	if r >= 'a' && r <= 'z' {
+		return true
+	}
+	if r >= 'A' && r <= 'Z' {
+		return true
+	}
+	if r >= '0' && r <= '9' {
+		return true
+	}
+	switch r {
+	case '-', '_':
+		return true
+	default:
+		return false
+	}
+}
+
+func formatTomlString(value string) string {
+	return fmt.Sprintf("\"%s\"", escapeTomlString(value))
+}
+
+func escapeTomlString(value string) string {
+	return strings.ReplaceAll(value, "\"", "\\\"")
 }
 
 // parseTomlKey extracts the key portion of a TOML line, returning false when the line is not an assignment.
