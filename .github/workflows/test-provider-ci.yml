@@ -108,7 +108,7 @@ jobs:
       - name: Await PR tests success
         if: steps.pr_opened.outputs.pull_request_created == 'true'
         timeout-minutes: 60
-        run: gh pr checks --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
+        run: gh pr checks --required --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
 
       - name: Close test PR
         if: github.event_name != 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
