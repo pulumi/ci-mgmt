@@ -41,7 +41,7 @@ func (migrateCimgmtOverrides) Migrate(templateName, outDir string) error {
 		mise.content = []byte("# Overwrites mise configuration at .config/mise.toml\n[tools]\n")
 	}
 
-	miseTools := []toolEntry{}
+	miseTools := []sectionEntry{}
 
 	// convert any toolVersions overrides to mise tool entries
 	toolVersionsMap := nodeToMap(toolVersions)
@@ -54,13 +54,13 @@ func (migrateCimgmtOverrides) Migrate(templateName, outDir string) error {
 		if tool == "java" {
 			version = fmt.Sprintf("corretto-%s", version)
 		}
-		miseTools = append(miseTools, toolEntry{
-			name:    tool,
-			version: version,
+		miseTools = append(miseTools, sectionEntry{
+			key:   tool,
+			value: version,
 		})
 	}
 
-	updated, err := mise.ensureToolsEntries(miseTools)
+	updated, err := mise.ensureSectionEntries("tools", miseTools)
 	if err != nil {
 		return fmt.Errorf("error writing toolVersions to mise.toml: %w", err)
 	}

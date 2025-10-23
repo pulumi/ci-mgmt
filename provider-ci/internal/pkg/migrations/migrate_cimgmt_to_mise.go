@@ -38,13 +38,19 @@ func (migrateCimgmtToMise) Migrate(templateName, outDir string) error {
 	// If we have any plugins overrides, move them to the .config/mise.toml
 	pluginList := nodeToPluginEntries(plugins)
 	entries := pluginsToToolEntries(pluginList)
-	updated, err := mise.ensureToolsEntries(entries)
+	updatedTools, err := mise.ensureSectionEntries("tools", entries)
 	if err != nil {
-		return fmt.Errorf("error updating mise.toml: %w", err)
+		return fmt.Errorf("error ensuring mise plugin entry: %w", err)
 	}
-	if updated {
-		err := mise.writeFile()
+
+	if updatedTools {
+		_, err := mise.ensureSectionEntries("plugins", []sectionEntry{
+			{key: "vfox-pulumi", value: "https://github.com/pulumi/vfox-pulumi"},
+		})
 		if err != nil {
+			return fmt.Errorf("error ensuring mise plugins entry: %w", err)
+		}
+		if err := mise.writeFile(); err != nil {
 			return err
 		}
 	}
@@ -92,31 +98,31 @@ func nodeToPluginEntries(m *yaml.Node) []cimgmtPluginEntry {
 	return out
 }
 
-func pluginsToToolEntries(plugins []cimgmtPluginEntry) []toolEntry {
+func pluginsToToolEntries(plugins []cimgmtPluginEntry) []sectionEntry {
 	if len(plugins) == 0 {
 		return nil
 	}
 
-	entries := make([]toolEntry, 0, len(plugins))
+	entries := make([]sectionEntry, 0, len(plugins))
 	index := make(map[string]int, len(plugins))
 	for _, plugin := range plugins {
 		repoName := fmt.Sprintf("pulumi-%s", plugin.Name)
 		if plugin.Kind != "" {
 			repoName = fmt.Sprintf("pulumi-%s-%s", plugin.Kind, plugin.Name)
 		}
-		name := fmt.Sprintf("github:pulumi/%s", repoName)
+		name := fmt.Sprintf("vfox-pulumi:pulumi/%s", repoName)
 		// set to latest so we can update via `mise upgrade`
 		version := "latest"
 
 		if pos, ok := index[name]; ok {
-			entries[pos].version = version
+			entries[pos].value = version
 			continue
 		}
 
 		index[name] = len(entries)
-		entries = append(entries, toolEntry{
-			name:    name,
-			version: version,
+		entries = append(entries, sectionEntry{
+			key:   name,
+			value: version,
 		})
 	}
 
