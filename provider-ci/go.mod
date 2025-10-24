@@ -8,7 +8,6 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/bitfield/script v0.24.0
 	github.com/spf13/cobra v1.7.0
-	golang.org/x/mod v0.27.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
