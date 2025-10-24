@@ -22,7 +22,7 @@ $(ACTIONLINT):
 # Basic helper targets.
 .PHONY: test-go clean lint format
 test-go:
-	go test ./internal/pkg/migrations/...
+	go test -C provider-ci ./...
 
 clean:
 	rm -rf bin
