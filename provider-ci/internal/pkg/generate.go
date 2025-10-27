@@ -147,6 +147,7 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "external-bridged-provider":
 		return []string{
@@ -156,15 +157,18 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "generic":
 		return []string{
 			".upgrade-config.yml", // Previously accidentally generated empty file.
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "parameterized-go":
 		return []string{
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	default:
 		return nil

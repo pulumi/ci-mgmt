@@ -10,5 +10,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3
         with:
+          # Latest working version. See https://github.com/jdx/mise/discussions/6781
+          version: 2025.10.16
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
