@@ -95,7 +95,8 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3
         with:
-          version: 2025.10.15
+          # Latest working version. See https://github.com/jdx/mise/discussions/6781
+          version: 2025.10.16
           install: false
           cache: false
           working_directory: pulumi-${{ inputs.provider_name }}
