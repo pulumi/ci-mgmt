@@ -133,4 +133,4 @@ jobs:
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
 
       - name: guibranco/github-status-action-v2
-        uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
+        uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284 # v1.1.14
