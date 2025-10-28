@@ -107,10 +107,17 @@ func pluginsToToolEntries(plugins []cimgmtPluginEntry) []sectionEntry {
 	index := make(map[string]int, len(plugins))
 	for _, plugin := range plugins {
 		repoName := fmt.Sprintf("pulumi-%s", plugin.Name)
+		org := "pulumi"
 		if plugin.Kind != "" {
 			repoName = fmt.Sprintf("pulumi-%s-%s", plugin.Kind, plugin.Name)
 		}
-		name := fmt.Sprintf("vfox-pulumi:pulumi/%s", repoName)
+		// special handling for the `time` provider which is a pulumiverse provider
+		// the plugins entry doesn't have any info on the GitHub org that the provider belongs to
+		// so we have to hardcode it for the 1 time migration
+		if plugin.Name == "time" {
+			org = "pulumiverse"
+		}
+		name := fmt.Sprintf("vfox-pulumi:%s/%s", org, repoName)
 		// set to latest so we can update via `mise upgrade`
 		version := "latest"
 
