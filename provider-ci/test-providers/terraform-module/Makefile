@@ -126,7 +126,6 @@ ci-mgmt: .ci-mgmt.yaml
 	go run github.com/pulumi/ci-mgmt/provider-ci@master generate
 .PHONY: ci-mgmt
 
-include scripts/plugins.mk
 include scripts/crossbuild.mk
 
 # Permit providers to extend the Makefile with provider-specific Make includes.
