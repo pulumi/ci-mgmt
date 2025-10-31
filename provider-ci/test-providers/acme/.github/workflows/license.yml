@@ -4,7 +4,10 @@ name: license_check
 
 on:
   workflow_call:
-    inputs: {}
+    inputs:
+      sha:
+        type: string
+        description: The commit to build, primarily for community PRs.
 
 env:
   PULUMI_API: https://api.pulumi-staging.io
@@ -21,6 +24,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
+          ref: ${{ inputs.sha }}
           persist-credentials: false
       - name: Setup mise
         uses: jdx/mise-action@v3
