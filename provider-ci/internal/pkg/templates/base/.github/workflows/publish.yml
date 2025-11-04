@@ -7,7 +7,7 @@ on:
       version:
         required: true
         type: string
-      isLatestRelease:
+      setLatestRelease:
         required: true
         type: boolean
       isPrerelease:
@@ -115,7 +115,7 @@ jobs:
         # We keep pre-releases as drafts so they're not visible until we manually publish them.
         draft: ${{ inputs.isPrerelease }}
         # Explicitly set make_latest to account for backported releases
-        make_latest: ${{ inputs.isLatestRelease }}
+        make_latest: ${{ inputs.setLatestRelease }}
 #{{- if not .Config.NoSchema }}#
         body: ${{ steps.schema-summary.outputs.summary }}
 #{{- else }}#
@@ -220,7 +220,7 @@ jobs:
     name: create_docs_build
     needs: publish_sdk
     # Only run for non-prerelease and for non-backported releases, if the publish_go_sdk job was successful or skipped
-    if: inputs.isPrerelease == false && inputs.isLatestRelease == true
+    if: inputs.isPrerelease == false && inputs.setLatestRelease == true
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
       - name: Checkout Repo
