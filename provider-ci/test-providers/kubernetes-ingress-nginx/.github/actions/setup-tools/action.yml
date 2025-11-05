@@ -11,7 +11,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup mise
-      uses: jdx/mise-action@be3be22d689038c7c6a149af7d62a66ca06c6312 # v3
+      uses: jdx/mise-action@be3be2260bc02bc3fbf94c5e2fed8b7964baf074 # v3
       with:
         # Latest working version. See https://github.com/jdx/mise/discussions/6781
         version: 2025.10.16
