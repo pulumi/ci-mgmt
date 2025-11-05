@@ -531,7 +531,7 @@ jobs:
     - name: golangci-lint provider pkg
       uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
       with:
-        version: ${{ env.GOLANGCI_LINT_VERSION }}
+        install-mode: none # Handled by mise.
         working-directory: .
     name: lint
     if: github.event_name == 'repository_dispatch' ||
