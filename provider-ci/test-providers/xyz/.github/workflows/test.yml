@@ -81,7 +81,7 @@ jobs:
       with:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
-      run: make --touch provider schema build_${{ matrix.language }}
+      run: make --touch provider schema build_sdks SDK_LANG=${{ matrix.language }}
     - name: Update path
       run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
     - name: Install Python deps
@@ -89,8 +89,6 @@ jobs:
       run: |-
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
     - name: Run tests
       if: matrix.testTarget == 'local'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .

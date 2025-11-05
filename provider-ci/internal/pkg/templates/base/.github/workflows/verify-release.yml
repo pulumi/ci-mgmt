@@ -76,6 +76,10 @@ jobs:
       #{{- .Config | renderEscStep | indent 6 }}#
       #{{- range .Config.Languages }}#
       #{{- if eq . "python" }}#
+      - name: Download python SDK
+        uses: ./.github/actions/download-sdk
+        with:
+          language: python
       - name: Setup Python
         uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
@@ -84,6 +88,10 @@ jobs:
       #{{- end }}#
       #{{- range .Config.Languages }}#
       #{{- if eq . "java" }}#
+      - name: Download java SDK
+        uses: ./.github/actions/download-sdk
+        with:
+          language: java
       - name: Setup Java
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
@@ -98,6 +106,10 @@ jobs:
       #{{- end }}#
       #{{- range .Config.Languages }}#
       #{{- if eq . "dotnet" }}#
+      - name: Download dotnet SDK
+        uses: ./.github/actions/download-sdk
+        with:
+          language: dotnet
       - name: Setup DotNet
         uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
         with:
@@ -106,6 +118,10 @@ jobs:
       #{{- end }}#
       #{{- range .Config.Languages }}#
       #{{- if eq . "nodejs" }}#
+      - name: Download nodejs SDK
+        uses: ./.github/actions/download-sdk
+        with:
+          language: nodejs
       - name: Setup Node
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
@@ -115,6 +131,10 @@ jobs:
       #{{- end }}#
       #{{- range .Config.Languages }}#
       #{{- if eq . "go" }}#
+      - name: Download go SDK
+        uses: ./.github/actions/download-sdk
+        with:
+          language: go
       - name: Install Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
         with:

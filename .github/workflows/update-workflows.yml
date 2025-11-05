@@ -65,10 +65,7 @@ jobs:
             GO_VERSION="stable"
           fi
           echo "go-version=$GO_VERSION" >> "$GITHUB_OUTPUT"
-      - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
-        with:
-          go-version: ${{ steps.go-version.outputs.go-version }}
+
       - name: Setup Python
         uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
         with:
@@ -97,6 +94,7 @@ jobs:
         with:
           # Latest working version. See https://github.com/jdx/mise/discussions/6781
           version: 2025.10.16
+          install: true
           cache: false
           working_directory: pulumi-${{ inputs.provider_name }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
