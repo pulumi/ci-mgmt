@@ -36,9 +36,11 @@ func (maintainGolangciConfig) ShouldRun(_ string) bool {
 func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	// JSON version output was introduced in v2.
 	cmd := exec.Command("golangci-lint", "version", "--json")
+	cmd.Dir = cwd
 	usingV2 := cmd.Run() == nil
 
 	if !usingV2 {
+		fmt.Printf("Skipping: already on golangci-lint v2")
 		return nil
 	}
 
@@ -62,6 +64,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	}
 
 	cmd = exec.Command("golangci-lint", "migrate")
+	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
