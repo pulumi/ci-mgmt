@@ -204,7 +204,7 @@ jobs:
         CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
+      uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
       with:
         author_name: Failure in building provider prerequisites
         fields: repo,commit,author,action
@@ -330,7 +330,7 @@ jobs:
         path: ${{ github.workspace}}/sdk/${{ matrix.language }}.tar.gz
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
+      uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
       with:
         author_name: Failure while building SDKs
         fields: repo,commit,author,action
@@ -495,7 +495,7 @@ jobs:
     #{{- end }}#
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
+      uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
       with:
         author_name: Failure in SDK tests
         fields: repo,commit,author,action
@@ -561,7 +561,7 @@ jobs:
         version: latest
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
+      uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
       with:
         author_name: Failure in publishing binaries
         fields: repo,commit,author,action
@@ -632,7 +632,7 @@ jobs:
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
-      uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e # v3.18.0
+      uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
       with:
         author_name: Failure in publishing SDK
         fields: repo,commit,author,action
