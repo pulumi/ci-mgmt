@@ -40,7 +40,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	usingV2 := cmd.Run() == nil
 
 	if !usingV2 {
-		fmt.Printf("Skipping: we are using golangci-lint v1")
+		fmt.Printf("Skipping: we are using golangci-lint v1\n")
 		return nil
 	}
 
