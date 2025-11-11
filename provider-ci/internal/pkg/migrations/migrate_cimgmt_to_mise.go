@@ -40,9 +40,11 @@ java = 'corretto-11'
 pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
 "github:pulumi/pulumictl" = 'latest'
 "github:pulumi/schema-tools" = "latest"
+"go:github.com/pulumi/provider-sdk-builder" = "latest"
 gradle = '7.6'
 golangci-lint = "1.64.8" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
+
 
 [settings]
 experimental = true # Required for Go binaries (e.g. pulumictl).
@@ -69,16 +71,15 @@ func (migrateCimgmtToMise) Migrate(templateName, outDir string) error {
 	}
 
 	plugins := cimgmt.getFieldNode("plugins")
-	if plugins == nil {
-		if needsWrite {
-			return mise.writeFile()
-		}
-		return nil
-	}
 
 	// If we have any plugins overrides, move them to the .config/mise.toml
 	pluginList := nodeToPluginEntries(plugins)
 	entries := pluginsToToolEntries(pluginList)
+
+	//Manually adding the new SDK tool to this list until we support dynamically adding new dependencies
+	sdkToolPlugin := sectionEntry{"go:github.com/pulumi/provider-sdk-builder", "latest"}
+	entries = append(entries, sdkToolPlugin)
+
 	updatedTools, err := mise.ensureSectionEntries("tools", entries)
 	if err != nil {
 		return fmt.Errorf("error ensuring mise plugin entry: %w", err)
