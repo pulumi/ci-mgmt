@@ -566,7 +566,7 @@ jobs:
         ref: ${{ env.PR_COMMIT_SHA }}
 #{{- .Config | renderEscStep | indent 4 }}#
     - name: Mark workflow as successful
-      uses: guibranco/github-status-action-v2@0849440ec82c5fa69b2377725b9b7852a3977e76 # v1.1.13
+      uses: guibranco/github-status-action-v2@631f55ea0251f0fb284525ad86c30e9f7a8dd284 # v1.1.14
       with:
         authToken: ${{ secrets.GITHUB_TOKEN }}
         context: Sentinel
