@@ -140,7 +140,7 @@ generate_java: .make/generate_java
 build_java: .make/build_java
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
-.make/generate_java: .make/mise_install bin/pulumi-java-gen .make/schema
+.make/generate_java: .make/mise_install .make/schema
 .make/generate_java: | mise_env
 	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --language java --out sdk/
 	printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/java/go.mod
