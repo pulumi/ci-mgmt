@@ -26,6 +26,8 @@ jobs:
         persist-credentials: false
     - name: Setup mise
       uses: jdx/mise-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         # Latest working version. See https://github.com/jdx/mise/discussions/6781
         version: 2025.10.16
