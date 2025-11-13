@@ -20,12 +20,12 @@ on:
         default: "latest"
       target-pulumi-version:
         description: |
-            Set the version of `pulumi/pkg` and `pulumi/sdk` to depend on for bridged providers. Currently,
-            these versions inform the linked runtime and SDK generation in all languages except Java. Valid
-            options are:
-            - "": Use the same version as pulumi-terraform-bridge
-            - A go version such as "v3.90.1"
-            - A commit SHA in pulumi/pulumi such as "ac71ebc1d34e5ccfd1a7fed61e6ff43a3160f3cb"
+             Set the version of `pulumi/pkg` and `pulumi/sdk` to depend on for bridged providers. Currently,
+             these versions inform the linked runtime and SDK generation in all languages except Java. Valid
+             options are:
+             - "": Use the same version as pulumi-terraform-bridge
+             - A go version such as "v3.90.1"
+             - A commit SHA in pulumi/pulumi such as "ac71ebc1d34e5ccfd1a7fed61e6ff43a3160f3cb"
         required: false
         type: string
         default: ""
