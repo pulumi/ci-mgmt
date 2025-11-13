@@ -8,7 +8,7 @@ ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
 
 .PHONY: all test gen ensure
 all: ensure test format lint
-test: test-providers
+test: test-go test-providers
 gen: test-providers
 ensure:: bin/provider-ci $(ACTIONLINT)
 
@@ -20,7 +20,10 @@ $(ACTIONLINT):
 	mv bin/actionlint $(ACTIONLINT)
 
 # Basic helper targets.
-.PHONY: clean lint format
+.PHONY: test-go clean lint format
+test-go:
+	go test -v ./...
+
 clean:
 	rm -rf bin
 
@@ -44,7 +47,7 @@ test-providers: test-provider/aws test-provider/docker test-provider/cloudflare 
 test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
-		find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' -delete && \
+	find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' -delete && \
 		../../bin/provider-ci generate --skip-migrations
 	mkdir -p bin/test-provider
 	rm -rf bin/test-provider/$(PROVIDER_NAME)

@@ -7,6 +7,9 @@ on:
       version:
         required: true
         type: string
+      setLatestRelease:
+        required: true
+        type: boolean
       isPrerelease:
         required: true
         type: boolean
@@ -45,6 +48,8 @@ jobs:
     - name: Setup mise
       uses: jdx/mise-action@v3
       with:
+        # Latest working version. See https://github.com/jdx/mise/discussions/6781
+        version: 2025.10.16
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
         cache_save: false
@@ -109,6 +114,8 @@ jobs:
         prerelease: ${{ inputs.isPrerelease }}
         # We keep pre-releases as drafts so they're not visible until we manually publish them.
         draft: ${{ inputs.isPrerelease }}
+        # Explicitly set make_latest to account for backported releases
+        make_latest: ${{ inputs.setLatestRelease }}
 #{{- if not .Config.NoSchema }}#
         body: ${{ steps.schema-summary.outputs.summary }}
 #{{- else }}#
@@ -139,12 +146,14 @@ jobs:
     - name: Setup mise
       uses: jdx/mise-action@v3
       with:
+        # Latest working version. See https://github.com/jdx/mise/discussions/6781
+        version: 2025.10.16
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_key: "mise-{{platform}}-{{file_hash}}"
         # only saving the cache in the prerequisites job
         cache_save: false
     - name: Setup Node
-      uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
       with:
         # we don't set node-version because we install with mise.
         # this step is needed to setup npm auth
@@ -210,8 +219,8 @@ jobs:
   create_docs_build:
     name: create_docs_build
     needs: publish_sdk
-    # Only run for non-prerelease, if the publish_go_sdk job was successful or skipped
-    if: inputs.isPrerelease == false
+    # Only run for non-prerelease and for non-backported releases, if the publish_go_sdk job was successful or skipped
+    if: inputs.isPrerelease == false && inputs.setLatestRelease == true
     runs-on: #{{ .Config.Runner.Default }}#
     steps:
       - name: Checkout Repo
