@@ -46,7 +46,7 @@ jobs:
           swap-storage: false
           dotnet: false
       #{{- end }}#
-      #{{- if .Config.GhAppAuth }}#
+      #{{- if .Config.GhAppAuth.Enabled }}#
       - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
         id: gh-app-token
         with:

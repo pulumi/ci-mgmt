@@ -337,8 +337,8 @@ type Config struct {
 	ActuallyCommentOnStaleIssues bool `yaml:"actuallyCommentOnStaleIssues"`
 
 	// GhAppAuth controls whether we use GitHub App to interact with the repository.
-	// This is used for bridged providers to avoid rate limits and is set to true
-	// by default. It can be set to false for providers that do not need it.
+	// This is used for providers that want GitHub App authentication, instead of
+	// personal access tokens.
 	GhAppAuth GhAppAuth `yaml:"ghAppAuth"`
 }
 
@@ -374,6 +374,9 @@ func LoadLocalConfig(path string) (Config, error) {
 }
 
 type GhAppAuth struct {
+	// Enabled controls whether the GitHub App authentication is enabled.
+	Enabled bool `yaml:"enabled"`
+
 	// AppID is the ID of the GitHub App.
 	AppID string `yaml:"app-id"`
 

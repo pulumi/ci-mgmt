@@ -78,7 +78,7 @@ jobs:
         swap-storage: false
         dotnet: false
     #{{- end }}#
-    #{{- if .Config.GhAppAuth }}#
+    #{{- if .Config.GhAppAuth.Enabled }}#
     - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
       id: gh-app-token
       with:
@@ -95,7 +95,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
-    #{{- .Config | renderEscStep | indent 6 }}#
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup mise
       uses: jdx/mise-action@v3
       with:

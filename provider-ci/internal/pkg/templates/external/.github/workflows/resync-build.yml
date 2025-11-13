@@ -19,7 +19,7 @@ jobs:
     name: pull-workflow-changes
     runs-on: ubuntu-latest
     steps:
-      #{{- if .Config.GhAppAuth }}#
+      #{{- if .Config.GhAppAuth.Enabled }}#
       - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
         id: gh-app-token
         with:
@@ -29,12 +29,12 @@ jobs:
         run: |
           echo "PULUMI_PROVIDER_AUTOMATION_TOKEN=${{ steps.gh-app-token.outputs.token }}" >> $GITHUB_ENV
       #{{- end }}#
-      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Checkout Repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           # Persist credentials so pull-workflow-changes can push a new branch.
           persist-credentials: true
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
