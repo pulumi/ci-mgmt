@@ -78,6 +78,16 @@ jobs:
         swap-storage: false
         dotnet: false
     #{{- end }}#
+    #{{- if .Config.GhAppAuth.Enabled }}#
+    - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
+      id: gh-app-token
+      with:
+        app-id: #{{ .Config.GhAppAuth.AppID }}#
+        private-key: #{{ .Config.GhAppAuth.PrivateKey }}#
+    - name: Set up GitHub App authentication
+      run: |
+        echo "PULUMI_PROVIDER_AUTOMATION_TOKEN=${{ steps.gh-app-token.outputs.token }}" >> $GITHUB_ENV
+    #{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
@@ -85,7 +95,7 @@ jobs:
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
-      #{{- .Config | renderEscStep | indent 4 }}#
+    #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup mise
       uses: jdx/mise-action@v3
       with:
