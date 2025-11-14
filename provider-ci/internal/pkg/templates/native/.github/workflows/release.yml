@@ -69,7 +69,7 @@ jobs:
     - name: Make Kubernetes provider
       run: make k8sprovider
     #{{- end }}#
-    #{{- if and (ne .Config.Provider "command") (ne .Config.Provider "terraform") }}#
+    #{{- if not .Config.NoSchema }}#
     - if: github.event_name == 'pull_request'
       name: Check Schema is Valid
       run: >-
