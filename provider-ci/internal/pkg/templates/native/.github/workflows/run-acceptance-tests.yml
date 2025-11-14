@@ -68,6 +68,7 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         cache: 'true'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     #{{- if ne .Config.Provider "command" }}#
     - if: github.event_name == 'pull_request'
       name: Install Schema Tools
@@ -274,6 +275,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Download provider
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
@@ -413,6 +416,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Download provider
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
@@ -594,6 +599,8 @@ jobs:
         ref: ${{ env.PR_COMMIT_SHA }}
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Disarm go:embed directives to enable linters that compile source code
       run: git grep -l 'go:embed' -- provider | xargs --no-run-if-empty sed -i
         's/go:embed/ goembed/g'
