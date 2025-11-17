@@ -40,7 +40,7 @@ java = 'corretto-11'
 pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
 "github:pulumi/pulumictl" = 'latest'
 "github:pulumi/schema-tools" = "latest"
-gradle = '7.6'
+gradle = '7.6.0'
 golangci-lint = "1.64.8" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
 
