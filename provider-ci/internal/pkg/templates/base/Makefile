@@ -32,6 +32,7 @@ PULUMI_MISSING_DOCS_ERROR := false
 #{{- else }}#
 PULUMI_MISSING_DOCS_ERROR := true
 #{{- end }}#
+SDK_LANG ?= all
 
 # Override during CI using `make [TARGET] PROVIDER_VERSION=""` or by setting a PROVIDER_VERSION environment variable
 # Local & branch builds will just used this fixed default version unless specified
@@ -116,7 +117,7 @@ help:
 	@echo "  mise_install             Install tools with mise"
 	@echo "  upstream                 Initialize the upstream submodule, if present"
 	@echo ""
-	@echo "  [language] =#{{ range .Config.Languages }}# #{{ . }}##{{ end }}#"
+	@echo "  [SDK_LANG] =#{{ range .Config.Languages }}# #{{ . }}##{{ end }}#"
 	@echo ""
 .PHONY: help
 
@@ -136,7 +137,7 @@ build_registry_docs: .make/build_registry_docs
 
 build_sdks: .make/build_sdks
 .make/build_sdks: .make/schema
-	provider-sdk-builder build-sdks --language all --providerName $(PACK)
+	provider-sdk-builder build-sdks --providerName $(PACK) --language $(SDK_LANG)
 	@touch $@
 .PHONY: build_sdks
 
