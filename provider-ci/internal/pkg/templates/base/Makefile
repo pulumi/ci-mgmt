@@ -59,23 +59,10 @@ LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(
 # Ensure all directories exist before evaluating targets to avoid issues with `touch` creating directories.
 _ := $(shell mkdir -p .make bin .pulumi/bin)
 
-# Installs all necessary tools with mise and records completion in a sentinel
-# file so dependent targets can participate in make's caching behaviour. The
-# environment is refreshed via an order-only prerequisite so it still runs on
-# every invocation without invalidating the sentinel.
-mise_install: .make/mise_install | mise_env
-
-.PHONY: mise_env
-mise_env:
-	@mise env -q  > /dev/null
-
-.make/mise_install:
-	@mise install -q
-	@touch $@
-
 # Build the provider and all SDKs and install ready for testing
 build: .make/mise_install provider build_sdks install_sdks#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 build: | mise_env
+
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
@@ -89,6 +76,20 @@ generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}##{{- 
 build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
 .PHONY: development only_build build generate generate_sdks build_sdks install_sdks mise_install mise_env
+
+# Installs all necessary tools with mise and records completion in a sentinel
+# file so dependent targets can participate in make's caching behaviour. The
+# environment is refreshed via an order-only prerequisite so it still runs on
+# every invocation without invalidating the sentinel.
+mise_install: .make/mise_install | mise_env
+
+mise_env:
+	@mise env -q  > /dev/null
+
+.make/mise_install:
+	@mise install -q
+	@touch $@
+
 
 help:
 	@echo "Usage: make [target]"
