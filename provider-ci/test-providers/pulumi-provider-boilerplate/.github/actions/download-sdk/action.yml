@@ -1,9 +1,15 @@
 name: Download SDK
 description: Downloads and extracts SDK artifacts for a specific language
 
+env:
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  TF_APPEND_USER_AGENT: pulumi
+
 inputs:
   language:
-    description: 'The SDK language to download (nodejs, python, dotnet, java)'
+    description: "The SDK language to download (nodejs, python, dotnet, java)"
     required: true
 
 runs:

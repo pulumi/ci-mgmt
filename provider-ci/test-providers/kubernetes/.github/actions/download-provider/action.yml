@@ -1,6 +1,16 @@
 name: Download Provider Binary
 description: Downloads the provider binary artifact and restores executable permissions
 
+env:
+  AWS_REGION: us-west-2
+  GOLANGCI_LINT_VERSION: v1.64.8
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-k8s-provider.iam.gserviceaccount.com
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
+  GOOGLE_PROJECT_NUMBER: "637339343727"
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_TEST_OWNER: moolumi
+
 runs:
   using: "composite"
   steps:

@@ -1,6 +1,9 @@
 name: Setup Tools
 description: Installs all tools (Go, Node, Python, .NET, Java, Pulumi, etc.) using mise
 
+env:
+#{{ .Config | renderGlobalEnv | indent 2 }}#
+
 inputs:
   cache:
     description: Enable caching

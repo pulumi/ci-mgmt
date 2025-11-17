@@ -1,6 +1,12 @@
 name: Setup Tools
 description: Installs all tools (Go, Node, Python, .NET, Java, Pulumi, etc.) using mise
 
+env:
+  PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  TF_APPEND_USER_AGENT: pulumi
+
 inputs:
   cache:
     description: Enable caching

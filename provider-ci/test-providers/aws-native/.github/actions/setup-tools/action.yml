@@ -1,6 +1,10 @@
 name: Setup Tools
 description: Installs all tools (Go, Node, Python, .NET, Java, Pulumi, etc.) using mise
 
+env:
+  AWS_REGION: us-west-2
+  PULUMI_API: https://api.pulumi-staging.io
+
 inputs:
   cache:
     description: Enable caching

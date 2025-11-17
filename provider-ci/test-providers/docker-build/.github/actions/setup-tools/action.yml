@@ -1,6 +1,21 @@
 name: Setup Tools
 description: Installs all tools (Go, Node, Python, .NET, Java, Pulumi, etc.) using mise
 
+env:
+  ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
+  ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
+  ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
+  AWS_REGION: us-west-2
+  AZURE_LOCATION: westus
+  GOOGLE_CI_SERVICE_ACCOUNT_EMAIL: pulumi-ci@pulumi-ci-gcp-provider.iam.gserviceaccount.com
+  GOOGLE_CI_WORKLOAD_IDENTITY_POOL: pulumi-ci
+  GOOGLE_CI_WORKLOAD_IDENTITY_PROVIDER: pulumi-ci
+  GOOGLE_PROJECT: pulumi-ci-gcp-provider
+  GOOGLE_PROJECT_NUMBER: "895284651812"
+  GOOGLE_REGION: us-central1
+  GOOGLE_ZONE: us-central1-a
+  PULUMI_API: https://api.pulumi-staging.io
+
 inputs:
   cache:
     description: Enable caching
