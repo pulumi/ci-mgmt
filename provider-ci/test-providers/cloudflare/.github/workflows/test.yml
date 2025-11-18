@@ -60,7 +60,7 @@ jobs:
       env:
         MISE_ENV: test
       with:
-        version: 2025.11.06
+        version: 2025.11.6
         github_token: ${{ secrets.GITHUB_TOKEN }}
         cache_key: "mise-{{platform}}-{{file_hash}}"
         # also save this cache since we are using a different mise env.
