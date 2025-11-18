@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-// Always update the mise.lock file when we update ci-mgmt
+// Remove mise.lock file if present - we no longer generate lockfiles
 type maintainMiseLock struct{}
 
 func (maintainMiseLock) Name() string {
-	return "Update mise.lock"
+	return "Remove mise.lock"
 }
 func (maintainMiseLock) ShouldRun(templateName string) bool {
 	return true
@@ -20,20 +20,17 @@ func (maintainMiseLock) ShouldRun(templateName string) bool {
 func (maintainMiseLock) Migrate(templateName, outDir string) error {
 	miseLockPath := filepath.Join(outDir, ".config", "mise.lock")
 	_, err := os.Stat(miseLockPath)
-	if os.IsNotExist(err) {
-		if _, err := os.Create(miseLockPath); err != nil {
-			return fmt.Errorf("error creating mise.lock: %w", err)
+	if err == nil {
+		// File exists, remove it
+		if err := os.Remove(miseLockPath); err != nil {
+			return fmt.Errorf("error removing mise.lock: %w", err)
 		}
+		fmt.Println("Removed mise.lock file")
+	} else if !os.IsNotExist(err) {
+		// Some other error occurred
+		return fmt.Errorf("error checking mise.lock: %w", err)
 	}
-	pulumiVersion, goVersion, err := getVersions(outDir)
-	if err != nil {
-		return fmt.Errorf("error getting go version from go.mod: %w", err)
-	}
-	fmt.Printf("PULUMI_VERSION_MISE: %s\n", pulumiVersion)
-	fmt.Printf("GO_VERSION_MISE: %s\n", goVersion)
-	if err := runMiseCommand(pulumiVersion, goVersion, outDir, "install"); err != nil {
-		return err
-	}
+	// If the file doesn't exist, nothing to do
 
 	return nil
 }
