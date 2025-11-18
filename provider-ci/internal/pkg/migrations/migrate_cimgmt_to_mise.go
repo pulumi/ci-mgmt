@@ -162,8 +162,11 @@ func pluginsToToolEntries(plugins []cimgmtPluginEntry) []sectionEntry {
 			org = "pulumiverse"
 		}
 		name := fmt.Sprintf("vfox-pulumi:%s/%s", org, repoName)
-		// set to latest so we can update via `mise upgrade`
-		version := "latest"
+		// Use the version from the plugin config if specified, otherwise default to latest
+		version := plugin.Version
+		if version == "" {
+			version = "latest"
+		}
 
 		if pos, ok := index[name]; ok {
 			entries[pos].value = version
