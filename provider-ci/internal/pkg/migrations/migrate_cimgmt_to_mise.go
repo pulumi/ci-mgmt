@@ -29,7 +29,7 @@ PULUMI_HOME = "{{config_root}}/.pulumi"
 
 # Runtimes
 # TODO: we may not need 'get_env' once https://github.com/jdx/mise/discussions/6339 is fixed
-go = "{{ get_env(name='GO_VERSION_MISE') }}"
+go = "{{ get_env(name='GO_VERSION_MISE', default='latest') }}"
 node = '20.19.5'
 python = '3.11.8'
 dotnet = '8.0.414'
@@ -37,7 +37,7 @@ dotnet = '8.0.414'
 java = 'corretto-11'
 
 # Executable tools
-pulumi = "{{ get_env(name='PULUMI_VERSION_MISE') }}"
+pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
 "github:pulumi/pulumictl" = '0.0.50'
 "github:pulumi/schema-tools" = "0.6.0"
 gradle = '7.6.0'
