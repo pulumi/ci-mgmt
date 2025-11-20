@@ -38,15 +38,15 @@ java = 'corretto-11'
 
 # Executable tools
 pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
-"github:pulumi/pulumictl" = 'latest'
-"github:pulumi/schema-tools" = "latest"
+"github:pulumi/pulumictl" = '0.0.50'
+"github:pulumi/schema-tools" = "0.6.0"
 gradle = '7.6.0'
 golangci-lint = "1.64.8" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
 
 [settings]
 experimental = true # Required for Go binaries (e.g. pulumictl).
-lockfile = true
+lockfile = false
 `
 
 func (migrateCimgmtToMise) Migrate(templateName, outDir string) error {
@@ -162,8 +162,11 @@ func pluginsToToolEntries(plugins []cimgmtPluginEntry) []sectionEntry {
 			org = "pulumiverse"
 		}
 		name := fmt.Sprintf("vfox-pulumi:%s/%s", org, repoName)
-		// set to latest so we can update via `mise upgrade`
-		version := "latest"
+		// Use the version from the plugin config if specified, otherwise default to latest
+		version := plugin.Version
+		if version == "" {
+			version = "latest"
+		}
 
 		if pos, ok := index[name]; ok {
 			entries[pos].value = version

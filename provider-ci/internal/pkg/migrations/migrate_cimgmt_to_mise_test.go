@@ -9,9 +9,9 @@ import (
 
 const pluginsYaml = `plugins:
   - name: aws
-    version: v5.0.0
+    version: 5.0.0
   - name: eks
-    version: v1.2.3
+    version: 1.2.3
     kind: bridge
 `
 
@@ -45,8 +45,8 @@ func TestMigrateCimgmtToMise_CreatesDefaultConfigAndPlugins(t *testing.T) {
 		"[tools]",
 		"golangci-lint = \"1.64.8\"",
 		"[settings]",
-		`"vfox-pulumi:pulumi/pulumi-aws" = "latest"`,
-		`"vfox-pulumi:pulumi/pulumi-bridge-eks" = "latest"`,
+		`"vfox-pulumi:pulumi/pulumi-aws" = "5.0.0"`,
+		`"vfox-pulumi:pulumi/pulumi-bridge-eks" = "1.2.3"`,
 		"[plugins]",
 		`vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"`,
 	} {
