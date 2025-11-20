@@ -126,6 +126,9 @@ jobs:
             sdk/*.sum
             *.sum
           cache: true
+      - name: Set Go Toolchain to auto explicitly
+        run: |
+          echo "GOTOOLCHAIN=auto" >> "$GITHUB_ENV"
       #{{- end }}#
       #{{- end }}#
       - name: Install Pulumi CLI
