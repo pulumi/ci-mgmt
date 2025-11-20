@@ -51,7 +51,6 @@ jobs:
         # Latest working version. See https://github.com/jdx/mise/discussions/6781
         version: 2025.10.16
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-${{ hashFiles('mise.lock') }}"
         cache_save: false
 #{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
@@ -149,7 +148,6 @@ jobs:
         # Latest working version. See https://github.com/jdx/mise/discussions/6781
         version: 2025.10.16
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-{{file_hash}}"
         # only saving the cache in the prerequisites job
         cache_save: false
     - name: Setup Node

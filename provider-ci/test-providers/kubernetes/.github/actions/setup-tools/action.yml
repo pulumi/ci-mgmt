@@ -18,7 +18,6 @@ runs:
       with:
         # Latest working version. See https://github.com/jdx/mise/discussions/6781
         version: 2025.10.16
-        cache_key: "mise-{{platform}}-{{file_hash}}"
         cache_save: ${{ inputs.cache }}
         github_token: ${{ inputs.github_token }}
 
