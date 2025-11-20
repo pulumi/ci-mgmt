@@ -105,7 +105,7 @@ GEN_ENVS := PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(G
 
 build_sdks: .make/build_sdks
 .make/build_sdks: .make/schema
-	provider-sdk-builder build-sdks --providerName $(PACK) --language $(SDK_LANG)
+	provider-sdk-builder build-sdks --providerName $(PACK) --language $(SDK_LANG) --version $(PROVIDER_VERSION)
 	@touch $@
 .PHONY: build_sdks
 

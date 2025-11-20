@@ -55,7 +55,8 @@ jobs:
     strategy:
       matrix:
 #{{- if .Config.ReleaseVerification }}#
-        runner: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        runner: ["ubuntu-latest", "macos-latest"] 
+        #TODO add "windows-latest" back in to this list. https://github.com/pulumi/ci-mgmt/issues/1827?issue=pulumi%7Cci-mgmt%7C1857
 #{{- else }}#
         # We don't have any release verification configurations, so we only run on Linux to print warnings to help users configure the release verification.
         runner: ["ubuntu-latest"]
