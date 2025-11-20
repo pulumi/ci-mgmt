@@ -50,7 +50,6 @@ jobs:
       with:
         version: 2025.11.6
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-{{file_hash}}"
         cache_save: false
 #{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
@@ -147,7 +146,6 @@ jobs:
       with:
         version: 2025.11.6
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        cache_key: "mise-{{platform}}-{{file_hash}}"
         # only saving the cache in the prerequisites job
         cache_save: false
     - name: Setup Node
