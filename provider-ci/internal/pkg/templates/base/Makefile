@@ -140,7 +140,14 @@ build_sdks: .make/build_sdks
 .PHONY: build_sdks
 
 clean:
-	rm -rf sdk/*
+	
+	rm -rf sdk/dotnet 
+	rm -rf sdk/go
+	rm -rf sdk/java
+	rm -rf sdk/nodejs
+	rm -rf sdk/python
+	rm -rf sdk/language-schemas
+
 	rm -rf bin/*
 	rm -rf .make/*
 	rm -rf "$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR)"

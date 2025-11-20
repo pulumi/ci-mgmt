@@ -152,7 +152,7 @@ jobs:
     #{{- end }}#
 #{{- if and .Config.Shards (not .Config.NoSchema) }}#
     - name: Install prebuilt SDKs
-      run: make install_sdks
+      run: provider-sdk-builder install
 #{{- end }}#
 #{{- if not .Config.Shards }}#
 #{{- if .Config.Actions.PreTest }}#

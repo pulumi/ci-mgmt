@@ -114,7 +114,7 @@ jobs:
       with:
         environment: logins/pulumi-ci
     - name: Install prebuilt SDKs
-      run: make install_sdks
+      run: provider-sdk-builder install
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:

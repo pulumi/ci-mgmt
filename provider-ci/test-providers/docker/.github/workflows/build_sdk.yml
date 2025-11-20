@@ -73,6 +73,7 @@ jobs:
         with:
           version: 2025.11.6
           github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          cache_key: "mise-{{platform}}-{{file_hash}}"
           # only saving the cache in the prerequisites job
           cache_save: false
       - name: Setup Go Cache
@@ -88,7 +89,7 @@ jobs:
       - name: Prepare local workspace
         run: make prepare_local_workspace
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       - name: Download prerequisites
         uses: ./.github/actions/download-prerequisites
       - name: Update path
