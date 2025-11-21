@@ -335,6 +335,11 @@ type Config struct {
 
 	// ActuallyCommentOnStaleIssues controls whether we comment on stale issues
 	ActuallyCommentOnStaleIssues bool `yaml:"actuallyCommentOnStaleIssues"`
+
+	// GhAppAuth controls whether we use GitHub App to interact with the repository.
+	// This is used for providers that want GitHub App authentication, instead of
+	// personal access tokens.
+	GhAppAuth GhAppAuth `yaml:"ghAppAuth"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
@@ -368,6 +373,17 @@ func LoadLocalConfig(path string) (Config, error) {
 	return config, nil
 }
 
+type GhAppAuth struct {
+	// Enabled controls whether the GitHub App authentication is enabled.
+	Enabled bool `yaml:"enabled"`
+
+	// AppID is the ID of the GitHub App.
+	AppID string `yaml:"app-id"`
+
+	// PrivateKey is the private key of the GitHub App. (This should be a GitHub secret.)
+	PrivateKey string `yaml:"private-key"`
+}
+
 type plugin struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
@@ -395,6 +411,7 @@ type actionVersions struct {
 	ProviderVersionAction   string `yaml:"providerVersionAction"`
 	Codecov                 string `yaml:"codeCov"`
 	VerifyProviderRelease   string `yaml:"verifyProviderRelease"`
+	CreateGithubAppToken    string `yaml:"createGithubAppToken"`
 }
 
 type toolVersions struct {
@@ -487,6 +504,8 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.VerifyProviderRelease = uses
 						case "codecov/codecov-action":
 							config.ActionVersions.Codecov = uses
+						case "actions/create-github-app-token":
+							config.ActionVersions.CreateGithubAppToken = uses
 						}
 					}
 				}
