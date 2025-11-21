@@ -17,9 +17,15 @@ type removeExplicitSDKDependency struct{}
 func (removeExplicitSDKDependency) Name() string {
 	return "remove explicit SDK dependency"
 }
+
 func (removeExplicitSDKDependency) ShouldRun(templateName string) bool {
-	return templateName == "bridged-provider"
+	if templateName != "bridged-provider" {
+		return false
+	}
+	_, err := os.Stat("./provider/resource.go")
+	return err == nil
 }
+
 func (removeExplicitSDKDependency) Migrate(templateName, outDir string) error {
 	path, cleanup, err := writeTempFile("removeExplicitSDKDependency.patch", removeExplicitSDKDependencyPatch)
 	if err != nil {

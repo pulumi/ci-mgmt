@@ -2,6 +2,9 @@ NAME ?= all
 PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
+CPUS ?= $(shell sysctl -n hw.ncpu || echo 1)
+MAKEFLAGS += --jobs=$(CPUS)
+
 # These targets are versioned to cause Make to rebuild them when the version changes.
 ACTIONLINT_VERSION := 1.7.7
 ACTIONLINT := bin/actionlint-$(ACTIONLINT_VERSION)
@@ -48,12 +51,12 @@ test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
 	find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' -delete && \
-		../../bin/provider-ci generate --skip-migrations
-	mkdir -p bin/test-provider
-	rm -rf bin/test-provider/$(PROVIDER_NAME)
-	cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
-	cd bin/test-provider/$(PROVIDER_NAME) && git init
-	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml
+		../../bin/provider-ci generate | sed "s/^/[$(PROVIDER_NAME)] /"
+	@mkdir -p bin/test-provider
+	@rm -rf bin/test-provider/$(PROVIDER_NAME)
+	@cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
+	@cd bin/test-provider/$(PROVIDER_NAME) && git init
+	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml | sed "s/^/[$(PROVIDER_NAME)] /"
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
