@@ -36,7 +36,7 @@ func (activateMise) Migrate(_ string, outDir string) error {
 	}
 
 	for name, value := range values {
-		os.Setenv(name, value)
+		_ = os.Setenv(name, value)
 	}
 
 	return nil
