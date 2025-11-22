@@ -46,7 +46,7 @@ jobs:
         persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup mise
-      uses: jdx/mise-action@v3
+      uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3
       with:
         version: 2025.11.6
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -142,7 +142,7 @@ jobs:
         persist-credentials: true
     #{{- .Config | renderEscStep | indent 4 }}#
     - name: Setup mise
-      uses: jdx/mise-action@v3
+      uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3
       with:
         version: 2025.11.6
         github_token: ${{ secrets.GITHUB_TOKEN }}

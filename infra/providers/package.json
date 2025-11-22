@@ -1,7 +1,7 @@
 {
     "name": "pulumi-provider-repos",
     "devDependencies": {
-        "@types/node": "^18"
+        "@types/node": "18.19.31"
     },
     "dependencies": {
         "@pulumi/github": "6.7.3",
