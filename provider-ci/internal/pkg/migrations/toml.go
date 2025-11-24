@@ -210,3 +210,70 @@ func parseTomlKey(line string) (string, bool) {
 	}
 	return key, true
 }
+
+// parseTomlValue extracts the value portion of a TOML line, returning false when the line is not an assignment.
+func parseTomlValue(line string) (string, bool) {
+	if line == "" || strings.HasPrefix(line, "#") {
+		return "", false
+	}
+	eq := strings.Index(line, "=")
+	if eq == -1 {
+		return "", false
+	}
+	value := strings.TrimSpace(line[eq+1:])
+	// Remove quotes if present
+	if len(value) >= 2 {
+		if (value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'') {
+			value = value[1 : len(value)-1]
+		}
+	}
+	return value, true
+}
+
+// getSection returns all key-value entries in a given section
+func (t *tomlFile) getSection(section string) []sectionEntry {
+	content := string(t.content)
+	lines := strings.Split(content, "\n")
+	sectionHeader := fmt.Sprintf("[%s]", section)
+	sectionIdx := -1
+
+	// Find the section header
+	for i, line := range lines {
+		if strings.TrimSpace(line) == sectionHeader {
+			sectionIdx = i
+			break
+		}
+	}
+
+	if sectionIdx == -1 {
+		return nil
+	}
+
+	var entries []sectionEntry
+	// Parse all entries in the section until we hit another section or end of file
+	for i := sectionIdx + 1; i < len(lines); i++ {
+		trimmed := strings.TrimSpace(lines[i])
+
+		// Stop if we hit another section
+		if len(trimmed) > 0 && trimmed[0] == '[' && strings.HasSuffix(trimmed, "]") {
+			break
+		}
+
+		// Skip empty lines and comments
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+
+		// Parse the key-value pair
+		if key, ok := parseTomlKey(trimmed); ok {
+			if value, ok := parseTomlValue(trimmed); ok {
+				entries = append(entries, sectionEntry{
+					key:   key,
+					value: value,
+				})
+			}
+		}
+	}
+
+	return entries
+}
