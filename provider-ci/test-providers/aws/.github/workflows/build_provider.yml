@@ -9,6 +9,9 @@ on:
         required: true
         type: string
         description: Version of the provider to build
+      sha:
+        type: string
+        description: The commit to build, primarily for community PRs.
       matrix:
         required: false
         type: string
@@ -49,6 +52,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
+          ref: ${{ inputs.sha }}
           submodules: true
           persist-credentials: false      
       - env:
