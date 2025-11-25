@@ -97,7 +97,6 @@ jobs:
         with:
           # Latest working version. See https://github.com/jdx/mise/discussions/6781
           version: 2025.10.16
-          install: false
           cache: false
           working_directory: pulumi-${{ inputs.provider_name }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
