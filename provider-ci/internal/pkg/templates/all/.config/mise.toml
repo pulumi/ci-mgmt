@@ -4,6 +4,20 @@
 [env]
 _.source = "{{config_root}}/scripts/get-versions.sh"
 PULUMI_HOME = "{{config_root}}/.pulumi"
+PULUMI_CONVERT_EXAMPLES_CACHE_DIR = "{{config_root}}/.pulumi/examples-cache"
+PACK = "docker"
+ORG = "pulumi"
+PROJECT = "github.com/pulumi/pulumi-docker"
+PROVIDER_PATH = "provider/v4"
+VERSION_PATH = "provider/v4/pkg/version.Version"
+CODEGEN = "pulumi-tfgen-docker"
+PROVIDER = "pulumi-resource-docker"
+PROVIDER_VERSION = "4.0.0-alpha.0+dev"
+TESTPARALLELISM = "10"
+GOTESTARGS = ""
+PULUMI_CONVERT = "1"
+PULUMI_MISSING_DOCS_ERROR = "false"
+PULUMI_PROVIDER_BUILD_PARALLELISM = ""
 
 [tools]
 
@@ -23,6 +37,9 @@ pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
 gradle = '7.6'
 golangci-lint = "1.64.8" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
+
+[task_config]
+includes = ["{{config_root}}/.config/tasks"]
 
 [settings]
 experimental = true # Required for Go binaries (e.g. pulumictl).

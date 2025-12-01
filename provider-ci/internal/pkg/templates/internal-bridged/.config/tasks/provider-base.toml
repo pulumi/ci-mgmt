@@ -1,0 +1,352 @@
+
+# [setup]
+# description = "Install toolchain via mise"
+# run = "mise install -q"
+
+[upstream]
+description = "Initialize upstream submodule and apply patches"
+run = "./scripts/upstream.sh init"
+sources = ["patches/**", "scripts/upstream.sh"]
+
+["tfgen:build"]
+description = "Build the pulumi-tfgen-docker code generator"
+depends = ["dirs", "upstream"]
+dir = "provider"
+run = [
+  'go build ${PULUMI_PROVIDER_BUILD_PARALLELISM} -o ../bin/${CODEGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${PROVIDER_VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${CODEGEN}'
+]
+outputs = ["bin/pulumi-tfgen-docker"]
+
+["docs:examples"]
+description = "Regenerate provider example documentation"
+dir = "provider/pkg/docs-gen/examples"
+run = "go run generate.go ./yaml ./"
+sources = ["provider/pkg/docs-gen/examples/*.go", "provider/pkg/docs-gen/examples/yaml/*.yaml"]
+
+[dirs]
+description = "Creates directories"
+outputs = { auto = true }
+run = [
+  "mkdir -p bin",
+  "mkdir -p .pulumi/examples-cache",
+]
+
+[schema]
+description = "Generate schema.json via tfgen"
+depends = ["tfgen:build", "docs:examples"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "bin/${CODEGEN} schema --out provider/cmd/${PROVIDER}",
+  { task = "schema:go-generate" }
+]
+sources = ["bin/pulumi-tfgen-docker"]
+outputs = ["provider/cmd/pulumi-resource-docker/schema.json"]
+
+[tfgen]
+description = "Run schema generation with dependencies"
+depends = ["schema"]
+run = "true"
+
+["tfgen:no-deps"]
+description = "Generate schema without rebuilding docs"
+run = [
+  "bin/${CODEGEN} schema --out provider/cmd/${PROVIDER}",
+  { task = "schema:go-generate" }
+]
+depends = ["tfgen:build"]
+
+["schema:go-generate"]
+description = "Generate provider entrypoint with VERSION set"
+dir = "provider"
+env.VERSION = "${PROVIDER_VERSION}"
+run = "go generate cmd/${PROVIDER}/main.go"
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["provider/cmd/pulumi-resource-docker/schema-embed.json"]
+
+[provider]
+description = "Build provider binary"
+depends = ["schema", "dirs"]
+run = [
+  { task = "provider:build-binary" }
+]
+outputs = ["bin/pulumi-resource-docker"]
+
+["provider:no-deps"]
+description = "Build provider binary without validating schema"
+depends = ["dirs"]
+run = [
+  { task = "provider:build-binary" }
+]
+
+["provider:build-binary"]
+description = "Compile the provider executable"
+dir = "provider"
+env.CGO_ENABLED = "0"
+run = 'go build ${PULUMI_PROVIDER_BUILD_PARALLELISM} -o ../bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${PROVIDER_VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${PROVIDER}'
+
+["generate:dotnet"]
+description = "Generate .NET SDK"
+depends = ["schema"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "mkdir -p sdk/dotnet",
+  "bin/${CODEGEN} dotnet --out sdk/dotnet/",
+  { task = "generate:dotnet:finalize" }
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["sdk/dotnet"]
+
+["build:dotnet"]
+description = "Build .NET SDK"
+depends = ["generate:dotnet"]
+dir = "sdk/dotnet"
+run = "dotnet build"
+sources = ["sdk/dotnet"]
+outputs = ["sdk/dotnet/bin"]
+
+["install:dotnet"]
+description = "Install .NET SDK locally"
+depends = ["build:dotnet"]
+run = '''
+mkdir -p nuget
+find sdk/dotnet/bin -name '*.nupkg' -print -exec cp -p "{}" $(pwd)/nuget \;
+if ! dotnet nuget list source | grep -q "$(pwd)/nuget"; then dotnet nuget add source "$(pwd)/nuget" --name "$(pwd)/nuget"; fi
+'''
+
+["generate:go"]
+description = "Generate Go SDK"
+depends = ["schema"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "mkdir -p sdk/go",
+  "bin/${CODEGEN} go --out sdk/go/"
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["sdk/go"]
+
+["build:go"]
+description = "Build Go SDK packages"
+depends = ["generate:go"]
+dir = "sdk"
+run = '''
+module_path="$(grep -e "^module" go.mod | cut -d " " -f 2)" && go list "${module_path}/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
+'''
+sources = ["sdk/go", "sdk/go.mod"]
+outputs = ["sdk/go"]
+
+["generate:java"]
+description = "Generate Java SDK"
+depends = ["schema"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "mkdir -p sdk/java",
+  "bin/${CODEGEN} java --out sdk/java/",
+  { task = "generate:java:finalize" }
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["sdk/java"]
+
+["build:java"]
+description = "Build Java SDK"
+depends = ["generate:java"]
+dir = "sdk/java"
+run = [
+  "gradle --console=plain build",
+  "gradle --console=plain javadoc"
+]
+sources = ["sdk/java"]
+outputs = ["sdk/java/build"]
+
+["generate:nodejs"]
+description = "Generate Node.js SDK"
+depends = ["schema"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "mkdir -p sdk/nodejs",
+  "bin/${CODEGEN} nodejs --out sdk/nodejs/",
+  { task = "generate:nodejs:finalize" }
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["sdk/nodejs"]
+
+["build:nodejs"]
+description = "Build Node.js SDK"
+depends = ["generate:nodejs"]
+dir = "sdk/nodejs"
+run = [
+  "yarn install",
+  "yarn run tsc",
+  "cp ../../README.md ../../LICENSE package.json yarn.lock ./bin/"
+]
+sources = ["sdk/nodejs", "README.md", "LICENSE", "package.json", "yarn.lock"]
+outputs = ["sdk/nodejs/bin"]
+
+["install:nodejs"]
+description = "Link Node.js SDK locally"
+depends = ["build:nodejs"]
+dir = "sdk/nodejs/bin"
+run = [
+  "yarn unlink || true",
+  "yarn link",
+]
+
+["install:go"]
+description = "Placeholder for Go SDK installation"
+run = "true"
+
+["install:java"]
+description = "Placeholder for Java SDK installation"
+run = "true"
+
+["generate:python"]
+description = "Generate Python SDK"
+depends = ["schema"]
+env.PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION = "{{ env.PULUMI_CONVERT | default(value='1') }}"
+run = [
+  "mkdir -p sdk/python",
+  "bin/${CODEGEN} python --out sdk/python/",
+  { task = "generate:python:finalize" }
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json", "README.md"]
+outputs = ["sdk/python"]
+
+["build:python"]
+description = "Build Python SDK"
+depends = ["generate:python"]
+run = [
+  { task = "build:python:prep" },
+  { task = "build:python:package" }
+]
+sources = ["sdk/python", "README.md"]
+outputs = ["sdk/python/bin"]
+
+["install:python"]
+description = "Placeholder for Python SDK installation"
+run = "true"
+
+["build:registry-docs"]
+description = "Generate registry docs"
+depends = ["schema"]
+run = [
+  "mkdir -p docs",
+  'bin/${CODEGEN} registry-docs --out "$(pwd)/docs"'
+]
+sources = ["provider/cmd/pulumi-resource-docker/schema.json"]
+outputs = ["docs"]
+
+["generate:sdks"]
+description = "Generate all SDKs"
+depends = ["generate:nodejs", "generate:python", "generate:dotnet", "generate:go", "generate:java"]
+run = "true"
+
+["build:sdks"]
+description = "Build all SDKs"
+depends = ["build:nodejs", "build:python", "build:dotnet", "build:go", "build:java"]
+run = "true"
+
+["install:sdks"]
+description = "Install all SDKs locally"
+depends = ["install:nodejs", "install:python", "install:dotnet", "install:go", "install:java"]
+run = "true"
+
+[generate]
+description = "Generate schema, docs, and all SDKs"
+depends = ["generate:sdks", "schema", "build:registry-docs"]
+run = "true"
+
+[build]
+description = "Build provider and SDKs, install artifacts"
+depends = ["provider", "build:sdks", "install:sdks", "build:registry-docs"]
+run = "true"
+
+["prepare:workspace"]
+description = "Install plugins and prepare upstream workspace"
+depends = ["upstream"]
+run = "true"
+
+["lint:provider"]
+description = "Run golangci-lint on provider"
+depends = ["upstream"]
+dir = "provider"
+run = "golangci-lint run --path-prefix provider -c ../.golangci.yml"
+
+["lint:provider:fix"]
+description = "Run golangci-lint with --fix on provider"
+depends = ["upstream"]
+dir = "provider"
+run = "golangci-lint run --path-prefix provider -c ../.golangci.yml --fix"
+
+[test]
+description = "Run example integration tests"
+depends = ["build"]
+env.PATH = "{{ [config_root, 'bin'] | join_path }}:{{ env.PATH }}"
+dir = "examples"
+run = 'go test -v -tags=all -parallel ${TESTPARALLELISM} -timeout 2h ${GOTESTARGS}'
+
+["test:provider"]
+description = "Run provider unit tests"
+depends = ["build"]
+dir = "provider"
+run = 'go test -v -short -coverprofile="coverage.txt" -coverpkg="./...,github.com/hashicorp/terraform-provider-..." -parallel ${TESTPARALLELISM} ./...'
+
+[clean]
+description = "Clean build artifacts"
+run = [
+  'rm -rf sdk/{dotnet,nodejs,go,python}',
+  "rm -rf bin/*",
+  "rm -rf .pulumi/examples-cache",
+  'if dotnet nuget list source | grep -q "$(pwd)/nuget"; then dotnet nuget remove source "$(pwd)/nuget"; fi'
+]
+
+[docs]
+description = "Run docs generator helper"
+depends = ["docs:examples"]
+run = "true"
+
+["ci:mgmt"]
+description = "Regenerate CI config"
+run = "go run github.com/pulumi/ci-mgmt/provider-ci@master generate"
+
+["debug:tfgen"]
+description = "Start dlv against tfgen"
+depends = ["tfgen:build"]
+run = 'dlv --listen=:2345 --headless=true --api-version=2 exec bin/${CODEGEN} -- schema --out provider/cmd/${PROVIDER}'
+
+["generate:dotnet:finalize"]
+description = "Write dotnet SDK metadata"
+dir = "sdk/dotnet"
+run = [
+  'printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod',
+  'printf "%s\n" "${PROVIDER_VERSION}" > version.txt'
+]
+["generate:java:finalize"]
+description = "Write Java SDK go.mod shim"
+dir = "sdk/java"
+run = 'printf "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod'
+["generate:nodejs:finalize"]
+description = "Write Node.js SDK go.mod shim"
+dir = "sdk/nodejs"
+run = 'printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod'
+["generate:python:finalize"]
+description = "Finalize Python SDK layout"
+dir = "sdk/python"
+run = [
+  'printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod',
+  'cp ../../README.md .'
+]
+["build:python:prep"]
+description = "Prepare Python SDK artifacts"
+dir = "sdk/python"
+run = [
+  "rm -rf ./bin ../python.bin",
+  "cp -R . ../python.bin",
+  "mv ../python.bin ./bin",
+  "rm ./bin/go.mod",
+  "python3 -m venv venv",
+  "./venv/bin/python -m pip install build==1.2.1"
+]
+
+["build:python:package"]
+description = "Build distributable Python package"
+dir = "sdk/python/bin"
+run = "../venv/bin/python -m build ."

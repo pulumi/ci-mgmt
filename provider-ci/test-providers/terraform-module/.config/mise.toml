@@ -4,6 +4,7 @@
 [env]
 _.source = "{{config_root}}/scripts/get-versions.sh"
 PULUMI_HOME = "{{config_root}}/.pulumi"
+MISE_DATA_DIR = "{{config_root}}/.mise"
 
 [tools]
 
@@ -23,6 +24,9 @@ pulumi = "{{ get_env(name='PULUMI_VERSION_MISE', default='latest') }}"
 gradle = '7.6'
 golangci-lint = "1.64.8" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
+
+[task_config]
+includes = ["{{config_root}}/.config/tasks"]
 
 [settings]
 experimental = true # Required for Go binaries (e.g. pulumictl).
