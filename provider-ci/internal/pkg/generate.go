@@ -317,7 +317,7 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 		return nil
 	}
 
-	err = os.MkdirAll(filepath.Dir(outPath), 0755)
+	err = os.MkdirAll(filepath.Dir(outPath), 0o755)
 	if err != nil {
 		return err
 	}
@@ -335,7 +335,7 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 
 	// Make shell scripts executable
 	if strings.HasSuffix(outPath, ".sh") {
-		err = os.Chmod(outPath, 0755)
+		err = os.Chmod(outPath, 0o755)
 		if err != nil {
 			return err
 		}
@@ -452,6 +452,9 @@ func renderGlobalEnv(v any) (string, error) {
 		}
 		env[k] = v
 	}
+
+	// Enable PULUMI_PULUMI_ENABLE_JOURNALING=true globally for all workflows.
+	env["PULUMI_PULUMI_ENABLE_JOURNALING"] = "true"
 
 	return toYAML(env)
 }
