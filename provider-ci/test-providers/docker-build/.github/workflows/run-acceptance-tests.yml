@@ -32,6 +32,7 @@ env:
   GOOGLE_REGION: us-central1
   GOOGLE_ZONE: us-central1-a
   PULUMI_API: https://api.pulumi-staging.io
+  PULUMI_PULUMI_ENABLE_JOURNALING: "true"
   PR_COMMIT_SHA: ${{ github.event.client_payload.pull_request.head.sha }}
 jobs:
   comment-notification:

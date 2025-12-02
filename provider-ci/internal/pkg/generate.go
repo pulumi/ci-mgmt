@@ -454,6 +454,7 @@ func renderGlobalEnv(v any) (string, error) {
 	}
 
 	// Enable PULUMI_PULUMI_ENABLE_JOURNALING=true globally for all workflows.
+	// Part of the rollout of https://github.com/pulumi/pulumi/issues/13502.
 	env["PULUMI_PULUMI_ENABLE_JOURNALING"] = "true"
 
 	return toYAML(env)
