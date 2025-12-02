@@ -43,7 +43,7 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         cache: 'true'
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
     - name: Generate Pulumi Access Token
       id: generate_pulumi_token
       uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1

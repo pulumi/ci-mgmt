@@ -13,18 +13,23 @@ jobs:
   license_check:
     name: License Check
     runs-on: #{{ .Config.Runner.Default }}#
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write # For ESC secrets.
     steps:
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#
         with:
           persist-credentials: false
+    #{{- .Config | renderEscStep | indent 6 }}#
       - name: Setup mise
         uses: jdx/mise-action@v3
         env:
           MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
         with:
           version: 2025.11.6
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           # only saving the cache in the prerequisites job
           cache_save: false
       - run: make prepare_local_workspace
