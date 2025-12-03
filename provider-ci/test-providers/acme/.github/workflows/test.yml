@@ -83,7 +83,7 @@ jobs:
         pip3 install virtualenv==20.0.23
         pip3 install pipenv
     - name: Link SDKs
-      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
+      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/ -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
     - name: Run tests
       if: matrix.testTarget == 'local'
       run: cd examples && go test -v -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -skip TestPulumiExamples -parallel 4 .

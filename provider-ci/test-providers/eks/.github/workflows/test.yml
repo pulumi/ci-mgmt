@@ -114,7 +114,7 @@ jobs:
       with:
         environment: logins/pulumi-ci
     - name: Link SDKs
-      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
+      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/ -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
