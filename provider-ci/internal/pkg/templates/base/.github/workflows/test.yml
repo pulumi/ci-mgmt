@@ -152,6 +152,7 @@ jobs:
     #{{- end }}#
     - name: Link SDKs
       run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
+#{{- if not .Config.Shards }}#
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
