@@ -35,9 +35,6 @@ func (maintainGolangciConfig) ShouldRun(_ string) bool {
 
 func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	// JSON version output was introduced in v2.
-
-	fmt.Println("Starting PATH now:", os.Getenv("PATH"))
-
 	cmd := exec.Command("golangci-lint", "version", "--json")
 	cmd.Dir = cwd
 	version, err := cmd.CombinedOutput()
