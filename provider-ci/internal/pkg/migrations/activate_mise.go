@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/kr/pretty"
 )
 
 // activateMise exports mise env variable so the mise toolchain is made
@@ -36,11 +38,15 @@ func (activateMise) Migrate(_ string, outDir string) error {
 		return fmt.Errorf("parsing mise output: %w", err)
 	}
 
+	fmt.Println("Starting env:", pretty.Print(os.Environ()))
+
 	for name, value := range values {
 		if err := os.Setenv(name, value); err != nil {
 			return fmt.Errorf("setting mise env: %w", err)
 		}
 	}
+
+	fmt.Println("Final env:", pretty.Print(os.Environ()))
 
 	return nil
 }
