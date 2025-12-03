@@ -150,19 +150,12 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
-#{{- if and .Config.Shards (not .Config.NoSchema) }}#
     - name: Link SDKs
-      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
-#{{- end }}#
-#{{- if not .Config.Shards }}#
-    - name: Link SDKs
-      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
+      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
     #{{- if .Config.IntegrationTestProvider }}#
-    - name: Link SDKs
-      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
     - name: Run provider tests
       if: matrix.testTarget == 'local'
       working-directory: provider
