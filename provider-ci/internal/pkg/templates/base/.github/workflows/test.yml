@@ -83,7 +83,7 @@ jobs:
       with:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
-      run: make --touch provider schema build_sdks SDK_LANG=${{ matrix.language }} 
+      run: make --touch provider schema build_sdks
     #{{- else }}#
     #{{- if not .Config.NoSchema }}#
     #{{- range $_, $language := .Config.Languages }}#
@@ -151,15 +151,17 @@ jobs:
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
 #{{- if and .Config.Shards (not .Config.NoSchema) }}#
-    - name: Install prebuilt SDKs
-      run: provider-sdk-builder install
+    - name: Link SDKs
+      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
 #{{- end }}#
 #{{- if not .Config.Shards }}#
+    - name: Link SDKs
+      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#
     #{{- if .Config.IntegrationTestProvider }}#
-    - name: Install dependencies
+    - name: Link SDKs
       run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
     - name: Run provider tests
       if: matrix.testTarget == 'local'

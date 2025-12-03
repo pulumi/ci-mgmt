@@ -65,18 +65,6 @@ jobs:
             GO_VERSION="stable"
           fi
           echo "go-version=$GO_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Setup Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
-        with:
-          python-version: 3.9
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
-        with:
-          repo: pulumi/pulumictl
-          tag: v0.0.46
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
-          cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
@@ -94,7 +82,6 @@ jobs:
         with:
           # Latest working version. See https://github.com/jdx/mise/discussions/6781
           version: 2025.10.16
-          install: true
           cache: false
           working_directory: pulumi-${{ inputs.provider_name }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}

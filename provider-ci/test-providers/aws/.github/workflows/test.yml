@@ -114,8 +114,8 @@ jobs:
         PULUMI_ACCESS_TOKEN: ${{ steps.generate_pulumi_token.outputs.pulumi-access-token }}
       with:
         environment: logins/pulumi-ci
-    - name: Install prebuilt SDKs
-      run: provider-sdk-builder install
+    - name: Link SDKs
+      run: provider-sdk-builder install  --sdkLocation ./sdk/${{ matrix.language}} -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
     - name: Generate test shards
       run: |-
         cd examples

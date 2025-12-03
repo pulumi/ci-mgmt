@@ -68,10 +68,6 @@ func (migrateCimgmtToMise) Migrate(templateName, outDir string) error {
 	pluginList := nodeToPluginEntries(plugins)
 	entries := pluginsToToolEntries(pluginList)
 
-	//Manually adding the new SDK tool to this list until we support dynamically adding new dependencies
-	sdkToolPlugin := sectionEntry{"go:github.com/pulumi/provider-sdk-builder", "latest"}
-	entries = append(entries, sdkToolPlugin)
-
 	_, err = mise.ensureSectionEntries("tools", entries)
 	if err != nil {
 		return fmt.Errorf("error ensuring mise plugin entry: %w", err)
