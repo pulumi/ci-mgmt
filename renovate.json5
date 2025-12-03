@@ -4,11 +4,17 @@
   "github-actions": {
     // Extend our matching to maintain our default action versions.
     fileMatch: [".*/action-versions\\.ya?ml$"],
-    ignorePaths: [
-      "provider-ci/test-providers/**",
-    ],
+    ignorePaths: ["provider-ci/test-providers/**"],
   },
   packageRules: [
+    {
+      // Re-generate test workflows in case action versions have been bumped.
+      matchPackageNames: ["*"],
+      postUpgradeTasks: {
+        commands: ["make build"],
+        executionMode: "branch", // Only run once.
+      },
+    },
     {
       matchManagers: ["github-actions"],
       // Automatically submit PRs to bump GitHub actions.
@@ -16,11 +22,6 @@
       // Only bump to releases older than 7 days since these will include
       // third-party / untrusted actions.
       minimumReleaseAge: "7 days",
-      // Re-generate test workflows in case action versions have been bumped.
-      postUpgradeTasks: {
-        commands: ["make build"],
-        executionMode: "branch", // Only run once.
-      },
     },
     // Pins
     {
