@@ -83,7 +83,8 @@ help:
 	@echo ""
 	@echo "More Precise Targets"
 	@echo "  schema        Generate the schema"
-	@echo "  build_sdks    Build and compile all SDKs"
+	@echo "  build_sdks    Generate and compile all SDKs"
+	@echo "  compile_sdks  compile all previously generated SDKs"
 	@echo "  install_sdks  Install SDKs. Installs nodejs and dotnet SDKs. Noop for go, java, and python, "
 	@echo "  provider_dist Build and package the provider for all platforms"
 	@echo ""
@@ -110,9 +111,16 @@ build_sdks: .make/build_sdks
 	@touch $@
 .PHONY: build_sdks
 
+compile_sdks: .make/compile_sdks
+.make/compile_sdks: .make/compile_sdks
+	provider-sdk-builder compile --language $(SDK_LANG)
+	@touch $@
+.PHONY: compile_sdks
+
+
 install_sdks: .make/install_sdks
 .make/install_sdks: .make/build_sdks
-	provider-sdk-builder build-sdks --language $(SDK_LANG)
+	provider-sdk-builder install --language $(SDK_LANG)
 	@touch $@
 .PHONY: install_sdks
 
