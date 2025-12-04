@@ -127,7 +127,7 @@ generate_sdks: .make/generate_sdks
 
 compile_sdks: .make/compile_sdks
 .make/compile_sdks: .make/generate_sdks
-	provider-sdk-builder compile --language $(SDK_LANG)
+	provider-sdk-builder compile --providerName $(PACK) --language $(SDK_LANG) --version $(PROVIDER_VERSION)
 	@touch $@
 .PHONY: compile_sdks
 
