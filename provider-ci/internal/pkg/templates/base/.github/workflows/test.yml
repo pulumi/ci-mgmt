@@ -83,7 +83,7 @@ jobs:
       with:
         language: ${{ matrix.language }}
     - name: Restore makefile progress
-      run: make --touch provider schema build_${{ matrix.language }}
+      run: make --touch provider schema build_sdks
     #{{- else }}#
     #{{- if not .Config.NoSchema }}#
     #{{- range $_, $language := .Config.Languages }}#
@@ -150,13 +150,9 @@ jobs:
     - name: Run setup script
       run: #{{ index .Config.SetupScript }}#
     #{{- end }}#
-#{{- if and .Config.Shards (not .Config.NoSchema) }}#
-    - name: Install prebuilt SDKs
-      run: make install_sdks
-#{{- end }}#
+    - name: Link SDKs
+      run: provider-sdk-builder install  --sdkLocation ${{ github.workspace }}/sdk/ -l ${{ matrix.language}} --installLocation ${{ github.workspace }}
 #{{- if not .Config.Shards }}#
-    - name: Install dependencies
-      run: make install_${{ matrix.language}}_sdk
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
 #{{- end }}#

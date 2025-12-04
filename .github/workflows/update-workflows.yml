@@ -65,21 +65,6 @@ jobs:
             GO_VERSION="stable"
           fi
           echo "go-version=$GO_VERSION" >> "$GITHUB_OUTPUT"
-      - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
-        with:
-          go-version: ${{ steps.go-version.outputs.go-version }}
-      - name: Setup Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
-        with:
-          python-version: 3.9
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
-        with:
-          repo: pulumi/pulumictl
-          tag: v0.0.46
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
-          cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
