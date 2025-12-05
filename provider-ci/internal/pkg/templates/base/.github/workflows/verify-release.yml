@@ -55,8 +55,7 @@ jobs:
     strategy:
       matrix:
 #{{- if .Config.ReleaseVerification }}#
-        runner: ["ubuntu-latest", "macos-latest", "windows-latest"] 
-        #TODO add "windows-latest" back in to this list. https://github.com/pulumi/ci-mgmt/issues/1827?issue=pulumi%7Cci-mgmt%7C1857
+        runner: ["ubuntu-latest", "windows-latest", "macos-latest"]
 #{{- else }}#
         # We don't have any release verification configurations, so we only run on Linux to print warnings to help users configure the release verification.
         runner: ["ubuntu-latest"]
@@ -75,15 +74,64 @@ jobs:
         with:
           persist-credentials: false
       #{{- .Config | renderEscStep | indent 6 }}#
-      - name: Setup mise
-        uses: jdx/mise-action@v3
-        env:
-          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+      #{{- range .Config.Languages }}#
+      #{{- if eq . "python" }}#
+      - name: Setup Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
         with:
-          version: 2025.11.6
-          github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          python-version: #{{ $.Config.ToolVersions.Python }}#
+      #{{- end }}#
+      #{{- end }}#
+      #{{- range .Config.Languages }}#
+      #{{- if eq . "java" }}#
+      - name: Setup Java
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
+        with:
+          distribution: temurin
+          java-version: #{{ $.Config.ToolVersions.Java }}#
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        with:
+          gradle-version: #{{ $.Config.ToolVersions.Gradle }}#
+      #{{- end }}#
+      #{{- end }}#
+      #{{- range .Config.Languages }}#
+      #{{- if eq . "dotnet" }}#
+      - name: Setup DotNet
+        uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
+        with:
+          dotnet-version: #{{ $.Config.ToolVersions.Dotnet }}#
+      #{{- end }}#
+      #{{- end }}#
+      #{{- range .Config.Languages }}#
+      #{{- if eq . "nodejs" }}#
+      - name: Setup Node
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6
+        with:
+          node-version: #{{ $.Config.ToolVersions.Nodejs }}#
+          registry-url: https://registry.npmjs.org
+      #{{- end }}#
+      #{{- end }}#
+      #{{- range .Config.Languages }}#
+      #{{- if eq . "go" }}#
+      - name: Install Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
+        with:
+          go-version: "#{{ $.Config.ToolVersions.Go }}#"
+          cache-dependency-path: |
+            provider/*.sum
+            upstream/*.sum
+            sdk/go/*.sum
+            sdk/*.sum
+            *.sum
+          cache: true
+      - name: Set Go Toolchain to auto explicitly
+        run: |
+          echo "GOTOOLCHAIN=auto" >> "$GITHUB_ENV"
+      #{{- end }}#
+      #{{- end }}#
       - name: Install Pulumi CLI
-        uses: pulumi/actions@d7ceb0215da5a14ec84f50b703365ddf0194a9c8 # v6
+        uses: pulumi/actions@8582a9e8cc630786854029b4e09281acd6794b58 # v6
         with:
           pulumi-version: "#{{ .Config.ToolVersions.Pulumi }}#"
 #{{- if .Config.ReleaseVerification }}#
