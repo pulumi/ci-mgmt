@@ -41,8 +41,8 @@ func (activateMise) Migrate(_ string, outDir string) error {
 	cmd = exec.Command("mise", "env", "--json", "--cd", outDir)
 	cmd.Stdout = buf
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("running mise: %w", err)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("running mise: %w\n%s", err, string(output))
 	}
 
 	var values map[string]string
