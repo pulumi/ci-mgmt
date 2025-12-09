@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,25 +28,21 @@ func (activateMise) Migrate(_ string, outDir string) error {
 
 	cmd = exec.Command("mise", "install", "--yes")
 	cmd.Dir = outDir
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
 	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("Failed to install dependencies: %s\n", err)
 	}
 
-	buf := &bytes.Buffer{}
-
 	cmd = exec.Command("mise", "env", "--json", "--cd", outDir)
-	cmd.Stdout = buf
 
-	if output, err := cmd.CombinedOutput(); err != nil {
+	output, err := cmd.CombinedOutput()
+	if err != nil {
 		return fmt.Errorf("running mise: %w\n%s", err, string(output))
 	}
 
 	var values map[string]string
 
-	if err := json.Unmarshal(buf.Bytes(), &values); err != nil {
+	if err := json.Unmarshal(output, &values); err != nil {
 		return fmt.Errorf("parsing mise output: %w", err)
 	}
 
