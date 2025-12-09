@@ -239,3 +239,211 @@ go = "latest"
 		t.Fatalf("expected non-vfox tools NOT to be merged, got:\n%s", contentStr)
 	}
 }
+
+func TestMergePluginsToRootFromCiMgmtYaml(t *testing.T) {
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, ".config")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("mkdir .config: %v", err)
+	}
+
+	// Create .config/mise.toml without plugins
+	configPath := filepath.Join(configDir, "mise.toml")
+	configContent := `[tools]
+go = "latest"
+`
+	if err := os.WriteFile(configPath, []byte(configContent), 0o644); err != nil {
+		t.Fatalf("write .config/mise.toml: %v", err)
+	}
+
+	// Create .ci-mgmt.yaml with plugins
+	ciMgmtPath := filepath.Join(dir, ".ci-mgmt.yaml")
+	ciMgmtContent := `plugins:
+  - name: aws
+    version: 5.0.0
+  - name: eks
+    version: 1.2.3
+    kind: bridge
+`
+	if err := os.WriteFile(ciMgmtPath, []byte(ciMgmtContent), 0o644); err != nil {
+		t.Fatalf("write .ci-mgmt.yaml: %v", err)
+	}
+
+	// Run plugin merge
+	migration := mergePluginsToRoot{}
+	if err := migration.Migrate("bridged-provider", dir); err != nil {
+		t.Fatalf("mergePluginsToRoot: %v", err)
+	}
+
+	// Verify root mise.toml was created with plugins from .ci-mgmt.yaml
+	rootPath := filepath.Join(dir, "mise.toml")
+	content, err := os.ReadFile(rootPath)
+	if err != nil {
+		t.Fatalf("read root mise.toml: %v", err)
+	}
+
+	contentStr := string(content)
+	if !strings.Contains(contentStr, "[tools]") {
+		t.Fatalf("expected [tools] section in root mise.toml, got:\n%s", contentStr)
+	}
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-aws" = "5.0.0"`) {
+		t.Fatalf("expected pulumi-aws tool from .ci-mgmt.yaml in root mise.toml, got:\n%s", contentStr)
+	}
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-bridge-eks" = "1.2.3"`) {
+		t.Fatalf("expected pulumi-bridge-eks tool from .ci-mgmt.yaml in root mise.toml, got:\n%s", contentStr)
+	}
+	if !strings.Contains(contentStr, "[plugins]") {
+		t.Fatalf("expected [plugins] section in root mise.toml, got:\n%s", contentStr)
+	}
+	if !strings.Contains(contentStr, `vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"`) {
+		t.Fatalf("expected vfox-pulumi plugin in root mise.toml, got:\n%s", contentStr)
+	}
+
+	// Verify non-vfox tools are NOT included
+	if strings.Contains(contentStr, `go = "latest"`) {
+		t.Fatalf("expected non-vfox tools NOT to be merged, got:\n%s", contentStr)
+	}
+}
+
+func TestMergePluginsToRootFromBothSources(t *testing.T) {
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, ".config")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("mkdir .config: %v", err)
+	}
+
+	// Create .config/mise.toml with some plugins
+	configPath := filepath.Join(configDir, "mise.toml")
+	configContent := `[tools]
+"vfox-pulumi:pulumi/pulumi-gcp" = "8.0.0"
+
+[plugins]
+"vfox-pulumi" = "https://github.com/pulumi/vfox-pulumi"
+`
+	if err := os.WriteFile(configPath, []byte(configContent), 0o644); err != nil {
+		t.Fatalf("write .config/mise.toml: %v", err)
+	}
+
+	// Create .ci-mgmt.yaml with different plugins
+	ciMgmtPath := filepath.Join(dir, ".ci-mgmt.yaml")
+	ciMgmtContent := `plugins:
+  - name: aws
+    version: 5.0.0
+`
+	if err := os.WriteFile(ciMgmtPath, []byte(ciMgmtContent), 0o644); err != nil {
+		t.Fatalf("write .ci-mgmt.yaml: %v", err)
+	}
+
+	// Run plugin merge
+	migration := mergePluginsToRoot{}
+	if err := migration.Migrate("bridged-provider", dir); err != nil {
+		t.Fatalf("mergePluginsToRoot: %v", err)
+	}
+
+	// Verify root mise.toml has plugins from both sources
+	rootPath := filepath.Join(dir, "mise.toml")
+	content, err := os.ReadFile(rootPath)
+	if err != nil {
+		t.Fatalf("read root mise.toml: %v", err)
+	}
+
+	contentStr := string(content)
+	// From .config/mise.toml
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-gcp" = "8.0.0"`) {
+		t.Fatalf("expected pulumi-gcp tool from .config/mise.toml in root mise.toml, got:\n%s", contentStr)
+	}
+	// From .ci-mgmt.yaml
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-aws" = "5.0.0"`) {
+		t.Fatalf("expected pulumi-aws tool from .ci-mgmt.yaml in root mise.toml, got:\n%s", contentStr)
+	}
+	if !strings.Contains(contentStr, `vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"`) {
+		t.Fatalf("expected vfox-pulumi plugin in root mise.toml, got:\n%s", contentStr)
+	}
+}
+
+func TestMergePluginsToRootNoCiMgmtYaml(t *testing.T) {
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, ".config")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("mkdir .config: %v", err)
+	}
+
+	// Create .config/mise.toml with plugins
+	configPath := filepath.Join(configDir, "mise.toml")
+	configContent := `[tools]
+"vfox-pulumi:pulumi/pulumi-aws" = "7.6.6"
+
+[plugins]
+"vfox-pulumi" = "https://github.com/pulumi/vfox-pulumi"
+`
+	if err := os.WriteFile(configPath, []byte(configContent), 0o644); err != nil {
+		t.Fatalf("write .config/mise.toml: %v", err)
+	}
+
+	// Don't create .ci-mgmt.yaml
+
+	// Run plugin merge - should succeed even without .ci-mgmt.yaml
+	migration := mergePluginsToRoot{}
+	if err := migration.Migrate("bridged-provider", dir); err != nil {
+		t.Fatalf("mergePluginsToRoot should succeed without .ci-mgmt.yaml: %v", err)
+	}
+
+	// Verify root mise.toml was created with plugins from .config/mise.toml
+	rootPath := filepath.Join(dir, "mise.toml")
+	content, err := os.ReadFile(rootPath)
+	if err != nil {
+		t.Fatalf("read root mise.toml: %v", err)
+	}
+
+	contentStr := string(content)
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-aws" = "7.6.6"`) {
+		t.Fatalf("expected pulumi-aws tool in root mise.toml, got:\n%s", contentStr)
+	}
+}
+
+func TestMergePluginsToRootCiMgmtYamlWithoutPlugins(t *testing.T) {
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, ".config")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("mkdir .config: %v", err)
+	}
+
+	// Create .config/mise.toml with plugins
+	configPath := filepath.Join(configDir, "mise.toml")
+	configContent := `[tools]
+"vfox-pulumi:pulumi/pulumi-aws" = "7.6.6"
+
+[plugins]
+"vfox-pulumi" = "https://github.com/pulumi/vfox-pulumi"
+`
+	if err := os.WriteFile(configPath, []byte(configContent), 0o644); err != nil {
+		t.Fatalf("write .config/mise.toml: %v", err)
+	}
+
+	// Create .ci-mgmt.yaml without plugins key
+	ciMgmtPath := filepath.Join(dir, ".ci-mgmt.yaml")
+	ciMgmtContent := `provider: aws
+version: 1.0.0
+`
+	if err := os.WriteFile(ciMgmtPath, []byte(ciMgmtContent), 0o644); err != nil {
+		t.Fatalf("write .ci-mgmt.yaml: %v", err)
+	}
+
+	// Run plugin merge - should succeed even with .ci-mgmt.yaml without plugins
+	migration := mergePluginsToRoot{}
+	if err := migration.Migrate("bridged-provider", dir); err != nil {
+		t.Fatalf("mergePluginsToRoot should succeed with .ci-mgmt.yaml without plugins: %v", err)
+	}
+
+	// Verify root mise.toml was created with plugins from .config/mise.toml only
+	rootPath := filepath.Join(dir, "mise.toml")
+	content, err := os.ReadFile(rootPath)
+	if err != nil {
+		t.Fatalf("read root mise.toml: %v", err)
+	}
+
+	contentStr := string(content)
+	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-aws" = "7.6.6"`) {
+		t.Fatalf("expected pulumi-aws tool in root mise.toml, got:\n%s", contentStr)
+	}
+}
