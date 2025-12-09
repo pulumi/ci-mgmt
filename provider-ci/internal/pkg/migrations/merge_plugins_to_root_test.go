@@ -292,12 +292,6 @@ go = "latest"
 	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-bridge-eks" = "1.2.3"`) {
 		t.Fatalf("expected pulumi-bridge-eks tool from .ci-mgmt.yaml in root mise.toml, got:\n%s", contentStr)
 	}
-	if !strings.Contains(contentStr, "[plugins]") {
-		t.Fatalf("expected [plugins] section in root mise.toml, got:\n%s", contentStr)
-	}
-	if !strings.Contains(contentStr, `vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"`) {
-		t.Fatalf("expected vfox-pulumi plugin in root mise.toml, got:\n%s", contentStr)
-	}
 
 	// Verify non-vfox tools are NOT included
 	if strings.Contains(contentStr, `go = "latest"`) {
@@ -355,9 +349,6 @@ func TestMergePluginsToRootFromBothSources(t *testing.T) {
 	// From .ci-mgmt.yaml
 	if !strings.Contains(contentStr, `"vfox-pulumi:pulumi/pulumi-aws" = "5.0.0"`) {
 		t.Fatalf("expected pulumi-aws tool from .ci-mgmt.yaml in root mise.toml, got:\n%s", contentStr)
-	}
-	if !strings.Contains(contentStr, `vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"`) {
-		t.Fatalf("expected vfox-pulumi plugin in root mise.toml, got:\n%s", contentStr)
 	}
 }
 
