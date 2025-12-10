@@ -34,7 +34,6 @@ env:
   ESC_ACTION_OIDC_ORGANIZATION: pulumi
   ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
   ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
-  ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: GITHUB_TOKEN=PULUMI_BOT_TOKEN
 
 jobs:
   update_workflows:
@@ -43,12 +42,17 @@ jobs:
       - name: Fetch secrets from ESC
         id: esc-secrets
         uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: appauth
+        with:
+          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
       - name: Clone pulumi-${{ inputs.provider_name }}
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.appauth.outputs.token }}
       - name: Get Go version to install
         id: go-version
         run: |
@@ -78,7 +82,7 @@ jobs:
         with:
           repo: pulumi/pulumictl
           tag: v0.0.46
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.appauth.outputs.token }}
           cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -108,7 +112,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         if: ${{ !inputs.skip_closing_prs }}
         with:
-          github-token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          github-token: ${{ steps.appauth.outputs.token }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
             const repo = 'pulumi-${{ inputs.provider_name }}'
@@ -141,7 +145,7 @@ jobs:
           labels: "impact/no-changelog-required"
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          token: ${{ steps.appauth.outputs.token }}
       - name: "Set PR to auto-merge"
         if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
         # Not all providers have auto-merge enabled, and we don't want to fail providers
