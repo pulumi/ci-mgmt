@@ -53,16 +53,6 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           path: ci-mgmt
-      - name: Install ci-mgmt's mise
-        uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3
-        with:
-          version: 2025.12.1
-          working_directory: ci-mgmt
-      - name: Setup Go cache
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
-        with:
-          cache: true
-          cache-dependency-path: ci-mgmt/provider-ci/go.sum
       - name: Initialize submodule in pulumi-${{ inputs.provider_name }}
         run: cd pulumi-${{ inputs.provider_name }} && make upstream && cd ..
         continue-on-error: true
@@ -71,12 +61,12 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/cleanup-artifacts.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
-      - name: Install provider's golangci-lint
+      - name: Install mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3
         with:
           version: 2025.12.1
-          install_args: golangci-lint
-          cache: false
+          install_args: go golangci-lint
+          cache_key_prefix: mise-v0-${{ inputs.provider_name}}-
           working_directory: pulumi-${{ inputs.provider_name }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         working-directory: ci-mgmt/provider-ci
