@@ -43,7 +43,7 @@ jobs:
         id: esc-secrets
         uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
       - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: appauth
+        id: app-auth
         with:
           app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
           private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
@@ -53,7 +53,7 @@ jobs:
         with:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ steps.appauth.outputs.token }}
+          token: ${{ steps.app-auth.outputs.token }}
       - name: Get Go version to install
         id: go-version
         run: |
@@ -83,7 +83,7 @@ jobs:
         with:
           repo: pulumi/pulumictl
           tag: v0.0.46
-          token: ${{ steps.appauth.outputs.token }}
+          token: ${{ steps.app-auth.outputs.token }}
           cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -104,6 +104,7 @@ jobs:
           version: 2025.12.1
           cache: false
           working_directory: pulumi-${{ inputs.provider_name }}
+          github_token: ${{ steps.app-auth.outputs.token }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
         run: |
           cd ci-mgmt/provider-ci && go run ./... generate \
@@ -113,7 +114,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         if: ${{ !inputs.skip_closing_prs }}
         with:
-          github-token: ${{ steps.appauth.outputs.token }}
+          github-token: ${{ steps.app-auth.outputs.token }}
           script: |
             const regex = /Update GitHub Actions workflows/i;
             const repo = 'pulumi-${{ inputs.provider_name }}'
@@ -146,7 +147,7 @@ jobs:
           labels: "impact/no-changelog-required"
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
-          token: ${{ steps.appauth.outputs.token }}
+          token: ${{ steps.app-auth.outputs.token }}
       - name: "Set PR to auto-merge"
         if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
         # Not all providers have auto-merge enabled, and we don't want to fail providers
@@ -156,7 +157,5 @@ jobs:
         # `continue-on-error: true`.
         continue-on-error: true
         run: "gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-url }}"
-      - name: Sleep to prevent hitting secondary rate limits
-        run: sleep 1
     outputs:
       pull_request_created: ${{ steps.create-pr.outputs.pull-request-operation == 'created' }}
