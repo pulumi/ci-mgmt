@@ -221,12 +221,40 @@ func parseTomlValue(line string) (string, bool) {
 		return "", false
 	}
 	value := strings.TrimSpace(line[eq+1:])
+
+	// Strip inline comments first (but only outside of quoted strings)
+	// We need to find the # that's not inside a quoted string
+	var inString bool
+	var stringChar byte
+	commentIdx := -1
+	for i := 0; i < len(value); i++ {
+		ch := value[i]
+		if !inString {
+			if ch == '"' || ch == '\'' {
+				inString = true
+				stringChar = ch
+			} else if ch == '#' {
+				commentIdx = i
+				break
+			}
+		} else {
+			if ch == stringChar && (i == 0 || value[i-1] != '\\') {
+				inString = false
+			}
+		}
+	}
+
+	if commentIdx != -1 {
+		value = strings.TrimSpace(value[:commentIdx])
+	}
+
 	// Remove quotes if present
 	if len(value) >= 2 {
 		if (value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'') {
 			value = value[1 : len(value)-1]
 		}
 	}
+
 	return value, true
 }
 
