@@ -49,37 +49,6 @@ jobs:
           repository: pulumi/pulumi-${{ inputs.provider_name }}
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
-      - name: Get Go version to install
-        id: go-version
-        run: |
-          # Use the default value of "stable" if the .ci-mgmt.yaml file does not exist.
-          if [ ! -f pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml ]; then
-            echo "go-version=stable" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Get the .toolVersions.go field from the .ci-mgmt.yaml file if it exists.
-          GO_VERSION="$(yq '.toolVersions.go' pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml)"
-          # If the field is equal to "null", set it to "stable".
-          if [ "$GO_VERSION" = "null" ]; then
-            GO_VERSION="stable"
-          fi
-          echo "go-version=$GO_VERSION" >> "$GITHUB_OUTPUT"
-      - name: Install Go
-        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
-        with:
-          go-version: ${{ steps.go-version.outputs.go-version }}
-      - name: Setup Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
-        with:
-          python-version: 3.9
-      - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
-        with:
-          repo: pulumi/pulumictl
-          tag: v0.0.46
-          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
-          cache: enable
       - name: Clone ci-mgmt
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
@@ -95,13 +64,14 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3
         with:
-          # Latest working version. See https://github.com/jdx/mise/discussions/6781
           version: 2025.12.1
-          cache: false
+          install_args: go golangci-lint
+          cache_key_prefix: mise-v0-${{ inputs.provider_name}}-
           working_directory: pulumi-${{ inputs.provider_name }}
       - name: Generate workflow files into pulumi-${{ inputs.provider_name }}
+        working-directory: ci-mgmt/provider-ci
         run: |
-          cd ci-mgmt/provider-ci && go run ./... generate \
+          go run ./... generate \
                 --config ../../pulumi-${{ inputs.provider_name }}/.ci-mgmt.yaml \
                 --out ../../pulumi-${{ inputs.provider_name }}
       - name: Close obsolete PRs started by this workflow
