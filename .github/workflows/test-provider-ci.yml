@@ -102,18 +102,18 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
 
-      - name: Await first checks start
+      - name: Await required checks start
         if: steps.pr_opened.outputs.pull_request_created == 'true'
-        timeout-minutes: 5
+        timeout-minutes: 60
         # Wait for at least 3 checks to be started before we start waiting for them to finish.
         # There's a couple of quick checks like comment notification and changelog which are started before the PR checks.
-        run: while [[ $(gh pr checks --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" | wc -l) -le 2 ]]; do sleep 1; done
+        run: while [[ $(gh pr checks --required --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" | wc -l) -le 2 ]]; do sleep 1; done
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
 
-      - name: Await PR tests success
+      - name: Await required checks succeed
         if: steps.pr_opened.outputs.pull_request_created == 'true'
-        timeout-minutes: 60
+        timeout-minutes: 5
         run: gh pr checks --required --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
