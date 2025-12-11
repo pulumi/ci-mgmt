@@ -8,16 +8,30 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+#{{ .Config | renderGlobalEnv | indent 2 }}#
+
 jobs:
   upgrade_provider:
     name: pull-workflow-changes
     runs-on: ubuntu-latest
     steps:
+      #{{- if .Config.GhAppAuth.Enabled }}#
+      - uses: #{{ .Config.ActionVersions.CreateGithubAppToken }}#
+        id: gh-app-token
+        with:
+          app-id: #{{ .Config.GhAppAuth.AppID }}#
+          private-key: #{{ .Config.GhAppAuth.PrivateKey }}#
+      - name: Set up GitHub App authentication
+        run: |
+          echo "PULUMI_PROVIDER_AUTOMATION_TOKEN=${{ steps.gh-app-token.outputs.token }}" >> $GITHUB_ENV
+      #{{- end }}#
       - name: Checkout Repo
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           # Persist credentials so pull-workflow-changes can push a new branch.
           persist-credentials: true
+      #{{- .Config | renderEscStep | indent 6 }}#
       - name: Setup mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3
         env:
@@ -35,7 +49,8 @@ jobs:
         with:
           author: pulumi-bot <bot@pulumi.com>
           base: main
-          body: This pull request was generated automatically by the resync-build workflow
+          body:
+            This pull request was generated automatically by the resync-build workflow
             in this repository.
           branch: chore/resync-${{ github.run_id }}
           commit-message: Regenerate workflows for pulumi-#{{ .Config.Provider }}#
@@ -44,4 +59,4 @@ jobs:
           title: Regenerate Github Actions workflows for pulumi-#{{ .Config.Provider }}#
           token: ${{ env.GITHUB_TOKEN }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_TOKEN || secrets.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
