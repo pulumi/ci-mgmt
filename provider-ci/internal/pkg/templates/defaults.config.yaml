@@ -108,8 +108,7 @@ env:
 # actions can contain preBuild and preTest additional steps to be spliced into workflows.
 # The use of these hooks vary - quite a few just build upstream and run provider tests.
 # Usage: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22actions%3A%22&type=code
-actions:
-  {}
+actions: {}
   # preBuild:
   #  - Your action here
   # preTest:
@@ -227,3 +226,9 @@ esc:
   environment: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
   organization: pulumi
   requestedTokenType: urn:pulumi:token-type:access_token:organization
+
+# Enables auth via a GitHub app.
+github-app:
+  enabled: true
+  id: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+  private-key: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_SECRET_KEY }}

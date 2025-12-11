@@ -335,6 +335,9 @@ type Config struct {
 
 	// ActuallyCommentOnStaleIssues controls whether we comment on stale issues
 	ActuallyCommentOnStaleIssues bool `yaml:"actuallyCommentOnStaleIssues"`
+
+	// GitHubApp contains our GitHub app auth parameters. Enabled by default.
+	GitHubApp GitHubApp `yaml:"github-app"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
@@ -368,6 +371,12 @@ func LoadLocalConfig(path string) (Config, error) {
 	return config, nil
 }
 
+type GitHubApp struct {
+	Enabled    bool
+	ID         string
+	PrivateKey string `yaml:"private-key"`
+}
+
 type plugin struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
@@ -395,6 +404,7 @@ type actionVersions struct {
 	ProviderVersionAction   string `yaml:"providerVersionAction"`
 	Codecov                 string `yaml:"codeCov"`
 	VerifyProviderRelease   string `yaml:"verifyProviderRelease"`
+	CreateGithubAppToken    string `yaml:"createGithubAppToken"`
 }
 
 type toolVersions struct {
@@ -487,6 +497,8 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.VerifyProviderRelease = uses
 						case "codecov/codecov-action":
 							config.ActionVersions.Codecov = uses
+						case "actions/create-github-app-token":
+							config.ActionVersions.CreateGithubAppToken = uses
 						}
 					}
 				}
