@@ -2,8 +2,6 @@ permissions: write-all # Equivalent to default permissions plus id-token: write
 name: Test Provider CI
 on:
   pull_request:
-    branches:
-      - master
   merge_group: {}
   workflow_dispatch: {}
 
