@@ -171,7 +171,7 @@ jobs:
 
         git stash pop
 
-        git add sdk
+        git add sdk provider/cmd/kubernetes/schema.json
 
         git reset sdk/python/*/pulumi-plugin.json \
             sdk/python/pyproject.toml \
@@ -317,7 +317,7 @@ jobs:
 
         git stash pop
 
-        git add sdk
+        git add sdk provider/cmd/kubernetes/schema.json
 
         git reset sdk/python/*/pulumi-plugin.json \
             sdk/python/pyproject.toml \
