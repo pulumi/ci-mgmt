@@ -28,6 +28,14 @@ jobs:
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
+#{{- if .Config.GitHubApp.Enabled }}#
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+#{{- end }}#
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
