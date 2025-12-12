@@ -205,7 +205,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download Provider Binary
       uses: ./.github/actions/download-provider
     - name: Initialize submodules
@@ -327,7 +327,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download Provider Binary
       uses: ./.github/actions/download-provider
     - name: Download SDK
@@ -418,7 +418,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
       with:
@@ -494,7 +494,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download python SDK
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:

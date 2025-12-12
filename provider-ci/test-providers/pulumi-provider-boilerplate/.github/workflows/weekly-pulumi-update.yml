@@ -46,7 +46,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Update Pulumi/Pulumi
       id: gomod
       run: >-

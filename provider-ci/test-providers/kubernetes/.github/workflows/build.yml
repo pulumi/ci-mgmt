@@ -198,7 +198,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download Provider Binary
       uses: ./.github/actions/download-provider
     - name: Generate SDK
@@ -317,7 +317,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download Provider Binary
       uses: ./.github/actions/download-provider
     - name: Download SDK
@@ -441,7 +441,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Clear GitHub Actions Ubuntu runner disk space
       uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       with:
@@ -526,7 +526,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Download python SDK
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
@@ -587,7 +587,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Disarm go:embed directives to enable linters that compile source code
       run: git grep -l 'go:embed' -- provider | xargs --no-run-if-empty sed -i
         's/go:embed/ goembed/g'
@@ -615,7 +615,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
@@ -679,7 +679,7 @@ jobs:
     - name: Setup Tools
       uses: ./.github/actions/setup-tools
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ steps.app-auth.outputs.token }}
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
