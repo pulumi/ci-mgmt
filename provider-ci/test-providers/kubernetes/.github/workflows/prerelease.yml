@@ -43,6 +43,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
@@ -165,6 +171,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
@@ -242,6 +254,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
@@ -360,6 +378,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
@@ -433,6 +457,12 @@ jobs:
       id: esc-secrets
       name: Fetch secrets from ESC
       uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
+    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
     - id: version
       name: Set Provider Version
       uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
