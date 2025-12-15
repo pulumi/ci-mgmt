@@ -45,6 +45,7 @@ assignees: ''
 - [ ] [postgresql](https://github.com/pulumi/pulumi-postgresql)
 - [ ] [random](https://github.com/pulumi/pulumi-random)
 - [ ] [tls](https://github.com/pulumi/pulumi-tls)
+- [ ] [terraform-module](https://github.com/pulumi/pulumi-terraform-module)
 
 ### Tier 3
 
