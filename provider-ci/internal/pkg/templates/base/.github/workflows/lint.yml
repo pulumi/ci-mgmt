@@ -18,6 +18,15 @@ jobs:
       pull-requests: write
       id-token: write # For ESC secrets.
     steps:
+#{{- if .Config.FreeDiskSpaceBeforeTest }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+        dotnet: false
+#{{- end }}#
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
