@@ -38,11 +38,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22plugins%3A%22&type=code
 	Plugins []plugin `yaml:"plugins"`
 
-	// JavaGenVersion ensures a specific javaGen version is used during
-	// upgrades if set. Set for 2 providers:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22javaGenVersion%3A%22&type=code
-	JavaGenVersion string `yaml:"javaGenVersion"`
-
 	// UpstreamProviderOrg is optional and used in the bridge upgrade config.
 	// Only set for 4 providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstreamProviderOrg%3A%22&type=code

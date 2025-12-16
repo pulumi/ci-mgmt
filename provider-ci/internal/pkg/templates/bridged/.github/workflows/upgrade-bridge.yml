@@ -113,9 +113,6 @@ jobs:
         automerge: ${{ inputs.automerge }}
         target-bridge-version: ${{ inputs.target-bridge-version }}
         target-pulumi-version: ${{ inputs.target-pulumi-version }}
-        #{{- if .Config.JavaGenVersion }}#
-        target-java-version: #{{ .Config.JavaGenVersion }}#
-        #{{- end }}#
         pr-reviewers: ${{ inputs.pr-reviewers }}
         pr-description: ${{ inputs.pr-description }}
         pr-title-prefix: ${{ inputs.pr-title-prefix }}
