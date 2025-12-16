@@ -98,7 +98,6 @@ jobs:
       - name: Call upgrade provider action
         id: upgrade_provider
         if: steps.target_version.outputs.version != ''
-        continue-on-error: true
         uses: #{{ .Config.ActionVersions.UpgradeProviderAction }}#
         with:
           kind: provider
@@ -112,19 +111,4 @@ jobs:
           #{{- end }}#
         env:
           GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Comment on upgrade issue if automated PR failed
-        if: steps.upgrade_provider.outcome == 'failure'
-        shell: bash
-        run: |
-          issue_number=$(gh issue list --search "pulumiupgradeproviderissue" --repo "${{ github.repository }}" --json=number --jq=".[0].number")
-          gh issue comment "${issue_number}" --repo "${{ github.repository }}" --body "Failed to create automatic PR: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
-        env:
-          GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Fail workflow if automated PR failed
-        if: steps.upgrade_provider.outcome == 'failure'
-        shell: bash
-        run: |
-          echo "Failed to create automated PR"
-          exit 1
-
 #{{ end -}}#
