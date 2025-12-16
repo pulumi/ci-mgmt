@@ -107,9 +107,6 @@ jobs:
           automerge: #{{ .Config.AutoMergeProviderUpgrades }}#
           target-version: ${{ steps.target_version.outputs.version }}
           allow-missing-docs: #{{ .Config.AllowMissingDocs }}#
-          #{{- if .Config.JavaGenVersion }}#
-          target-java-version: #{{ .Config.JavaGenVersion }}#
-          #{{- end }}#
         env:
           GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
       - name: Comment on upgrade issue if automated PR failed
