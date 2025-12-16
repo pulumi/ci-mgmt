@@ -109,4 +109,10 @@ jobs:
           gh issue comment "${issue_number}" --repo "${{ github.repository }}" --body "Failed to create automatic PR: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
         env:
           GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Fail workflow if automated PR failed
+        if: steps.upgrade_provider.outcome == 'failure'
+        shell: bash
+        run: |
+          echo "Failed to create automated PR"
+          exit 1
 
