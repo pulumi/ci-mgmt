@@ -13,7 +13,7 @@ on:
         type: boolean
         default: false
       provider:
-        description: The name of the provider to update - do not include the pulumi prefix in the name.
+        description: The name of the provider to update - do not include the "pulumi-" prefix in the name.
         required: true
         type: string
 
