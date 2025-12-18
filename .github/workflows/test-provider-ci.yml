@@ -113,7 +113,7 @@ jobs:
 
       - name: Await required checks succeed
         if: steps.pr_opened.outputs.pull_request_created == 'true'
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: gh pr checks --required --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --watch --fail-fast
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
@@ -129,7 +129,7 @@ jobs:
       - name: Await PR merged
         if: github.event_name == 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
         run: while [[ $(gh pr view --repo "${{ matrix.repo }}" "${{ steps.pr_number.outputs.number }}" --json "state" --jq ".state") == "OPEN" ]]; do sleep 1; done
-        timeout-minutes: 5
+        timeout-minutes: 10
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
 
@@ -182,7 +182,7 @@ jobs:
       - name: Await release workflow run
         if: github.event_name == 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
         id: release_workflow
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           until (gh run list --repo "${{ matrix.repo }}" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
           database_id=$(gh run list --repo "${{ matrix.repo }}" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" --jq '.[0].databaseId')
