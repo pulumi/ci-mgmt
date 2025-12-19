@@ -52,8 +52,7 @@ jobs:
           #{{- if .Config.CheckoutSubmodules }}#
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
-          # Persist credentials so upgrade-provider can push a new branch.
-          persist-credentials: true
+          persist-credentials: false # Conflicts with app auth token.
       #{{- .Config | renderEscStep | indent 6 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
       - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
