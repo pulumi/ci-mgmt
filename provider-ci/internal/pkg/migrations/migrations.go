@@ -23,7 +23,6 @@ func Migrate(templateName, outDir string) error {
 		ignoreMiseLocal{},
 		deleteOldMiseConfig{},
 		migrateCimgmtOverrides{},
-		migrateCimgmtToMise{},
 		maintainMiseLock{},
 		mergePluginsToRoot{},
 		activateMise{},
