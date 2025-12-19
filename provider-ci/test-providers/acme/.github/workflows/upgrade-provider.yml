@@ -44,8 +44,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          # Persist credentials so upgrade-provider can push a new branch.
-          persist-credentials: true      
+          persist-credentials: false # Conflicts with app auth token.      
       - id: esc-secrets
         name: Map environment to ESC outputs
         uses: ./.github/actions/esc-action
