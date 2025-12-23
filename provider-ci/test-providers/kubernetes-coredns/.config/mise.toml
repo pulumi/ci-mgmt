@@ -32,6 +32,3 @@ pin = true # `mise use` should pin versions instead of defaulting to latest.
 
 [plugins]
 vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"
-
-[alias]
-vfox-pulumi = "https://github.com/pulumi/vfox-pulumi" # This auto-installs the plugin.
