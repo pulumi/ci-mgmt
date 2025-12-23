@@ -70,7 +70,7 @@ jobs:
         uses: blampe/mise-action@blampe/plugins
         with:
           version: 2025.12.12
-          plugin_install: --all https://github.com/pulumi/vfox-pulumi
+          plugin_install: https://github.com/pulumi/vfox-pulumi
           install_args: go golangci-lint
           cache_key_prefix: mise-v0-${{ inputs.provider_name}}-
           working_directory: pulumi-${{ inputs.provider_name }}
