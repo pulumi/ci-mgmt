@@ -43,7 +43,7 @@ func (activateMise) Migrate(_ string, outDir string) error {
 	var values map[string]string
 
 	if err := json.Unmarshal(output, &values); err != nil {
-		return fmt.Errorf("parsing mise output: %w", err)
+		return fmt.Errorf("parsing mise output: %w\n%s", err, string(output))
 	}
 
 	for name, value := range values {
