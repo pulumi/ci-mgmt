@@ -54,14 +54,14 @@ jobs:
           #{{- end }}#
           persist-credentials: false # Conflicts with app auth token.
       #{{- .Config | renderEscStep | indent 6 }}#
-#{{- if .Config.GitHubApp.Enabled }}#
+      #{{- if .Config.GitHubApp.Enabled }}#
       - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: app-auth
         with:
-          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
-          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+          app-id: #{{ .Config.GitHubApp.ID }}#
+          private-key: #{{ .Config.GitHubApp.PrivateKey }}#
           owner: ${{ github.repository_owner }}
-#{{- end }}#
+      #{{- end }}#
       - name: Setup mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3
         env:
