@@ -28,14 +28,14 @@ func (activateMise) Migrate(_ string, outDir string) error {
 
 	cmd = exec.Command("mise", "install", "--yes")
 	cmd.Dir = outDir
-	err := cmd.Run()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("Failed to install dependencies: %s\n", err)
+		fmt.Printf("Failed to install dependencies: %s\n%s", err, string(output))
 	}
 
 	cmd = exec.Command("mise", "env", "--json", "--cd", outDir)
 
-	output, err := cmd.CombinedOutput()
+	output, err = cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("running mise: %w\n%s", err, string(output))
 	}
