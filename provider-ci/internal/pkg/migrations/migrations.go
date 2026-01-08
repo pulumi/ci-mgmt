@@ -24,7 +24,6 @@ func Migrate(templateName, outDir string) error {
 		deleteOldMiseConfig{},
 		migrateCimgmtOverrides{},
 		maintainMiseLock{},
-		activateMise{},
 		maintainGolangciConfig{},
 	}
 	for i, migration := range migrations {
