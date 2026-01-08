@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -41,16 +42,19 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		Version string
 	}
 
+	buf := &bytes.Buffer{}
 	cmd := exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
 	cmd.Dir = cwd
-	output, err := cmd.CombinedOutput()
+	cmd.Stdout = buf
+	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("problem getting golangci-lint version: %w", err)
 	}
 
-	err = json.Unmarshal(output, &parsed)
+	err = json.NewDecoder(buf).Decode(&parsed)
+
 	if err != nil || len(parsed) != 1 {
-		return fmt.Errorf("parsing output: %w\n%s", err, string(output))
+		return fmt.Errorf("parsing output: %w\n%s", err, buf.String())
 	}
 	version := parsed[0].Version
 
@@ -81,7 +85,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 
 	cmd = exec.Command("golangci-lint", "migrate")
 	cmd.Dir = cwd
-	output, err = cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
 
 	if err != nil {
 		fmt.Printf("Problem migrating golangci-lint config:\n%s\n%s\n", err, string(output))
