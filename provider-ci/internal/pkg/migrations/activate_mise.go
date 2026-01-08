@@ -26,7 +26,7 @@ func (activateMise) Migrate(_ string, outDir string) error {
 	cmd.Dir = outDir
 	_ = cmd.Run() // Error is ignored in case mise isn't present.
 
-	cmd = exec.Command("mise", "install", "--yes")
+	cmd = exec.Command("mise", "install", "--yes", "pulumi", "golangci-lint")
 	cmd.Dir = outDir
 	output, err := cmd.CombinedOutput()
 	if err != nil {
