@@ -73,7 +73,7 @@ jobs:
       - name: Setup mise
         uses: blampe/mise-action@blampe/plugins
         with:
-          version: 2025.11.6
+          version: 2026.1.1
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache_save: false
           plugin_install: https://github.com/pulumi/vfox-pulumi
