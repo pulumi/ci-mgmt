@@ -69,7 +69,7 @@ jobs:
       - name: Install mise
         uses: blampe/mise-action@blampe/plugins
         with:
-          version: 2025.12.12
+          version: 2026.1.1
           plugin_install: https://github.com/pulumi/vfox-pulumi
           install_args: go golangci-lint
           cache_key_prefix: mise-v0-${{ inputs.provider_name}}-

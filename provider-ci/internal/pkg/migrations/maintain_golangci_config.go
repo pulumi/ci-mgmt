@@ -1,10 +1,13 @@
 package migrations
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -34,14 +37,31 @@ func (maintainGolangciConfig) ShouldRun(_ string) bool {
 }
 
 func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
-	// JSON version output was introduced in v2.
-	cmd := exec.Command("golangci-lint", "version", "--json")
-	cmd.Dir = cwd
-	version, err := cmd.CombinedOutput()
 
+	var parsed []struct {
+		Version string
+	}
+
+	buf := &bytes.Buffer{}
+	cmd := exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
+	cmd.Dir = cwd
+	cmd.Stdout = buf
+	err := cmd.Run()
 	if err != nil {
-		fmt.Printf("Skipping: we are probably using golangci-lint v1 (%q)\n", string(version))
+		return fmt.Errorf("problem getting golangci-lint version: %w", err)
+	}
+
+	err = json.NewDecoder(buf).Decode(&parsed)
+
+	if err != nil || len(parsed) != 1 {
+		return fmt.Errorf("parsing output: %w\n%s", err, buf.String())
+	}
+	version := parsed[0].Version
+
+	if strings.HasPrefix(version, "1") {
+		fmt.Printf("Skipping: we are using golangci-lint %s\n", version)
 		return nil
+
 	}
 
 	// If we have the binary available and it's using v2 then we need to check
