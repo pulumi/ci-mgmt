@@ -36,13 +36,5 @@
       matchPackageNames: ["golangci/golangci-lint-action"],
       allowedVersions: "^6",
     },
-    {
-      // Until we get our change merged upstream, Renovate should track
-      // pose/fixes/correct-transpilation-arguments branch instead of main.
-      // See: https://github.com/aws-actions/stale-issue-cleanup/issues/385
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["pose/stale-issue-cleanup"],
-      enabled: false
-    }
   ],
 }
