@@ -16,7 +16,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     steps:
       - name: Checkout Repo
         uses: #{{ .Config.ActionVersions.Checkout }}#

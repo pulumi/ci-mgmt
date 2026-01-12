@@ -34,7 +34,6 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
-  id-token: write # For ESC secrets.
 
 jobs:
   upgrade_provider:

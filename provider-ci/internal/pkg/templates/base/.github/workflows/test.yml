@@ -20,7 +20,9 @@ jobs:
   test:
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write
+      #{{- end }}#
     runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSdk }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ inputs.version }}

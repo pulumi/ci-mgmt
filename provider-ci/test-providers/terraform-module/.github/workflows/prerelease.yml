@@ -23,7 +23,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      id-token: write # For ESC secrets.
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
@@ -34,7 +33,6 @@ jobs:
   build_provider:
     permissions:
       contents: read
-      id-token: write # For ESC secrets.
     uses: ./.github/workflows/build_provider.yml
     needs: prerequisites
     secrets: inherit
@@ -57,7 +55,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      id-token: write
     needs:
       - prerequisites
       - build_provider
@@ -77,7 +74,6 @@ jobs:
       - build_provider
     permissions:
       contents: read
-      id-token: write
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}

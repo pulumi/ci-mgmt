@@ -30,7 +30,9 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  #{{- if .Config.ESC.Enabled }}#
   id-token: write # For ESC secrets.
+  #{{- end }}#
 
 jobs:
   upgrade_provider:

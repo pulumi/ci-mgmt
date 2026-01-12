@@ -27,7 +27,9 @@ jobs:
 #{{ .Config.Languages | toYaml | indent 8 }}#
     permissions:
       contents: write # For Renovate SDKs.
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeSdkBuild }}#
       # Run as first step so we don't delete things that have just been installed

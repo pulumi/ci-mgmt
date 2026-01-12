@@ -9,7 +9,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
@@ -23,7 +25,9 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
@@ -35,7 +39,9 @@ jobs:
     secrets: inherit
     permissions:
       contents: write # For Renovate SDKs.
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     with:
       version: ${{ needs.prerequisites.outputs.version }}
   #{{- end }}#
@@ -50,7 +56,9 @@ jobs:
 #{{- end }}#
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write
+      #{{- end }}#
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}

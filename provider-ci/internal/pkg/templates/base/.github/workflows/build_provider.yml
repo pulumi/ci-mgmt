@@ -36,7 +36,9 @@ jobs:
       matrix: ${{ fromJSON(inputs.matrix) }}
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed

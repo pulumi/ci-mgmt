@@ -247,7 +247,6 @@ jobs:
     needs: publish_sdk
     permissions:
       contents: write
-      id-token: write
     uses: ./.github/workflows/verify-release.yml
     secrets: inherit
     with:

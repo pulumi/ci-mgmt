@@ -16,7 +16,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     steps:
 #{{- if .Config.FreeDiskSpaceBeforeTest }}#
     # Run as first step so we don't delete things that have just been installed
@@ -49,7 +51,7 @@ jobs:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
         version: 2026.1.1
-        github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+        github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         plugin_install: https://github.com/pulumi/vfox-pulumi
         cache_save: false # A different job handles caching our tools.
     - name: disarm go:embed directives to enable lint
