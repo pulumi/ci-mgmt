@@ -15,7 +15,6 @@ jobs:
     runs-on: #{{ .Config.Runner.Default }}#
     permissions:
       contents: read
-      pull-requests: write
       #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
       #{{- end }}#
