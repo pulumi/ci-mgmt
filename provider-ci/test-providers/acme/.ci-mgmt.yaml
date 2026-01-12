@@ -24,5 +24,7 @@ license:
         - github.com/go-acme/tencentclouddnspod
         - github.com/go-acme/tencentedgdeone
 pulumiConvert: 1
+github-app:
+    enabled: false
 esc:
     enabled: false
