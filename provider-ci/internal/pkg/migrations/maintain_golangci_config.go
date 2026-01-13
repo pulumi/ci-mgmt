@@ -83,12 +83,12 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("bash", "-c", "mise exec golangci-lint -- migrate")
+	cmd = exec.Command("bash", "-c", "mise trust -y -a . && mise exec golangci-lint -- migrate -verbose -path "+cfgPath)
 	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Printf("Problem migrating golangci-lint config:\n%s\n%s\n", err, string(output))
+		fmt.Printf("Problem migrating golangci-lint config %s:\n%s\n%s\n", cfgPath, err, string(output))
 		return nil
 	}
 
