@@ -83,7 +83,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("bash", "-c", "mise trust -y -a . && mise exec golangci-lint -- migrate -verbose -path "+cfgPath)
+	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
 	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
@@ -92,6 +92,6 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil
 	}
 
-	// Cleanup the backup config if all went well.
+	// Cleanup the backup config if all went well
 	return os.Remove(filepath.Join(cwd, ".golangci.bck.yml"))
 }
