@@ -19,3 +19,4 @@ envOverride:
     GOOGLE_PROJECT_NUMBER: 637339343727
 runner:
     publish: pulumi-ubuntu-8core
+    prerequisites: pulumi-ubuntu-8core
