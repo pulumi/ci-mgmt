@@ -28,7 +28,7 @@ env:
 
 jobs:
   prerequisites:
-    runs-on: ubuntu-latest
+    runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else }}#ubuntu-latest#{{ end }}#
     name: prerequisites
     permissions:
       id-token: write # For ESC secrets.
@@ -468,8 +468,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   publish:
-    runs-on: #{{ if eq .Config.Provider "aws-native" }}#macos-latest#{{ else
-      }}#ubuntu-latest#{{ end }}#
+    runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else if eq .Config.Provider "aws-native" }}#macos-latest#{{ else }}#ubuntu-latest#{{ end }}#
     needs: test
     name: publish
     permissions:
