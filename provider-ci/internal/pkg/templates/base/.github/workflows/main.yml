@@ -8,7 +8,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     uses: ./.github/workflows/prerequisites.yml
     secrets: inherit
     with:
@@ -22,7 +24,9 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
@@ -34,7 +38,9 @@ jobs:
     secrets: inherit
     permissions:
       contents: write # For Renovate SDKs.
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     with:
       version: ${{ needs.prerequisites.outputs.version }}
   #{{- end }}#
@@ -46,7 +52,9 @@ jobs:
     secrets: inherit
     permissions:
       contents: write # For Renovate SDKs.
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
@@ -66,7 +74,9 @@ jobs:
     name: publish
     permissions:
       contents: write
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write
+      #{{- end }}#
     needs:
       - prerequisites
       - build_provider
@@ -87,7 +97,9 @@ jobs:
     runs-on: #{{ .Config.Runner.Default }}#
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write # For ESC secrets.
+      #{{- end }}#
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
@@ -117,7 +129,9 @@ jobs:
 #{{- end }}#
     permissions:
       contents: read
+      #{{- if .Config.ESC.Enabled }}#
       id-token: write
+      #{{- end }}#
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
