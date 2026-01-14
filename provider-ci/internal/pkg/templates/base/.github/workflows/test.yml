@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSdk }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
+    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     env:
       PROVIDER_VERSION: ${{ inputs.version }}
     steps:
