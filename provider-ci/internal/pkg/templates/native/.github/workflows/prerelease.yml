@@ -430,8 +430,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   publish:
-    runs-on: #{{ if eq .Config.Provider "aws-native" }}#macos-latest#{{ else
-      }}#ubuntu-latest#{{ end }}#
+    runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else if eq .Config.Provider "aws-native" }}#macos-latest#{{ else }}#ubuntu-latest#{{ end }}#
     needs: test
     name: publish
     permissions:
