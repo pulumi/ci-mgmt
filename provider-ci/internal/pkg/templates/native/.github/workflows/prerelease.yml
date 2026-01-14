@@ -20,7 +20,7 @@ env:
 
 jobs:
   prerequisites:
-    runs-on: ubuntu-latest
+    runs-on: #{{ if .Config.Runner.Prerequisites }}##{{ .Config.Runner.Prerequisites }}##{{ else }}#ubuntu-latest#{{ end }}#
     name: prerequisites
     #{{- if eq .Config.Provider "aws-native" }}#
     permissions:
