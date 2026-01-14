@@ -83,7 +83,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("golangci-lint", "migrate", "--verbose")
+	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
 	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
