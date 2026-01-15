@@ -83,15 +83,15 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("golangci-lint", "migrate")
+	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
 	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Printf("Problem migrating golangci-lint config:\n%s\n%s\n", err, string(output))
+		fmt.Printf("Problem migrating golangci-lint config %s:\n%s\n%s\n", cfgPath, err, string(output))
 		return nil
 	}
 
-	// Cleanup the backup config if all went well.
+	// Cleanup the backup config if all went well
 	return os.Remove(filepath.Join(cwd, ".golangci.bck.yml"))
 }
