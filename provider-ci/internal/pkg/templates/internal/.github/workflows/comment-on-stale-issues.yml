@@ -10,6 +10,8 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     name: Stale issue job
+    permissions:
+      issues: write
     steps:
     - uses: aws-actions/stale-issue-cleanup@0604f2edf84a3a66bc0dfb4a30eb07814cbdf440
       with:
