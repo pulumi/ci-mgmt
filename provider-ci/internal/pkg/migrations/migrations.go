@@ -25,6 +25,7 @@ func Migrate(templateName, outDir string) error {
 		migrateCimgmtOverrides{},
 		maintainMiseLock{},
 		maintainGolangciConfig{},
+		unignoreSDKSchemaGo{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
