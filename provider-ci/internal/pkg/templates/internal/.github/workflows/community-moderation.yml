@@ -4,6 +4,8 @@ jobs:
   warn_codegen:
     name: warn_codegen
     runs-on: #{{ .Config.Runner.Default }}#
+    permissions:
+      pull-requests: write
     steps:
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
