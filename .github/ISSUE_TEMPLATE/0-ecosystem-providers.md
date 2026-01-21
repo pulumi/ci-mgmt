@@ -103,4 +103,3 @@ assignees: ''
 - [ ] [vault](https://github.com/pulumi/pulumi-vault)
 - [ ] [venafi](https://github.com/pulumi/pulumi-venafi)
 - [ ] [vsphere](https://github.com/pulumi/pulumi-vsphere)
-- [ ] [wavefront](https://github.com/pulumi/pulumi-wavefront)
