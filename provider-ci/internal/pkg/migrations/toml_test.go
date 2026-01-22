@@ -128,6 +128,7 @@ func TestNewTomlFileMissingCreatesPlaceholder(t *testing.T) {
 	}
 	if tf == nil {
 		t.Fatalf("expected tomlFile instance")
+		return
 	}
 	if _, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("expected file %s to not exist yet", path)
