@@ -57,7 +57,7 @@ jobs:
         uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
 
       - name: pulumi/esc-action
-        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1.5.0
+        uses: pulumi/esc-action@9840934db12128a33f6afb60b17d9de8f7ec5519
 
       # Tools
 
@@ -78,9 +78,6 @@ jobs:
 
       - name: pulumi/auth-actions
         uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
-
-      - name: pulumi/esc-action
-        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1.5.0
 
       - name: pulumi/verify-provider-release
         uses: pulumi/verify-provider-release@679d5e6838ac4f68696bfa1bf9e2c5da94509dd6 # v1.3.1
