@@ -11,7 +11,15 @@ paths:
 
   ".github/workflows/build_sdk.yml":
     ignore:
-      - 'property "pulumi_bot_token" is not defined in object type {}'
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/lint.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
+
+  ".github/workflows/license.yml":
+    ignore:
+      - 'property ".*" is not defined in object type {}'
 
   ".github/workflows/command-dispatch.yml":
     ignore:

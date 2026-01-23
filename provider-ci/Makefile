@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 NAME ?= all
 PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
@@ -56,7 +57,7 @@ test-provider/%: bin/provider-ci $(ACTIONLINT)
 	@rm -rf bin/test-provider/$(PROVIDER_NAME)
 	@cp -r test-providers/$(PROVIDER_NAME) bin/test-provider
 	@cd bin/test-provider/$(PROVIDER_NAME) && git init
-	cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml | sed "s/^/[$(PROVIDER_NAME)] /"
+	(set -o pipefail && cd bin/test-provider/$(PROVIDER_NAME) && ../../../$(ACTIONLINT) -config-file ../../../../.github/actionlint.yaml | sed "s/^/[$(PROVIDER_NAME)] /")
 
 # Fetch the latest .ci-mgmt.yaml from the provider repositories ready for testing.
 update-provider-configs:
