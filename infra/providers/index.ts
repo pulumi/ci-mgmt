@@ -1,7 +1,17 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
-import * as fs from 'fs';
+import * as fs from "fs";
 
+const config = new pulumi.Config();
+
+const gh = new github.Provider("github", {
+  owner: "pulumi",
+  appAuth: {
+    id: config.require("app_id"),
+    installationId: config.require("app_installation_id"),
+    pemFile: config.requireSecret("app_private_key"),
+  },
+});
 
 // grab all the providers from their directory listing
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
@@ -15,22 +25,33 @@ function tfProviderProtection(provider: string) {
 
   const repo = `pulumi-${provider}`;
 
-  new github.BranchProtection(`${provider}-default`, {
-    repositoryId: repo,
-    pattern: github.BranchDefault.get(provider, repo).branch,
-    enforceAdmins: true,
-    requiredStatusChecks: [{
-      strict: false,
-      contexts: requiredChecks,
-    }],
-    requiredPullRequestReviews: [{
-      // We want to make sure that pulumi-bot can auto-merge PRs, so we
-      // explicitly remove review requirements.
-      requiredApprovingReviewCount: 0,
-    }],
-  }, {
-    deleteBeforeReplace: true,
-  });
+  new github.BranchProtection(
+    `${provider}-default`,
+    {
+      repositoryId: repo,
+      pattern: github.BranchDefault.get(provider, repo, undefined, {
+        provider: gh,
+      }).branch,
+      enforceAdmins: true,
+      requiredStatusChecks: [
+        {
+          strict: false,
+          contexts: requiredChecks,
+        },
+      ],
+      requiredPullRequestReviews: [
+        {
+          // We want to make sure that pulumi-bot can auto-merge PRs, so we
+          // explicitly remove review requirements.
+          requiredApprovingReviewCount: 0,
+        },
+      ],
+    },
+    {
+      provider: gh,
+      deleteBeforeReplace: true,
+    },
+  );
 
   new BridgedProviderLabels(provider);
 }
