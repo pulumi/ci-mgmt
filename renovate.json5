@@ -41,7 +41,7 @@
       // pose/chores/better-stack-traces branch instead of main.
       // See: https://github.com/pulumi/ci-mgmt/issues/1987
       matchManagers: ["github-actions"],
-      matchPackageNames: ["pose/chores/better-stack-traces"],
+      matchPackageNames: ["pose/stale-issue-cleanup"],
       enabled: false
     }
   ],
