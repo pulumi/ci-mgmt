@@ -18,7 +18,6 @@ const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/prov
 
 function tfProviderProtection(provider: string) {
   const requiredChecks: string[] = [
-    "Update Changelog",
     // Sentinel is responsible for encapsulating CI checks.
     "Sentinel",
   ];
@@ -80,17 +79,20 @@ class ProviderLabels extends pulumi.ComponentResource {
 
   protected labels(repo: string, labels: (Omit<Omit<github.IssueLabelArgs, "repository">, "name"> & { name: string })[]) {
     for (const label of labels) {
-      new github.IssueLabel(`${repo}-${label.name}`, {
-        repository: repo,
-        ...label,
-      }, {
-        parent: this,
-        // Recreating labels will drop them from any issues they are attached
-        // to. To avoid this, we protect our labels. We also generally don't want to delete Labels
-        // when we remove a repo from management, so we set retainOnDelete to true.
-        protect: true,
-        retainOnDelete: true,
-      })
+      new github.IssueLabel(
+        `${repo}-${label.name}`,
+        {
+          repository: repo,
+          ...label,
+        },
+        {
+          parent: this,
+          // Deleting labels will drop them from any issues they are attached
+          // to. To avoid this, we set retainOnDelete to true.
+          retainOnDelete: true,
+          provider: gh,
+        },
+      );
     }
   }
 }
