@@ -27,8 +27,6 @@ const (
 	parameterizedGo = "parameterized-go"
 	// workflows for native providers
 	native = "native"
-	// workflows for aws-native provider
-	awsNative = "aws-native"
 )
 
 // getTemplateDirs returns a list of directories in the embedded filesystem that form the overall template.
@@ -54,8 +52,6 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		return []TemplateDir{base, parameterizedGo, all /* overrides Makefile */}, nil
 	case "native":
 		return []TemplateDir{native, internal, all}, nil // Can't use base because it has a Makefile that would conflict
-	case "aws-native":
-		return []TemplateDir{native, internal, awsNative, all}, nil // AWS native has 2 extra workflows
 	default:
 		return nil, fmt.Errorf("unknown template: %s", templateName)
 	}
