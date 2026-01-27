@@ -14,6 +14,8 @@ on:
     - sdk/*
     - "**"
   workflow_dispatch: {}
+  merge_group:
+    types: [checks_requested]
 env:
   PROVIDER: #{{ .Config.Provider }}#
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -28,6 +30,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else }}#ubuntu-latest#{{ end }}#
     name: prerequisites
     permissions:
@@ -182,6 +185,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   build_sdks:
+    if: github.actor != 'github-merge-queue[bot]'
     needs: prerequisites
     runs-on: #{{ if eq .Config.Provider "command" }}#ubuntu-latest#{{ else }}#pulumi-ubuntu-8core#{{ end }}#
     strategy:
@@ -268,6 +272,7 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
 
   tag_release_if_labeled_needs_release:
+    if: github.event_name != 'merge_group' && github.actor != 'github-merge-queue[bot]'
     name: Tag release if labeled as needs-release
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
@@ -294,6 +299,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: #{{ if eq .Config.Provider "command" }}#ubuntu-latest#{{ else }}#pulumi-ubuntu-8core#{{ end }}#
     needs:
     - build_sdks
@@ -448,6 +454,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   publish:
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else if eq .Config.Provider "aws-native" }}#macos-latest#{{ else }}#ubuntu-latest#{{ end }}#
     needs: test
     name: publish
@@ -523,6 +530,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   publish_sdk:
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: ubuntu-latest
     needs: publish
     name: publish_sdk
@@ -616,6 +624,7 @@ jobs:
 #{{- end }}#
 #{{- if eq .Config.Provider "kubernetes" }}#
   build-test-cluster:
+    if: github.actor != 'github-merge-queue[bot]'
     runs-on: ubuntu-latest
     name: build-test-cluster
     outputs:
@@ -678,7 +687,7 @@ jobs:
     needs:
     - build-test-cluster
     - test
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.actor != 'github-merge-queue[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
       id-token: write # For Pulumi access token OIDC.
