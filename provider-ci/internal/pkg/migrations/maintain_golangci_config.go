@@ -43,10 +43,19 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	}
 
 	buf := &bytes.Buffer{}
-	cmd := exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
+	cmd := exec.Command("mise", "trust", "--yes")
 	cmd.Dir = cwd
 	cmd.Stdout = buf
 	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("problem trusting: %w", err)
+	}
+
+	buf = &bytes.Buffer{}
+	cmd = exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
+	cmd.Dir = cwd
+	cmd.Stdout = buf
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("problem getting golangci-lint version: %w", err)
 	}
