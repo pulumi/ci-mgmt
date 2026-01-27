@@ -159,7 +159,7 @@ build_go: .make/build_go
 
 generate_java: .make/generate_java
 build_java: .make/build_java
-#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+#{{- if or ( .Config.UseJavaPackageGenSdk ) (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/generate_java: .make/mise_install .make/schema
@@ -330,7 +330,10 @@ tfgen_no_deps: .make/schema
 	(cd provider && VERSION=$(PROVIDER_VERSION) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
 tfgen_build_only: bin/$(CODEGEN)
-bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
+
+GOSRCS = $(shell find ./provider -type f -name '*.go')
+GOMODFILES = $(shell find ./provider -type f -name 'go.*')
+bin/$(CODEGEN): $(GOSRCS) $(GOMODFILES) .make/upstream
 	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
