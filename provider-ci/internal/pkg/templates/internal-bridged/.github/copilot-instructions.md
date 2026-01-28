@@ -37,7 +37,7 @@ Always reference these instructions first and fallback to search or bash command
 - `make build_java` -- Build Java SDK
 
 #### Development Targets:
-- `make lint_provider` -- Lint provider Go code
+- `make lint` -- Lint provider Go code
 - `make test_provider` -- Run provider unit tests
 
 ### Build Guidelines:
@@ -65,13 +65,13 @@ Always reference these instructions first and fallback to search or bash command
 ### Making Code Changes:
 1. Initialize repository: `make upstream`
 2. Make changes to provider code in `provider/`
-3. Validate with: `make lint_provider`
+3. Validate with: `make lint`
 4. Test with: `make test_provider`
 5. Build provider: `make provider`
 6. Generate and build SDKs: `make build_sdks`
 
 ### Validation Steps:
-- Always use `make lint_provider` to lint provider code
+- Always use `make lint` to lint provider code
 - Use `make test_provider` to run provider unit tests  
 - Use `make build` to validate the full build process
 
@@ -87,7 +87,7 @@ Always reference these instructions first and fallback to search or bash command
 ## Validation Scenarios
 
 ### Code Quality Validation:
-- Use `make lint_provider` to lint provider Go code
+- Use `make lint` to lint provider Go code
 - Use `make test_provider` to run provider unit tests
 - Use `make build` to validate full build process
 

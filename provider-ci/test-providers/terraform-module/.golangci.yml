@@ -17,6 +17,11 @@ linters:
   - revive
   - unconvert
   - unused
+  disable:
+    # We lint in contexts where generated go:embed files don't exist yet. Go
+    # won't let us compile if these files are missing, so this check doesn't
+    # provide any value.
+    - embedcheck
   enable-all: false
 issues:
   exclude-dirs:

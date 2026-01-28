@@ -17,6 +17,11 @@ linters:
   - revive
   - unconvert
   - unused
+  disable:
+    # We lint in contexts where generated go:embed files don't exist yet. Go
+    # won't let us compile if these files are missing, so this check doesn't
+    # provide any value.
+    - embedcheck
   enable-all: false
 issues:
   exclude-dirs:
@@ -33,5 +38,5 @@ linters-settings:
       - blank # Blank section: contains all blank imports.
       - default # Default section: contains all imports that could not be matched to another section type.
       - prefix(github.com/pulumi/) # Custom section: groups all imports with the github.com/pulumi/ prefix.
-      - prefix(github.com/#{{ .Config.Organization }}#/pulumi-#{{ .Config.Provider }}#) # Custom section: local imports
+      - prefix(github.com/pulumi/pulumi-kubernetes-ingress-nginx) # Custom section: local imports
     custom-order: true
