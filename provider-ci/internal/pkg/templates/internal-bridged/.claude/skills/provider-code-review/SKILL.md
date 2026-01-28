@@ -20,4 +20,7 @@ See [patches.md](./patches.md) for detailed instructions.
 
 The resources.go file defines resource mappings between Terraform and Pulumi.
 
-See [resources.md](./resources.md) for review guidelines.
+### Generated SDK Files (`sdk/**`)
+
+These are generated SDK files and SHOULD NOT be reviewed. When reviewing the diff these files
+should be excluded since they will add a lot of noise to the review.
