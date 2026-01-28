@@ -12,6 +12,7 @@ env:
   PULUMI_ENABLE_RESOURCE_REFERENCES: "1"
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PULUMI_PULUMI_ENABLE_JOURNALING: "true"
   PYTHON_VERSION: "3.9"
   TF_APPEND_USER_AGENT: pulumi
 
@@ -84,6 +85,7 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
       isPrerelease: true
+      setLatestRelease: false
       skipGoSdk: true
       skipJavaSdk: true
 
@@ -96,7 +98,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       with:
         persist-credentials: false    
     - env:

@@ -20,8 +20,13 @@ func (fixupBridgeImports) Name() string {
 	return "Fixup Bridge Imports"
 }
 func (fixupBridgeImports) ShouldRun(templateName string) bool {
-	return templateName == "bridged-provider"
+	if templateName != "bridged-provider" {
+		return false
+	}
+	_, err := os.Stat("./provider/resources.go")
+	return err == nil
 }
+
 func (fixupBridgeImports) Migrate(templateName, outDir string) error {
 	path, cleanup, err := writeTempFile("fixupBridgeImports.patch", fixupBridgeImportsPatch)
 	if err != nil {

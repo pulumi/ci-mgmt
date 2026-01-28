@@ -18,6 +18,7 @@ env:
   PULUMI_ENABLE_RESOURCE_REFERENCES: "1"
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+  PULUMI_PULUMI_ENABLE_JOURNALING: "true"
   PYTHON_VERSION: "3.9"
   TF_APPEND_USER_AGENT: pulumi
 
@@ -80,6 +81,8 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
       isPrerelease: false
+      # Only tags on the default branch should set the release as `latest`; backported releases (tagged on a feature branch) should not.
+      setLatestRelease: ${{ github.event.base_ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 
   test:
     uses: ./.github/workflows/test.yml

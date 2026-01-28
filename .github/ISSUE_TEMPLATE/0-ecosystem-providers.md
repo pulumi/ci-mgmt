@@ -45,6 +45,7 @@ assignees: ''
 - [ ] [postgresql](https://github.com/pulumi/pulumi-postgresql)
 - [ ] [random](https://github.com/pulumi/pulumi-random)
 - [ ] [tls](https://github.com/pulumi/pulumi-tls)
+- [ ] [terraform-module](https://github.com/pulumi/pulumi-terraform-module)
 
 ### Tier 3
 
@@ -102,4 +103,3 @@ assignees: ''
 - [ ] [vault](https://github.com/pulumi/pulumi-vault)
 - [ ] [venafi](https://github.com/pulumi/pulumi-venafi)
 - [ ] [vsphere](https://github.com/pulumi/pulumi-vsphere)
-- [ ] [wavefront](https://github.com/pulumi/pulumi-wavefront)

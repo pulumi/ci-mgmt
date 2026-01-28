@@ -1,10 +1,13 @@
 package migrations
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -34,12 +37,40 @@ func (maintainGolangciConfig) ShouldRun(_ string) bool {
 }
 
 func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
-	// JSON version output was introduced in v2.
-	cmd := exec.Command("golangci-lint", "version", "--json")
-	usingV2 := cmd.Run() == nil
 
-	if !usingV2 {
+	var parsed []struct {
+		Version string
+	}
+
+	buf := &bytes.Buffer{}
+	cmd := exec.Command("mise", "trust", "--yes")
+	cmd.Dir = cwd
+	cmd.Stdout = buf
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("problem trusting: %w", err)
+	}
+
+	buf = &bytes.Buffer{}
+	cmd = exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
+	cmd.Dir = cwd
+	cmd.Stdout = buf
+	err = cmd.Run()
+	if err != nil {
+		return fmt.Errorf("problem getting golangci-lint version: %w", err)
+	}
+
+	err = json.NewDecoder(buf).Decode(&parsed)
+
+	if err != nil || len(parsed) != 1 {
+		return fmt.Errorf("parsing output: %w\n%s", err, buf.String())
+	}
+	version := parsed[0].Version
+
+	if strings.HasPrefix(version, "1") {
+		fmt.Printf("Skipping: we are using golangci-lint %s\n", version)
 		return nil
+
 	}
 
 	// If we have the binary available and it's using v2 then we need to check
@@ -61,14 +92,15 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("golangci-lint", "migrate")
+	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
+	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Printf("Problem migrating golangci-lint config:\n%s\n%s\n", err, string(output))
+		fmt.Printf("Problem migrating golangci-lint config %s:\n%s\n%s\n", cfgPath, err, string(output))
 		return nil
 	}
 
-	// Cleanup the backup config if all went well.
+	// Cleanup the backup config if all went well
 	return os.Remove(filepath.Join(cwd, ".golangci.bck.yml"))
 }

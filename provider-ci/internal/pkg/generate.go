@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -94,21 +93,6 @@ func GeneratePackage(opts GenerateOpts) error {
 		}
 	}
 
-	fmt.Println("Installing dependencies")
-
-	// We need to run this to keep our mise lockfile up to date.
-	cmd := exec.Command("mise", "trust", ".")
-	cmd.Dir = opts.OutDir
-	_ = cmd.Run() // Error is ignored in case mise isn't present.
-
-	cmd = exec.Command("mise", "install", "--yes")
-	cmd.Dir = opts.OutDir
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	err = cmd.Run()
-	if err != nil {
-		fmt.Printf("Failed to install dependencies: %s\n", err)
-	}
 	return nil
 }
 
@@ -147,6 +131,7 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "external-bridged-provider":
 		return []string{
@@ -156,15 +141,18 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.yml",
 			".goreleaser.prerelease.yml",
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "generic":
 		return []string{
 			".upgrade-config.yml", // Previously accidentally generated empty file.
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	case "parameterized-go":
 		return []string{
 			".github/actions/setup-tools",
+			"scripts/plugins.mk",
 		}
 	default:
 		return nil
@@ -313,7 +301,7 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 		return nil
 	}
 
-	err = os.MkdirAll(filepath.Dir(outPath), 0755)
+	err = os.MkdirAll(filepath.Dir(outPath), 0o755)
 	if err != nil {
 		return err
 	}
@@ -331,7 +319,7 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 
 	// Make shell scripts executable
 	if strings.HasSuffix(outPath, ".sh") {
-		err = os.Chmod(outPath, 0755)
+		err = os.Chmod(outPath, 0o755)
 		if err != nil {
 			return err
 		}
@@ -448,6 +436,10 @@ func renderGlobalEnv(v any) (string, error) {
 		}
 		env[k] = v
 	}
+
+	// Enable PULUMI_PULUMI_ENABLE_JOURNALING=true globally for all workflows.
+	// Part of the rollout of https://github.com/pulumi/pulumi/issues/13502.
+	env["PULUMI_PULUMI_ENABLE_JOURNALING"] = "true"
 
 	return toYAML(env)
 }

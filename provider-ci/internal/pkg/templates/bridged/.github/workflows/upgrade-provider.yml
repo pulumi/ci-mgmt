@@ -52,14 +52,24 @@ jobs:
           #{{- if .Config.CheckoutSubmodules }}#
           submodules: #{{ .Config.CheckoutSubmodules }}#
           #{{- end }}#
-          # Persist credentials so upgrade-provider can push a new branch.
-          persist-credentials: true
+          persist-credentials: false # Conflicts with app auth token.
       #{{- .Config | renderEscStep | indent 6 }}#
-      - name: Setup mise
-        uses: jdx/mise-action@v3
+#{{- if .Config.GitHubApp.Enabled }}#
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: app-auth
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          cache_key: "mise-{{platform}}-{{file_hash}}"
+          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+#{{- end }}#
+      - name: Setup mise
+        uses: blampe/mise-action@blampe/plugins
+        env:
+          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+        with:
+          version: 2026.1.1
+          github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+          plugin_install: https://github.com/pulumi/vfox-pulumi
           # only saving the cache in the prerequisites job
           cache_save: false
       - name: Install upgrade-provider
@@ -88,7 +98,6 @@ jobs:
       - name: Call upgrade provider action
         id: upgrade_provider
         if: steps.target_version.outputs.version != ''
-        continue-on-error: true
         uses: #{{ .Config.ActionVersions.UpgradeProviderAction }}#
         with:
           kind: provider
@@ -97,18 +106,6 @@ jobs:
           automerge: #{{ .Config.AutoMergeProviderUpgrades }}#
           target-version: ${{ steps.target_version.outputs.version }}
           allow-missing-docs: #{{ .Config.AllowMissingDocs }}#
-          #{{- if .Config.JavaGenVersion }}#
-          target-java-version: #{{ .Config.JavaGenVersion }}#
-          #{{- end }}#
         env:
           GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-      - name: Comment on upgrade issue if automated PR failed
-        if: steps.upgrade_provider.outcome == 'failure'
-        shell: bash
-        run: |
-          issue_number=$(gh issue list --search "pulumiupgradeproviderissue" --repo "${{ github.repository }}" --json=number --jq=".[0].number")
-          gh issue comment "${issue_number}" --repo "${{ github.repository }}" --body "Failed to create automatic PR: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
-        env:
-          GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_TOKEN || steps.esc-secrets.outputs.PULUMI_BOT_TOKEN || secrets.GITHUB_TOKEN }}
-
 #{{ end -}}#

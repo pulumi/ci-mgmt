@@ -28,15 +28,18 @@ jobs:
     # If you do not check out your code, Copilot will do this for you.
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           persist-credentials: false
 
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: blampe/mise-action@blampe/plugins
+        env:
+          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
         with:
+          version: 2026.1.1
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          cache_key: "mise-{{platform}}-{{file_hash}}"
+          plugin_install: https://github.com/pulumi/vfox-pulumi
           # only saving the cache in the prerequisites job
           cache_save: false
 

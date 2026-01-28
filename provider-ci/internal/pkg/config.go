@@ -38,11 +38,6 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22plugins%3A%22&type=code
 	Plugins []plugin `yaml:"plugins"`
 
-	// JavaGenVersion ensures a specific javaGen version is used during
-	// upgrades if set. Set for 2 providers:
-	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22javaGenVersion%3A%22&type=code
-	JavaGenVersion string `yaml:"javaGenVersion"`
-
 	// UpstreamProviderOrg is optional and used in the bridge upgrade config.
 	// Only set for 4 providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstreamProviderOrg%3A%22&type=code
@@ -335,6 +330,9 @@ type Config struct {
 
 	// ActuallyCommentOnStaleIssues controls whether we comment on stale issues
 	ActuallyCommentOnStaleIssues bool `yaml:"actuallyCommentOnStaleIssues"`
+
+	// GitHubApp contains our GitHub app auth parameters. Enabled by default.
+	GitHubApp GitHubApp `yaml:"github-app"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
@@ -368,6 +366,12 @@ func LoadLocalConfig(path string) (Config, error) {
 	return config, nil
 }
 
+type GitHubApp struct {
+	Enabled    bool
+	ID         string
+	PrivateKey string `yaml:"private-key"`
+}
+
 type plugin struct {
 	Name    string `yaml:"name"`
 	Version string `yaml:"version"`
@@ -395,6 +399,7 @@ type actionVersions struct {
 	ProviderVersionAction   string `yaml:"providerVersionAction"`
 	Codecov                 string `yaml:"codeCov"`
 	VerifyProviderRelease   string `yaml:"verifyProviderRelease"`
+	CreateGithubAppToken    string `yaml:"createGithubAppToken"`
 }
 
 type toolVersions struct {
@@ -487,6 +492,8 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.VerifyProviderRelease = uses
 						case "codecov/codecov-action":
 							config.ActionVersions.Codecov = uses
+						case "actions/create-github-app-token":
+							config.ActionVersions.CreateGithubAppToken = uses
 						}
 					}
 				}
