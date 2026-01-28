@@ -149,10 +149,6 @@ func getDeletedFiles(templateName string) []string {
 			".github/actions/setup-tools",
 			"scripts/plugins.mk",
 		}
-	case "aws-native":
-		return []string{
-			".github/workflows/nightly-sdk-generation", // managed by repo now
-		}
 	case "parameterized-go":
 		return []string{
 			".github/actions/setup-tools",
