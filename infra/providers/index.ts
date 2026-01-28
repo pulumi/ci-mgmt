@@ -24,13 +24,15 @@ function tfProviderProtection(provider: string) {
 
   const repo = `pulumi-${provider}`;
 
+  const defaultBranch = github.BranchDefault.get(provider, repo, undefined, {
+    provider: gh,
+  }).branch;
+
   new github.BranchProtection(
     `${provider}-default`,
     {
       repositoryId: repo,
-      pattern: github.BranchDefault.get(provider, repo, undefined, {
-        provider: gh,
-      }).branch,
+      pattern: defaultBranch,
       enforceAdmins: true,
       requiredStatusChecks: [
         {
@@ -45,12 +47,39 @@ function tfProviderProtection(provider: string) {
           requiredApprovingReviewCount: 0,
         },
       ],
+      requireConversationResolution: false,
     },
     {
       provider: gh,
       deleteBeforeReplace: true,
     },
   );
+
+  if (provider === "random") {
+    new github.RepositoryRuleset(
+      `${provider}-merge-queue`,
+      {
+        repository: repo,
+        name: "Merge Queue",
+        target: "branch",
+        enforcement: "active",
+        conditions: {
+          refName: {
+            includes: [defaultBranch],
+            excludes: [],
+          },
+        },
+        rules: {
+          mergeQueue: {
+            mergeMethod: "SQUASH",
+          },
+        },
+      },
+      {
+        provider: gh,
+      },
+    );
+  }
 
   new BridgedProviderLabels(provider);
 }
