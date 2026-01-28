@@ -367,31 +367,24 @@ func renderESCStep(v any) (string, error) {
 		return "\n" + s, err
 	}
 
-	if config.ESC.Enabled {
-		env := map[string]string{
-			"ESC_ACTION_OIDC_AUTH":                    "true",
-			"ESC_ACTION_OIDC_ORGANIZATION":            "pulumi",
-			"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE":    "urn:pulumi:token-type:access_token:organization",
-			"ESC_ACTION_ENVIRONMENT":                  config.ESC.Environment,
-			"ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES": "false",
-		}
-		step := map[string]any{
-			"name": "Fetch secrets from ESC",
-			"id":   "esc-secrets",
-			"uses": "pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b",
-			"env":  env,
-		}
-		return yaml(step)
+	if !config.ESC.Enabled {
+		return "", fmt.Errorf("`esc: { enabled: true } is required for Pulumi providers`")
 	}
 
-	// If ESC is disabled, we use a shim action which pipes environment
-	// variables to the action's outputs. This way our steps stay the same
-	// regardless of whether ESC is enabled or not.
-	return yaml(map[string]any{
-		"name": "Map environment to ESC outputs",
+	env := map[string]string{
+		"ESC_ACTION_OIDC_AUTH":                    "true",
+		"ESC_ACTION_OIDC_ORGANIZATION":            "pulumi",
+		"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE":    "urn:pulumi:token-type:access_token:organization",
+		"ESC_ACTION_ENVIRONMENT":                  config.ESC.Environment,
+		"ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES": "false",
+	}
+	step := map[string]any{
+		"name": "Fetch secrets from ESC",
 		"id":   "esc-secrets",
-		"uses": "./.github/actions/esc-action",
-	})
+		"uses": "pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b",
+		"env":  env,
+	}
+	return yaml(step)
 }
 
 // renderGlobalEnv is used to generate environment variables shared by all
