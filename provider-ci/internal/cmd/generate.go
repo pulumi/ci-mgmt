@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/pulumi/ci-mgmt/provider-ci/internal/pkg"
 	"github.com/spf13/cobra"
@@ -49,6 +51,16 @@ var generateCmd = &cobra.Command{
 
 		if generateArgs.RepositoryName == "" {
 			return fmt.Errorf("repository name must be set either in the config file or via the --name flag")
+		}
+
+		// Validate that the repository is owned by "pulumi"
+		parts := strings.Split(generateArgs.RepositoryName, "/")
+		if len(parts) != 2 {
+			return fmt.Errorf("repository name must be in the format 'owner/repo', got: %s", generateArgs.RepositoryName)
+		}
+		if parts[0] != "pulumi" {
+			fmt.Fprintln(os.Stderr, "Skipping workflow regeneration because this appears to be a third-party provider.")
+			return nil
 		}
 
 		err = pkg.GeneratePackage(pkg.GenerateOpts{

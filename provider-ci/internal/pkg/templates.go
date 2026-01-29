@@ -16,8 +16,6 @@ const (
 	base TemplateDir = "base"
 	// CoC, upgrade-provider config, issue templates, command dispatch workflows
 	internal TemplateDir = "internal"
-	// ci-mgmt pull-based updates workflow
-	external TemplateDir = "external"
 	// Makefile for bridged providers (internal & external)
 	bridged TemplateDir = "bridged"
 	// Upgrade config
@@ -42,9 +40,9 @@ func getTemplateDirs(templateName string) ([]TemplateDir, error) {
 		return []TemplateDir{base, internal, bridged, internalBridged, all}, nil
 	case "external-bridged-provider":
 		// third-party bridged providers
-		return []TemplateDir{base, external, bridged, all}, nil
+		return []TemplateDir{base, bridged, all}, nil
 	case "external-native-provider":
-		return []TemplateDir{native, external, all}, nil // Can't use base because it has a Makefile that would conflict
+		return []TemplateDir{native, all}, nil // Can't use base because it has a Makefile that would conflict
 	case "generic":
 		// Pulumi-owned providers not based on tf-bridge
 		return []TemplateDir{base, internal, all}, nil
