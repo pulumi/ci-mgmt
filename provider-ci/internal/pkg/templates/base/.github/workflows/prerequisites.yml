@@ -91,7 +91,7 @@ jobs:
           sdk/*.sum
           *.sum
     - name: Prepare local workspace before restoring previously built files
-      run: make prepare_local_workspace
+      run: make upstream
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #{{- if .Config.Actions.PreBuild }}#

@@ -41,10 +41,10 @@ mise_install: .make/mise_install | mise_env
 
 .PHONY: mise_env
 mise_env:
-	@mise env -q  > /dev/null
+	@./scripts/mise.sh env -q > /dev/null
 
 .make/mise_install:
-	@mise install -q
+	@./scripts/mise.sh install -q
 	@touch $@
 
 # Build the provider
@@ -53,10 +53,6 @@ build: | mise_env
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
-# Prepare the workspace for building the provider
-# Importantly this is run by CI ahead of restoring the bin directory
-prepare_local_workspace: .make/mise_install
-prepare_local_workspace: | mise_env
 # Creates all generated files which need to be committed
 .PHONY: development only_build build mise_install mise_env
 
@@ -76,10 +72,6 @@ help:
 	@echo ""
 	@echo "Tool Targets"
 	@echo "  ci-mgmt     Re-generate CI configuration from .ci-mgmt.yaml"
-	@echo ""
-	@echo "Internal Targets (automatically run as dependencies of other targets)"
-	@echo "  prepare_local_workspace  Prepare for building"
-	@echo "  mise_install             Install tools with mise"
 	@echo ""
 .PHONY: help
 

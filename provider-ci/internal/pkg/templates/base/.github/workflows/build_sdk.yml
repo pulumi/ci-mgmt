@@ -81,7 +81,7 @@ jobs:
             sdk/*.sum
             *.sum
       - name: Prepare local workspace
-        run: make prepare_local_workspace
+        run: make upstream
         env:
           GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
       - name: Download prerequisites
