@@ -4,7 +4,10 @@ name: license_check
 
 on:
   workflow_call:
-    inputs: {}
+    inputs:
+      sha:
+        type: string
+        description: The commit to build, primarily for community PRs.
 
 env:
   AWS_REGION: us-west-2
@@ -27,6 +30,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
+          ref: ${{ inputs.sha }}
           persist-credentials: false      
       - env:
           ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}

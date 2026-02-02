@@ -14,6 +14,10 @@ on:
       default_branch:
         type: string
         required: true
+      sha:
+        type: string
+        required: false
+        description: The commit to build, primarily for community PRs.
     outputs:
       version:
         description: "Provider version being built"
@@ -33,6 +37,7 @@ jobs:
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
     steps:
+
 #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
     # Run as first step so we don't delete things that have just been installed
     - name: Free Disk Space (Ubuntu)
@@ -45,10 +50,12 @@ jobs:
     - name: Checkout Repo
       uses: #{{ .Config.ActionVersions.Checkout }}#
       with:
+        ref: ${{ inputs.sha }}
         #{{- if .Config.CheckoutSubmodules }}#
         submodules: #{{ .Config.CheckoutSubmodules }}#
         #{{- end }}#
         persist-credentials: false
+
     #{{- .Config | renderEscStep | indent 4 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
     - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
