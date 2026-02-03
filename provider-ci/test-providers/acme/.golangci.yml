@@ -8,8 +8,6 @@ linters:
     - nakedret
     - revive
     - unconvert
-  disable:
-    - embedcheck
   exclusions:
     generated: lax
     presets:
