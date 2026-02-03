@@ -59,7 +59,7 @@ var generateCmd = &cobra.Command{
 			return fmt.Errorf("repository name must be in the format 'owner/repo', got: %s", generateArgs.RepositoryName)
 		}
 		if parts[0] != "pulumi" {
-			fmt.Fprintln(os.Stderr, "Skipping workflow regeneration because this appears to be a third-party provider.")
+			fmt.Fprintln(os.Stderr, "Skipping workflow regeneration because this appears to be a third-party provider. Use github.com/pulumi-labs/ci-mgmt instead.")
 			return nil
 		}
 
