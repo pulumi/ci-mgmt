@@ -66,12 +66,15 @@ build: | mise_env
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
+prepare: upstream
 # Creates all generated files which need to be committed
 generate: generate_sdks schema#{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 generate_sdks:#{{ range .Config.Languages }}# generate_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 build_sdks:#{{ range .Config.Languages }}# build_#{{ . }}##{{ end }}##{{- if .Config.RegistryDocs }}# build_registry_docs#{{- end }}#
 install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
-.PHONY: development only_build build generate generate_sdks build_sdks install_sdks mise_install mise_env
+.PHONY: development only_build build prepare generate generate_sdks build_sdks install_sdks mise_install mise_env
 
 # Installs all necessary tools with mise and records completion in a sentinel
 # file so dependent targets can participate in make's caching behaviour. The
@@ -111,6 +114,7 @@ help:
 	@echo "  debug_tfgen Start a debug server for tfgen"
 	@echo ""
 	@echo "Internal Targets (automatically run as dependencies of other targets)"
+	@echo "  prepare                  Prepare for building"
 	@echo "  upstream                 Initialize the upstream submodule, if present"
 	@echo ""
 	@echo "Language-Specific Targets"

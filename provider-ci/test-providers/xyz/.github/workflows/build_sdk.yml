@@ -84,7 +84,7 @@ jobs:
             sdk/*.sum
             *.sum
       - name: Prepare local workspace
-        run: make upstream
+        run: make prepare
         env:
           GITHUB_TOKEN: ${{ steps.app-auth.outputs.token }}
       - name: Download prerequisites

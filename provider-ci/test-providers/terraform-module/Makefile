@@ -53,8 +53,13 @@ build: | mise_env
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
+# For parameterized-go providers, this is a no-op since there is no upstream submodule
+prepare:
+	@true
 # Creates all generated files which need to be committed
-.PHONY: development only_build build mise_install mise_env
+.PHONY: development only_build build prepare mise_install mise_env
 
 help:
 	@echo "Usage: make [target]"

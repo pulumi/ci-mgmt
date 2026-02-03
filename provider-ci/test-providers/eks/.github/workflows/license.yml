@@ -60,7 +60,7 @@ jobs:
           plugin_install: https://github.com/pulumi/vfox-pulumi
           # only saving the cache in the prerequisites job
           cache_save: false
-      - run: make upstream
+      - run: make prepare
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

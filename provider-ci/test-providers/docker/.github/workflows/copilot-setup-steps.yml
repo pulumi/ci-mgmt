@@ -44,4 +44,4 @@ jobs:
           cache_save: false
 
       - name: Prepare local workspace
-        run: make upstream
+        run: make prepare
