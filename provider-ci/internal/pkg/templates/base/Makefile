@@ -50,6 +50,8 @@ LDFLAGS_UPSTREAM_VERSION=
 LDFLAGS_EXTRAS=#{{- range .Config.ExtraLDFlags }}# #{{ . }}# #{{- end }}#
 LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_UPSTREAM_VERSION) $(LDFLAGS_EXTRAS) $(LDFLAGS_STRIP_SYMBOLS)
 
+include .config/defaults.mk
+
 # Create a `.make` directory for tracking targets which don't generate a single file output. This should be ignored by git.
 # For targets which either don't generate a single file output, or the output file is committed, we use a "sentinel"
 # file within `.make/` to track the staleness of the target and only rebuild when needed.
@@ -262,17 +264,23 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
-lint_provider: upstream
-	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-# `lint_provider.fix` is a utility target meant to be run manually
+.PHONY: lint
+lint: upstream lint.pre default.lint lint.post
+
+# `lint.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
-lint_provider.fix: upstream
+.PHONY: lint.fix
+lint.fix: upstream lint.pre default.lint.fix lint.post
+
+.PHONY: lint.pre
+lint.pre:
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
+
+.PHONY: lint.post
+lint.post:
 	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-.PHONY: lint_provider lint_provider.fix
+
+.PHONY: lint lint.fix
 
 #{{- if .Config.BuildProviderCmd }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#

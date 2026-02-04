@@ -24,6 +24,8 @@ LDFLAGS_STRIP_SYMBOLS=-s -w
 LDFLAGS_PROJ_VERSION=-X $(GO_MODULE)/pkg/version.Version=$(PROVIDER_VERSION)
 LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_STRIP_SYMBOLS)
 
+include .config/defaults.mk
+
 # Create a `.make` directory for tracking targets which don't generate a single file output. This should be ignored by git.
 # For targets which either don't generate a single file output, or the output file is committed, we use a "sentinel"
 # file within `.make/` to track the staleness of the target and only rebuild when needed.
@@ -88,15 +90,15 @@ clean:
 	rm -rf .make/*
 .PHONY: clean
 
-lint_provider: provider
+.PHONY: lint
+lint: provider
 	golangci-lint run -c .golangci.yml
 
 # `lint_provider.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
-lint_provider.fix:
+.PHONY: lint.fix
+lint.fix:
 	golangci-lint run -c .golangci.yml --fix
-
-.PHONY: lint_provider lint_provider.fix
 build_provider_cmd = GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
 
 .PHONY: provider
