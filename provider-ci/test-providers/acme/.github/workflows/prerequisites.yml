@@ -20,7 +20,6 @@ on:
         value: ${{ jobs.prerequisites.outputs.version }}
 
 env:
-  AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -62,6 +61,12 @@ jobs:
       with:
         major-version: 0
         set-env: 'PROVIDER_VERSION'
+    - name: Cache examples generation
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      with:
+        path: |
+          .pulumi/examples-cache
+        key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
     - name: Setup mise
       uses: blampe/mise-action@blampe/plugins
       env:
@@ -85,10 +90,8 @@ jobs:
       run: make prepare_local_workspace
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Install opentofu
-      uses: opentofu/setup-opentofu@v1
-      with:
-        tofu_wrapper: false
+    - name: Generate schema
+      run: make schema
     - name: Build provider binary
       run: make provider
     - name: Unit-test provider code
@@ -99,6 +102,28 @@ jobs:
       uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
       env:
         CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
+    - if: inputs.is_pr
+      name: Check Schema is Valid
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "SCHEMA_CHANGES<<$EOF";
+          schema-tools compare -r github://api.github.com/pulumiverse -p acme -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-acme/schema.json;
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+    - if: inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
+      name: Comment on PR with Details of Schema Check
+      uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-tag: schemaCheck
+        message: >+
+          ${{ env.SCHEMA_CHANGES }}
+
+
+          Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
 
     - name: Upload artifacts
       uses: ./.github/actions/upload-prerequisites

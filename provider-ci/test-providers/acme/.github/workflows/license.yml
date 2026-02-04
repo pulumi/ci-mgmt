@@ -7,7 +7,6 @@ on:
     inputs: {}
 
 env:
-  AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -58,8 +57,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: pulumi/license-check-action@main
         with:
-          module-path: .
+          module-path: provider
           ignore-modules: >-
+            github.com/OpenDNS/vegadns2client,
+            github.com/alibabacloud-go/endpoint-util,
+            github.com/nrdcg/oci-go-sdk,
+            github.com/cespare/xxhash,
+            github.com/envoyproxy/protoc-gen-validate,
+            github.com/go-acme/tencentclouddnspod,
+            github.com/go-acme/tencentedgdeone,
             github.com/aead/chacha20,
             github.com/apache/arrow/go/v12,
             github.com/apache/thrift/lib/go/thrift,

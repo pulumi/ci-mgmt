@@ -7,7 +7,6 @@ on:
     inputs: {}
 
 env:
-  AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -64,4 +63,4 @@ jobs:
       uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6
       with:
         install-mode: none # Handled by mise.
-        working-directory: .
+        working-directory: provider

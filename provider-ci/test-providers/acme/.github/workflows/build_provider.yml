@@ -89,7 +89,7 @@ jobs:
           path: |
             ${{ steps.gocache.outputs.path }}
             ${{ steps.gomodcache.outputs.path }}
-          key: go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-${{ hashFiles('./go.sum') }}
+          key: go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-${{ hashFiles('provider/go.sum') }}
           restore-keys: |
             go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-
       - name: Prepare local workspace before restoring previously built
@@ -98,6 +98,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Restore prerequisites
         uses: ./.github/actions/download-prerequisites
+      - name: Restore makefile progress
+        # This mirrors the targets completed in the prerequisites job
+        run: make --touch provider schema
 
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
@@ -114,6 +117,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: pulumi-resource-terraform-module-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
-          path: bin/pulumi-resource-terraform-module-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          name: pulumi-resource-acme-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
+          path: bin/pulumi-resource-acme-v${{ inputs.version }}-${{ matrix.platform.os }}-${{ matrix.platform.arch }}.tar.gz
           retention-days: 30
