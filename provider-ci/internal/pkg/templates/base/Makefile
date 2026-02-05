@@ -159,7 +159,7 @@ build_go: .make/build_go
 
 generate_java: .make/generate_java
 build_java: .make/build_java
-#{{- if or ( .Config.UseJavaPackageGenSdk ) (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+#{{- if or (eq .Config.Provider "pulumiservice") (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/generate_java: .make/mise_install .make/schema
