@@ -1,0 +1,14 @@
+{
+  "name": "Provider Dev Container",
+  "build": {
+    "dockerfile": "./Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": []
+    }
+  },
+  "remoteUser": "root"
+}

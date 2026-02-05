@@ -1,0 +1,22 @@
+provider: pulumiservice
+major-version: 0
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+  PULUMI_BACKEND_URL: https://api.pulumi-staging.io
+  # Required to properly write "go mod edit -replace=.." when running go examples
+  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
+  PROVIDER: pulumiservice
+  # Need to pin this as 0.10.0 until codegen is updated
+  PULUMI_JAVA_SDK_VERSION: 0.10.0
+
+  # Lookup nuget packages from this directory as well as default nuget directories
+  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
+
+  PULUMI_TEST_OWNER: service-provider-test-org
+  PULUMI_TEST_USE_SERVICE: true
+providerDefaultBranch: main
+template: generic
+shards: 6
+esc:
+    enabled: true
