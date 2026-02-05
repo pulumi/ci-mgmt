@@ -30,10 +30,9 @@ jobs:
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
         run: git config --global init.defaultBranch master
       - name: Install mise
-        uses: blampe/mise-action@blampe/plugins
+        uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
         with:
-          version: 2026.1.1
-          plugin_install: https://github.com/pulumi/vfox-pulumi
+          version: 2026.2.10
       - name: Build & test
         run: cd provider-ci && make all
       - name: Check worktree clean

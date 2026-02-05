@@ -336,6 +336,9 @@ type Config struct {
 
 	// UseJavaPackageGenSdk controls whether we use the Java SDK generation via package gen-sdk
 	UseJavaPackageGenSdk bool `yaml:"useJavaPackageGenSdk"`
+
+	// MiseVersion specifies the version of mise to use on GitHub Actions.
+	MiseVersion string `yaml:"mise-version"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
