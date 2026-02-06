@@ -32,6 +32,8 @@ LDFLAGS_STRIP_SYMBOLS=-s -w
 LDFLAGS_PROJ_VERSION=-X $(GO_MODULE)/pkg/version.Version=$(PROVIDER_VERSION)#{{if .Config.ProviderVersion}}# -X #{{ .Config.ProviderVersion }}#=$(PROVIDER_VERSION)#{{end}}#
 LDFLAGS=$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_STRIP_SYMBOLS)
 
+include .config/defaults.mk
+
 # Create a `.make` directory for tracking targets which don't generate a single file output. This should be ignored by git.
 # For targets which either don't generate a single file output, or the output file is committed, we use a "sentinel"
 # file within `.make/` to track the staleness of the target and only rebuild when needed.
@@ -96,15 +98,15 @@ clean:
 	rm -rf .make/*
 .PHONY: clean
 
-lint_provider: provider
+.PHONY: lint
+lint: provider
 	golangci-lint run -c .golangci.yml
 
 # `lint_provider.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
-lint_provider.fix:
+.PHONY: lint.fix
+lint.fix:
 	golangci-lint run -c .golangci.yml --fix
-
-.PHONY: lint_provider lint_provider.fix
 
 #{{- if .Config.BuildProviderCmd }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
