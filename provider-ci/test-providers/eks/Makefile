@@ -218,7 +218,7 @@ install_python_sdk:
 lint: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml; LINT_EXIT=$$?; \
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
 	exit $$LINT_EXIT
 
 # `lint.fix` is a utility target meant to be run manually
@@ -226,7 +226,7 @@ lint: upstream
 lint.fix: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix; LINT_EXIT=$$?; \
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
 	exit $$LINT_EXIT
 
 .PHONY: lint lint.fix
