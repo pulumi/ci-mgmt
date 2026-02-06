@@ -7,7 +7,6 @@ on:
     - "!v*.*.*-**"
 
 env:
-  AWS_REGION: us-west-2
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
   PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
@@ -37,7 +36,16 @@ jobs:
     with:
       version: ${{ needs.prerequisites.outputs.version }}
 
-  
+  build_sdk:
+    name: build_sdk
+    needs: prerequisites
+    uses: ./.github/workflows/build_sdk.yml
+    secrets: inherit
+    permissions:
+      contents: write # For Renovate SDKs.
+      id-token: write # For ESC secrets.
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
 
   lint:
     name: lint
@@ -72,6 +80,7 @@ jobs:
     needs:
       - prerequisites
       - build_provider
+      - build_sdk
     permissions:
       contents: read
       id-token: write
