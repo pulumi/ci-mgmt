@@ -64,7 +64,6 @@ update-provider-configs:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws/master/.ci-mgmt.yaml" > ./test-providers/aws/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-cloudflare/master/.ci-mgmt.yaml" > ./test-providers/cloudflare/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-docker/master/.ci-mgmt.yaml" > ./test-providers/docker/.ci-mgmt.yaml
-	curl "https://raw.githubusercontent.com/pulumiverse/pulumi-acme/main/.ci-mgmt.yaml" > ./test-providers/acme/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws-native/master/.ci-mgmt.yaml" > ./test-providers/aws-native/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-command/master/.ci-mgmt.yaml" > ./test-providers/command/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-eks/master/.ci-mgmt.yaml" > ./test-providers/eks/.ci-mgmt.yaml
