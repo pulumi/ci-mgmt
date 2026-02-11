@@ -229,7 +229,7 @@ lint.fix: upstream
 	exit $$LINT_EXIT
 
 .PHONY: lint lint.fix
-build_provider_cmd = cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = OS=$(1) ARCH=$(2) OUT=$(3) go build .
 
 provider: bin/$(PROVIDER)
 

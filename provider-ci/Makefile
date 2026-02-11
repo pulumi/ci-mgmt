@@ -51,7 +51,7 @@ test-providers: test-provider/aws test-provider/docker test-provider/cloudflare 
 test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
-	find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' ! -name 'mise.toml'  ! -name '.golangci.yml' -delete && \
+	find . -type f ! -name '.ci-mgmt.yaml' ! -name "*.go" ! -name 'go.mod' ! -name 'provider/go.mod' ! -name 'mise.toml'  ! -name '.golangci.yml' -delete && \
 		../../bin/provider-ci generate 2>&1 | sed "s/^/[$(PROVIDER_NAME)] /"
 	@mkdir -p bin/test-provider
 	@rm -rf bin/test-provider/$(PROVIDER_NAME)

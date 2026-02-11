@@ -21,3 +21,4 @@ shards: 6
 esc:
     enabled: true
 modulePath: .
+buildProviderCmd: "OS=$(1) ARCH=$(2) OUT=$(3) go build ."
