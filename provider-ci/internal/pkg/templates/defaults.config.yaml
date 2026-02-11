@@ -232,3 +232,6 @@ github-app:
   enabled: true
   id: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
   private-key: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_SECRET_KEY }}
+
+# Enables Java SDK generation via package gen-sdk
+useJavaPackageGenSdk: false
