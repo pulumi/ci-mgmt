@@ -20,3 +20,4 @@ template: generic
 shards: 6
 esc:
     enabled: true
+modulePath: .

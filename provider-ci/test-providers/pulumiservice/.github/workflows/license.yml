@@ -62,7 +62,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: pulumi/license-check-action@main
         with:
-          module-path: provider
+          module-path: .
           ignore-modules: >-
             github.com/aead/chacha20,
             github.com/apache/arrow/go/v12,
