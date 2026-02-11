@@ -333,6 +333,9 @@ type Config struct {
 
 	// GitHubApp contains our GitHub app auth parameters. Enabled by default.
 	GitHubApp GitHubApp `yaml:"github-app"`
+
+	// UseJavaPackageGenSdk controls whether we use the Java SDK generation via package gen-sdk
+	UseJavaPackageGenSdk bool `yaml:"useJavaPackageGenSdk"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with
