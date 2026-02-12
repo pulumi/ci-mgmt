@@ -98,7 +98,7 @@ help:
 	@echo "  build (default)     Build the provider and all SDKs and install for testing"
 	@echo "  generate            Generate all SDKs, documentation and schema"
 	@echo "  provider            Build the local provider binary"
-	@echo "  lint_provider<.fix> Run the linter on the provider (& optionally fix)"
+	@echo "  lint<.fix>          Run the linter on the provider (& optionally fix)"
 	@echo "  test_provider       Run the provider tests"
 	@echo "  test                Run the example tests (must run 'build' first)"
 	@echo "  clean               Clean up generated files"
@@ -159,7 +159,7 @@ build_go: .make/build_go
 
 generate_java: .make/generate_java
 build_java: .make/build_java
-#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+#{{- if .Config.UseJavaPackageGenSdk }}#
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/generate_java: .make/mise_install .make/schema
@@ -262,17 +262,21 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
-lint_provider: upstream
+lint: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-# `lint_provider.fix` is a utility target meant to be run manually
+	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml; LINT_EXIT=$$?; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	exit $$LINT_EXIT
+
+# `lint.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
-lint_provider.fix: upstream
+lint.fix: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-.PHONY: lint_provider lint_provider.fix
+	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix; LINT_EXIT=$$?; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	exit $$LINT_EXIT
+
+.PHONY: lint lint.fix
 
 #{{- if .Config.BuildProviderCmd }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
@@ -330,8 +334,8 @@ tfgen_no_deps: .make/schema
 	(cd provider && VERSION=$(PROVIDER_VERSION) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
 tfgen_build_only: bin/$(CODEGEN)
-bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
-	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
+bin/$(CODEGEN): #{{ .Config.ModulePath }}#/*.go #{{ .Config.ModulePath }}#/go.* .make/upstream
+	(cd #{{ .Config.ModulePath }}# && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
 # Apply patches to the upstream submodule, if it exists

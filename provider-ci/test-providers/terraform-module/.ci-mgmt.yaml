@@ -9,6 +9,8 @@ aws: true
 modulePath: .
 env:
   AWS_REGION: "us-west-2"
+esc:
+  enabled: true
 
 actions:
   preTest:

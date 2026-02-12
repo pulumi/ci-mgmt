@@ -44,14 +44,14 @@ format:
 # files for other bridged provider repositories should be ephemeral.
 .PHONY: test-providers test-provider/%
 
-test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx test-provider/xyz test-provider/pulumi-provider-boilerplate
+test-providers: test-provider/aws test-provider/docker test-provider/cloudflare test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx test-provider/xyz test-provider/pulumi-provider-boilerplate test-provider/pulumiservice
 
 # 1. Delete all files except the .ci-mgmt.yaml file and run the provider-ci generate command.
 # 2. Copy the generated provider repository to a temporary git repo and run actionlint on it.
 test-provider/%: PROVIDER_NAME = $*
 test-provider/%: bin/provider-ci $(ACTIONLINT)
 	cd test-providers/$(PROVIDER_NAME) && \
-	find . -type f ! -name '.ci-mgmt.yaml' ! -name 'go.mod' ! -name 'provider/go.mod' ! -name 'mise.toml'  ! -name '.golangci.yml' -delete && \
+	find . -type f ! -name '.ci-mgmt.yaml' ! -name "*.go" ! -name 'go.mod' ! -name 'provider/go.mod' ! -name 'mise.toml'  ! -name '.golangci.yml' -delete && \
 		../../bin/provider-ci generate 2>&1 | sed "s/^/[$(PROVIDER_NAME)] /"
 	@mkdir -p bin/test-provider
 	@rm -rf bin/test-provider/$(PROVIDER_NAME)
@@ -64,7 +64,6 @@ update-provider-configs:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws/master/.ci-mgmt.yaml" > ./test-providers/aws/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-cloudflare/master/.ci-mgmt.yaml" > ./test-providers/cloudflare/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-docker/master/.ci-mgmt.yaml" > ./test-providers/docker/.ci-mgmt.yaml
-	curl "https://raw.githubusercontent.com/pulumiverse/pulumi-acme/main/.ci-mgmt.yaml" > ./test-providers/acme/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-aws-native/master/.ci-mgmt.yaml" > ./test-providers/aws-native/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-command/master/.ci-mgmt.yaml" > ./test-providers/command/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-eks/master/.ci-mgmt.yaml" > ./test-providers/eks/.ci-mgmt.yaml
