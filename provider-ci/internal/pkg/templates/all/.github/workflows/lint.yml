@@ -44,13 +44,12 @@ jobs:
         owner: ${{ github.repository_owner }}
 #{{- end }}#
     - name: Setup mise
-      uses: blampe/mise-action@blampe/plugins
+      uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
-        version: 2026.1.1
+        version: #{{ .Config.MiseVersion }}#
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
-        plugin_install: https://github.com/pulumi/vfox-pulumi
         cache_save: false # A different job handles caching our tools.
     - name: prepare workspace
       continue-on-error: true
