@@ -90,9 +90,8 @@ languages:
   - go
   - java
 
-# env contains an assortment of properties for different purposes.
-# Additional entries are added by individual providers for different reasons.
-# All jobs currently get the same env for all steps but values might only be used for very specific purposes.
+# Default environment variables for all providers
+# Providers can use envOverride in .ci-mgmt.yaml to merge additional env vars or override defaults
 env:
   # Used by pulumi-package-publisher
   PULUMI_API: https://api.pulumi-staging.io
