@@ -9,6 +9,7 @@ env:
   ESC_ACTION_OIDC_ORGANIZATION: pulumi
   ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
   ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
+  PULUMI_API: https://api.pulumi.io
 
 concurrency:
   group: pulumi-provider-repos
