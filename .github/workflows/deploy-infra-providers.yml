@@ -9,7 +9,6 @@ env:
   ESC_ACTION_OIDC_ORGANIZATION: pulumi
   ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
   ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
-  PULUMI_API: https://api.pulumi.com
 
 concurrency:
   group: pulumi-provider-repos
@@ -37,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Pulumi login
-        run: pulumi login --verbose 9
+        run: pulumi login https://api.pulumi.com
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
 
