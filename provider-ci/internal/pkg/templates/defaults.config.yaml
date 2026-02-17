@@ -236,4 +236,4 @@ github-app:
 useJavaPackageGenSdk: false
 
 # Version of mise to use
-mise-version: 2026.2.10
+mise-version: 2026.2.15
