@@ -42,7 +42,7 @@ jobs:
 
       - name: Select stack
         working-directory: infra/providers
-        run: pulumi stack select production
+        run: pulumi stack select pulumi/pulumi-provider-repos/production
 
       - name: Pulumi up
         working-directory: infra/providers
