@@ -48,6 +48,7 @@ function tfProviderProtection(provider: string) {
     },
     {
       provider: gh,
+      retainOnDelete: true,
       deleteBeforeReplace: true,
     },
   );
