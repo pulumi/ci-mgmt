@@ -2,6 +2,7 @@ permissions: write-all
 name: Deploy pulumi-provider-repos stack
 on:
   merge_group: {}
+  pull_request: {}
   workflow_dispatch: {}
 
 env:
@@ -36,16 +37,24 @@ jobs:
         run: npm ci
 
       - name: Pulumi login
-        run: pulumi login
+        run: pulumi login https://api.pulumi.com
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
 
       - name: Select stack
         working-directory: infra/providers
-        run: pulumi stack select production
+        run: pulumi stack select pulumi/pulumi-provider-repos/production
 
       - name: Pulumi up
+        if: github.event_name == 'merge_group'
         working-directory: infra/providers
         run: pulumi up --yes --skip-preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+      - name: Pulumi preview
+        if: github.event_name == 'pull_request'
+        working-directory: infra/providers
+        run: pulumi preview
         env:
           PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
