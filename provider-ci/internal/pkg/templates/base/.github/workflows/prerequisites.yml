@@ -92,7 +92,7 @@ jobs:
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
 #{{- if .Config.Actions.PreBuild }}#
 #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
 #{{- end }}#
