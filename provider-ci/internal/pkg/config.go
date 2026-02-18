@@ -361,8 +361,11 @@ func LoadLocalConfig(path string) (Config, error) {
 		return Config{}, err
 	}
 
+	// Merge envOverride into config.Env (overriding specific keys rather than replacing all)
 	if config.EnvOverride != nil {
-		config.Env = config.EnvOverride
+		for k, v := range config.EnvOverride {
+			config.Env[k] = v
+		}
 	}
 
 	if config.ModulePath == "" {

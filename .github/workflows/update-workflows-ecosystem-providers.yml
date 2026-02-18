@@ -52,3 +52,4 @@ jobs:
       provider_name: ${{ matrix.provider }}
       automerge: ${{ github.event.inputs.automerge == 'true' || github.event_name == 'schedule' }}
       caller_workflow: update-workflows-ecosystem-providers
+      called_by: "@${{ github.actor }}"
