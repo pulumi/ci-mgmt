@@ -235,5 +235,17 @@ github-app:
 # Enables Java SDK generation via package gen-sdk
 useJavaPackageGenSdk: false
 
+# Enables Dotnet SDK generation via package gen-sdk
+useDotnetPackageGenSdk: false
+
+# Enables Go SDK generation via package gen-sdk
+useGoPackageGenSdk: false
+
+# Enables NodeJS SDK generation via package gen-sdk
+useNodejsPackageGenSdk: false
+
+# Enables Python SDK generation via package gen-sdk
+usePythonPackageGenSdk: false
+
 # Version of mise to use
 mise-version: 2026.2.15
