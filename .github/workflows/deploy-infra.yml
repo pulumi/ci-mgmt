@@ -85,7 +85,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           role-to-assume: arn:aws:iam::146095493949:role/ContinuousDelivery
-          role-session-name: pulumi-ci-mgmt_gha-run-id-${{ env.GITHUB_RUN_ID }}
+          role-session-name: pulumi-ci-mgmt_gha-run-id-${{ github.run_id }}
           aws-region: us-west-2
           role-duration-seconds: 7200
 
@@ -96,7 +96,7 @@ jobs:
 
       - name: Select stack
         working-directory: infra/linear-agent
-        run: pulumi stack select pulumi/linear-agent/production
+        run: pulumi stack select pulumi/linear-agent/corp
 
       - name: Pulumi up
         if: github.event_name == 'merge_group'
