@@ -73,6 +73,7 @@
     "snowflake",
     "splunk",
     "spotinst",
+    "std",
     "tailscale",
     "terraform",
     "terraform-module",

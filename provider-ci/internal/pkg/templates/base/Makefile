@@ -97,7 +97,7 @@ help:
 	@echo "  build (default)     Build the provider and all SDKs and install for testing"
 	@echo "  generate            Generate all SDKs, documentation and schema"
 	@echo "  provider            Build the local provider binary"
-	@echo "  lint_provider<.fix> Run the linter on the provider (& optionally fix)"
+	@echo "  lint<.fix>          Run the linter on the provider (& optionally fix)"
 	@echo "  test_provider       Run the provider tests"
 	@echo "  test                Run the example tests (must run 'build' first)"
 	@echo "  clean               Clean up generated files"
@@ -132,6 +132,13 @@ GEN_ENVS := PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(G
 
 generate_dotnet: .make/generate_dotnet
 build_dotnet: .make/build_dotnet
+#{{- if .Config.UseDotnetPackageGenSdk }}#
+.make/generate_dotnet: .make/mise_install#{{- if not .Config.NoSchema }}# .make/schema#{{- end }}#
+.make/generate_dotnet: | mise_env
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language dotnet --out sdk/
+	printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/dotnet/go.mod
+	@touch $@
+#{{- else }}#
 .make/generate_dotnet: .make/mise_install bin/$(CODEGEN)
 .make/generate_dotnet: | mise_env
 	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) dotnet --out sdk/dotnet/
@@ -139,6 +146,7 @@ build_dotnet: .make/build_dotnet
 		printf "module fake_dotnet_module // Exclude this directory from Go tools\n\ngo 1.17\n" > go.mod && \
 		echo "$(PROVIDER_VERSION)" >version.txt
 	@touch $@
+#{{- end }}#
 .make/build_dotnet: .make/generate_dotnet
 	cd sdk/dotnet/ && dotnet build
 	@touch $@
@@ -146,10 +154,17 @@ build_dotnet: .make/build_dotnet
 
 generate_go: .make/generate_go
 build_go: .make/build_go
+#{{- if .Config.UseGoPackageGenSdk }}#
+.make/generate_go: .make/mise_install#{{- if not .Config.NoSchema }}# .make/schema#{{- end }}#
+.make/generate_go: | mise_env
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language go --out sdk/
+	@touch $@
+#{{- else }}#
 .make/generate_go: .make/mise_install bin/$(CODEGEN)
 .make/generate_go: | mise_env
 	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) go --out sdk/go/
 	@touch $@
+#{{- end }}#
 .make/build_go: .make/generate_go
 	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
 	@touch $@
@@ -157,7 +172,7 @@ build_go: .make/build_go
 
 generate_java: .make/generate_java
 build_java: .make/build_java
-#{{- if or (eq .Config.Provider "eks") (eq .Config.Provider "awsx") (eq .Config.Provider "aws-apigateway") }}#
+#{{- if .Config.UseJavaPackageGenSdk }}#
 .make/generate_java: export PATH := $(WORKING_DIR)/.pulumi/bin:$(PATH)
 .make/generate_java: PACKAGE_VERSION := $(PROVIDER_VERSION)
 .make/generate_java: .make/mise_install .make/schema
@@ -183,11 +198,19 @@ build_java: .make/build_java
 
 generate_nodejs: .make/generate_nodejs
 build_nodejs: .make/build_nodejs
+#{{- if .Config.UseNodejsPackageGenSdk }}#
+.make/generate_nodejs: .make/mise_install#{{- if not .Config.NoSchema }}# .make/schema#{{- end }}#
+.make/generate_nodejs: | mise_env
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language nodejs --out sdk/
+	printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/nodejs/go.mod
+	@touch $@
+#{{- else }}#
 .make/generate_nodejs: .make/mise_install bin/$(CODEGEN)
 .make/generate_nodejs: | mise_env
 	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) nodejs --out sdk/nodejs/
 	printf "module fake_nodejs_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/nodejs/go.mod
 	@touch $@
+#{{- end }}#
 .make/build_nodejs: .make/generate_nodejs
 	cd sdk/nodejs/ && \
 		yarn install && \
@@ -198,12 +221,20 @@ build_nodejs: .make/build_nodejs
 
 generate_python: .make/generate_python
 build_python: .make/build_python
+#{{- if .Config.UsePythonPackageGenSdk }}#
+.make/generate_python: .make/mise_install#{{- if not .Config.NoSchema }}# .make/schema#{{- end }}#
+.make/generate_python: | mise_env
+	PULUMI_HOME=$(GEN_PULUMI_HOME) PULUMI_CONVERT_EXAMPLES_CACHE_DIR=$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR) pulumi package gen-sdk provider/cmd/$(PROVIDER)/schema.json --version ${PROVIDER_VERSION} --language python --out sdk/
+	printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/python/go.mod
+	@touch $@
+#{{- else }}#
 .make/generate_python: .make/mise_install bin/$(CODEGEN)
 .make/generate_python: | mise_env
 	$(GEN_ENVS) $(WORKING_DIR)/bin/$(CODEGEN) python --out sdk/python/
 	printf "module fake_python_module // Exclude this directory from Go tools\n\ngo 1.17\n" > sdk/python/go.mod
 	cp README.md sdk/python/
 	@touch $@
+#{{- end }}#
 .make/build_python: .make/generate_python
 	cd sdk/python/ && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
@@ -260,17 +291,21 @@ install_nodejs_sdk: .make/install_nodejs_sdk
 install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
-lint_provider: upstream
+lint: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-# `lint_provider.fix` is a utility target meant to be run manually
+	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml; LINT_EXIT=$$?; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	exit $$LINT_EXIT
+
+# `lint.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
-lint_provider.fix: upstream
+lint.fix: upstream
 	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
-	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix
-	git grep -l 'goembed' -- provider | xargs perl -i -pe 's/ goembed/go:embed/g'
-.PHONY: lint_provider lint_provider.fix
+	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix; LINT_EXIT=$$?; \
+	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	exit $$LINT_EXIT
+
+.PHONY: lint lint.fix
 
 #{{- if .Config.BuildProviderCmd }}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
@@ -328,8 +363,8 @@ tfgen_no_deps: .make/schema
 	(cd provider && VERSION=$(PROVIDER_VERSION) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
 tfgen_build_only: bin/$(CODEGEN)
-bin/$(CODEGEN): provider/*.go provider/go.* .make/upstream
-	(cd provider && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
+bin/$(CODEGEN): #{{ .Config.ModulePath }}#/*.go #{{ .Config.ModulePath }}#/go.* .make/upstream
+	(cd #{{ .Config.ModulePath }}# && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
 .PHONY: tfgen schema tfgen_no_deps tfgen_build_only
 
 # Apply patches to the upstream submodule, if it exists
