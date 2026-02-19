@@ -1,0 +1,168 @@
+permissions: write-all
+name: Linear Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      linear_session_id:
+        required: true
+        type: string
+        description: "Linear AgentSession ID"
+      linear_issue_id:
+        required: true
+        type: string
+        description: "Linear issue ID"
+      issue_title:
+        required: true
+        type: string
+        description: "Linear issue title"
+      issue_body:
+        required: true
+        type: string
+        description: "Linear issue body / description"
+      event_type:
+        required: false
+        type: string
+        default: created
+        description: "'created' for new issue assignment, 'prompted' for follow-up comment"
+      prompt_body:
+        required: false
+        type: string
+        default: ""
+        description: "Body of the follow-up comment (populated when event_type=prompted)"
+
+env:
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
+
+jobs:
+  orchestrate:
+    name: Orchestrate Linear issue across repos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
+
+    steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Run Claude Orchestrator
+        id: claude-agent
+        uses: anthropics/claude-code-action@8341a564b0c1693e9fa29c681852ee3714980098 # v1
+        with:
+          anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --max-turns 20
+            --allowedTools "Skill,Read,Glob,Grep,LS,Bash(gh workflow run *),Bash(curl *)"
+          prompt: |
+            You are a CI automation orchestrator triggered by a Linear issue.
+            Your job is to parse the issue and dispatch per-repo worker workflows.
+
+            LINEAR SESSION ID: ${{ inputs.linear_session_id }}
+            LINEAR ISSUE ID:   ${{ inputs.linear_issue_id }}
+            EVENT TYPE:        ${{ inputs.event_type }}
+            ISSUE TITLE:       ${{ inputs.issue_title }}
+
+            ISSUE BODY:
+            ${{ inputs.issue_body }}
+
+            ${{ inputs.event_type == 'prompted' && format('FOLLOW-UP COMMENT:\n{0}', inputs.prompt_body) || '' }}
+
+            ## Instructions
+
+            1. Post a `thought` activity to Linear at the start. Use the LINEAR_API_KEY
+               environment variable (already set). Example:
+               ```
+               curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Analyzing issue...\"}) { success } }"}'
+               ```
+
+            2. Check `.claude/skills/` for any skill that matches the task described in the
+               issue.
+
+            3. Determine which repositories to update:
+               - **If event_type=created**: First check whether the issue has child
+                 (sub) issues in Linear by querying:
+                 ```bash
+                 curl -s -X POST https://api.linear.app/graphql \
+                   -H "Authorization: $LINEAR_API_KEY" \
+                   -H "Content-Type: application/json" \
+                   -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children { nodes { id title description } } } }"}'
+                 ```
+                 **If child issues are returned** (`children.nodes` is non-empty):
+                 - Extract the provider short name from each child issue title or
+                   description (e.g., "Update pulumi-aws" → "aws"). Skip any child
+                   issue that doesn't clearly map to a single provider.
+                 - Dispatch one worker per child issue. Pass the **parent** issue title
+                   as `issue_title`. For `issue_body`, combine the child issue
+                   description (if non-empty) with the parent issue body so the worker
+                   has both the specific and general context.
+                 - Do **not** also parse the parent body for additional repos — child
+                   issues take precedence.
+
+                 **If no child issues exist** (empty or missing `children.nodes`):
+                 - Fall back to parsing the parent issue body to find ALL provider
+                   names listed (typically as `pulumi-PROVIDER` or just `PROVIDER`)
+                   and dispatch a worker for each one with prompt_body="".
+
+               - **If event_type=prompted**: Read the follow-up comment carefully to
+                 identify WHICH specific repos it applies to (could be one, a subset,
+                 or all from the original issue). Dispatch workers only for those repos,
+                 with prompt_body set to the follow-up comment text. (No need to
+                 re-query sub-issues for prompted events.)
+
+            4. For each repo to process, dispatch a worker workflow. The inputs issue_body
+               and prompt_body may be multi-line; write them to temp files to avoid shell
+               quoting issues, e.g.:
+               ```bash
+               # Write multi-line values to temp files
+               cat > /tmp/issue_body_input.txt << 'ISSUE_BODY_HEREDOC'
+               <issue body content here>
+               ISSUE_BODY_HEREDOC
+
+               gh workflow run linear-agent-worker.yml \
+                 --repo pulumi/ci-mgmt \
+                 -f repo=PROVIDER_SHORT_NAME \
+                 -f linear_session_id="${{ inputs.linear_session_id }}" \
+                 -f issue_title="ESCAPED_TITLE" \
+                 -f issue_body="$(cat /tmp/issue_body_input.txt)" \
+                 -f event_type="${{ inputs.event_type }}" \
+                 -f prompt_body="PROMPT_BODY"
+               ```
+               PROVIDER_SHORT_NAME is the short name only, e.g. "aws" for pulumi-aws.
+
+            5. Post a `response` activity to Linear listing the dispatched repos:
+               ```
+               curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:response,body:\"SUMMARY\"}) { success } }"}'
+               ```
+               For created events: "Dispatching workers for N repos: provider1, provider2, ..."
+               For prompted events: "Dispatching targeted update for REPO based on your comment"
+
+            ## Available Environment Variables
+            - `LINEAR_API_KEY`: for posting activity updates to the Linear session
+            - `GH_TOKEN`: for dispatching worker workflows via `gh workflow run`
+
+            Always post a `thought` at the start and a `response` at the end, even on failure.
+        env:
+          LINEAR_API_KEY: ${{ steps.esc-secrets.outputs.LINEAR_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Upload execution log on failure
+        if: failure() && steps.claude-agent.outputs.execution_file
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-linear-orchestrator-log
+          path: ${{ steps.claude-agent.outputs.execution_file }}
+          retention-days: 7
