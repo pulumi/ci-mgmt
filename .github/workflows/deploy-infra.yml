@@ -1,0 +1,113 @@
+permissions: write-all
+name: Deploy infrastructure stacks
+on:
+  merge_group: {}
+  pull_request: {}
+  workflow_dispatch: {}
+
+env:
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
+
+jobs:
+  deploy-provider-repos:
+    name: Deploy provider repository settings
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pulumi-provider-repos
+      cancel-in-progress: false # Don't cancel in-progress deployments
+    steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Install mise
+        uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
+        with:
+          version: 2026.2.10
+
+      - name: Install dependencies
+        working-directory: infra/providers
+        run: npm ci
+
+      - name: Pulumi login
+        run: pulumi login https://api.pulumi.com
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+      - name: Select stack
+        working-directory: infra/providers
+        run: pulumi stack select pulumi/pulumi-provider-repos/production
+
+      - name: Pulumi up
+        if: github.event_name == 'merge_group'
+        working-directory: infra/providers
+        run: pulumi up --yes --skip-preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+      - name: Pulumi preview
+        if: github.event_name == 'pull_request'
+        working-directory: infra/providers
+        run: pulumi preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+  deploy-linear-agent:
+    name: Deploy linear agent webhook
+    runs-on: ubuntu-latest
+    concurrency:
+      group: linear-agent
+      cancel-in-progress: false # Don't cancel in-progress deployments
+    steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Install mise
+        uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
+        with:
+          version: 2026.2.10
+
+      - name: Install dependencies
+        working-directory: infra/linear-agent
+        run: npm ci
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
+        with:
+          role-to-assume: arn:aws:iam::146095493949:role/ContinuousDelivery
+          role-session-name: pulumi-ci-mgmt_gha-run-id-${{ github.run_id }}
+          aws-region: us-west-2
+          role-duration-seconds: 7200
+
+      - name: Pulumi login
+        run: pulumi login https://api.pulumi.com
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+      - name: Select stack
+        working-directory: infra/linear-agent
+        run: pulumi stack select pulumi/linear-agent/corp
+
+      - name: Pulumi up
+        if: github.event_name == 'merge_group'
+        working-directory: infra/linear-agent
+        run: pulumi up --yes --skip-preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
+
+      - name: Pulumi preview
+        if: github.event_name == 'pull_request'
+        working-directory: infra/linear-agent
+        run: pulumi preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN }}
