@@ -1,0 +1,13 @@
+{
+  "name": "linear-agent",
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3",
+    "@pulumi/aws": "^6",
+    "@pulumi/pulumi": "^3",
+    "@types/aws-lambda": "^8"
+  },
+  "devDependencies": {
+    "@types/node": "^18",
+    "typescript": "^5"
+  }
+}
