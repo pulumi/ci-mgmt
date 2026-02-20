@@ -41,10 +41,10 @@ mise_install: .make/mise_install | mise_env
 
 .PHONY: mise_env
 mise_env:
-	@./scripts/mise.sh env -q > /dev/null
+	@mise env -q  > /dev/null
 
 .make/mise_install:
-	@./scripts/mise.sh install -q
+	@mise install -q
 	@touch $@
 
 # Build the provider
@@ -55,11 +55,10 @@ development: build
 only_build: build
 # Prepare the workspace for building the provider and SDKs
 # Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
-# For parameterized-go providers, this is a no-op since there is no upstream submodule
-prepare:
-	@true
+prepare_local_workspace: .make/mise_install
+prepare_local_workspace: | mise_env
 # Creates all generated files which need to be committed
-.PHONY: development only_build build prepare mise_install mise_env
+.PHONY: development only_build build mise_install mise_env
 
 help:
 	@echo "Usage: make [target]"
@@ -77,6 +76,10 @@ help:
 	@echo ""
 	@echo "Tool Targets"
 	@echo "  ci-mgmt     Re-generate CI configuration from .ci-mgmt.yaml"
+	@echo ""
+	@echo "Internal Targets (automatically run as dependencies of other targets)"
+	@echo "  prepare_local_workspace  Prepare for building"
+	@echo "  mise_install             Install tools with mise"
 	@echo ""
 .PHONY: help
 

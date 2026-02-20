@@ -70,7 +70,7 @@ jobs:
         # also save this cache since we are using a different mise env.
         cache_save: true
     - name: Prepare local workspace
-      run: make prepare
+      run: make #{{ if .Config.MiseBootstrap }}#prepare#{{ else }}#prepare_local_workspace#{{ end }}#
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Download bin

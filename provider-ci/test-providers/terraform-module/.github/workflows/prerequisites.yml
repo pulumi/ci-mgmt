@@ -81,7 +81,7 @@ jobs:
           sdk/*.sum
           *.sum
     - name: Prepare local workspace before restoring previously built files
-      run: make prepare
+      run: make prepare_local_workspace
       env:
         GITHUB_TOKEN: ${{ steps.app-auth.outputs.token }}
     - name: Install opentofu
