@@ -7,13 +7,6 @@ on:
     inputs: {}
 
 env:
-<<<<<<< HEAD:provider-ci/test-providers/acme/.github/workflows/license.yml
-  PULUMI_API: https://api.pulumi-staging.io
-  PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
-  PULUMI_LOCAL_NUGET: ${{ github.workspace }}/nuget
-  PULUMI_PROVIDER_AUTOMATION_TOKEN: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_TOKEN }}
-  PULUMI_PULUMI_ENABLE_JOURNALING: "true"
-=======
   PROVIDER: pulumiservice
   PULUMI_API: https://api.pulumi-staging.io
   PULUMI_BACKEND_URL: https://api.pulumi-staging.io
@@ -23,7 +16,6 @@ env:
   PULUMI_PULUMI_ENABLE_JOURNALING: "true"
   PULUMI_TEST_OWNER: service-provider-test-org
   PULUMI_TEST_USE_SERVICE: "true"
->>>>>>> f591fbcab3c096e497ab858d7155b31b12495ed1:provider-ci/test-providers/pulumiservice/.github/workflows/license.yml
   TF_APPEND_USER_AGENT: pulumi
 
 jobs:
@@ -39,11 +31,6 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false      
-<<<<<<< HEAD:provider-ci/test-providers/acme/.github/workflows/license.yml
-      - id: esc-secrets
-        name: Map environment to ESC outputs
-        uses: ./.github/actions/esc-action
-=======
       - env:
           ESC_ACTION_ENVIRONMENT: github-secrets/${{ github.repository_owner }}-${{ github.event.repository.name }}
           ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
@@ -53,7 +40,6 @@ jobs:
         id: esc-secrets
         name: Fetch secrets from ESC
         uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
->>>>>>> f591fbcab3c096e497ab858d7155b31b12495ed1:provider-ci/test-providers/pulumiservice/.github/workflows/license.yml
       - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: app-auth
         with:
@@ -61,18 +47,6 @@ jobs:
           private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
       - name: Setup mise
-<<<<<<< HEAD:provider-ci/test-providers/acme/.github/workflows/license.yml
-        uses: blampe/mise-action@blampe/plugins
-        env:
-          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
-        with:
-          version: 2026.1.1
-          github_token: ${{ steps.app-auth.outputs.token }}
-          plugin_install: https://github.com/pulumi/vfox-pulumi
-          # only saving the cache in the prerequisites job
-          cache_save: false
-      - run: make upstream
-=======
         uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
         env:
           MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
@@ -82,26 +56,13 @@ jobs:
           # only saving the cache in the prerequisites job
           cache_save: false
       - run: make prepare_local_workspace
->>>>>>> f591fbcab3c096e497ab858d7155b31b12495ed1:provider-ci/test-providers/pulumiservice/.github/workflows/license.yml
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: pulumi/license-check-action@main
         with:
-<<<<<<< HEAD:provider-ci/test-providers/acme/.github/workflows/license.yml
-          module-path: provider
-          ignore-modules: >-
-            github.com/OpenDNS/vegadns2client,
-            github.com/alibabacloud-go/endpoint-util,
-            github.com/nrdcg/oci-go-sdk,
-            github.com/cespare/xxhash,
-            github.com/envoyproxy/protoc-gen-validate,
-            github.com/go-acme/tencentclouddnspod,
-            github.com/go-acme/tencentedgdeone,
-=======
           module-path: .
           ignore-modules: >-
->>>>>>> f591fbcab3c096e497ab858d7155b31b12495ed1:provider-ci/test-providers/pulumiservice/.github/workflows/license.yml
             github.com/aead/chacha20,
             github.com/apache/arrow/go/v12,
             github.com/apache/thrift/lib/go/thrift,

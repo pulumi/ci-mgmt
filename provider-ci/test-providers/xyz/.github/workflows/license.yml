@@ -52,7 +52,7 @@ jobs:
           github_token: ${{ steps.app-auth.outputs.token }}
           # only saving the cache in the prerequisites job
           cache_save: false
-      - run: make prepare
+      - run: make prepare_local_workspace
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
