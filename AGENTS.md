@@ -475,7 +475,7 @@ When in doubt, audit the actual codebase to verify documented counts and structu
 
 ### Timeouts
 - `make all` takes 5-10 minutes (16 providers × generation × validation)
-- Always use generous timeouts (10m recommended)
+- Always use generous timeouts (1m recommended)
 - User's global CLAUDE.md already specifies this for the repo
 
 ### Test Provider .ci-mgmt.yaml Files
