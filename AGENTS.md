@@ -121,7 +121,7 @@ cd provider-ci
 make clean && make all
 ```
 
-This runs (takes 5-10 minutes, use 10m timeout):
+This runs (takes 5-15 seconds, use a 1m timeout):
 1. `go build` - Compiles provider-ci CLI
 2. `test-go` - Runs Go unit tests
 3. `test-providers` - Regenerates all 15 test providers deterministically
