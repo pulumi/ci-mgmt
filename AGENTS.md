@@ -147,7 +147,7 @@ For faster iteration during development:
 ```bash
 cd provider-ci
 make test-provider/aws    # Regenerates aws test provider with debug output
-make lint-providers/aws   # Just validates aws workflows
+$(cd test-providers/aws && actionlint)   # Just validates aws workflows
 ```
 
 ### Testing Against a Real Provider Locally
@@ -194,9 +194,11 @@ Steps:
 - **Applies to all providers?** → Add to `templates/all/.github/workflows/`
 - **Only bridged providers?** → Add to `templates/base/.github/workflows/` or `templates/bridged/.github/workflows/`
 - **Only native providers?** → Add to `templates/native/.github/workflows/`
-- **Specific provider only?** → Either:
-  - Create provider-specific template directory (rare)
-  - Use config hooks in `.ci-mgmt.yaml` (actions.preBuild, actions.postTest, etc.)
+- **Specific provider only?**
+  - NEVER create provider-specific template directory
+  - Look for other ways the provider can extend behavior (in the provider's repo, not ci-mgmt):
+     - Custom tools specified in mise.toml.
+     - TODO: Custom Makefile target behavior overriding defaults.
 
 **Remember**: Workflow files use `#{{ }}#` delimiters for templates, but GitHub Actions expressions still use `${{ }}`
 
