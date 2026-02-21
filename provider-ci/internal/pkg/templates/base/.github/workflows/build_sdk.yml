@@ -60,6 +60,23 @@ jobs:
           path: |
             .pulumi/examples-cache
           key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+#{{- if .Config.MiseBootstrap }}#
+      - name: Get mise cache path
+        id: mise-cache-path
+        shell: bash
+        run: echo "path=$(./scripts/mise.sh cache path)" >> "$GITHUB_OUTPUT"
+      - name: Restore mise cache
+        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+        with:
+          path: ${{ steps.mise-cache-path.outputs.path }}
+          key: mise-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('mise*.toml', '.config/mise*.toml') }}
+          restore-keys: mise-${{ runner.os }}-${{ runner.arch }}-
+      - name: Setup mise
+        shell: bash
+        run: ./scripts/mise.sh install
+        env:
+          MISE_GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+#{{- else }}#
       - name: Setup mise
         uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
         env:
@@ -69,6 +86,7 @@ jobs:
           github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
           # only saving the cache in the prerequisites job
           cache_save: false
+#{{- end }}#
       - name: Setup Go Cache
         if: matrix.language == 'go' || contains(matrix.language, 'go')
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
