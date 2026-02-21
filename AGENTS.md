@@ -474,7 +474,7 @@ AGENTS.md is a symlink to CLAUDE.md - they are the same file. **Agents must keep
 When in doubt, audit the actual codebase to verify documented counts and structures remain accurate. The most important things to keep correct are the template composition tables (incorrect template dirs cause broken generation) and the migration interface (incorrect interface causes broken migrations).
 
 ### Timeouts
-- `make all` takes 5-10 minutes (16 providers × generation × validation)
+- `make all` takes 5-15 seconds (16 providers × generation × validation)
 - Always use generous timeouts (1m recommended)
 - User's global CLAUDE.md already specifies this for the repo
 
