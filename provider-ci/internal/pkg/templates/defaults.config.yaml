@@ -90,9 +90,8 @@ languages:
   - go
   - java
 
-# env contains an assortment of properties for different purposes.
-# Additional entries are added by individual providers for different reasons.
-# All jobs currently get the same env for all steps but values might only be used for very specific purposes.
+# Default environment variables for all providers
+# Providers can use envOverride in .ci-mgmt.yaml to merge additional env vars or override defaults
 env:
   # Used by pulumi-package-publisher
   PULUMI_API: https://api.pulumi-staging.io
@@ -236,5 +235,17 @@ github-app:
 # Enables Java SDK generation via package gen-sdk
 useJavaPackageGenSdk: false
 
+# Enables Dotnet SDK generation via package gen-sdk
+useDotnetPackageGenSdk: false
+
+# Enables Go SDK generation via package gen-sdk
+useGoPackageGenSdk: false
+
+# Enables NodeJS SDK generation via package gen-sdk
+useNodejsPackageGenSdk: false
+
+# Enables Python SDK generation via package gen-sdk
+usePythonPackageGenSdk: false
+
 # Version of mise to use
-mise-version: 2026.2.10
+mise-version: 2026.2.15

@@ -84,7 +84,7 @@ jobs:
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
-        version: 2026.2.10
+        version: 2026.2.15
         github_token: ${{ steps.app-auth.outputs.token }}
         # only saving the cache in the prerequisites job
         cache_save: true
@@ -100,7 +100,7 @@ jobs:
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.app-auth.outputs.token }}
     - name: Generate schema
       run: make schema
     - name: Build registry docs

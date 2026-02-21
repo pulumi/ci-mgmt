@@ -337,6 +337,18 @@ type Config struct {
 	// UseJavaPackageGenSdk controls whether we use the Java SDK generation via package gen-sdk
 	UseJavaPackageGenSdk bool `yaml:"useJavaPackageGenSdk"`
 
+	// UseDotnetPackageGenSdk controls whether we use the Dotnet SDK generation via package gen-sdk
+	UseDotnetPackageGenSdk bool `yaml:"useDotnetPackageGenSdk"`
+
+	// UseGoPackageGenSdk controls whether we use the Go SDK generation via package gen-sdk
+	UseGoPackageGenSdk bool `yaml:"useGoPackageGenSdk"`
+
+	// UseNodejsPackageGenSdk controls whether we use the NodeJS SDK generation via package gen-sdk
+	UseNodejsPackageGenSdk bool `yaml:"useNodejsPackageGenSdk"`
+
+	// UsePythonPackageGenSdk controls whether we use the Python SDK generation via package gen-sdk
+	UsePythonPackageGenSdk bool `yaml:"usePythonPackageGenSdk"`
+
 	// MiseVersion specifies the version of mise to use on GitHub Actions.
 	MiseVersion string `yaml:"mise-version"`
 }
@@ -361,8 +373,11 @@ func LoadLocalConfig(path string) (Config, error) {
 		return Config{}, err
 	}
 
+	// Merge envOverride into config.Env (overriding specific keys rather than replacing all)
 	if config.EnvOverride != nil {
-		config.Env = config.EnvOverride
+		for k, v := range config.EnvOverride {
+			config.Env[k] = v
+		}
 	}
 
 	if config.ModulePath == "" {
