@@ -49,10 +49,18 @@ mise_install: .make/mise_install | mise_env
 
 .PHONY: mise_env
 mise_env:
+#{{- if .Config.MiseBootstrap }}#
+	@./scripts/mise.sh env -q > /dev/null
+#{{- else }}#
 	@mise env -q  > /dev/null
+#{{- end }}#
 
 .make/mise_install:
+#{{- if .Config.MiseBootstrap }}#
+	@./scripts/mise.sh install -q
+#{{- else }}#
 	@mise install -q
+#{{- end }}#
 	@touch $@
 
 # Build the provider
@@ -61,12 +69,22 @@ build: | mise_env
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
-# Prepare the workspace for building the provider
-# Importantly this is run by CI ahead of restoring the bin directory
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
+#{{- if .Config.MiseBootstrap }}#
+# For parameterized-go providers, this is a no-op since there is no upstream submodule
+prepare:
+	@true
+#{{- else }}#
 prepare_local_workspace: .make/mise_install
 prepare_local_workspace: | mise_env
+#{{- end }}#
 # Creates all generated files which need to be committed
+#{{- if .Config.MiseBootstrap }}#
+.PHONY: development only_build build prepare mise_install mise_env
+#{{- else }}#
 .PHONY: development only_build build mise_install mise_env
+#{{- end }}#
 
 help:
 	@echo "Usage: make [target]"
@@ -85,10 +103,12 @@ help:
 	@echo "Tool Targets"
 	@echo "  ci-mgmt     Re-generate CI configuration from .ci-mgmt.yaml"
 	@echo ""
+#{{- if not .Config.MiseBootstrap }}#
 	@echo "Internal Targets (automatically run as dependencies of other targets)"
 	@echo "  prepare_local_workspace  Prepare for building"
 	@echo "  mise_install             Install tools with mise"
 	@echo ""
+#{{- end }}#
 .PHONY: help
 
 clean:

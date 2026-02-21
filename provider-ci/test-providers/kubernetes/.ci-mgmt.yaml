@@ -20,3 +20,4 @@ envOverride:
 runner:
     publish: pulumi-ubuntu-8core
     prerequisites: pulumi-ubuntu-8core
+mise-bootstrap: true

@@ -43,7 +43,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	}
 
 	buf := &bytes.Buffer{}
-	cmd := exec.Command("mise", "trust", "--yes")
+	cmd := exec.Command("./scripts/mise.sh", "trust", "--yes")
 	cmd.Dir = cwd
 	cmd.Stdout = buf
 	err := cmd.Run()
@@ -52,7 +52,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	}
 
 	buf = &bytes.Buffer{}
-	cmd = exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
+	cmd = exec.Command("./scripts/mise.sh", "ls", "golangci-lint", "--json", "-c")
 	cmd.Dir = cwd
 	cmd.Stdout = buf
 	err = cmd.Run()
@@ -92,7 +92,7 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		return nil // Config was already migrated.
 	}
 
-	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
+	cmd = exec.Command("./scripts/mise.sh", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
 	cmd.Dir = cwd
 	output, err := cmd.CombinedOutput()
 

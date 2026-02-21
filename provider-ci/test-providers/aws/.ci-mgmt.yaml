@@ -32,3 +32,4 @@ releaseVerification:
     dotnet: examples/webserver-cs
     go: examples/webserver-go
 autoMergeProviderUpgrades: false
+mise-bootstrap: true

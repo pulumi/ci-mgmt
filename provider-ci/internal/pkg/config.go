@@ -351,6 +351,11 @@ type Config struct {
 
 	// MiseVersion specifies the version of mise to use on GitHub Actions.
 	MiseVersion string `yaml:"mise-version"`
+
+	// MiseBootstrap controls whether to use scripts/mise.sh for bootstrapping mise
+	// instead of relying on a system-installed mise. When enabled, provides a pinned
+	// version of mise for both CI and local development.
+	MiseBootstrap bool `yaml:"mise-bootstrap"`
 }
 
 // LoadLocalConfig loads the provider configuration at the given path with

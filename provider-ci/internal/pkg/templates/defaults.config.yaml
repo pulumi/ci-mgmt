@@ -249,3 +249,7 @@ usePythonPackageGenSdk: false
 
 # Version of mise to use
 mise-version: 2026.2.15
+
+# Controls whether scripts/mise.sh is used for bootstrapping mise instead of
+# relying on a system-installed mise. Opt-in on a per-provider basis.
+mise-bootstrap: false
