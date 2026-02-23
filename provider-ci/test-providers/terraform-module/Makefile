@@ -53,8 +53,8 @@ build: | mise_env
 # Keep aliases for old targets to ensure backwards compatibility
 development: build
 only_build: build
-# Prepare the workspace for building the provider
-# Importantly this is run by CI ahead of restoring the bin directory
+# Prepare the workspace for building the provider and SDKs
+# Importantly this is run by CI ahead of restoring the bin directory and resuming SDK builds
 prepare_local_workspace: .make/mise_install
 prepare_local_workspace: | mise_env
 # Creates all generated files which need to be committed
