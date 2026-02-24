@@ -83,7 +83,7 @@ jobs:
                environment variable (already set). Example:
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Analyzing issue...\"}) { success } }"}'
                ```
@@ -96,7 +96,7 @@ jobs:
                  (sub) issues in Linear by querying:
                  ```bash
                  curl -s -X POST https://api.linear.app/graphql \
-                   -H "Authorization: $LINEAR_API_KEY" \
+                   -H "Authorization: Bearer $LINEAR_API_KEY" \
                    -H "Content-Type: application/json" \
                    -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children { nodes { id title description } } } }"}'
                  ```
@@ -136,6 +136,7 @@ jobs:
                  --ref blampe/testing \
                  -f repo=PROVIDER_SHORT_NAME \
                  -f linear_session_id="${{ inputs.linear_session_id }}" \
+                 -f linear_issue_id="${{ inputs.linear_issue_id }}" \
                  -f issue_title="ESCAPED_TITLE" \
                  -f issue_body="$(cat /tmp/issue_body_input.txt)" \
                  -f event_type="${{ inputs.event_type }}" \
@@ -146,7 +147,7 @@ jobs:
             5. Post a `response` activity to Linear listing the dispatched repos:
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:response,body:\"SUMMARY\"}) { success } }"}'
                ```

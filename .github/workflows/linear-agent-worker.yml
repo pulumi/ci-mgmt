@@ -12,6 +12,10 @@ on:
         required: true
         type: string
         description: "Linear AgentSession ID"
+      linear_issue_id:
+        required: true
+        type: string
+        description: "Linear issue UUID (used to look up the human-readable identifier for branch naming)"
       issue_title:
         required: true
         type: string
@@ -96,7 +100,7 @@ jobs:
                environment variable (already set). Example:
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Starting work on pulumi-${{ inputs.repo }}...\"}) { success } }"}'
                ```
@@ -114,30 +118,81 @@ jobs:
                gh repo clone pulumi/pulumi-${{ inputs.repo }} /tmp/pulumi-${{ inputs.repo }}
                ```
 
-            5. Make the necessary changes in /tmp/pulumi-${{ inputs.repo }} as described
-               by the issue (and refined by the follow-up if provided). Commit the changes.
-
-            6. Create a pull request:
-               ```
-               gh pr create \
-                 --repo pulumi/pulumi-${{ inputs.repo }} \
-                 --title "..." \
-                 --body "Automated by Linear issue: ${{ inputs.issue_title }}"
-               ```
-
-            7. Post an `action` activity to Linear with the PR URL:
+            5. Determine the branch name for this issue. Query Linear to get the
+               human-readable identifier (e.g. `ENG-123`):
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier } }"}'
+               ```
+               Lowercase the identifier to use as the branch name. For example,
+               `ENG-123` becomes `eng-123`.
+
+            6. Check whether a PR already exists on that branch in the provider repo.
+               If one exists, check out the existing branch and update it; otherwise
+               create a new branch.
+               ```bash
+               cd /tmp/pulumi-${{ inputs.repo }}
+
+               BRANCH_NAME="<computed above>"
+
+               # Check for an open PR on this branch
+               EXISTING_PR=$(gh pr list \
+                 --repo pulumi/pulumi-${{ inputs.repo }} \
+                 --state open \
+                 --head "$BRANCH_NAME" \
+                 --json number,url \
+                 --jq '.[0]')
+
+               if [ -n "$EXISTING_PR" ]; then
+                 # Fetch and check out the existing branch
+                 git fetch origin "$BRANCH_NAME"
+                 git checkout "$BRANCH_NAME"
+               else
+                 git checkout -b "$BRANCH_NAME"
+               fi
+               ```
+
+            7. Make the necessary changes in /tmp/pulumi-${{ inputs.repo }} as described
+               by the issue (and refined by the follow-up if provided). Commit the changes
+               and push the branch.
+
+            8. Create or update the pull request:
+               - If `$EXISTING_PR` was non-empty (PR already exists): push the branch and
+                 update the PR description:
+                 ```
+                 git push origin "$BRANCH_NAME"
+                 PR_NUMBER=$(echo "$EXISTING_PR" | jq -r '.number')
+                 gh pr edit "$PR_NUMBER" \
+                   --repo pulumi/pulumi-${{ inputs.repo }} \
+                   --body "Automated by Linear issue: ${{ inputs.issue_title }}"
+                 PR_URL=$(echo "$EXISTING_PR" | jq -r '.url')
+                 ```
+               - If no existing PR: push and create a new one:
+                 ```
+                 git push origin "$BRANCH_NAME"
+                 PR_URL=$(gh pr create \
+                   --repo pulumi/pulumi-${{ inputs.repo }} \
+                   --head "$BRANCH_NAME" \
+                   --title "..." \
+                   --body "Automated by Linear issue: ${{ inputs.issue_title }}" \
+                   --json url --jq '.url')
+                 ```
+
+            9. Post an `action` activity to Linear with the PR URL:
+               ```
+               curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}) { success } }"}'
                ```
-               Replace NUMBER and URL with the actual PR number and URL from step 6.
+               Replace NUMBER and URL with the actual PR number and URL from step 8.
 
             If any step fails, post an `action` activity to Linear describing the failure:
             ```
             curl -s -X POST https://api.linear.app/graphql \
-              -H "Authorization: $LINEAR_API_KEY" \
+              -H "Authorization: Bearer $LINEAR_API_KEY" \
               -H "Content-Type: application/json" \
               -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Failed to process pulumi-${{ inputs.repo }}: REASON\"}) { success } }"}'
             ```
