@@ -58,6 +58,7 @@ jobs:
         uses: anthropics/claude-code-action@8341a564b0c1693e9fa29c681852ee3714980098 # v1
         with:
           anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
+          github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           allowed_bots: pulumi-provider-automation
           claude_args: |
             --max-turns 20
