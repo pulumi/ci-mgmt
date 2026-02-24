@@ -228,7 +228,7 @@ async function handleWebhook(
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
-        ref: "master",
+        ref: "blampe/testing",
         inputs: {
           linear_session_id: session.id,
           linear_issue_id: issue.id,

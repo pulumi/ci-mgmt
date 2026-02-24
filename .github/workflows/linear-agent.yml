@@ -132,6 +132,7 @@ jobs:
 
                gh workflow run linear-agent-worker.yml \
                  --repo pulumi/ci-mgmt \
+                 --ref blampe/testing \
                  -f repo=PROVIDER_SHORT_NAME \
                  -f linear_session_id="${{ inputs.linear_session_id }}" \
                  -f issue_title="ESCAPED_TITLE" \
