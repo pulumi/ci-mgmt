@@ -113,6 +113,13 @@ jobs:
 
             ${{ inputs.prompt_body != '' && format('FOLLOW-UP / REFINEMENT (takes precedence for this repo):\n{0}', inputs.prompt_body) || '' }}
 
+            ## CRITICAL: Repository Location
+
+            The provider repository `pulumi/pulumi-${{ inputs.repo }}` is ALREADY checked
+            out at `./provider-repo` (relative to your working directory). Do NOT clone it,
+            do NOT use /tmp, do NOT run `git clone`. All git and file operations on the
+            provider must use the path `./provider-repo`.
+
             ## Instructions
 
             1. Post a `thought` activity to Linear at the start. Use the LINEAR_API_KEY
@@ -124,18 +131,17 @@ jobs:
                  -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"thought\",body:\"Starting work on pulumi-${{ inputs.repo }}...\"}}) { success } }"}'
                ```
 
-            2. Check `.claude/skills/` for a skill that matches the task described in the
-               issue. If a matching skill exists, use it to guide your approach. If no
-               matching skill exists, use the issue title and body directly.
+            2. Check `.claude/skills/` in your current working directory (the ci-mgmt repo)
+               for a skill that matches the task described in the issue. Use the LS tool —
+               not bash — to list the directory; it won't error if the directory is missing.
+               If a matching skill exists, use it to guide your approach. If no matching
+               skill exists, use the issue title and body directly.
 
             3. If a FOLLOW-UP / REFINEMENT section is present above, treat it as a
                refinement or override that takes precedence over the general issue
                instructions for this specific repo.
 
-            4. The provider repository is already checked out at `$GITHUB_WORKSPACE/provider-repo`.
-               Skip cloning and proceed to step 5.
-
-            5. Determine the branch name for this issue. Query Linear to get the
+            4. Determine the branch name for this issue. Query Linear to get the
                human-readable identifier (e.g. `ENG-123`):
                ```
                curl -s -X POST https://api.linear.app/graphql \
@@ -146,11 +152,11 @@ jobs:
                Lowercase the identifier to use as the branch name. For example,
                `ENG-123` becomes `eng-123`.
 
-            6. Check whether a PR already exists on that branch in the provider repo.
+            5. Check whether a PR already exists on that branch in the provider repo.
                If one exists, check out the existing branch and update it; otherwise
                create a new branch.
                ```bash
-               cd $GITHUB_WORKSPACE/provider-repo
+               cd ./provider-repo
 
                BRANCH_NAME="<computed above>"
 
@@ -171,11 +177,11 @@ jobs:
                fi
                ```
 
-            7. Make the necessary changes in $GITHUB_WORKSPACE/provider-repo as described
-               by the issue (and refined by the follow-up if provided). Commit the changes
-               and push the branch.
+            6. Make the necessary changes in `./provider-repo` as described by the issue
+               (and refined by the follow-up if provided). Commit the changes and push
+               the branch.
 
-            8. Create or update the pull request:
+            7. Create or update the pull request:
                - If `$EXISTING_PR` was non-empty (PR already exists): push the branch and
                  update the PR description:
                  ```
@@ -197,14 +203,14 @@ jobs:
                    --json url --jq '.url')
                  ```
 
-            9. Post an `action` activity to Linear with the PR URL:
+            8. Post an `action` activity to Linear with the PR URL:
                ```
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}}) { success } }"}'
                ```
-               Replace NUMBER and URL with the actual PR number and URL from step 8.
+               Replace NUMBER and URL with the actual PR number and URL from step 7.
 
             If any step fails, post an `action` activity to Linear describing the failure:
             ```

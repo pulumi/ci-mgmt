@@ -105,12 +105,15 @@ jobs:
                  curl -s -X POST https://api.linear.app/graphql \
                    -H "Authorization: Bearer $LINEAR_API_KEY" \
                    -H "Content-Type: application/json" \
-                   -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children { nodes { id title description } } } }"}'
+                   -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children { nodes { id title description state { name type } } } } }"}'
                  ```
                  **If child issues are returned** (`children.nodes` is non-empty):
                  - Extract the provider short name from each child issue title or
                    description (e.g., "Update pulumi-aws" → "aws"). Skip any child
                    issue that doesn't clearly map to a single provider.
+                 - Skip any child issue whose `state.type` is `"completed"` or
+                   `"cancelled"` (i.e., already done — do not re-dispatch work for
+                   closed sub-issues).
                  - Dispatch one worker per child issue. Pass the **parent** issue title
                    as `issue_title`. For `issue_body`, combine the child issue
                    description (if non-empty) with the parent issue body so the worker
