@@ -35,7 +35,7 @@ interface AgentSessionEvent {
   agentSession?: {
     id: string;
     status: string;
-    issue?: { id: string; title: string; description: string };
+    issue?: { id: string; title: string; description: string | null };
   };
   agentActivity?: { content: { type: string; body?: string } };
 }
@@ -233,7 +233,7 @@ async function handleWebhook(
           linear_session_id: session.id,
           linear_issue_id: issue.id,
           issue_title: issue.title,
-          issue_body: issue.description,
+          issue_body: issue.description ?? "",
           event_type: action === "created" ? "created" : "prompted",
           prompt_body: agentActivity?.content?.body ?? "",
         },

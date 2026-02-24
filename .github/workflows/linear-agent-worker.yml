@@ -183,6 +183,37 @@ jobs:
                (and refined by the follow-up if provided). Commit the changes and push
                the branch.
 
+               **If you determine that no changes are needed** (e.g. the repository
+               already reflects the desired state), skip steps 8–9 and instead:
+
+               a. Find the "completed" workflow state for the issue's team:
+                  ```
+                  STATES=$(curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { team { states { nodes { id type } } } } }"}')
+                  DONE_STATE_ID=$(echo "$STATES" | jq -r \
+                    '.data.issue.team.states.nodes[] | select(.type=="completed") | .id' \
+                    | head -1)
+                  ```
+
+               b. Mark the issue as done:
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d "{\"query\":\"mutation { issueUpdate(id: \\\"${{ inputs.linear_issue_id }}\\\", input: { stateId: \\\"$DONE_STATE_ID\\\" }) { success } }\"}"
+                  ```
+
+               c. Post an `action` activity explaining that no changes were needed:
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"No changes needed for pulumi-${{ inputs.repo }} — already up to date. Marked issue as done.\"}}) { success } }"}'
+                  ```
+                  Then stop; do not proceed to step 8.
+
             8. Create or update the pull request:
                - If `$EXISTING_PR` was non-empty (PR already exists): push the branch and
                  update the PR description:

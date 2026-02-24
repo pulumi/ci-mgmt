@@ -155,6 +155,11 @@ jobs:
                PROVIDER_SHORT_NAME is the short name only, e.g. "aws" for pulumi-aws.
                ISSUE_ID is the child issue id (for sub-issues) or the parent issue id.
 
+               ⚠️ CRITICAL: When dispatching for sub-issues, -f linear_issue_id=ISSUE_ID
+               MUST be the child issue's UUID from the API response — NOT the value of
+               LINEAR ISSUE ID shown at the top of this prompt (that is the parent issue
+               ID and must NOT be forwarded to the worker).
+
             5. Post a `response` activity to Linear listing the dispatched repos:
                ```
                curl -s -X POST https://api.linear.app/graphql \
