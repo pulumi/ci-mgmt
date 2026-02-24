@@ -37,7 +37,7 @@ interface AgentSessionEvent {
     status: string;
     issue?: { id: string; title: string; description: string };
   };
-  agentActivity?: { body: string };
+  agentActivity?: { content: { type: string; body?: string } };
 }
 
 // Token cached for the lifetime of this Lambda container
@@ -144,23 +144,31 @@ async function handleWebhook(
     return { statusCode: 500, body: "Server configuration error" };
   }
 
+  // Decode body if Lambda base64-encoded it; Linear always signs the raw bytes.
+  const rawBody = event.isBase64Encoded
+    ? Buffer.from(event.body ?? "", "base64").toString("utf8")
+    : (event.body ?? "");
+
   const expected = crypto
     .createHmac("sha256", secret)
-    .update(event.body ?? "")
+    .update(rawBody)
     .digest();
 
   if (!sig || !/^[0-9a-f]+$/i.test(sig) || sig.length !== expected.length * 2) {
+    log.error("Invalid signature format", { sigLength: sig.length, expectedLength: expected.length * 2, sig });
     return { statusCode: 401, body: "Invalid signature" };
   }
 
   if (!crypto.timingSafeEqual(Buffer.from(sig, "hex"), expected)) {
+    log.error("Signature mismatch");
     return { statusCode: 401, body: "Invalid signature" };
   }
 
   let payload: AgentSessionEvent;
   try {
-    payload = JSON.parse(event.body ?? "");
-  } catch {
+    payload = JSON.parse(rawBody);
+  } catch (err) {
+    log.error("Invalid JSON body", { error: String(err) });
     return { statusCode: 400, body: "Invalid JSON" };
   }
   if (payload.type !== "AgentSessionEvent") {
@@ -170,20 +178,32 @@ async function handleWebhook(
 
   const { action, agentSession, agentActivity } = payload;
 
+  log.info("Received AgentSessionEvent", {
+    action,
+    sessionId: agentSession?.id,
+    sessionStatus: agentSession?.status,
+    hasAgentActivity: !!agentActivity,
+    agentActivityKeys: agentActivity ? Object.keys(agentActivity) : [],
+  });
+
   if (!action) {
+    log.error("Missing action in payload");
     return { statusCode: 400, body: "Missing action" };
   }
   if (!agentSession?.id) {
+    log.error("Missing agentSession.id in payload");
     return { statusCode: 400, body: "Missing agentSession.id" };
   }
-  if (action !== "create" && !agentActivity?.body) {
-    return { statusCode: 400, body: "Missing agentActivity.body" };
+  if (action !== "created" && !agentActivity?.content?.body) {
+    log.error("Missing agentActivity.content.body for non-create action", { action });
+    return { statusCode: 400, body: "Missing agentActivity.content.body" };
   }
 
   const session = agentSession;
   const issue = session.issue ?? { id: "", title: "", description: "" };
 
   const linearToken = await getLinearToken();
+  log.info("Linear token status", { tokenLength: linearToken.length, isPlaceholder: linearToken === "placeholder" });
 
   // Post immediate thought to Linear — must arrive within 10 seconds
   await postLinearActivity(linearToken, session.id, "thought", "Received issue. Starting work...");
@@ -214,8 +234,8 @@ async function handleWebhook(
           linear_issue_id: issue.id,
           issue_title: issue.title,
           issue_body: issue.description,
-          event_type: action === "create" ? "created" : "prompted",
-          prompt_body: agentActivity?.body ?? "",
+          event_type: action === "created" ? "created" : "prompted",
+          prompt_body: agentActivity?.content?.body ?? "",
         },
       }),
     },
@@ -291,18 +311,19 @@ async function postLinearActivity(
     return;
   }
 
-  const escapedBody = body.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   const response = await fetch("https://api.linear.app/graphql", {
     method: "POST",
-    headers: { Authorization: token, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      query: `mutation {
-        agentActivityCreate(input: {
-          sessionId: "${sessionId}"
-          type: ${type}
-          body: "${escapedBody}"
-        }) { success }
+      query: `mutation AgentActivityCreate($input: AgentActivityCreateInput!) {
+        agentActivityCreate(input: $input) { success }
       }`,
+      variables: {
+        input: {
+          agentSessionId: sessionId,
+          content: { type, body },
+        },
+      },
     }),
   });
 
