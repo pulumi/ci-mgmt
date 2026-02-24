@@ -1,5 +1,6 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
+import { handler } from "./handler";
 
 const config = new pulumi.Config();
 
@@ -47,8 +48,8 @@ new aws.iam.RolePolicy("linear-webhook-ssm-policy", {
 const callbackUrl = config.get("linearCallbackUrl") ?? "";
 
 const func = new aws.lambda.CallbackFunction("linear-webhook-handler", {
-  runtime: aws.lambda.Runtime.NodeJS22dX,
-  callback: require("./handler").handler,
+  runtime: aws.lambda.Runtime.NodeJS24dX,
+  callback: handler,
   role: role,
   environment: {
     variables: {

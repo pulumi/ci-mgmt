@@ -1,4 +1,12 @@
 import * as crypto from "crypto";
+import { SSMClient, GetParameterCommand, PutParameterCommand } from "@aws-sdk/client-ssm";
+
+const log = {
+  info: (msg: string, extra?: Record<string, unknown>) =>
+    console.log(JSON.stringify({ level: "info", message: msg, ...extra })),
+  error: (msg: string, extra?: Record<string, unknown>) =>
+    console.error(JSON.stringify({ level: "error", message: msg, ...extra })),
+};
 
 // Lambda Function URL event shape (payload format version 2.0)
 interface LambdaFunctionUrlEvent {
@@ -41,7 +49,6 @@ async function getLinearToken(): Promise<string> {
   const paramName = process.env.LINEAR_TOKEN_PARAM;
   if (!paramName) return "";
 
-  const { SSMClient, GetParameterCommand } = require("@aws-sdk/client-ssm");
   const ssm = new SSMClient({});
   const response = await ssm.send(
     new GetParameterCommand({ Name: paramName, WithDecryption: true }),
@@ -80,7 +87,7 @@ async function handleOAuthCallback(
   const paramName = process.env.LINEAR_TOKEN_PARAM;
 
   if (!clientId || !clientSecret || !callbackUrl || !paramName) {
-    console.error("Missing OAuth configuration");
+    log.error("Missing OAuth configuration");
     return { statusCode: 500, body: "Server configuration error" };
   }
 
@@ -98,9 +105,7 @@ async function handleOAuthCallback(
   });
 
   if (!tokenResponse.ok) {
-    console.error(
-      `Token exchange failed: ${tokenResponse.status} ${await tokenResponse.text()}`,
-    );
+    log.error("Token exchange failed", { status: tokenResponse.status, body: await tokenResponse.text() });
     return { statusCode: 502, body: "Token exchange failed" };
   }
 
@@ -109,7 +114,6 @@ async function handleOAuthCallback(
   };
 
   // Store token in SSM Parameter Store and invalidate cache
-  const { SSMClient, PutParameterCommand } = require("@aws-sdk/client-ssm");
   const ssm = new SSMClient({});
   await ssm.send(
     new PutParameterCommand({
@@ -121,7 +125,7 @@ async function handleOAuthCallback(
   );
   cachedLinearToken = undefined;
 
-  console.log("OAuth token stored successfully");
+  log.info("OAuth token stored successfully");
   return {
     statusCode: 200,
     headers: { "Content-Type": "text/html" },
@@ -136,30 +140,47 @@ async function handleWebhook(
   const sig = event.headers["linear-signature"] ?? "";
   const secret = process.env.LINEAR_WEBHOOK_SECRET;
   if (!secret) {
-    console.error("LINEAR_WEBHOOK_SECRET is not set");
+    log.error("LINEAR_WEBHOOK_SECRET is not set");
     return { statusCode: 500, body: "Server configuration error" };
   }
 
   const expected = crypto
     .createHmac("sha256", secret)
     .update(event.body ?? "")
-    .digest("hex");
+    .digest();
 
-  if (
-    !sig ||
-    sig.length !== expected.length ||
-    !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
-  ) {
+  if (!sig || !/^[0-9a-f]+$/i.test(sig) || sig.length !== expected.length * 2) {
     return { statusCode: 401, body: "Invalid signature" };
   }
 
-  const payload: AgentSessionEvent = JSON.parse(event.body ?? "{}");
+  if (!crypto.timingSafeEqual(Buffer.from(sig, "hex"), expected)) {
+    return { statusCode: 401, body: "Invalid signature" };
+  }
+
+  let payload: AgentSessionEvent;
+  try {
+    payload = JSON.parse(event.body ?? "");
+  } catch {
+    return { statusCode: 400, body: "Invalid JSON" };
+  }
   if (payload.type !== "AgentSessionEvent") {
+    log.info("Ignored non-AgentSessionEvent webhook", { type: payload.type });
     return { statusCode: 200, body: "Ignored" };
   }
 
   const { action, agentSession, agentActivity } = payload;
-  const session = agentSession ?? { id: "", status: "" };
+
+  if (!action) {
+    return { statusCode: 400, body: "Missing action" };
+  }
+  if (!agentSession?.id) {
+    return { statusCode: 400, body: "Missing agentSession.id" };
+  }
+  if (action !== "create" && !agentActivity?.body) {
+    return { statusCode: 400, body: "Missing agentActivity.body" };
+  }
+
+  const session = agentSession;
   const issue = session.issue ?? { id: "", title: "", description: "" };
 
   const linearToken = await getLinearToken();
@@ -171,7 +192,7 @@ async function handleWebhook(
   try {
     githubToken = await generateGitHubInstallationToken();
   } catch (err) {
-    console.error("Failed to generate GitHub token:", err);
+    log.error("Failed to generate GitHub token", { error: String(err) });
     await postLinearActivity(linearToken, session.id, "response", "Internal error: could not authenticate with GitHub");
     return { statusCode: 500, body: "GitHub auth failed" };
   }
@@ -202,7 +223,7 @@ async function handleWebhook(
 
   if (!dispatchResponse.ok) {
     const errorBody = await dispatchResponse.text();
-    console.error(`GitHub dispatch failed: ${dispatchResponse.status} ${errorBody}`);
+    log.error("GitHub dispatch failed", { status: dispatchResponse.status, body: errorBody });
     await postLinearActivity(
       linearToken,
       session.id,
@@ -212,6 +233,7 @@ async function handleWebhook(
     return { statusCode: 500, body: "Failed to trigger workflow" };
   }
 
+  log.info("Webhook dispatched", { sessionId: session.id, action });
   return { statusCode: 200, body: "OK" };
 }
 
@@ -265,7 +287,7 @@ async function postLinearActivity(
   body: string,
 ): Promise<void> {
   if (!token) {
-    console.error("No Linear token available — OAuth installation may be incomplete");
+    log.error("No Linear token available — OAuth installation may be incomplete");
     return;
   }
 
@@ -285,6 +307,6 @@ async function postLinearActivity(
   });
 
   if (!response.ok) {
-    console.error(`Failed to post Linear activity: ${response.status} ${await response.text()}`);
+    log.error("Failed to post Linear activity", { status: response.status, body: await response.text() });
   }
 }
