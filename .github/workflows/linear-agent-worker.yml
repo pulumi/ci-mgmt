@@ -50,12 +50,12 @@ jobs:
         id: esc-secrets
         uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
 
-      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: app-auth
-        with:
-          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
-          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
-          owner: pulumi
+      # - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      #   id: app-auth
+      #   with:
+      #     app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+      #     private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+      #     owner: pulumi
 
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
@@ -149,7 +149,7 @@ jobs:
             Always post a `thought` at the start and an `action` (success or failure) at the end.
         env:
           LINEAR_API_KEY: ${{ steps.esc-secrets.outputs.LINEAR_API_KEY }}
-          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
+          GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
 
       - name: Upload execution log on failure
         if: failure() && steps.claude-agent.outputs.execution_file
