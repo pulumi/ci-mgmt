@@ -1,3 +1,7 @@
+# Linear GraphQL schema reference:
+#   https://studio.apollographql.com/public/Linear-API/variant/current/schema/reference
+# All Linear GraphQL queries in this file should be double-checked against that schema.
+
 permissions: write-all
 name: Linear Agent
 
@@ -57,7 +61,7 @@ jobs:
 
       - name: Get claude executable path
         id: claude
-        run: echo "claude=$(which claude)" >> $GITHUB_OUTPUT
+        run: echo "claude=$(which claude)" >> "$GITHUB_OUTPUT"
 
       - name: Run Claude Orchestrator
         id: claude-agent
@@ -115,9 +119,8 @@ jobs:
                    `"cancelled"` (i.e., already done — do not re-dispatch work for
                    closed sub-issues).
                  - Dispatch one worker per child issue. Pass the **parent** issue title
-                   as `issue_title`. For `issue_body`, combine the child issue
-                   description (if non-empty) with the parent issue body so the worker
-                   has both the specific and general context.
+                   as `issue_title`. The worker will fetch the child issue body and
+                   parent context itself.
                  - Because you are dispatching for a sub-issue, pass the **child**
                    issue's `id` as `linear_issue_id` (not the parent's). The worker
                    uses this ID to look up the branch name, so using the parent ID
@@ -127,8 +130,9 @@ jobs:
 
                  **If no child issues exist** (empty or missing `children.nodes`):
                  - Fall back to parsing the parent issue body to find ALL provider
-                   names listed (typically as `pulumi-PROVIDER` or just `PROVIDER`)
-                   and dispatch a worker for each one with prompt_body="".
+                   names listed (typically as `pulumi-PROVIDER` or
+                   just `PROVIDER`) and dispatch a worker for each one with
+                   prompt_body="".
 
                - **If event_type=prompted**: Read the follow-up comment carefully to
                  identify WHICH specific repos it applies to (could be one, a subset,
@@ -136,27 +140,20 @@ jobs:
                  with prompt_body set to the follow-up comment text. (No need to
                  re-query sub-issues for prompted events.)
 
-            4. For each repo to process, dispatch a worker workflow. The inputs issue_body
-               and prompt_body may be multi-line; write them to temp files to avoid shell
-               quoting issues, e.g.:
+            4. For each repo to process, dispatch a worker workflow:
                ```bash
-               # Write multi-line values to temp files
-               cat > /tmp/issue_body_input.txt << 'ISSUE_BODY_HEREDOC'
-               <issue body content here>
-               ISSUE_BODY_HEREDOC
-
                gh workflow run linear-agent-worker.yml \
                  --repo pulumi/ci-mgmt \
                  --ref blampe/testing \
                  -f repo=PROVIDER_SHORT_NAME \
                  -f linear_session_id="${{ inputs.linear_session_id }}" \
-                 -f linear_issue_id="${{ inputs.linear_issue_id }}" \
-                 -f issue_title="ESCAPED_TITLE" \
-                 -f issue_body="$(cat /tmp/issue_body_input.txt)" \
+                 -f linear_issue_id=ISSUE_ID \
+                 -f issue_title="ISSUE_TITLE" \
                  -f event_type="${{ inputs.event_type }}" \
                  -f prompt_body="PROMPT_BODY"
                ```
                PROVIDER_SHORT_NAME is the short name only, e.g. "aws" for pulumi-aws.
+               ISSUE_ID is the child issue id (for sub-issues) or the parent issue id.
 
             5. Post a `response` activity to Linear listing the dispatched repos:
                ```

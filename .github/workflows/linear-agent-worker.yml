@@ -1,3 +1,7 @@
+# Linear GraphQL schema reference:
+#   https://studio.apollographql.com/public/Linear-API/variant/current/schema/reference
+# All Linear GraphQL queries in this file should be double-checked against that schema.
+
 permissions: write-all
 name: Linear Agent Worker
 
@@ -20,10 +24,6 @@ on:
         required: true
         type: string
         description: "Linear issue title"
-      issue_body:
-        required: true
-        type: string
-        description: "Linear issue body / description"
       event_type:
         required: false
         type: string
@@ -79,7 +79,7 @@ jobs:
 
       - name: Get claude executable path
         id: claude
-        run: echo "claude=$(which claude)" >> $GITHUB_OUTPUT
+        run: echo "claude=$(which claude)" >> "$GITHUB_OUTPUT"
 
       - name: Run Claude Worker Agent
         id: claude-agent
@@ -99,7 +99,7 @@ jobs:
             }
           claude_args: |
             --max-turns 200
-            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *)"
+            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(mise *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *)"
           prompt: |
             You are a CI automation worker processing one provider repository.
 
@@ -107,9 +107,6 @@ jobs:
             LINEAR SESSION ID: ${{ inputs.linear_session_id }}
             EVENT TYPE:        ${{ inputs.event_type }}
             ISSUE TITLE:       ${{ inputs.issue_title }}
-
-            ISSUE BODY:
-            ${{ inputs.issue_body }}
 
             ${{ inputs.prompt_body != '' && format('FOLLOW-UP / REFINEMENT (takes precedence for this repo):\n{0}', inputs.prompt_body) || '' }}
 
@@ -131,28 +128,33 @@ jobs:
                  -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"thought\",body:\"Starting work on pulumi-${{ inputs.repo }}...\"}}) { success } }"}'
                ```
 
-            2. Check `.claude/skills/` in your current working directory (the ci-mgmt repo)
+            2. Fetch the full issue context from Linear. This also retrieves the parent
+               issue if this is a sub-issue, so you have complete context:
+               ```
+               ISSUE_DATA=$(curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}')
+               echo "$ISSUE_DATA"
+               ```
+               Extract and use the `description` field as the issue body. If `parent` is
+               non-null, include the parent's `title` and `description` as additional context
+               (the sub-issue refines or specialises the parent task).
+
+            3. Check `.claude/skills/` in your current working directory (the ci-mgmt repo)
                for a skill that matches the task described in the issue. Use the LS tool —
                not bash — to list the directory; it won't error if the directory is missing.
                If a matching skill exists, use it to guide your approach. If no matching
                skill exists, use the issue title and body directly.
 
-            3. If a FOLLOW-UP / REFINEMENT section is present above, treat it as a
+            4. If a FOLLOW-UP / REFINEMENT section is present above, treat it as a
                refinement or override that takes precedence over the general issue
                instructions for this specific repo.
 
-            4. Determine the branch name for this issue. Query Linear to get the
-               human-readable identifier (e.g. `ENG-123`):
-               ```
-               curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: Bearer $LINEAR_API_KEY" \
-                 -H "Content-Type: application/json" \
-                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier } }"}'
-               ```
-               Lowercase the identifier to use as the branch name. For example,
-               `ENG-123` becomes `eng-123`.
+            5. Determine the branch name from the `identifier` returned in step 2.
+               Lowercase it (e.g. `ENG-123` → `eng-123`).
 
-            5. Check whether a PR already exists on that branch in the provider repo.
+            6. Check whether a PR already exists on that branch in the provider repo.
                If one exists, check out the existing branch and update it; otherwise
                create a new branch.
                ```bash
@@ -177,11 +179,11 @@ jobs:
                fi
                ```
 
-            6. Make the necessary changes in `./provider-repo` as described by the issue
+            7. Make the necessary changes in `./provider-repo` as described by the issue
                (and refined by the follow-up if provided). Commit the changes and push
                the branch.
 
-            7. Create or update the pull request:
+            8. Create or update the pull request:
                - If `$EXISTING_PR` was non-empty (PR already exists): push the branch and
                  update the PR description:
                  ```
@@ -203,14 +205,14 @@ jobs:
                    --json url --jq '.url')
                  ```
 
-            8. Post an `action` activity to Linear with the PR URL:
+            9. Post an `action` activity to Linear with the PR URL:
                ```
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
                  -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}}) { success } }"}'
                ```
-               Replace NUMBER and URL with the actual PR number and URL from step 7.
+               Replace NUMBER and URL with the actual PR number and URL from step 8.
 
             If any step fails, post an `action` activity to Linear describing the failure:
             ```
