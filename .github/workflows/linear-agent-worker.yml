@@ -63,10 +63,17 @@ jobs:
 
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
+      - uses: jdx/mise-action@v2
+
+      - name: Get claude executable path
+        id: claude
+        run: echo "claude=$(which claude)" >> $GITHUB_OUTPUT
+
       - name: Run Claude Worker Agent
         id: claude-agent
         uses: anthropics/claude-code-action@8341a564b0c1693e9fa29c681852ee3714980098 # v1
         with:
+          path_to_claude_code_executable: ${{ steps.claude.outputs.claude }}
           anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
           github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           allowed_bots: pulumi-provider-automation
