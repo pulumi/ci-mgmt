@@ -115,6 +115,10 @@ jobs:
                    as `issue_title`. For `issue_body`, combine the child issue
                    description (if non-empty) with the parent issue body so the worker
                    has both the specific and general context.
+                 - Because you are dispatching for a sub-issue, pass the **child**
+                   issue's `id` as `linear_issue_id` (not the parent's). The worker
+                   uses this ID to look up the branch name, so using the parent ID
+                   would name the branch after the parent issue.
                  - Do **not** also parse the parent body for additional repos — child
                    issues take precedence.
 
