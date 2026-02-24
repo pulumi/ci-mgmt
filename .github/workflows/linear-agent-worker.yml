@@ -65,6 +65,18 @@ jobs:
 
       - uses: jdx/mise-action@v2
 
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          repository: pulumi/pulumi-${{ inputs.repo }}
+          path: provider-repo
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git user for provider repo
+        run: |
+          git -C provider-repo config user.email "pulumi-bot@pulumi.com"
+          git -C provider-repo config user.name "Pulumi Bot"
+
       - name: Get claude executable path
         id: claude
         run: echo "claude=$(which claude)" >> $GITHUB_OUTPUT
@@ -86,7 +98,7 @@ jobs:
               }
             }
           claude_args: |
-            --max-turns 50
+            --max-turns 200
             --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *)"
           prompt: |
             You are a CI automation worker processing one provider repository.
@@ -109,7 +121,7 @@ jobs:
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Starting work on pulumi-${{ inputs.repo }}...\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"thought\",body:\"Starting work on pulumi-${{ inputs.repo }}...\"}}) { success } }"}'
                ```
 
             2. Check `.claude/skills/` for a skill that matches the task described in the
@@ -120,10 +132,8 @@ jobs:
                refinement or override that takes precedence over the general issue
                instructions for this specific repo.
 
-            4. Clone the provider repository:
-               ```
-               gh repo clone pulumi/pulumi-${{ inputs.repo }} /tmp/pulumi-${{ inputs.repo }}
-               ```
+            4. The provider repository is already checked out at `$GITHUB_WORKSPACE/provider-repo`.
+               Skip cloning and proceed to step 5.
 
             5. Determine the branch name for this issue. Query Linear to get the
                human-readable identifier (e.g. `ENG-123`):
@@ -140,7 +150,7 @@ jobs:
                If one exists, check out the existing branch and update it; otherwise
                create a new branch.
                ```bash
-               cd /tmp/pulumi-${{ inputs.repo }}
+               cd $GITHUB_WORKSPACE/provider-repo
 
                BRANCH_NAME="<computed above>"
 
@@ -161,7 +171,7 @@ jobs:
                fi
                ```
 
-            7. Make the necessary changes in /tmp/pulumi-${{ inputs.repo }} as described
+            7. Make the necessary changes in $GITHUB_WORKSPACE/provider-repo as described
                by the issue (and refined by the follow-up if provided). Commit the changes
                and push the branch.
 
@@ -192,7 +202,7 @@ jobs:
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}}) { success } }"}'
                ```
                Replace NUMBER and URL with the actual PR number and URL from step 8.
 
@@ -201,7 +211,7 @@ jobs:
             curl -s -X POST https://api.linear.app/graphql \
               -H "Authorization: Bearer $LINEAR_API_KEY" \
               -H "Content-Type: application/json" \
-              -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Failed to process pulumi-${{ inputs.repo }}: REASON\"}) { success } }"}'
+              -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Failed to process pulumi-${{ inputs.repo }}: REASON\"}}) { success } }"}'
             ```
             Replace REASON with a concise description of what went wrong.
 
