@@ -69,7 +69,7 @@ jobs:
           github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           allowed_bots: pulumi-provider-automation
           claude_args: |
-            --max-turns 20
+            --max-turns 200
             --allowedTools "Skill,Read,Glob,Grep,LS,Bash(gh workflow run *),Bash(curl *)"
           prompt: |
             You are a CI automation orchestrator triggered by a Linear issue.
