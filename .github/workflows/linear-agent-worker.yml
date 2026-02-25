@@ -200,7 +200,7 @@ jobs:
                instructions for this specific repo.
 
             5. Determine the branch name from the `identifier` returned in step 2.
-               Lowercase it (e.g. `ENG-123` → `eng-123`).
+               Prepend `linear/` and lowercase it (e.g. `ENG-123` → `linear/eng-123`).
 
             6. Check whether a PR already exists on that branch in the provider repo.
                If one exists, check out the existing branch and update it; otherwise
