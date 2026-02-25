@@ -4,6 +4,11 @@
 
 permissions: write-all
 name: Linear Agent Worker
+run-name: "Linear Worker (${{ inputs.repo }}): ${{ inputs.issue_title }}"
+
+concurrency:
+  group: linear-worker-${{ inputs.repo }}-${{ inputs.linear_session_id }}
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
