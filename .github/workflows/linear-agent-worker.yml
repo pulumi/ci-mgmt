@@ -210,7 +210,7 @@ jobs:
                   curl -s -X POST https://api.linear.app/graphql \
                     -H "Authorization: Bearer $LINEAR_API_KEY" \
                     -H "Content-Type: application/json" \
-                    -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"No changes needed for pulumi-${{ inputs.repo }} — already up to date. Marked issue as done.\"}}) { success } }"}'
+                    -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Checked\",parameter:\"pulumi-${{ inputs.repo }}\",result:\"No changes needed — already up to date. Marked issue as done.\"}}) { success } }"}'
                   ```
                   Then stop; do not proceed to step 8.
 
@@ -241,7 +241,7 @@ jobs:
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Created PR\",parameter:\"pulumi/pulumi-${{ inputs.repo }}#NUMBER\",result:\"URL\"}}) { success } }"}'
                ```
                Replace NUMBER and URL with the actual PR number and URL from step 8.
 
@@ -250,7 +250,7 @@ jobs:
             curl -s -X POST https://api.linear.app/graphql \
               -H "Authorization: Bearer $LINEAR_API_KEY" \
               -H "Content-Type: application/json" \
-              -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",body:\"Failed to process pulumi-${{ inputs.repo }}: REASON\"}}) { success } }"}'
+              -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Failed\",parameter:\"pulumi-${{ inputs.repo }}\",result:\"REASON\"}}) { success } }"}'
             ```
             Replace REASON with a concise description of what went wrong.
 
