@@ -203,7 +203,6 @@ async function handleWebhook(
   const issue = session.issue ?? { id: "", title: "", description: "" };
 
   const linearToken = await getLinearToken();
-  log.info("Linear token status", { tokenLength: linearToken.length, isPlaceholder: linearToken === "placeholder" });
 
   // Post immediate thought to Linear — must arrive within 10 seconds
   await postLinearActivity(linearToken, session.id, "thought", "Received issue. Starting work...");
@@ -232,8 +231,6 @@ async function handleWebhook(
         inputs: {
           linear_session_id: session.id,
           linear_issue_id: issue.id,
-          issue_title: issue.title,
-          issue_body: issue.description ?? "",
           event_type: action === "created" ? "created" : "prompted",
           prompt_body: agentActivity?.content?.body ?? "",
         },

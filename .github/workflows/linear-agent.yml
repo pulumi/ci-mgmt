@@ -16,14 +16,6 @@ on:
         required: true
         type: string
         description: "Linear issue ID"
-      issue_title:
-        required: true
-        type: string
-        description: "Linear issue title"
-      issue_body:
-        required: true
-        type: string
-        description: "Linear issue body / description"
       event_type:
         required: false
         type: string
@@ -81,10 +73,6 @@ jobs:
             LINEAR SESSION ID: ${{ inputs.linear_session_id }}
             LINEAR ISSUE ID:   ${{ inputs.linear_issue_id }}
             EVENT TYPE:        ${{ inputs.event_type }}
-            ISSUE TITLE:       ${{ inputs.issue_title }}
-
-            ISSUE BODY:
-            ${{ inputs.issue_body }}
 
             ${{ inputs.event_type == 'prompted' && format('FOLLOW-UP COMMENT:\n{0}', inputs.prompt_body) || '' }}
 
@@ -96,13 +84,25 @@ jobs:
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Analyzing issue...\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"thought\",body:\"Analyzing issue...\"}}) { success } }"}'
                ```
 
-            2. Check `.claude/skills/` for any skill that matches the task described in the
+            2. Fetch the full issue context from Linear. This also retrieves the parent
+               issue if this is a sub-issue, so you have complete context:
+               ```
+               ISSUE_DATA=$(curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}')
+               echo "$ISSUE_DATA"
+               ```
+               Extract the `title` and `description` fields. If `parent` is non-null,
+               include the parent's `title` and `description` as additional context.
+
+            3. Check `.claude/skills/` for any skill that matches the task described in the
                issue.
 
-            3. Determine which repositories to update:
+            4. Determine which repositories to update:
                - **If event_type=created**: First check whether the issue has child
                  (sub) issues in Linear by querying:
                  ```bash
@@ -140,7 +140,7 @@ jobs:
                  with prompt_body set to the follow-up comment text. (No need to
                  re-query sub-issues for prompted events.)
 
-            4. For each repo to process, dispatch a worker workflow:
+            5. For each repo to process, dispatch a worker workflow:
                ```bash
                gh workflow run linear-agent-worker.yml \
                  --repo pulumi/ci-mgmt \
@@ -160,12 +160,12 @@ jobs:
                LINEAR ISSUE ID shown at the top of this prompt (that is the parent issue
                ID and must NOT be forwarded to the worker).
 
-            5. Post a `response` activity to Linear listing the dispatched repos:
+            6. Post a `response` activity to Linear listing the dispatched repos:
                ```
                curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:response,body:\"SUMMARY\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"response\",body:\"SUMMARY\"}}) { success } }"}'
                ```
                For created events: "Dispatching workers for N repos: provider1, provider2, ..."
                For prompted events: "Dispatching targeted update for REPO based on your comment"
