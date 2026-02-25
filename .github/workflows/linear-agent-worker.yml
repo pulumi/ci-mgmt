@@ -76,6 +76,7 @@ jobs:
           path: provider-repo
           token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           fetch-depth: 0
+          submodules: recursive
 
       - name: Configure git user for provider repo
         run: |
