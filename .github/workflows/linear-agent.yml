@@ -123,7 +123,7 @@ jobs:
                  curl -s -X POST https://api.linear.app/graphql \
                    -H "Authorization: Bearer $LINEAR_API_KEY" \
                    -H "Content-Type: application/json" \
-                   -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children { nodes { id title description state { name type } } } } }"}'
+                   -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { children(first: 250) { nodes { id title description state { name type } } } } }"}'
                  ```
                  **If child issues are returned** (`children.nodes` is non-empty):
                  - Extract the provider short name from each child issue title or
