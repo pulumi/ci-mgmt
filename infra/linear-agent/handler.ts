@@ -190,12 +190,16 @@ async function handleWebhook(
     log.error("Missing action in payload");
     return { statusCode: 400, body: "Missing action" };
   }
+  if (action !== "created" && action !== "prompted") {
+    log.info("Ignored action", { action });
+    return { statusCode: 200, body: "Ignored" };
+  }
   if (!agentSession?.id) {
     log.error("Missing agentSession.id in payload");
     return { statusCode: 400, body: "Missing agentSession.id" };
   }
   if (action !== "created" && !agentActivity?.content?.body) {
-    log.error("Missing agentActivity.content.body for non-create action", { action });
+    log.error("Missing agentActivity.content.body for prompted action");
     return { statusCode: 400, body: "Missing agentActivity.content.body" };
   }
 
