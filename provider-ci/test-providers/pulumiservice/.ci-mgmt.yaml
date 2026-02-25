@@ -18,6 +18,7 @@ env:
 providerDefaultBranch: main
 template: generic
 shards: 6
+useProviderBinarySchemaGen: true
 esc:
     enabled: true
 modulePath: .

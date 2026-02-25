@@ -349,6 +349,14 @@ type Config struct {
 	// UsePythonPackageGenSdk controls whether we use the Python SDK generation via package gen-sdk
 	UsePythonPackageGenSdk bool `yaml:"usePythonPackageGenSdk"`
 
+	// UseProviderBinarySchemaGen controls whether to use the provider binary
+	// directly for schema generation via "pulumi package get-schema" instead of
+	// the traditional codegen binary approach.
+	//
+	// Default: false (use traditional codegen binary)
+	// Set to true for providers that support dynamic schema generation.
+	UseProviderBinarySchemaGen bool `yaml:"useProviderBinarySchemaGen"`
+
 	// MiseVersion specifies the version of mise to use on GitHub Actions.
 	MiseVersion string `yaml:"mise-version"`
 }

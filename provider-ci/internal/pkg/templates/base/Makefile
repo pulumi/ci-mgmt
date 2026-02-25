@@ -328,8 +328,15 @@ provider: bin/$(PROVIDER)
 # To create a release ready binary, you should use `make provider`.
 provider_no_deps:
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
+#{{- if .Config.UseProviderBinarySchemaGen }}#
+# New approach: No schema dependency (schema depends on provider instead)
+bin/$(PROVIDER):
+	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
+#{{- else }}#
+# Traditional approach: Provider depends on schema (schema must exist first)
 bin/$(PROVIDER): .make/schema
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
+#{{- end }}#
 .PHONY: provider provider_no_deps
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
@@ -359,11 +366,21 @@ tfgen_no_deps: .make/schema
 .make/schema: export PULUMI_CONVERT_EXAMPLES_CACHE_DIR := $(WORKING_DIR)/.pulumi/examples-cache
 .make/schema: export PULUMI_DISABLE_AUTOMATIC_PLUGIN_ACQUISITION := $(PULUMI_CONVERT)
 .make/schema: export PULUMI_MISSING_DOCS_ERROR := $(PULUMI_MISSING_DOCS_ERROR)
+#{{- if .Config.UseProviderBinarySchemaGen }}#
+# New approach: Use provider binary directly for schema generation
+.make/schema: .make/mise_install .make/upstream
+.make/schema: bin/$(PROVIDER) | mise_env
+	pulumi package get-schema ./bin/$(PROVIDER) | \
+		jq 'del(.version)' > provider/cmd/$(PROVIDER)/schema.json
+	@touch $@
+#{{- else }}#
+# Traditional approach: Use codegen binary for schema generation
 .make/schema: bin/$(CODEGEN) .make/mise_install .make/upstream
 .make/schema: | mise_env
 	$(WORKING_DIR)/bin/$(CODEGEN) schema --out provider/cmd/$(PROVIDER)
 	(cd provider && VERSION=$(PROVIDER_VERSION) go generate cmd/$(PROVIDER)/main.go)
 	@touch $@
+#{{- end }}#
 tfgen_build_only: bin/$(CODEGEN)
 bin/$(CODEGEN): #{{ .Config.ModulePath }}#/*.go #{{ .Config.ModulePath }}#/go.* .make/upstream
 	(cd #{{ .Config.ModulePath }}# && go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o $(WORKING_DIR)/bin/$(CODEGEN) -ldflags "$(LDFLAGS_PROJ_VERSION) $(LDFLAGS_EXTRAS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(CODEGEN))
