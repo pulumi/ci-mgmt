@@ -25,7 +25,7 @@ jobs:
       pull-requests: write # For schema check comment.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -187,7 +187,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -276,7 +276,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -416,7 +416,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -491,7 +491,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -511,7 +511,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout Scripts Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         path: ci-scripts
         repository: pulumi/scripts
@@ -573,7 +573,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
     #{{- .Config | renderEscStep | indent 4 }}#
@@ -623,7 +623,7 @@ jobs:
     needs: publish_sdk
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
     - id: version
@@ -667,7 +667,7 @@ jobs:
       id-token: write # For ESC secrets.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
 #{{- .Config | renderEscStep | indent 4 }}#
@@ -701,7 +701,7 @@ jobs:
       id-token: write # For Pulumi access token OIDC.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
     - name: Setup Tools
@@ -760,7 +760,7 @@ jobs:
       id-token: write # For Pulumi access token OIDC.
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         lfs: true
     - name: Setup Tools
