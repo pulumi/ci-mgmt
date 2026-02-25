@@ -94,17 +94,35 @@ jobs:
           anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
           github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           allowed_bots: pulumi-provider-automation
-          # Sandbox settings: Edit() rules control all bash filesystem writes (mkdir,
-          # output redirection, etc.), not just the Edit tool.
+          # Sandbox settings: --allowedTools controls which Bash commands Claude can
+          # call; settings.permissions.allow controls which operations are
+          # auto-approved in non-interactive CI (anything not listed here is
+          # denied because there is no human to confirm the prompt). Both lists
+          # must be kept in sync — a tool in --allowedTools but absent from
+          # permissions.allow will still be denied in CI.
           settings: |
             {
               "permissions": {
-                "allow": ["Edit(./**)", "Edit(/tmp/**)"]
+                "allow": [
+                  "Edit(./**)",
+                  "Edit(/tmp/**)",
+                  "Bash(gh *)",
+                  "Bash(git *)",
+                  "Bash(curl *)",
+                  "Bash(make *)",
+                  "Bash(mise *)",
+                  "Bash(mkdir *)",
+                  "Bash(ls *)",
+                  "Bash(cat *)",
+                  "Bash(echo *)",
+                  "Bash(jq *)",
+                  "Bash(cd *)"
+                ]
               }
             }
           claude_args: |
             --max-turns 200
-            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(mise *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *)"
+            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(mise *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *),Bash(echo *),Bash(jq *),Bash(cd *)"
           prompt: |
             You are a CI automation worker processing one provider repository.
 
@@ -122,6 +140,20 @@ jobs:
             do NOT use /tmp, do NOT run `git clone`. All git and file operations on the
             provider must use the path `./provider-repo`.
 
+            ## CRITICAL: Shell Command Restrictions
+
+            Each Bash tool call is sandboxed. Only commands whose first token matches an
+            allowed pattern will execute. Rules to avoid permission denials:
+
+            - **Do NOT start a command with a variable assignment** like `VAR=$(cmd ...)`.
+              Run the command directly (`cmd ...`) and read its output from the tool result.
+              Use the observed value literally in subsequent commands.
+            - **Use `git -C ./provider-repo`** for all git operations inside the provider
+              repo — do NOT use `cd ./provider-repo && git ...` unless `cd` is the intended
+              first operation.
+            - **Each Bash call is a separate shell** — variables set in one call are not
+              visible in the next. Treat every call as stateless.
+
             ## Instructions
 
             1. Post a `thought` activity to Linear at the start. Use the LINEAR_API_KEY
@@ -136,15 +168,16 @@ jobs:
             2. Fetch the full issue context from Linear. This also retrieves the parent
                issue if this is a sub-issue, so you have complete context:
                ```
-               ISSUE_DATA=$(curl -s -X POST https://api.linear.app/graphql \
+               curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}')
-               echo "$ISSUE_DATA"
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}'
                ```
-               Extract and use the `description` field as the issue body. If `parent` is
-               non-null, include the parent's `title` and `description` as additional context
-               (the sub-issue refines or specialises the parent task).
+               Read the JSON output and extract the `description` field as the issue body.
+               If `parent` is non-null, include the parent's `title` and `description` as
+               additional context (the sub-issue refines or specialises the parent task).
+               IMPORTANT: Run `curl` as the first token — do NOT wrap it in a shell variable
+               assignment like `VAR=$(curl ...)` as that pattern is not permitted.
 
             3. Check `.claude/skills/` in your current working directory (the ci-mgmt repo)
                for a skill that matches the task described in the issue. Use the LS tool —
@@ -162,26 +195,27 @@ jobs:
             6. Check whether a PR already exists on that branch in the provider repo.
                If one exists, check out the existing branch and update it; otherwise
                create a new branch.
+
+               All git commands must be run with `-C ./provider-repo` so that the working
+               directory is correct (do NOT use `cd ./provider-repo && git ...` — that
+               pattern is not permitted). Similarly, use `gh pr list --repo ...` directly
+               without `cd`.
+
                ```bash
-               cd ./provider-repo
-
-               BRANCH_NAME="<computed above>"
-
-               # Check for an open PR on this branch
-               EXISTING_PR=$(gh pr list \
+               # Check for an open PR — run gh directly, no cd prefix
+               gh pr list \
                  --repo pulumi/pulumi-${{ inputs.repo }} \
                  --state open \
                  --head "$BRANCH_NAME" \
                  --json number,url \
-                 --jq '.[0]')
+                 --jq '.[0]'
 
-               if [ -n "$EXISTING_PR" ]; then
-                 # Fetch and check out the existing branch
-                 git fetch origin "$BRANCH_NAME"
-                 git checkout "$BRANCH_NAME"
-               else
-                 git checkout -b "$BRANCH_NAME"
-               fi
+               # If PR exists, fetch and check out the branch
+               git -C ./provider-repo fetch origin "$BRANCH_NAME"
+               git -C ./provider-repo checkout "$BRANCH_NAME"
+
+               # If no PR, create a new branch
+               git -C ./provider-repo checkout -b "$BRANCH_NAME"
                ```
 
             7. Make the necessary changes in `./provider-repo` as described by the issue
@@ -191,23 +225,25 @@ jobs:
                **If you determine that no changes are needed** (e.g. the repository
                already reflects the desired state), skip steps 8–9 and instead:
 
-               a. Find the "completed" workflow state for the issue's team:
-                  ```
-                  STATES=$(curl -s -X POST https://api.linear.app/graphql \
-                    -H "Authorization: Bearer $LINEAR_API_KEY" \
-                    -H "Content-Type: application/json" \
-                    -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { team { states { nodes { id type } } } } }"}')
-                  DONE_STATE_ID=$(echo "$STATES" | jq -r \
-                    '.data.issue.team.states.nodes[] | select(.type=="completed") | .id' \
-                    | head -1)
-                  ```
-
-               b. Mark the issue as done:
+               a. Find the "completed" workflow state for the issue's team. Run curl
+                  directly (no variable-assignment prefix) and pipe to jq:
                   ```
                   curl -s -X POST https://api.linear.app/graphql \
                     -H "Authorization: Bearer $LINEAR_API_KEY" \
                     -H "Content-Type: application/json" \
-                    -d "{\"query\":\"mutation { issueUpdate(id: \\\"${{ inputs.linear_issue_id }}\\\", input: { stateId: \\\"$DONE_STATE_ID\\\" }) { success } }\"}"
+                    -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { team { states { nodes { id type } } } } }"}' \
+                    | jq -r '.data.issue.team.states.nodes[] | select(.type=="completed") | .id' \
+                    | head -1
+                  ```
+                  Note the DONE_STATE_ID from the output.
+
+               b. Mark the issue as done — substitute the state ID value you observed
+                  in step (a) directly into the mutation (replace STATE_ID_HERE):
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"mutation { issueUpdate(id: \"${{ inputs.linear_issue_id }}\", input: { stateId: \"STATE_ID_HERE\" }) { success } }"}'
                   ```
 
                c. Post an `action` activity explaining that no changes were needed:
@@ -219,26 +255,30 @@ jobs:
                   ```
                   Then stop; do not proceed to step 8.
 
-            8. Create or update the pull request:
-               - If `$EXISTING_PR` was non-empty (PR already exists): push the branch and
-                 update the PR description:
+            8. Create or update the pull request. Use `git -C ./provider-repo` for all
+               git commands — do not use `cd ./provider-repo && git ...`.
+               - If a PR already existed (step 6): push the branch and update the PR.
+                 First get the PR number from the earlier `gh pr list` JSON output:
                  ```
-                 git push origin "$BRANCH_NAME"
-                 PR_NUMBER=$(echo "$EXISTING_PR" | jq -r '.number')
-                 gh pr edit "$PR_NUMBER" \
+                 git -C ./provider-repo push origin "$BRANCH_NAME"
+                 echo '{"number":...}' | jq -r '.number'
+                 gh pr edit <NUMBER> \
                    --repo pulumi/pulumi-${{ inputs.repo }} \
                    --body "Automated by Linear issue: ${{ inputs.issue_title }}"
-                 PR_URL=$(echo "$EXISTING_PR" | jq -r '.url')
                  ```
-               - If no existing PR: push and create a new one:
+                 Note the PR URL from the edit output or by running:
                  ```
-                 git push origin "$BRANCH_NAME"
-                 PR_URL=$(gh pr create \
+                 gh pr view <NUMBER> --repo pulumi/pulumi-${{ inputs.repo }} --json url --jq '.url'
+                 ```
+               - If no existing PR: push and create a new one (`gh pr create` prints the
+                 URL on stdout — read it from the output):
+                 ```
+                 git -C ./provider-repo push origin "$BRANCH_NAME"
+                 gh pr create \
                    --repo pulumi/pulumi-${{ inputs.repo }} \
                    --head "$BRANCH_NAME" \
                    --title "..." \
-                   --body "Automated by Linear issue: ${{ inputs.issue_title }}" \
-                   --json url --jq '.url')
+                   --body "Automated by Linear issue: ${{ inputs.issue_title }}"
                  ```
 
             9. Post an `action` activity to Linear with the PR URL:
