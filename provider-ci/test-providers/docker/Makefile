@@ -268,7 +268,7 @@ test_provider:
 .PHONY: test_provider
 
 tfgen: schema
-schema: .make/schema  .make/docs
+schema: .make/schema .make/docs
 # This does actually have dependencies, but we're keeping it around for backwards compatibility for now
 tfgen_no_deps: .make/schema
 .make/schema: export PULUMI_HOME := $(WORKING_DIR)/.pulumi
