@@ -56,15 +56,24 @@ jobs:
 
       - uses: jdx/mise-action@v2
 
-      - name: Get claude executable path
+      - name: Get claude and bun executable paths
         id: claude
-        run: echo "claude=$(which claude)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "claude=$(mise which claude)" >> "$GITHUB_OUTPUT"
+          echo "bun=$(mise which bun)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache bun package downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-packages-${{ runner.os }}-8341a564b0c1693e9fa29c681852ee3714980098
 
       - name: Run Claude Orchestrator
         id: claude-agent
         uses: anthropics/claude-code-action@8341a564b0c1693e9fa29c681852ee3714980098 # v1
         with:
           path_to_claude_code_executable: ${{ steps.claude.outputs.claude }}
+          path_to_bun_executable: ${{ steps.claude.outputs.bun }}
           anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
           github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
           allowed_bots: pulumi-provider-automation

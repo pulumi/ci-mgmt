@@ -86,8 +86,14 @@ jobs:
       - name: Get claude and bun executable paths
         id: claude
         run: |
-          echo "claude=$(which claude)" >> "$GITHUB_OUTPUT"
-          echo "bun=$(which bun)" >> "$GITHUB_OUTPUT"
+          echo "claude=$(mise which claude)" >> "$GITHUB_OUTPUT"
+          echo "bun=$(mise which bun)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache bun package downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-packages-${{ runner.os }}-8341a564b0c1693e9fa29c681852ee3714980098
 
       - name: Run Claude Worker Agent
         id: claude-agent
