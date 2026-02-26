@@ -18,10 +18,14 @@ new aws.iam.RolePolicyAttachment("linear-webhook-basic-execution", {
 
 // SSM SecureString parameter — stores the Linear OAuth token obtained via /oauth/callback.
 // Created empty; populated automatically when the OAuth flow completes.
-const tokenParam = new aws.ssm.Parameter("linear-token", {
-  type: "SecureString",
-  value: config.getSecret("linearToken") ?? "placeholder",
-});
+const tokenParam = new aws.ssm.Parameter(
+  "linear-token",
+  {
+    type: "SecureString",
+    value: "placeholder", // Overwritten by oauth callback.
+  },
+  { ignoreChanges: ["value"] },
+);
 
 // Allow the Lambda to read and write the token parameter
 new aws.iam.RolePolicy("linear-webhook-ssm-policy", {
@@ -79,4 +83,4 @@ const funcUrl = new aws.lambda.FunctionUrl("linear-webhook-url", {
 
 export const webhookUrl = funcUrl.functionUrl;
 // OAuth install URL (constructed after deploy — paste into Linear app settings):
-// https://linear.app/oauth/authorize?client_id=<YOUR_CLIENT_ID>&redirect_uri=<webhookUrl>oauth/callback&scope=app:assignable,app:mentionable,read,write&response_type=code&actor=app
+// https://linear.app/oauth/authorize?client_id=8008fc08432f9b94b9d682644ad97388&redirect_uri=https://kedkfg7ljryb67jmqbjfxemmpm0wjhht.lambda-url.us-west-2.on.aws/oauth/callback&scope=app:assignable,app:mentionable,read,write&response_type=code&actor=app

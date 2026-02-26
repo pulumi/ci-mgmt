@@ -40,21 +40,133 @@ interface AgentSessionEvent {
   agentActivity?: { content: { type: string; body?: string } };
 }
 
+interface TokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number; // Unix seconds
+}
+
 // Token cached for the lifetime of this Lambda container
-let cachedLinearToken: string | undefined;
+let cachedTokenData: TokenData | undefined;
 
-async function getLinearToken(): Promise<string> {
-  if (cachedLinearToken) return cachedLinearToken;
-
+async function loadTokenFromSSM(): Promise<TokenData | null> {
   const paramName = process.env.LINEAR_TOKEN_PARAM;
-  if (!paramName) return "";
+  if (!paramName) return null;
 
   const ssm = new SSMClient({});
-  const response = await ssm.send(
-    new GetParameterCommand({ Name: paramName, WithDecryption: true }),
+  let value: string;
+  try {
+    const response = await ssm.send(
+      new GetParameterCommand({ Name: paramName, WithDecryption: true }),
+    );
+    value = response.Parameter?.Value ?? "";
+  } catch {
+    return null;
+  }
+
+  if (!value || value === "placeholder") return null;
+
+  // Try to parse as JSON TokenData; fall back to legacy raw-string token
+  try {
+    return JSON.parse(value) as TokenData;
+  } catch {
+    // Legacy: plain access_token string with no refresh capability
+    return { access_token: value, refresh_token: "", expires_at: Infinity };
+  }
+}
+
+async function saveTokenToSSM(data: TokenData): Promise<void> {
+  const paramName = process.env.LINEAR_TOKEN_PARAM;
+  if (!paramName) return;
+
+  const ssm = new SSMClient({});
+  await ssm.send(
+    new PutParameterCommand({
+      Name: paramName,
+      Value: JSON.stringify(data),
+      Type: "SecureString",
+      Overwrite: true,
+    }),
   );
-  cachedLinearToken = response.Parameter?.Value ?? "";
-  return cachedLinearToken!;
+  cachedTokenData = data;
+}
+
+async function doRefresh(refreshToken: string): Promise<TokenData> {
+  const clientId = process.env.LINEAR_CLIENT_ID;
+  const clientSecret = process.env.LINEAR_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing LINEAR_CLIENT_ID or LINEAR_CLIENT_SECRET for token refresh");
+  }
+
+  const response = await fetch("https://api.linear.app/oauth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+    }).toString(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Token refresh failed: ${response.status} ${await response.text()}`);
+  }
+
+  const { access_token, refresh_token, expires_in } = (await response.json()) as {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  };
+
+  return {
+    access_token,
+    refresh_token,
+    expires_at: Math.floor(Date.now() / 1000) + expires_in,
+  };
+}
+
+async function getLinearToken(): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+
+  // 1. Cache valid and not expiring soon
+  if (cachedTokenData && cachedTokenData.expires_at > now + 300) {
+    return cachedTokenData.access_token;
+  }
+
+  // 2. Cache exists but expiring — try refresh
+  if (cachedTokenData?.refresh_token) {
+    try {
+      const refreshed = await doRefresh(cachedTokenData.refresh_token);
+      await saveTokenToSSM(refreshed);
+      log.info("Proactively refreshed Linear token from cache");
+      return refreshed.access_token;
+    } catch (err) {
+      log.error("Token refresh from cache failed", { error: String(err) });
+      // Fall through to SSM load
+    }
+  }
+
+  // 3. Load from SSM
+  const ssmToken = await loadTokenFromSSM();
+  if (!ssmToken) return "";
+
+  // 4. SSM token expiring soon and has a refresh token
+  if (ssmToken.refresh_token && ssmToken.expires_at <= now + 300) {
+    try {
+      const refreshed = await doRefresh(ssmToken.refresh_token);
+      await saveTokenToSSM(refreshed);
+      log.info("Proactively refreshed Linear token from SSM");
+      return refreshed.access_token;
+    } catch (err) {
+      log.error("Token refresh from SSM failed", { error: String(err) });
+    }
+  }
+
+  // 5. Use SSM token as-is
+  cachedTokenData = ssmToken;
+  return ssmToken.access_token;
 }
 
 export const handler = async (
@@ -84,9 +196,8 @@ async function handleOAuthCallback(
   const clientId = process.env.LINEAR_CLIENT_ID;
   const clientSecret = process.env.LINEAR_CLIENT_SECRET;
   const callbackUrl = process.env.LINEAR_CALLBACK_URL;
-  const paramName = process.env.LINEAR_TOKEN_PARAM;
 
-  if (!clientId || !clientSecret || !callbackUrl || !paramName) {
+  if (!clientId || !clientSecret || !callbackUrl) {
     log.error("Missing OAuth configuration");
     return { statusCode: 500, body: "Server configuration error" };
   }
@@ -109,21 +220,19 @@ async function handleOAuthCallback(
     return { statusCode: 502, body: "Token exchange failed" };
   }
 
-  const { access_token } = (await tokenResponse.json()) as {
+  const { access_token, refresh_token, expires_in } = (await tokenResponse.json()) as {
     access_token: string;
+    refresh_token: string;
+    expires_in: number;
   };
 
-  // Store token in SSM Parameter Store and invalidate cache
-  const ssm = new SSMClient({});
-  await ssm.send(
-    new PutParameterCommand({
-      Name: paramName,
-      Value: access_token,
-      Type: "SecureString",
-      Overwrite: true,
-    }),
-  );
-  cachedLinearToken = undefined;
+  const tokenData: TokenData = {
+    access_token,
+    refresh_token,
+    expires_at: Math.floor(Date.now() / 1000) + expires_in,
+  };
+
+  await saveTokenToSSM(tokenData);
 
   log.info("OAuth token stored successfully");
   return {
@@ -206,17 +315,15 @@ async function handleWebhook(
   const session = agentSession;
   const issue = session.issue ?? { id: "", title: "", description: "" };
 
-  const linearToken = await getLinearToken();
-
   // Post immediate thought to Linear — must arrive within 10 seconds
-  await postLinearActivity(linearToken, session.id, "thought", "Received issue. Starting work...");
+  await postLinearActivity(session.id, "thought", "Received issue. Starting work...");
 
   let githubToken: string;
   try {
     githubToken = await generateGitHubInstallationToken();
   } catch (err) {
     log.error("Failed to generate GitHub token", { error: String(err) });
-    await postLinearActivity(linearToken, session.id, "response", "Internal error: could not authenticate with GitHub");
+    await postLinearActivity(session.id, "response", "Internal error: could not authenticate with GitHub");
     return { statusCode: 500, body: "GitHub auth failed" };
   }
 
@@ -246,7 +353,6 @@ async function handleWebhook(
     const errorBody = await dispatchResponse.text();
     log.error("GitHub dispatch failed", { status: dispatchResponse.status, body: errorBody });
     await postLinearActivity(
-      linearToken,
       session.id,
       "response",
       `Failed to start workflow: ${dispatchResponse.status}`,
@@ -302,11 +408,12 @@ async function generateGitHubInstallationToken(): Promise<string> {
 }
 
 async function postLinearActivity(
-  token: string,
   sessionId: string,
   type: string,
   body: string,
+  isRetry = false,
 ): Promise<void> {
+  const token = await getLinearToken();
   if (!token) {
     log.error("No Linear token available — OAuth installation may be incomplete");
     return;
@@ -327,6 +434,17 @@ async function postLinearActivity(
       },
     }),
   });
+
+  if (response.status === 401 && !isRetry && cachedTokenData?.refresh_token) {
+    log.info("Linear returned 401, attempting token refresh");
+    try {
+      const refreshed = await doRefresh(cachedTokenData.refresh_token);
+      await saveTokenToSSM(refreshed);
+      return postLinearActivity(sessionId, type, body, true);
+    } catch (err) {
+      log.error("Token refresh on 401 failed", { error: String(err) });
+    }
+  }
 
   if (!response.ok) {
     log.error("Failed to post Linear activity", { status: response.status, body: await response.text() });
