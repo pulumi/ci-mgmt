@@ -173,7 +173,6 @@ jobs:
                ```bash
                gh workflow run linear-agent-worker.yml \
                  --repo pulumi/ci-mgmt \
-                 --ref blampe/testing \
                  -f repo=PROVIDER_SHORT_NAME \
                  -f linear_session_id="${{ inputs.linear_session_id }}" \
                  -f linear_issue_id=ISSUE_ID \
