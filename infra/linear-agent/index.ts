@@ -20,7 +20,7 @@ new aws.iam.RolePolicyAttachment("linear-webhook-basic-execution", {
 // Created empty; populated automatically when the OAuth flow completes.
 const tokenParam = new aws.ssm.Parameter("linear-token", {
   type: "SecureString",
-  value: "placeholder", // overwritten by the OAuth callback handler at install time
+  value: config.getSecret("linearToken") ?? "placeholder",
 });
 
 // Allow the Lambda to read and write the token parameter
