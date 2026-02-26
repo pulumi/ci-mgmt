@@ -3,7 +3,18 @@ NAME ?= all
 PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
 
-CPUS ?= $(shell sysctl -n hw.ncpu || echo 1)
+# Detect Operating System
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+    NPROC := $(shell nproc)
+else ifeq ($(UNAME_S),Darwin)
+    NPROC := $(shell sysctl -n hw.ncpu)
+else
+    NPROC := 1
+endif
+
+CPUS ?= $(NPROC)
 MAKEFLAGS += --jobs=$(CPUS)
 
 # These targets are versioned to cause Make to rebuild them when the version changes.
