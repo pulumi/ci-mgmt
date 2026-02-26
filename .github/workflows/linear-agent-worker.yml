@@ -274,8 +274,11 @@ jobs:
                  echo '{"number":...}' | jq -r '.number'
                  gh pr edit <NUMBER> \
                    --repo pulumi/pulumi-${{ inputs.repo }} \
+                   --title "${{ inputs.repo }}: ..." \
                    --body "Automated by Linear issue: ${{ inputs.issue_title }}"
                  ```
+                 The `...` in `--title` should be replaced with a concise description of
+                 the change. Always keep the `${{ inputs.repo }}:` prefix.
                  Note the PR URL from the edit output or by running:
                  ```
                  gh pr view <NUMBER> --repo pulumi/pulumi-${{ inputs.repo }} --json url --jq '.url'
@@ -287,9 +290,11 @@ jobs:
                  gh pr create \
                    --repo pulumi/pulumi-${{ inputs.repo }} \
                    --head "$BRANCH_NAME" \
-                   --title "..." \
+                   --title "${{ inputs.repo }}: ..." \
                    --body "Automated by Linear issue: ${{ inputs.issue_title }}"
                  ```
+                 The `...` in `--title` should be replaced with a concise description of
+                 the change. Always keep the `${{ inputs.repo }}:` prefix.
 
             9. Post an `action` activity to Linear with the PR URL:
                ```

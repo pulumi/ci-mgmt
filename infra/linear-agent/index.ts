@@ -82,5 +82,6 @@ const funcUrl = new aws.lambda.FunctionUrl("linear-webhook-url", {
 });
 
 export const webhookUrl = funcUrl.functionUrl;
+export const tokenParamName = tokenParam.name;
 // OAuth install URL (constructed after deploy — paste into Linear app settings):
 // https://linear.app/oauth/authorize?client_id=8008fc08432f9b94b9d682644ad97388&redirect_uri=https://kedkfg7ljryb67jmqbjfxemmpm0wjhht.lambda-url.us-west-2.on.aws/oauth/callback&scope=app:assignable,app:mentionable,read,write&response_type=code&actor=app
