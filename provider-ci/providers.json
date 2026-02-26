@@ -62,6 +62,7 @@
     "opsgenie",
     "pagerduty",
     "postgresql",
+    "pulumiservice",
     "provider-boilerplate",
     "rabbitmq",
     "rancher2",
