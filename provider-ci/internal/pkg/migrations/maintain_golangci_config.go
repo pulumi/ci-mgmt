@@ -12,6 +12,48 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// runCmd executes a command and returns stdout and stderr separately.
+// Both outputs are also formatted with [stdout] and [stderr] prefixes for logging.
+func runCmd(cmd *exec.Cmd) (stdout, stderr string, err error) {
+	var outBuf, errBuf bytes.Buffer
+	cmd.Stdout = &outBuf
+	cmd.Stderr = &errBuf
+
+	err = cmd.Run()
+	stdout = outBuf.String()
+	stderr = errBuf.String()
+	return
+}
+
+// formatOutput returns a string with [stdout] and [stderr] prefixed lines.
+func formatOutput(stdout, stderr string) string {
+	var result strings.Builder
+
+	if stdout != "" {
+		scanner := strings.Split(stdout, "\n")
+		for _, line := range scanner {
+			if line != "" {
+				result.WriteString("[stdout] ")
+				result.WriteString(line)
+				result.WriteString("\n")
+			}
+		}
+	}
+
+	if stderr != "" {
+		scanner := strings.Split(stderr, "\n")
+		for _, line := range scanner {
+			if line != "" {
+				result.WriteString("[stderr] ")
+				result.WriteString(line)
+				result.WriteString("\n")
+			}
+		}
+	}
+
+	return result.String()
+}
+
 // maintainGolangciConfig allows us to maintain provider lint configurations
 // over time.
 //
@@ -42,28 +84,27 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 		Version string
 	}
 
-	buf := &bytes.Buffer{}
 	cmd := exec.Command("mise", "trust", "--yes")
 	cmd.Dir = cwd
-	cmd.Stdout = buf
-	err := cmd.Run()
+	stdout, stderr, err := runCmd(cmd)
 	if err != nil {
-		return fmt.Errorf("problem trusting: %w", err)
+		output := formatOutput(stdout, stderr)
+		return fmt.Errorf("problem trusting: %w\n%s", err, output)
 	}
 
-	buf = &bytes.Buffer{}
 	cmd = exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
 	cmd.Dir = cwd
-	cmd.Stdout = buf
-	err = cmd.Run()
+	stdout, stderr, err = runCmd(cmd)
 	if err != nil {
-		return fmt.Errorf("problem getting golangci-lint version: %w", err)
+		output := formatOutput(stdout, stderr)
+		return fmt.Errorf("problem getting golangci-lint version: %w\n%s", err, output)
 	}
 
-	err = json.NewDecoder(buf).Decode(&parsed)
+	err = json.NewDecoder(strings.NewReader(stdout)).Decode(&parsed)
 
 	if err != nil || len(parsed) != 1 {
-		return fmt.Errorf("parsing output: %w\n%s", err, buf.String())
+		output := formatOutput(stdout, stderr)
+		return fmt.Errorf("parsing output: %w\n%s", err, output)
 	}
 	version := parsed[0].Version
 
@@ -94,10 +135,11 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 
 	cmd = exec.Command("mise", "exec", "golangci-lint", "--", "golangci-lint", "migrate", "--verbose")
 	cmd.Dir = cwd
-	output, err := cmd.CombinedOutput()
+	stdout, stderr, err = runCmd(cmd)
 
 	if err != nil {
-		fmt.Printf("Problem migrating golangci-lint config %s:\n%s\n%s\n", cfgPath, err, string(output))
+		output := formatOutput(stdout, stderr)
+		fmt.Printf("Problem migrating golangci-lint config %s:\n%s\n%s\n", cfgPath, err, output)
 		return nil
 	}
 
