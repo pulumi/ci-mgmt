@@ -90,6 +90,18 @@ jobs:
 
             ${{ inputs.event_type == 'prompted' && format('FOLLOW-UP COMMENT:\n{0}', inputs.prompt_body) || '' }}
 
+            ## CRITICAL: Shell Command Restrictions
+
+            Each Bash tool call is sandboxed. Only commands whose first token matches an
+            allowed pattern will execute. Rules to avoid permission denials:
+
+            - **Do NOT start a command with a variable assignment** like `VAR=$(cmd ...)`.
+              Run the command directly (`cmd ...`) and read its output from the tool result.
+              Use the observed value literally in subsequent commands.
+            - **Each Bash call is a separate shell** — variables set in one call are not
+              visible in the next. Treat every call as stateless.
+            - Only `curl` and `gh workflow run` are permitted as Bash commands.
+
             ## Instructions
 
             1. Post a `thought` activity to Linear at the start. Use the LINEAR_API_KEY
@@ -104,14 +116,17 @@ jobs:
             2. Fetch the full issue context from Linear. This also retrieves the parent
                issue if this is a sub-issue, so you have complete context:
                ```
-               ISSUE_DATA=$(curl -s -X POST https://api.linear.app/graphql \
+               curl -s -X POST https://api.linear.app/graphql \
                  -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}')
-               echo "$ISSUE_DATA"
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}'
                ```
-               Extract the `title` and `description` fields. If `parent` is non-null,
-               include the parent's `title` and `description` as additional context.
+               Read the JSON output and extract the `title` and `description` fields.
+               If `parent` is non-null, include the parent's `title` and `description`
+               as additional context.
+               IMPORTANT: Run `curl` as the first token — do NOT wrap it in a shell
+               variable assignment like `VAR=$(curl ...)` as that pattern is not
+               permitted.
 
             3. Check `.claude/skills/` for any skill that matches the task described in the
                issue.
