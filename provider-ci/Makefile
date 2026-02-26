@@ -74,5 +74,6 @@ update-provider-configs:
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes-coredns/master/.ci-mgmt.yaml" > ./test-providers/kubernetes-coredns/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-kubernetes-ingress-nginx/master/.ci-mgmt.yaml" > ./test-providers/kubernetes-ingress-nginx/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-provider-boilerplate/master/.ci-mgmt.yaml" > ./test-providers/pulumi-provider-boilerplate/.ci-mgmt.yaml
+	curl "https://raw.githubusercontent.com/pulumi/pulumi-pulumiservice/main/.ci-mgmt.yaml" > ./test-providers/pulumiservice/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-terraform-module/master/.ci-mgmt.yaml" > ./test-providers/terraform-module/.ci-mgmt.yaml
 	curl "https://raw.githubusercontent.com/pulumi/pulumi-xyz/main/.ci-mgmt.yaml" > ./test-providers/xyz/.ci-mgmt.yaml
