@@ -10,6 +10,7 @@ env:
   ESC_ACTION_OIDC_ORGANIZATION: pulumi
   ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
   ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
+  GOMAXPROCS: "1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,7 +19,7 @@ concurrency:
 jobs:
   test:
     name: Verify against testdata
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
@@ -34,7 +35,32 @@ jobs:
         with:
           version: 2026.2.10
       - name: Build & test
-        run: cd provider-ci && make all
+        run: |
+          # Monitor system resources during test execution
+          (
+            echo "=== Starting resource monitor ==="
+            while sleep 5; do
+              echo ""
+              echo "[$(date +%T)] === Resource Snapshot ==="
+              echo "Memory:"
+              free -h | grep -E "Mem|Swap"
+              echo ""
+              echo "Top memory consumers:"
+              ps aux --sort=-%mem | head -10 | awk '{printf "  %s %s %s %s\n", $2, $3, $4, $11}'
+              echo ""
+              echo "Running processes:"
+              ps aux | grep -E "(provider-ci|actionlint|go |mise)" | grep -v grep | awk '{printf "  [%s] %s: CPU=%s%% MEM=%s%% CMD=%s\n", $2, $11, $3, $4, $0}' | head -20
+            done
+          ) &
+          monitor_pid=$!
+
+          echo "Starting make all at $(date +%T)"
+          cd provider-ci && make all
+          exit_code=$?
+
+          kill $monitor_pid 2>/dev/null || true
+          echo "Completed make all at $(date +%T) with exit code $exit_code"
+          exit $exit_code
       - name: Check worktree clean
         uses: pulumi/git-status-check-action@v1
 

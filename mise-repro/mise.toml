@@ -1,0 +1,6 @@
+[tools]
+# This go: dependency triggers excessive memory usage during mise ls
+"go:github.com/pulumi/upgrade-provider" = "1c85aa79bad096152d90cc69b2e06209598c9280"
+
+# Any other tool to trigger mise ls
+golangci-lint = "1.62.2"

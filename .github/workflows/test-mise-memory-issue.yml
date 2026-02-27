@@ -1,0 +1,76 @@
+name: Reproduce Mise Memory Issue
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'mise-repro/**'
+      - '.github/workflows/test-mise-memory-issue.yml'
+
+jobs:
+  repro-ubuntu-latest:
+    name: Reproduce on ubuntu-latest (15GB RAM)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2026.2.10
+
+      - name: Show system resources
+        run: |
+          echo "=== System Information ==="
+          free -h
+          nproc
+          cat /proc/cpuinfo | grep "model name" | head -1
+          ulimit -a
+          echo ""
+
+      - name: Run reproduction script
+        run: |
+          cd mise-repro
+          ./repro.sh
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Check if OOM occurred
+        run: |
+          echo "Checking dmesg for OOM events..."
+          sudo dmesg | grep -i "out of memory" || echo "No OOM found in dmesg"
+          sudo dmesg | grep -i "kill" | tail -20 || echo "No kill events"
+
+  repro-8core:
+    name: Reproduce on pulumi-ubuntu-8core (32GB+ RAM)
+    runs-on: pulumi-ubuntu-8core
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2026.2.10
+
+      - name: Show system resources
+        run: |
+          echo "=== System Information ==="
+          free -h
+          nproc
+          cat /proc/cpuinfo | grep "model name" | head -1
+          ulimit -a
+          echo ""
+
+      - name: Run reproduction script
+        run: |
+          cd mise-repro
+          ./repro.sh
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Check if OOM occurred
+        run: |
+          echo "Checking dmesg for OOM events..."
+          sudo dmesg | grep -i "out of memory" || echo "No OOM found in dmesg"
+          sudo dmesg | grep -i "kill" | tail -20 || echo "No kill events"
