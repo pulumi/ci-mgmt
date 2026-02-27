@@ -55,7 +55,6 @@ func (maintainGolangciConfig) Migrate(_ string, cwd string) error {
 	cmd = exec.Command("mise", "ls", "golangci-lint", "--json", "-c")
 	cmd.Dir = cwd
 	cmd.Stdout = buf
-	cmd.Env = append(os.Environ(), "GOMAXPROCS=1")
 	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("problem getting golangci-lint version: %w", err)
