@@ -60,7 +60,10 @@ mise-plugins:
 	@echo "Installing mise plugins..."
 	@mise plugins install vfox-pulumi https://github.com/pulumi/vfox-pulumi 2>/dev/null || mise plugins update vfox-pulumi || true
 
-test-providers: mise-plugins test-provider/aws test-provider/docker test-provider/cloudflare test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx test-provider/xyz test-provider/pulumi-provider-boilerplate test-provider/pulumiservice
+test-providers: mise-plugins
+	@for provider in aws docker cloudflare eks terraform-module command aws-native kubernetes-coredns docker-build kubernetes kubernetes-cert-manager kubernetes-ingress-nginx xyz pulumi-provider-boilerplate pulumiservice; do \
+		$(MAKE) test-provider/$$provider || exit 1; \
+	done
 
 # 1. Delete all files except the .ci-mgmt.yaml file and run the provider-ci generate command.
 # 2. Copy the generated provider repository to a temporary git repo and run actionlint on it.
