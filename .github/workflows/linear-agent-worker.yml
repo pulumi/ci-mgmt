@@ -1,5 +1,14 @@
+# Linear GraphQL schema reference:
+#   https://studio.apollographql.com/public/Linear-API/variant/current/schema/reference
+# All Linear GraphQL queries in this file should be double-checked against that schema.
+
 permissions: write-all
 name: Linear Agent Worker
+run-name: "Linear Worker (${{ inputs.repo }}): ${{ inputs.issue_title }}"
+
+concurrency:
+  group: linear-worker-${{ inputs.repo }}-${{ inputs.linear_session_id }}
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
@@ -12,14 +21,14 @@ on:
         required: true
         type: string
         description: "Linear AgentSession ID"
+      linear_issue_id:
+        required: true
+        type: string
+        description: "Linear issue UUID (used to look up the human-readable identifier for branch naming)"
       issue_title:
         required: true
         type: string
         description: "Linear issue title"
-      issue_body:
-        required: true
-        type: string
-        description: "Linear issue body / description"
       event_type:
         required: false
         type: string
@@ -59,22 +68,71 @@ jobs:
 
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
+      - uses: jdx/mise-action@v2
+
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          repository: pulumi/pulumi-${{ inputs.repo }}
+          path: provider-repo
+          token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Configure git user for provider repo
+        run: |
+          git -C provider-repo config --global user.email "pulumi-bot@pulumi.com"
+          git -C provider-repo config --global user.name "Pulumi Bot"
+
+      - name: Get claude and bun executable paths
+        id: claude
+        run: |
+          echo "claude=$(mise which claude)" >> "$GITHUB_OUTPUT"
+          echo "bun=$(mise which bun)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache bun package downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-packages-${{ runner.os }}-8341a564b0c1693e9fa29c681852ee3714980098
+
       - name: Run Claude Worker Agent
         id: claude-agent
         uses: anthropics/claude-code-action@8341a564b0c1693e9fa29c681852ee3714980098 # v1
         with:
+          path_to_claude_code_executable: ${{ steps.claude.outputs.claude }}
+          path_to_bun_executable: ${{ steps.claude.outputs.bun }}
           anthropic_api_key: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
-          # Sandbox settings: Edit() rules control all bash filesystem writes (mkdir,
-          # output redirection, etc.), not just the Edit tool.
+          github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          allowed_bots: pulumi-provider-automation
+          # Sandbox settings: --allowedTools controls which Bash commands Claude can
+          # call; settings.permissions.allow controls which operations are
+          # auto-approved in non-interactive CI (anything not listed here is
+          # denied because there is no human to confirm the prompt). Both lists
+          # must be kept in sync — a tool in --allowedTools but absent from
+          # permissions.allow will still be denied in CI.
           settings: |
             {
               "permissions": {
-                "allow": ["Edit(./**)", "Edit(/tmp/**)"]
+                "allow": [
+                  "Edit(./**)",
+                  "Edit(/tmp/**)",
+                  "Bash(gh *)",
+                  "Bash(git *)",
+                  "Bash(curl *)",
+                  "Bash(make *)",
+                  "Bash(mise *)",
+                  "Bash(mkdir *)",
+                  "Bash(ls *)",
+                  "Bash(cat *)",
+                  "Bash(echo *)",
+                  "Bash(jq *)",
+                  "Bash(cd *)"
+                ]
               }
             }
           claude_args: |
-            --max-turns 50
-            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *)"
+            --max-turns 200
+            --allowedTools "Skill,Read,Write,Edit,MultiEdit,Glob,Grep,LS,Bash(gh *),Bash(git *),Bash(make *),Bash(mise *),Bash(curl *),Bash(mkdir *),Bash(ls *),Bash(cat *),Bash(echo *),Bash(jq *),Bash(cd *)"
           prompt: |
             You are a CI automation worker processing one provider repository.
 
@@ -83,10 +141,28 @@ jobs:
             EVENT TYPE:        ${{ inputs.event_type }}
             ISSUE TITLE:       ${{ inputs.issue_title }}
 
-            ISSUE BODY:
-            ${{ inputs.issue_body }}
-
             ${{ inputs.prompt_body != '' && format('FOLLOW-UP / REFINEMENT (takes precedence for this repo):\n{0}', inputs.prompt_body) || '' }}
+
+            ## CRITICAL: Repository Location
+
+            The provider repository `pulumi/pulumi-${{ inputs.repo }}` is ALREADY checked
+            out at `./provider-repo` (relative to your working directory). Do NOT clone it,
+            do NOT use /tmp, do NOT run `git clone`. All git and file operations on the
+            provider must use the path `./provider-repo`.
+
+            ## CRITICAL: Shell Command Restrictions
+
+            Each Bash tool call is sandboxed. Only commands whose first token matches an
+            allowed pattern will execute. Rules to avoid permission denials:
+
+            - **Do NOT start a command with a variable assignment** like `VAR=$(cmd ...)`.
+              Run the command directly (`cmd ...`) and read its output from the tool result.
+              Use the observed value literally in subsequent commands.
+            - **Use `git -C ./provider-repo`** for all git operations inside the provider
+              repo — do NOT use `cd ./provider-repo && git ...` unless `cd` is the intended
+              first operation.
+            - **Each Bash call is a separate shell** — variables set in one call are not
+              visible in the next. Treat every call as stateless.
 
             ## Instructions
 
@@ -94,50 +170,147 @@ jobs:
                environment variable (already set). Example:
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:thought,body:\"Starting work on pulumi-${{ inputs.repo }}...\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"thought\",body:\"Starting work on pulumi-${{ inputs.repo }}...\"}}) { success } }"}'
                ```
 
-            2. Check `.claude/skills/` for a skill that matches the task described in the
-               issue. If a matching skill exists, use it to guide your approach. If no
-               matching skill exists, use the issue title and body directly.
+            2. Fetch the full issue context from Linear. This also retrieves the parent
+               issue if this is a sub-issue, so you have complete context:
+               ```
+               curl -s -X POST https://api.linear.app/graphql \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
+                 -H "Content-Type: application/json" \
+                 -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { identifier title description parent { identifier title description } } }"}'
+               ```
+               Read the JSON output and extract the `description` field as the issue body.
+               If `parent` is non-null, include the parent's `title` and `description` as
+               additional context (the sub-issue refines or specialises the parent task).
+               IMPORTANT: Run `curl` as the first token — do NOT wrap it in a shell variable
+               assignment like `VAR=$(curl ...)` as that pattern is not permitted.
 
-            3. If a FOLLOW-UP / REFINEMENT section is present above, treat it as a
+            3. Check `.claude/skills/` in your current working directory (the ci-mgmt repo)
+               for a skill that matches the task described in the issue. Use the LS tool —
+               not bash — to list the directory; it won't error if the directory is missing.
+               If a matching skill exists, use it to guide your approach. If no matching
+               skill exists, use the issue title and body directly.
+
+            4. If a FOLLOW-UP / REFINEMENT section is present above, treat it as a
                refinement or override that takes precedence over the general issue
                instructions for this specific repo.
 
-            4. Clone the provider repository:
-               ```
-               gh repo clone pulumi/pulumi-${{ inputs.repo }} /tmp/pulumi-${{ inputs.repo }}
-               ```
+            5. Determine the branch name from the `identifier` returned in step 2.
+               Prepend `linear/` and lowercase it (e.g. `ENG-123` → `linear/eng-123`).
 
-            5. Make the necessary changes in /tmp/pulumi-${{ inputs.repo }} as described
-               by the issue (and refined by the follow-up if provided). Commit the changes.
+            6. Check whether a PR already exists on that branch in the provider repo.
+               If one exists, check out the existing branch and update it; otherwise
+               create a new branch.
 
-            6. Create a pull request:
-               ```
-               gh pr create \
+               All git commands must be run with `-C ./provider-repo` so that the working
+               directory is correct (do NOT use `cd ./provider-repo && git ...` — that
+               pattern is not permitted). Similarly, use `gh pr list --repo ...` directly
+               without `cd`.
+
+               ```bash
+               # Check for an open PR — run gh directly, no cd prefix
+               gh pr list \
                  --repo pulumi/pulumi-${{ inputs.repo }} \
-                 --title "..." \
-                 --body "Automated by Linear issue: ${{ inputs.issue_title }}"
+                 --state open \
+                 --head "$BRANCH_NAME" \
+                 --json number,url \
+                 --jq '.[0]'
+
+               # If PR exists, fetch and check out the branch
+               git -C ./provider-repo fetch origin "$BRANCH_NAME"
+               git -C ./provider-repo checkout "$BRANCH_NAME"
+
+               # If no PR, create a new branch
+               git -C ./provider-repo checkout -b "$BRANCH_NAME"
                ```
 
-            7. Post an `action` activity to Linear with the PR URL:
+            7. Make the necessary changes in `./provider-repo` as described by the issue
+               (and refined by the follow-up if provided). Commit the changes and push
+               the branch.
+
+               **If you determine that no changes are needed** (e.g. the repository
+               already reflects the desired state), skip steps 8–9 and instead:
+
+               a. Find the "completed" workflow state for the issue's team. Run curl
+                  directly (no variable-assignment prefix) and pipe to jq:
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"{ issue(id: \"${{ inputs.linear_issue_id }}\") { team { states { nodes { id type } } } } }"}' \
+                    | jq -r '.data.issue.team.states.nodes[] | select(.type=="completed") | .id' \
+                    | head -1
+                  ```
+                  Note the DONE_STATE_ID from the output.
+
+               b. Mark the issue as done — substitute the state ID value you observed
+                  in step (a) directly into the mutation (replace STATE_ID_HERE):
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"mutation { issueUpdate(id: \"${{ inputs.linear_issue_id }}\", input: { stateId: \"STATE_ID_HERE\" }) { success } }"}'
+                  ```
+
+               c. Post an `action` activity explaining that no changes were needed:
+                  ```
+                  curl -s -X POST https://api.linear.app/graphql \
+                    -H "Authorization: Bearer $LINEAR_API_KEY" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Checked\",parameter:\"pulumi-${{ inputs.repo }}\",result:\"No changes needed — already up to date. Marked issue as done.\"}}) { success } }"}'
+                  ```
+                  Then stop; do not proceed to step 8.
+
+            8. Create or update the pull request. Use `git -C ./provider-repo` for all
+               git commands — do not use `cd ./provider-repo && git ...`.
+               - If a PR already existed (step 6): push the branch and update the PR.
+                 First get the PR number from the earlier `gh pr list` JSON output:
+                 ```
+                 git -C ./provider-repo push origin "$BRANCH_NAME"
+                 echo '{"number":...}' | jq -r '.number'
+                 gh pr edit <NUMBER> \
+                   --repo pulumi/pulumi-${{ inputs.repo }} \
+                   --title "${{ inputs.repo }}: ..." \
+                   --body "Automated by Linear issue: ${{ inputs.issue_title }}"
+                 ```
+                 The `...` in `--title` should be replaced with a concise description of
+                 the change. Always keep the `${{ inputs.repo }}:` prefix.
+                 Note the PR URL from the edit output or by running:
+                 ```
+                 gh pr view <NUMBER> --repo pulumi/pulumi-${{ inputs.repo }} --json url --jq '.url'
+                 ```
+               - If no existing PR: push and create a new one (`gh pr create` prints the
+                 URL on stdout — read it from the output):
+                 ```
+                 git -C ./provider-repo push origin "$BRANCH_NAME"
+                 gh pr create \
+                   --repo pulumi/pulumi-${{ inputs.repo }} \
+                   --head "$BRANCH_NAME" \
+                   --title "${{ inputs.repo }}: ..." \
+                   --body "Automated by Linear issue: ${{ inputs.issue_title }}"
+                 ```
+                 The `...` in `--title` should be replaced with a concise description of
+                 the change. Always keep the `${{ inputs.repo }}:` prefix.
+
+            9. Post an `action` activity to Linear with the PR URL:
                ```
                curl -s -X POST https://api.linear.app/graphql \
-                 -H "Authorization: $LINEAR_API_KEY" \
+                 -H "Authorization: Bearer $LINEAR_API_KEY" \
                  -H "Content-Type: application/json" \
-                 -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Created PR pulumi/pulumi-${{ inputs.repo }}#NUMBER: URL\"}) { success } }"}'
+                 -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Created PR\",parameter:\"pulumi/pulumi-${{ inputs.repo }}#NUMBER\",result:\"URL\"}}) { success } }"}'
                ```
-               Replace NUMBER and URL with the actual PR number and URL from step 6.
+               Replace NUMBER and URL with the actual PR number and URL from step 8.
 
             If any step fails, post an `action` activity to Linear describing the failure:
             ```
             curl -s -X POST https://api.linear.app/graphql \
-              -H "Authorization: $LINEAR_API_KEY" \
+              -H "Authorization: Bearer $LINEAR_API_KEY" \
               -H "Content-Type: application/json" \
-              -d '{"query":"mutation { agentActivityCreate(input: {sessionId:\"${{ inputs.linear_session_id }}\",type:action,body:\"Failed to process pulumi-${{ inputs.repo }}: REASON\"}) { success } }"}'
+              -d '{"query":"mutation { agentActivityCreate(input: {agentSessionId:\"${{ inputs.linear_session_id }}\",content:{type:\"action\",action:\"Failed\",parameter:\"pulumi-${{ inputs.repo }}\",result:\"REASON\"}}) { success } }"}'
             ```
             Replace REASON with a concise description of what went wrong.
 
