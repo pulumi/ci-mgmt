@@ -19,7 +19,7 @@ concurrency:
 jobs:
   test:
     name: Verify against testdata
-    runs-on: ubuntu-latest
+    runs-on: pulumi-ubuntu-8core
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
