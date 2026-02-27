@@ -80,8 +80,8 @@ jobs:
 
       - name: Configure git user for provider repo
         run: |
-          git -C provider-repo config user.email "pulumi-bot@pulumi.com"
-          git -C provider-repo config user.name "Pulumi Bot"
+          git -C provider-repo config --global user.email "pulumi-bot@pulumi.com"
+          git -C provider-repo config --global user.name "Pulumi Bot"
 
       - name: Get claude and bun executable paths
         id: claude
