@@ -61,8 +61,9 @@ mise-plugins:
 	@mise plugins install vfox-pulumi https://github.com/pulumi/vfox-pulumi 2>/dev/null || mise plugins update vfox-pulumi || true
 
 test-providers: mise-plugins
-	@echo "Pre-warming mise cache (installing and validating all tools)..."
-	@cd test-providers/aws && mise install > /dev/null 2>&1 || true
+	@echo "Pre-warming mise cache (running mise ls golangci-lint as migration does)..."
+	@cd test-providers/aws && mise trust --yes > /dev/null 2>&1 || true
+	@cd test-providers/aws && mise ls golangci-lint --json -c > /dev/null 2>&1 || true
 	@for provider in aws docker cloudflare eks terraform-module command aws-native kubernetes-coredns docker-build kubernetes kubernetes-cert-manager kubernetes-ingress-nginx xyz pulumi-provider-boilerplate pulumiservice; do \
 		$(MAKE) test-provider/$$provider || exit 1; \
 	done
