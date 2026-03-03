@@ -16,6 +16,13 @@ const gh = new github.Provider("github", {
 // grab all the providers from their directory listing
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
 
+// Providers whose branch protection rule pre-existed Pulumi management.
+// The node ID here is used to import the existing rule into state on the
+// first deployment rather than attempting to create a duplicate.
+const branchProtectionImports: Record<string, string> = {
+  pulumiservice: "BPR_kwDOHDpjg84BgNoo",
+};
+
 function tfProviderProtection(provider: string) {
   const requiredChecks: string[] = [
     // Sentinel is responsible for encapsulating CI checks.
@@ -50,6 +57,7 @@ function tfProviderProtection(provider: string) {
       provider: gh,
       retainOnDelete: true,
       deleteBeforeReplace: true,
+      import: branchProtectionImports[provider],
     },
   );
 
