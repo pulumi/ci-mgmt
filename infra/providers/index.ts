@@ -17,10 +17,10 @@ const gh = new github.Provider("github", {
 const tfProviders: string[] = JSON.parse(fs.readFileSync("../../provider-ci/providers.json", "utf-8"));
 
 // Providers whose branch protection rule pre-existed Pulumi management.
-// The node ID here is used to import the existing rule into state on the
-// first deployment rather than attempting to create a duplicate.
+// The import ID (repository:pattern) is used to adopt the existing rule into
+// state on the first deployment rather than attempting to create a duplicate.
 const branchProtectionImports: Record<string, string> = {
-  pulumiservice: "BPR_kwDOHDpjg84BgNoo",
+  pulumiservice: "pulumi-pulumiservice:main",
 };
 
 function tfProviderProtection(provider: string) {
@@ -58,6 +58,10 @@ function tfProviderProtection(provider: string) {
       retainOnDelete: true,
       deleteBeforeReplace: true,
       import: branchProtectionImports[provider],
+      // When importing a pre-existing rule, repositoryId in state will be the
+      // GitHub node ID but code specifies the repo name — suppress the diff to
+      // prevent Pulumi from attempting a replace.
+      ignoreChanges: branchProtectionImports[provider] !== undefined ? ["repositoryId"] : [],
     },
   );
 
