@@ -58,6 +58,10 @@ function tfProviderProtection(provider: string) {
       retainOnDelete: true,
       deleteBeforeReplace: true,
       import: branchProtectionImports[provider],
+      // When importing a pre-existing rule, repositoryId in state will be the
+      // GitHub node ID but code specifies the repo name — suppress the diff to
+      // prevent Pulumi from attempting a replace.
+      ignoreChanges: branchProtectionImports[provider] !== undefined ? ["repositoryId"] : [],
     },
   );
 
