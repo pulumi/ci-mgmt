@@ -248,4 +248,4 @@ useNodejsPackageGenSdk: false
 usePythonPackageGenSdk: false
 
 # Version of mise to use
-mise-version: 2026.2.15
+mise-version: 2026.3.7
