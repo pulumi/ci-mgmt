@@ -10,6 +10,7 @@
     "aws-native",
     "awsx",
     "azure",
+    "azure-native",
     "azuread",
     "azuredevops",
     "cloudamqp",
