@@ -13,6 +13,7 @@ CODEGEN := pulumi-#{{ .Config.GenName }}#-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 TESTPARALLELISM := 10
 GOTESTARGS := ""
+GO_TEST_EXEC ?= go test
 WORKING_DIR := $(shell pwd)
 #{{- if .Config.GoBuildParallelism }}#
 PULUMI_PROVIDER_BUILD_PARALLELISM ?= -p #{{ .Config.GoBuildParallelism }}#
@@ -341,13 +342,13 @@ bin/$(PROVIDER): .make/schema
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd #{{ .Config.TestFolder }}# && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
+	cd #{{ .Config.TestFolder }}# && $(GO_TEST_EXEC) -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
 
 #{{- if .Config.TestProviderCmd }}#
 test_provider_cmd = #{{ .Config.TestProviderCmd }}#
 #{{- else }}#
-test_provider_cmd = cd provider && go test -v -short \
+test_provider_cmd = cd provider && $(GO_TEST_EXEC) -v -short \
 	-coverprofile="coverage.txt" \
 	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
 	-parallel $(TESTPARALLELISM) \
