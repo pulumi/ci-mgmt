@@ -353,7 +353,7 @@ test_provider_cmd = cd provider && $(GO_TEST_EXEC) -v -short \
 	-coverprofile="coverage.txt" \
 	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
 	-parallel $(TESTPARALLELISM) \
-	./...
+	.
 #{{- end }}#
 test_provider:
 	$(call test_provider_cmd)
