@@ -96,6 +96,12 @@ func GeneratePackage(opts GenerateOpts) error {
 	return nil
 }
 
+// workflowCleanAllowList contains workflow directory entries that should never
+// be deleted by cleanGithubWorkflows, regardless of naming convention.
+var workflowCleanAllowList = map[string]bool{
+	"shared": true,
+}
+
 func cleanGithubWorkflows(outDir string, providerName string) error {
 	workflows, err := os.ReadDir(filepath.Join(outDir, ".github", "workflows"))
 	if err != nil {
@@ -109,6 +115,10 @@ func cleanGithubWorkflows(outDir string, providerName string) error {
 	for _, workflow := range workflows {
 		// Skip provider-specific workflows which are prefixed with the provider name
 		if strings.HasPrefix(workflow.Name(), providerName+"-") {
+			continue
+		}
+		// Skip entries in the allow list (e.g. shared/)
+		if workflowCleanAllowList[workflow.Name()] {
 			continue
 		}
 		err = os.Remove(filepath.Join(outDir, ".github", "workflows", workflow.Name()))
