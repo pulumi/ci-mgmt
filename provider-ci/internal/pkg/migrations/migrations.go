@@ -26,6 +26,7 @@ func Migrate(templateName, outDir string) error {
 		maintainMiseLock{},
 		maintainGolangciConfig{},
 		unignoreSDKSchemaGo{},
+		allowBinMise{},
 	}
 	for i, migration := range migrations {
 		if !migration.ShouldRun(templateName) {
