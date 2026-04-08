@@ -19,6 +19,12 @@ providerDefaultBranch: main
 template: generic
 shards: 6
 useProviderBinarySchemaGen: true
+testProviderCmd: >-
+  cd provider && $(GO_TEST_EXEC) -v -short
+  -coverprofile="coverage.txt"
+  -coverpkg="./...,github.com/hashicorp/terraform-provider-..."
+  -parallel $(TESTPARALLELISM)
+  ./pkg/...
 esc:
     enabled: true
 modulePath: .
