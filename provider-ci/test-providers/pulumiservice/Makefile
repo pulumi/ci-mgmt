@@ -249,11 +249,7 @@ test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && $(GO_TEST_EXEC) -v -tags=$(TESTTAGS) -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
-test_provider_cmd = cd provider && $(GO_TEST_EXEC) -v -short \
-	-coverprofile="coverage.txt" \
-	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
-	-parallel $(TESTPARALLELISM) \
-	.
+test_provider_cmd = cd provider && $(GO_TEST_EXEC) -v -short -coverprofile="coverage.txt" -coverpkg="./...,github.com/hashicorp/terraform-provider-..." -parallel $(TESTPARALLELISM) ./pkg/...
 test_provider:
 	$(call test_provider_cmd)
 .PHONY: test_provider
