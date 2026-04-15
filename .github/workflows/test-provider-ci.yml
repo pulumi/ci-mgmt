@@ -24,7 +24,7 @@ jobs:
         id: esc-secrets
         uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
       - name: Checkout Repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Configure git
         # Set the default branch to silence the warnings about the default branch name changing
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
