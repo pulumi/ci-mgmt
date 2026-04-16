@@ -52,7 +52,7 @@ jobs:
         uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
       - name: pulumi-${{ matrix.provider }} main
         id: upgrade-on-main
-        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
+        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 # v1.3.1
         continue-on-error: true
         with:
             workflow: upgrade-bridge.yml
@@ -63,7 +63,7 @@ jobs:
       - name: pulumi-${{ matrix.provider }} master
         id: upgrade-on-master
         if: steps.upgrade-on-main.outcome == 'failure'
-        uses: benc-uk/workflow-dispatch@e2e5e9a103e331dad343f381a29e654aea3cf8fc # v1.2.4
+        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 # v1.3.1
         with:
             workflow: upgrade-bridge.yml
             token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
