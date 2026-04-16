@@ -53,7 +53,7 @@ jobs:
           private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
         with:
           aws-access-key-id: ${{ steps.esc-secrets.outputs.AWS_CORP_S3_UPLOAD_ACCESS_KEY_ID }}
           aws-region: us-west-2
