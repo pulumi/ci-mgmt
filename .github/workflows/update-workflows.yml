@@ -72,7 +72,7 @@ jobs:
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/pull_request.yml || echo "not found"
           rm pulumi-${{ inputs.provider_name }}/.github/workflows/master.yml || echo "not found"
       - name: Install mise
-        uses: jdx/mise-action@89d8187abcefc89d2f30d3e01953bf5c209e4cbc
+        uses: jdx/mise-action@db69447ab3fe3551c979c98174c303c5d9708e58
         with:
           version: 2026.3.7
           install_args: go golangci-lint
