@@ -10,6 +10,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.actor != 'github-merge-queue[bot]'
     permissions:
       contents: read
       pull-requests: write
@@ -22,6 +23,7 @@ jobs:
       is_automated: ${{ github.actor == 'dependabot[bot]' }}
 
   build_provider:
+    if: github.actor != 'github-merge-queue[bot]'
     uses: ./.github/workflows/build_provider.yml
     needs: prerequisites
     secrets: inherit
@@ -34,6 +36,7 @@ jobs:
   
 
   post_build:
+    if: github.actor != 'github-merge-queue[bot]'
     name: post_build
     needs: prerequisites
     uses: ./.github/workflows/main-post-build.yml
@@ -45,15 +48,18 @@ jobs:
       version: ${{ needs.prerequisites.outputs.version }}
 
   lint:
+    if: github.actor != 'github-merge-queue[bot]'
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
   license_check:
+    if: github.actor != 'github-merge-queue[bot]'
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
 
   publish:
+    if: github.actor != 'github-merge-queue[bot]'
     name: publish
     permissions:
       contents: write
@@ -73,6 +79,7 @@ jobs:
       skipJavaSdk: true
 
   tag_release_if_labeled_needs_release:
+    if: github.event_name != 'merge_group' && github.actor != 'github-merge-queue[bot]'
     name: Tag release if labeled as needs-release
     needs: publish
     runs-on: ubuntu-latest
@@ -107,6 +114,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
+    if: github.actor != 'github-merge-queue[bot]'
     uses: ./.github/workflows/test.yml
     needs:
       - prerequisites
@@ -130,3 +138,5 @@ on:
     - v*
     - sdk/*
     - "**"
+  merge_group:
+    types: [checks_requested]
