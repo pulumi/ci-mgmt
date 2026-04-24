@@ -30,7 +30,7 @@ jobs:
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
         run: git config --global init.defaultBranch master
       - name: Install mise
-        uses: jdx/mise-action@db69447ab3fe3551c979c98174c303c5d9708e58
+        uses: jdx/mise-action@5ad13376e30bbca3721f7f33f25bc0baff52c02d
         with:
           version: 2026.3.7
       - name: Build & test
