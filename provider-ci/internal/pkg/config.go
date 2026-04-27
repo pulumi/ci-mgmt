@@ -237,8 +237,8 @@ type Config struct {
 	// binary with coverage (`go build -cover`) for the SDK integration test
 	// matrix and uploading the resulting profile to Codecov. Requires the
 	// repo's Makefile to define a `provider_cover` target that produces the
-	// instrumented binary at the same path as `make provider`. (Native
-	// providers only.)
+	// instrumented binary at the same path as `make provider`. Supported by
+	// the `native` and `generic` templates.
 	IntegrationTestCoverage bool `yaml:"integrationTestCoverage"`
 
 	// PulumiVersionFile specifies the file to read the Pulumi version from.
