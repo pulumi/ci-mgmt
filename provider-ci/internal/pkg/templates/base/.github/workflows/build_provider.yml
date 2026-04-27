@@ -9,6 +9,13 @@ on:
         required: true
         type: string
         description: Version of the provider to build
+      cover:
+        required: false
+        type: boolean
+        default: false
+        description: Build the provider with `-cover` so it emits runtime
+          coverage data files at exit. Used by the SDK integration test
+          workflow when `integrationTestCoverage` is enabled.
       matrix:
         required: false
         type: string
@@ -113,6 +120,7 @@ jobs:
       - name: Build provider
         run: make "provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}"
         env:
+          PROVIDER_BUILD_FLAGS: ${{ inputs.cover && '-cover -covermode=atomic' || '' }}
           AZURE_SIGNING_CLIENT_ID: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_CLIENT_ID }}
           AZURE_SIGNING_CLIENT_SECRET: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_CLIENT_SECRET }}
           AZURE_SIGNING_TENANT_ID: ${{ steps.esc-secrets.outputs.AZURE_SIGNING_TENANT_ID }}

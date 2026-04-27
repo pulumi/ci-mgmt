@@ -43,6 +43,9 @@ jobs:
       id-token: write # For ESC secrets.
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+      #{{- if .Config.IntegrationTestCoverage }}#
+      cover: true
+      #{{- end }}#
       matrix: |
         {
           "platform": [
