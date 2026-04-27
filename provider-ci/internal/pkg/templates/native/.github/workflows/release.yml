@@ -393,6 +393,18 @@ jobs:
         2h -parallel 4 ./...
       env:
         GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #{{- else if .Config.IntegrationTestCoverage }}#
+    # `go test -cover` would override the test process's GOCOVERDIR with a
+    # private tmpdir, which then gets inherited (and discarded) by the
+    # provider subprocess. Omit -cover so the env var we set below sticks.
+    - name: Run tests
+      run: >-
+        set -euo pipefail
+
+        cd examples && go test -count=1 -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+      env:
+        GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GOCOVERDIR: ${{ github.workspace }}/coverage
     #{{- else }}#
     - name: Run tests
       run: >-
@@ -401,9 +413,6 @@ jobs:
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
         GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #{{- if .Config.IntegrationTestCoverage }}#
-        GOCOVERDIR: ${{ github.workspace }}/coverage
-        #{{- end }}#
     #{{- end }}#
     #{{- if .Config.IntegrationTestCoverage }}#
     - name: Convert coverage data
