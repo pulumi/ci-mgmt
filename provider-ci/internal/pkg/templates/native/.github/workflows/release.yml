@@ -110,7 +110,7 @@ jobs:
     #{{- end }}#
     #{{- if ne .Config.Provider "kubernetes" }}#
     - name: Build Provider
-      run: make provider
+      run: #{{ if .Config.IntegrationTestCoverage }}#make provider_cover#{{ else }}#make provider#{{ end }}#
     #{{- end }}#
     - name: Check worktree clean
       id: worktreeClean
@@ -383,6 +383,10 @@ jobs:
         node_image: kindest/node:v1.29.2
         config: kind.config.yml
     #{{- end }}#
+    #{{- if .Config.IntegrationTestCoverage }}#
+    - name: Prepare coverage directory
+      run: mkdir -p ${{ github.workspace }}/coverage
+    #{{- end }}#
     #{{- if eq .Config.Provider "kubernetes" }}#
     - name: Run tests
       run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
@@ -397,6 +401,23 @@ jobs:
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
         GTIHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #{{- if .Config.IntegrationTestCoverage }}#
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+        #{{- end }}#
+    #{{- end }}#
+    #{{- if .Config.IntegrationTestCoverage }}#
+    - name: Convert coverage data
+      if: always()
+      run: go tool covdata textfmt -i=${{ github.workspace }}/coverage -o
+        ${{ github.workspace }}/coverage-${{ matrix.language }}.out
+    - name: Upload integration test coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+      with:
+        files: ${{ github.workspace }}/coverage-${{ matrix.language }}.out
+        flags: integration-${{ matrix.language }}
+      env:
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     #{{- end }}#
     - if: failure() && github.event_name == 'push'
       name: Notify Slack

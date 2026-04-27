@@ -233,6 +233,14 @@ type Config struct {
 	// SetupKind controls whether to setup a KinD cluster. (only used in kubernetes-coredns)
 	SetupKind bool `yaml:"setupKind"`
 
+	// IntegrationTestCoverage opts the provider into instrumenting the provider
+	// binary with coverage (`go build -cover`) for the SDK integration test
+	// matrix and uploading the resulting profile to Codecov. Requires the
+	// repo's Makefile to define a `provider_cover` target that produces the
+	// instrumented binary at the same path as `make provider`. (Native
+	// providers only.)
+	IntegrationTestCoverage bool `yaml:"integrationTestCoverage"`
+
 	// PulumiVersionFile specifies the file to read the Pulumi version from.
 	PulumiVersionFile string `yaml:"pulumiVersionFile"`
 

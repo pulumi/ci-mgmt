@@ -257,6 +257,15 @@ bin/$(PROVIDER): .make/schema
 	$(call build_provider_cmd,$(shell go env GOOS),$(shell go env GOARCH),$(WORKING_DIR)/bin/$(PROVIDER))
 .PHONY: provider provider_no_deps
 
+# Build a coverage-instrumented provider binary suitable for collecting runtime
+# coverage from the SDK integration tests. The binary is written to the same
+# path as `make provider`. Set `GOCOVERDIR` when running the binary so that the
+# Go runtime writes coverage data files to that directory; convert them to a
+# coverage profile with `go tool covdata textfmt -i=$$GOCOVERDIR -o cover.out`.
+provider_cover:
+	cd provider && GOOS=$(shell go env GOOS) GOARCH=$(shell go env GOARCH) CGO_ENABLED=0 go build -cover -covermode=atomic -o $(WORKING_DIR)/bin/$(PROVIDER) -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+.PHONY: provider_cover
+
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
 	cd examples && $(GO_TEST_EXEC) -v -tags=$(TESTTAGS) -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
