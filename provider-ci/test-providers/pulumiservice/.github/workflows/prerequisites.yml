@@ -97,7 +97,7 @@ jobs:
     - name: Generate schema
       run: make schema
     - name: Build provider binary
-      run: make provider
+      run: make provider_cover
     - name: Unit-test provider code
       run: make test_provider
       env:
