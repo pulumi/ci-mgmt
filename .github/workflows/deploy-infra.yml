@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install mise
-        uses: jdx/mise-action@1a7cfe93727ba904800786350fb9036893422b15
+        uses: jdx/mise-action@b9e293457e56d4673e497f4e094a64273db23835
         with:
           version: 2026.3.7
 
