@@ -36,6 +36,10 @@ major-version: 2
 # Only set for 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
 #upstream-provider-repo: terraform-provider-xyz
 
+# disableMajorProviderUpgrades is used in the bridge upgrade config. When true, upgrade-provider will not
+# cross major upstream version boundaries.
+disableMajorProviderUpgrades: false
+
 # Customizes the name of the "gen" program.
 # Defaults to "tfgen" for bridged providers and "gen" for generic providers.
 #genName: tfgen
