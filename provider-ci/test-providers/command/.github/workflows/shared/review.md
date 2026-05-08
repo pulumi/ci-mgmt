@@ -30,25 +30,7 @@ tools:
   github:
     toolsets: [pull_requests, repos]
 safe-outputs:
-  threat-detection:
-    steps:
-      - env:
-          ESC_ACTION_ENVIRONMENT: imports/github-secrets
-          ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES: "false"
-          ESC_ACTION_OIDC_AUTH: "true"
-          ESC_ACTION_OIDC_ORGANIZATION: pulumi
-          ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
-        id: esc-secrets
-        name: Fetch secrets from ESC
-        uses: pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b
-      - name: Validate ESC secret output
-        env:
-          ANTHROPIC_API_KEY_FROM_ESC: ${{ steps.esc-secrets.outputs.ANTHROPIC_API_KEY }}
-        run: |
-          test -n "$ANTHROPIC_API_KEY_FROM_ESC" || {
-            echo "ESC did not return ANTHROPIC_API_KEY";
-            exit 1;
-          }
+  threat-detection: false
   create-pull-request-review-comment:
     max: 12
     side: "RIGHT"

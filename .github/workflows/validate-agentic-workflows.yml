@@ -10,7 +10,6 @@ on:
       - '.github/snippets/**'
       - '.gitattributes'
       - 'mise.toml'
-      - 'scripts/patch-gh-aw-detection-permissions.sh'
       - 'scripts/sync-gh-aw-templates.sh'
       - 'provider-ci/internal/pkg/templates/internal/.github/aw/**'
       - 'provider-ci/internal/pkg/templates/internal/.github/snippets/**'
@@ -29,7 +28,6 @@ on:
       - '.github/snippets/**'
       - '.gitattributes'
       - 'mise.toml'
-      - 'scripts/patch-gh-aw-detection-permissions.sh'
       - 'scripts/sync-gh-aw-templates.sh'
       - 'provider-ci/internal/pkg/templates/internal/.github/aw/**'
       - 'provider-ci/internal/pkg/templates/internal/.github/snippets/**'
@@ -61,7 +59,6 @@ jobs:
           set -euo pipefail
           gh-aw validate
           gh-aw compile
-          ./scripts/patch-gh-aw-detection-permissions.sh
 
       - name: Verify provider-ci templates are synced
         run: |
