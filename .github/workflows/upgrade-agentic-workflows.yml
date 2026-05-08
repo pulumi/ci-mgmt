@@ -43,6 +43,8 @@ jobs:
         run: |
           rm -rf .github/agents
           rm -f .github/workflows/copilot-setup-steps.yml
+      - name: Patch detection job permissions
+        run: ./scripts/patch-gh-aw-detection-permissions.sh
       - name: Sync provider-ci templates
         run: ./scripts/sync-gh-aw-templates.sh
       - name: Verify generated provider fixtures
