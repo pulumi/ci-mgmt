@@ -1,0 +1,64 @@
+permissions:
+  id-token: write
+name: Upgrade Agentic Workflows
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 5:30AM UTC every Monday.
+    - cron: '30 5 * * 1'
+
+env:
+  ESC_ACTION_OIDC_AUTH: true
+  ESC_ACTION_OIDC_ORGANIZATION: pulumi
+  ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE: urn:pulumi:token-type:access_token:organization
+  ESC_ACTION_ENVIRONMENT: github-secrets/pulumi-ci-mgmt
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch secrets from ESC
+        id: esc-secrets
+        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        id: app-auth
+        with:
+          app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+          private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+      - name: Checkout ci-mgmt
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          token: ${{ steps.app-auth.outputs.token }}
+      - name: Install mise
+        uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
+        with:
+          version: 2026.3.7
+          install: true
+          github_token: ${{ steps.app-auth.outputs.token }}
+      - name: Upgrade root agentic workflows
+        run: gh-aw upgrade --approve
+      - name: Remove unused gh-aw generated files
+        run: |
+          rm -rf .github/agents
+          rm -f .github/workflows/copilot-setup-steps.yml
+      - name: Sync provider-ci templates
+        run: ./scripts/sync-gh-aw-templates.sh
+      - name: Verify generated provider fixtures
+        working-directory: provider-ci
+        run: make gen
+      - name: Create PR
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          author: Pulumi Bot <bot@pulumi.com>
+          body: "This PR upgrades the root gh-aw workflows, syncs them into provider-ci templates, and regenerates provider fixtures."
+          branch: "upgrade-agentic-workflows"
+          committer: Pulumi Bot <bot@pulumi.com>
+          commit-message: |
+            [internal] Upgrade agentic workflows
+
+            Co-authored-by: Codex <noreply@openai.com>
+          labels: "impact/no-changelog-required"
+          title: "Upgrade agentic workflows"
+          token: ${{ steps.app-auth.outputs.token }}

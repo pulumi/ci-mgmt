@@ -9,5 +9,29 @@ shellcheck = '0.10.0'
 "npm:@anthropic-ai/claude-code" = '2.1.52'
 bun = '1.3.6'
 
+[tools."github:github/gh-aw"]
+version = "0.71.5"
+bin = "gh-aw"
+
 [settings]
 experimental = true
+
+[tasks.aw-version]
+description = "Show pinned gh-aw version"
+run = "gh-aw version"
+
+[tasks.aw-validate]
+description = "Validate agentic workflows without emitting lock files"
+run = "gh-aw validate"
+
+[tasks.aw-compile]
+description = "Compile all agentic workflows"
+run = "gh-aw compile"
+
+[tasks.sync-gh-aw-templates]
+description = "Sync root gh-aw workflows into provider-ci templates"
+run = "./scripts/sync-gh-aw-templates.sh"
+
+[tasks.check-gh-aw-templates]
+description = "Check that provider-ci gh-aw templates match root workflows"
+run = "./scripts/sync-gh-aw-templates.sh --check"

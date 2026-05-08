@@ -1,0 +1,71 @@
+name: Validate Agentic Workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/*.md'
+      - '.github/workflows/*.lock.yml'
+      - '.github/workflows/shared/**/*.md'
+      - '.github/aw/actions-lock.json'
+      - '.github/snippets/**'
+      - '.gitattributes'
+      - 'mise.toml'
+      - 'scripts/sync-gh-aw-templates.sh'
+      - 'provider-ci/internal/pkg/templates/internal/.github/aw/**'
+      - 'provider-ci/internal/pkg/templates/internal/.github/snippets/**'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/gh-aw-*.md'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/gh-aw-*.lock.yml'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/shared/**/*.md'
+      - '.github/workflows/validate-agentic-workflows.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/*.md'
+      - '.github/workflows/*.lock.yml'
+      - '.github/workflows/shared/**/*.md'
+      - '.github/aw/actions-lock.json'
+      - '.github/snippets/**'
+      - '.gitattributes'
+      - 'mise.toml'
+      - 'scripts/sync-gh-aw-templates.sh'
+      - 'provider-ci/internal/pkg/templates/internal/.github/aw/**'
+      - 'provider-ci/internal/pkg/templates/internal/.github/snippets/**'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/gh-aw-*.md'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/gh-aw-*.lock.yml'
+      - 'provider-ci/internal/pkg/templates/internal/.github/workflows/shared/**/*.md'
+      - '.github/workflows/validate-agentic-workflows.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install tools via mise
+        uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
+        with:
+          version: 2026.3.7
+          install: true
+
+      - name: Show gh-aw version
+        run: |
+          set -euo pipefail
+          gh-aw version
+
+      - name: Validate and compile workflows
+        run: |
+          set -euo pipefail
+          gh-aw validate
+          gh-aw compile
+
+      - name: Verify provider-ci templates are synced
+        run: |
+          set -euo pipefail
+          ./scripts/sync-gh-aw-templates.sh --check
+
+      - name: Verify lockfiles are up to date
+        run: |
+          set -euo pipefail
+          git diff --exit-code

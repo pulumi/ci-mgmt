@@ -1,10 +1,17 @@
 self-hosted-runner:
   labels:
     - pulumi-ubuntu-8core
+    - ubuntu-slim
 
 # Most of these ignores are in place because our esc-secrets action has dynamic
 # outputs, and actionlint assumes all outputs are explicit.
 paths:
+  ".github/workflows/*.lock.yml":
+    ignore:
+      - 'property "esc-secrets" is not defined in object type'
+      - "shellcheck reported issue in this script: SC2016"
+      - "shellcheck reported issue in this script: SC2015"
+
   ".github/workflows/build_provider.yml":
     ignore:
       - 'property ".*" is not defined in object type {}'
