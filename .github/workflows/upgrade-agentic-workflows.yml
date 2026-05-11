@@ -37,7 +37,9 @@ jobs:
           version: 2026.3.7
           install: true
           github_token: ${{ steps.app-auth.outputs.token }}
-      - name: Upgrade root agentic workflows
+      - name: Update root agentic workflows from sources
+        run: gh-aw update --force
+      - name: Upgrade root agentic workflow tooling
         run: gh-aw upgrade --approve
       - name: Remove unused gh-aw generated files
         run: |
