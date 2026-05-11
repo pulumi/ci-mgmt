@@ -113,6 +113,33 @@ Workflow runs on a nightly schedule.
 You may trigger this Workflow manually; however be aware that this causes a lot of GitHub Actions to run at the same
 time, which may cause rate limiting across the org. Plan ahead and do this at a low-traffic time.
 
+## Updating Agentic Workflows
+
+The root `.github/workflows/gh-aw-*.md` files are the source of truth for provider
+agentic workflows. After editing or upgrading those files, sync them into the
+provider templates:
+
+```bash
+make sync-gh-aw-templates
+```
+
+To check that the templates are already synced:
+
+```bash
+make check-gh-aw-templates
+```
+
+The `Upgrade Agentic Workflows` GitHub Actions workflow runs on a schedule and
+uses `gh-aw upgrade` to update the root agentic workflow sources and lock files,
+then syncs them into `provider-ci/internal/pkg/templates/internal`.
+
+Provider repositories can opt out of generated agentic workflows by setting this
+in their `.ci-mgmt.yaml`:
+
+```yaml
+disableAgenticWorkflows: true
+```
+
 ## Updating GitHub workflow schema
 
 Fetch the latest JSON Schema then re-generate type definitions:

@@ -40,6 +40,9 @@ major-version: 2
 # cross major upstream version boundaries.
 disableMajorProviderUpgrades: false
 
+# disableAgenticWorkflows opts a provider repository out of generated gh-aw review workflows and their support files.
+disableAgenticWorkflows: false
+
 # Customizes the name of the "gen" program.
 # Defaults to "tfgen" for bridged providers and "gen" for generic providers.
 #genName: tfgen

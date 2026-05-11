@@ -52,6 +52,10 @@ type Config struct {
 	// upgrade-provider from crossing major upstream version boundaries.
 	DisableMajorProviderUpgrades bool `yaml:"disableMajorProviderUpgrades"`
 
+	// DisableAgenticWorkflows prevents generated gh-aw review workflows and
+	// their support files from being written to the provider repository.
+	DisableAgenticWorkflows bool `yaml:"disableAgenticWorkflows"`
+
 	// Lint includes an extra lint job in workflows if enabled (default). Can
 	// be explicitly set to false. This is false in around 8 provider repos:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code

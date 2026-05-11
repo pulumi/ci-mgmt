@@ -85,6 +85,12 @@ func GeneratePackage(opts GenerateOpts) error {
 			return fmt.Errorf("error rendering template %s: %w", templateDir, err)
 		}
 	}
+	for _, deletedFile := range getConfigDeletedFiles(opts.Config) {
+		err = os.RemoveAll(filepath.Join(opts.OutDir, deletedFile))
+		if err != nil {
+			return fmt.Errorf("error deleting file %s: %w", deletedFile, err)
+		}
+	}
 	if !opts.SkipMigrations {
 		// Run any relevant migrations
 		err = migrations.Migrate(opts.TemplateName, opts.OutDir)
@@ -167,6 +173,30 @@ func getDeletedFiles(templateName string) []string {
 	default:
 		return nil
 	}
+}
+
+func getConfigDeletedFiles(config Config) []string {
+	deletedFiles := []string{
+		filepath.Join(".github", "workflows", config.Provider+"-pr-rereview.lock.yml"),
+		filepath.Join(".github", "workflows", config.Provider+"-pr-rereview.md"),
+		filepath.Join(".github", "workflows", config.Provider+"-pr-review.lock.yml"),
+		filepath.Join(".github", "workflows", config.Provider+"-pr-review.md"),
+	}
+
+	if !config.DisableAgenticWorkflows {
+		return deletedFiles
+	}
+
+	deletedFiles = append(deletedFiles,
+		filepath.Join(".github", "aw", "actions-lock.json"),
+		".github/workflows/gh-aw-pr-rereview.lock.yml",
+		".github/workflows/gh-aw-pr-rereview.md",
+		".github/workflows/gh-aw-pr-review.lock.yml",
+		".github/workflows/gh-aw-pr-review.md",
+		filepath.Join(".github", "workflows", "shared", "review.md"),
+		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
+	)
+	return deletedFiles
 }
 
 func renderTemplateDir(template TemplateDir, opts GenerateOpts) error {
