@@ -14,6 +14,10 @@ on:
       default_branch:
         type: string
         required: true
+      acceptance_fanout:
+        type: boolean
+        required: false
+        default: false
     outputs:
       version:
         description: "Provider version being built"
@@ -80,6 +84,26 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         # only saving the cache in the prerequisites job
         cache_save: true
+    #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
+    - name: Setup Go Cache
+      if: inputs.acceptance_fanout
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-prerequisites-${{ hashFiles('provider/*.sum', 'upstream/*.sum', 'sdk/go/*.sum', 'sdk/*.sum', '*.sum') }}
+    - name: Setup Go Cache
+      if: inputs.acceptance_fanout == false
+      uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
+      with:
+        cache-dependency-path: |
+          provider/*.sum
+          upstream/*.sum
+          sdk/go/*.sum
+          sdk/*.sum
+          *.sum
+    #{{- else }}#
     - name: Setup Go Cache
       uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
       with:
@@ -89,6 +113,7 @@ jobs:
           sdk/go/*.sum
           sdk/*.sum
           *.sum
+    #{{- end }}#
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:
@@ -96,6 +121,87 @@ jobs:
 #{{- if .Config.Actions.PreBuild }}#
 #{{ .Config.Actions.PreBuild | toYaml | indent 4 }}#
 #{{- end }}#
+    #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
+    - name: Generate schema-embed
+      if: inputs.acceptance_fanout
+      run: make schema_embed
+    - name: Build tfgen
+      if: inputs.acceptance_fanout
+      run: make tfgen_build_only
+    #{{- if not .Config.NoSchema }}#
+    - name: Generate schema
+      if: inputs.acceptance_fanout == false
+      run: make schema
+    #{{- end }}#
+    #{{- if .Config.RegistryDocs }}#
+    - name: Build registry docs
+      if: inputs.acceptance_fanout == false
+      run: make build_registry_docs
+    #{{- end }}#
+    - name: Build provider binary
+      if: inputs.acceptance_fanout == false
+      run: make provider
+    - name: Unit-test provider code
+      if: inputs.acceptance_fanout == false
+      run: make test_provider
+      env:
+#{{ .Config | renderLocalEnv | indent 8 }}#
+    - name: Upload coverage reports to Codecov
+      if: inputs.acceptance_fanout == false
+      uses: #{{ .Config.ActionVersions.Codecov }}#
+      env:
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
+#{{- if not .Config.NoSchema }}#
+    - if: inputs.acceptance_fanout == false && inputs.is_pr
+      name: Check Schema is Valid
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "SCHEMA_CHANGES<<$EOF";
+          schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+    - if: inputs.acceptance_fanout == false && inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
+      name: Comment on PR with Details of Schema Check
+      uses: #{{ .Config.ActionVersions.PrComment }}#
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-tag: schemaCheck
+        message: >+
+          ${{ env.SCHEMA_CHANGES }}
+
+
+          Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+#{{- if .Config.EnableConfigurationCheck }}#
+    - if: inputs.acceptance_fanout == false && inputs.is_pr
+      name: Check Configuration section
+      run: |
+        sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
+        jq -r '.config | select(.variables) | .variables | keys[]' < provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json >> keys.txt
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "MISSING_CONFIG<<$EOF";
+          xargs -I {} sh -c "grep -q {} config_section.txt || echo \\\`{}\\\` not found in Configuration section" < keys.txt
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+
+    - if: inputs.acceptance_fanout == false && inputs.is_pr && inputs.is_automated == false
+      name: Check for missing config
+      run: |
+        if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
+        cat <<EOF
+        ${{ env.MISSING_CONFIG }}
+        EOF
+        echo 'Please add a description for each of these options to `README.md`.'
+        echo 'Details about them can be found in either the upstream docs or `schema.json`.'
+        exit 1
+        fi
+#{{- end }}#
+#{{- end }}#
+    #{{- else }}#
     #{{- if not .Config.NoSchema }}#
     - name: Generate schema
       run: make schema
@@ -162,6 +268,7 @@ jobs:
         echo 'Details about them can be found in either the upstream docs or `schema.json`.'
         exit 1
         fi
+#{{- end }}#
 #{{- end }}#
 #{{- end }}#
 
