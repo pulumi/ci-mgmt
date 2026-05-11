@@ -52,6 +52,7 @@ jobs:
       id-token: write # For ESC secrets.
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+      cover: true
       matrix: |
         {
           "platform": [

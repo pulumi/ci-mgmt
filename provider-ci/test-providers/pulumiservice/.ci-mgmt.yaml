@@ -17,6 +17,7 @@ env:
   PULUMI_TEST_USE_SERVICE: true
 providerDefaultBranch: main
 template: generic
+integrationTestCoverage: true
 shards: 6
 useProviderBinarySchemaGen: true
 testProviderCmd: >-

@@ -163,6 +163,10 @@ jobs:
     - name: Install prebuilt SDKs
       run: make install_sdks
 #{{- end }}#
+    #{{- if .Config.IntegrationTestCoverage }}#
+    - name: Prepare coverage directory
+      run: mkdir -p ${{ github.workspace }}/coverage
+    #{{- end }}#
 #{{- if not .Config.Shards }}#
     - name: Install dependencies
       run: make install_${{ matrix.language}}_sdk
@@ -172,20 +176,29 @@ jobs:
     #{{- if .Config.IntegrationTestProvider }}#
     - name: Run provider tests
       if: matrix.testTarget == 'local'
-      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1 -cover" test_provider
+      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1#{{ if not .Config.IntegrationTestCoverage }}# -cover#{{ end }}#" test_provider
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
+        #{{- if .Config.IntegrationTestCoverage }}#
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+        #{{- end }}#
     #{{- end }}#
     - name: Run tests
       if: matrix.testTarget == 'local'
-      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1 -cover -skip TestPulumiExamples" test
+      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1#{{ if not .Config.IntegrationTestCoverage }}# -cover#{{ end }}# -skip TestPulumiExamples" test
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
+        #{{- if .Config.IntegrationTestCoverage }}#
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+        #{{- end }}#
     - name: Run pulumi/examples tests
       if: matrix.testTarget == 'pulumiExamples'
-      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1 -cover -run TestPulumiExamples" test
+      run: make TESTTAGS=${{ matrix.language }} GOTESTARGS="-count=1#{{ if not .Config.IntegrationTestCoverage }}# -cover#{{ end }}# -run TestPulumiExamples" test
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
+        #{{- if .Config.IntegrationTestCoverage }}#
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+        #{{- end }}#
 #{{- else }}#
 #{{- if .Config.Actions.PreTest }}#
 #{{ .Config.Actions.PreTest | toYaml | indent 4 }}#
@@ -202,7 +215,24 @@ jobs:
         make GOTESTARGS="-test.run ${SHARD_TESTS} ${SHARD_PATHS}" test
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
+        #{{- if .Config.IntegrationTestCoverage }}#
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+        #{{- end }}#
 #{{- end }}#
+    #{{- if .Config.IntegrationTestCoverage }}#
+    - name: Convert coverage data
+      if: always()
+      run: go tool covdata textfmt -i=${{ github.workspace }}/coverage -o
+        ${{ github.workspace }}/coverage-integration.out
+    - name: Upload integration test coverage to Codecov
+      if: always()
+      uses: #{{ .Config.ActionVersions.Codecov }}#
+      with:
+        files: ${{ github.workspace }}/coverage-integration.out
+        flags: integration#{{ if .Config.Shards }}#-shard-${{ matrix.current-shard }}#{{ else }}#-${{ matrix.language }}-${{ matrix.testTarget }}#{{ end }}#
+      env:
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
+    #{{- end }}#
     strategy:
       fail-fast: false
 #{{- if .Config.Shards }}#

@@ -105,7 +105,7 @@ jobs:
       run: make build_registry_docs
     #{{- end }}#
     - name: Build provider binary
-      run: make provider
+      run: #{{ if .Config.IntegrationTestCoverage }}#make provider_cover#{{ else }}#make provider#{{ end }}#
     - name: Unit-test provider code
       run: make test_provider
       env:

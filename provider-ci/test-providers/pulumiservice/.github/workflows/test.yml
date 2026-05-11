@@ -106,6 +106,8 @@ jobs:
         pip3 install pipenv
     - name: Install prebuilt SDKs
       run: make install_sdks
+    - name: Prepare coverage directory
+      run: mkdir -p ${{ github.workspace }}/coverage
     - name: Generate test shards
       run: |-
         cd examples
@@ -119,6 +121,19 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PULUMI_ACCESS_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_ACCESS_TOKEN_STAGING }}
+        GOCOVERDIR: ${{ github.workspace }}/coverage
+    - name: Convert coverage data
+      if: always()
+      run: go tool covdata textfmt -i=${{ github.workspace }}/coverage -o
+        ${{ github.workspace }}/coverage-integration.out
+    - name: Upload integration test coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+      with:
+        files: ${{ github.workspace }}/coverage-integration.out
+        flags: integration-shard-${{ matrix.current-shard }}
+      env:
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
