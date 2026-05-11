@@ -189,13 +189,11 @@ func getConfigDeletedFiles(config Config) []string {
 
 	deletedFiles = append(deletedFiles,
 		filepath.Join(".github", "aw", "actions-lock.json"),
-		filepath.Join(".github", "snippets", "code-review.md"),
 		".github/workflows/gh-aw-pr-rereview.lock.yml",
 		".github/workflows/gh-aw-pr-rereview.md",
 		".github/workflows/gh-aw-pr-review.lock.yml",
 		".github/workflows/gh-aw-pr-review.md",
 		filepath.Join(".github", "workflows", "shared", "review.md"),
-		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "README.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
 	)
 	return deletedFiles

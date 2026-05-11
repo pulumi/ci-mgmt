@@ -6,12 +6,12 @@ template_root="${repo_root}/provider-ci/internal/pkg/templates/internal"
 
 managed_paths=(
   ".github/aw/actions-lock.json"
-  ".github/snippets"
   ".github/workflows/gh-aw-pr-rereview.lock.yml"
   ".github/workflows/gh-aw-pr-rereview.md"
   ".github/workflows/gh-aw-pr-review.lock.yml"
   ".github/workflows/gh-aw-pr-review.md"
-  ".github/workflows/shared"
+  ".github/workflows/shared/review.md"
+  ".github/workflows/shared/plugins/code-review/code-review.md"
 )
 
 sync_into() {
