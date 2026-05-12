@@ -182,8 +182,6 @@ jobs:
         GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
     - name: Restore prerequisites
       uses: ./.github/actions/download-prerequisites
-    - name: Restore makefile progress
-      run: make --touch provider
     - name: Generate schema
       run: make schema
       env:

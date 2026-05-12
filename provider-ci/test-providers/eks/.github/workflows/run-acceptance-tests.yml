@@ -187,8 +187,6 @@ jobs:
         GITHUB_TOKEN: ${{ steps.app-auth.outputs.token }}
     - name: Restore prerequisites
       uses: ./.github/actions/download-prerequisites
-    - name: Restore makefile progress
-      run: make --touch provider
     - name: Generate schema
       run: make schema
       env:
