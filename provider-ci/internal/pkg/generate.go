@@ -357,8 +357,9 @@ func renderTemplateFile(tmpl *template.Template, outPath string, ctx templateCon
 		return err
 	}
 
-	// Make shell scripts executable
-	if strings.HasSuffix(outPath, ".sh") {
+	// Make shell scripts and the mise bootstrap script executable
+	isMiseBinary := filepath.Base(outPath) == "mise" && filepath.Base(filepath.Dir(outPath)) == "bin"
+	if strings.HasSuffix(outPath, ".sh") || isMiseBinary {
 		err = os.Chmod(outPath, 0o755)
 		if err != nil {
 			return err
