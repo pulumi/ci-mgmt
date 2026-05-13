@@ -130,7 +130,7 @@ jobs:
         uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0
 
       - name: guibranco/github-status-action-v2
-        uses: guibranco/github-status-action-v2@3f704867b3ec00272a5f1b550c207789736bbee9 # v1.2.0
+        uses: guibranco/github-status-action-v2@e8a8fa568b768f554cfe1d34e27e917aed4c6127 # v1.2.1
 
       - name: actions/create-github-app-token
         uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
