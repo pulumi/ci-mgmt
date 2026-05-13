@@ -20,29 +20,6 @@ before:
   - make generate_schema
 #{{- end }}#
 builds:
-#{{- if eq .Config.Provider "aws-native" }}#
-- dir: provider
-  env:
-  - GO111MODULE=on
-  goos:
-  - darwin
-  - windows
-  - linux
-  goarch:
-  - amd64
-  - arm64
-  ignore: []
-  main: ./cmd/pulumi-resource-#{{ .Config.Provider }}#/
-  ldflags:
-  - -s
-  - -w
-#{{- if ge .Config.MajorVersion 2 }}#
-  - -X github.com/pulumi/pulumi-#{{ .Config.Provider }}#/provider/v#{{ .Config.MajorVersion }}#/pkg/version.Version={{.Tag}}
-#{{- else }}#
-  - -X github.com/pulumi/pulumi-#{{ .Config.Provider }}#/provider/pkg/version.Version={{.Tag}}
-#{{- end }}#
-  binary: pulumi-resource-#{{ .Config.Provider }}#
-#{{- else }}#
 - id: build-provider
 #{{- if ne .Config.Provider "terraform" }}#
   dir: provider
@@ -100,7 +77,6 @@ builds:
   hooks:
     post:
     - make sign-goreleaser-exe-{{ .Arch }}
-#{{- end }}#
 archives:
 - name_template: "{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
   id: archive
