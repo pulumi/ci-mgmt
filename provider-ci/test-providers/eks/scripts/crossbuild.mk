@@ -59,6 +59,12 @@ bin/%/$(PROVIDER) bin/%/$(PROVIDER).exe: bin/jsign-7.4.jar
 		fi; \
 	fi
 
+	@# Verify the windows binary was actually signed when signing was expected.
+	@# This runs in its own shell as a separate recipe line, so make checks its
+	@# exit code directly (no set-e-inside-if antipattern). Catches the silent
+	@# failure where the signing block above exits 0 without producing a signature.
+	@[ "${GOOS}" != "windows" ] || [ "${SKIP_SIGNING}" = "true" ] || python3 scripts/verify_signed.py "$@"
+
 bin/jsign-7.4.jar:
 	wget https://github.com/ebourg/jsign/releases/download/7.4/jsign-7.4.jar --output-document=bin/jsign-7.4.jar
 
