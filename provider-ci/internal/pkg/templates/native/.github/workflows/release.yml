@@ -408,7 +408,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   publish:
-    runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else if eq .Config.Provider "aws-native" }}#macos-latest#{{ else }}#ubuntu-latest#{{ end }}#
+    runs-on: #{{ if .Config.Runner.Publish }}##{{ .Config.Runner.Publish }}##{{ else }}#ubuntu-latest#{{ end }}#
     needs: test
     name: publish
     permissions:
@@ -439,7 +439,6 @@ jobs:
       uses: ./.github/actions/setup-tools
       with:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
-    #{{- if ne .Config.Provider "aws-native" }}#
     - name: Clear GitHub Actions Ubuntu runner disk space
       uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       with:
@@ -449,7 +448,6 @@ jobs:
         haskell: true
         swap-storage: true
         large-packages: false
-    #{{- end }}#
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
       with:
