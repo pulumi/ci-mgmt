@@ -33,6 +33,9 @@ jobs:
       default_branch: ${{ github.event.pull_request.base.ref }}
       is_pr: ${{ github.event_name == 'pull_request' }}
       is_automated: ${{ github.actor == 'dependabot[bot]' }}
+      #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
+      acceptance_fanout: true
+      #{{- end }}#
 
   build_provider:
     uses: ./.github/workflows/build_provider.yml
@@ -50,6 +53,195 @@ jobs:
             {"os": "windows", "arch": "amd64"}
           ]
         }
+
+#{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
+
+  test_provider:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: #{{ .Config.Runner.Prerequisites }}#
+    needs: prerequisites
+    permissions:
+      contents: read
+      id-token: write # For ESC secrets.
+    steps:
+    #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+        dotnet: false
+    #{{- end }}#
+    - name: Checkout Repo
+      uses: #{{ .Config.ActionVersions.Checkout }}#
+      with:
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
+        #{{- end }}#
+        persist-credentials: false
+#{{ .Config | renderEscStep | trimPrefix "\n" | indent 4 }}#
+#{{- if .Config.GitHubApp.Enabled }}#
+    - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+#{{- end }}#
+    - name: Setup mise
+      uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+      env:
+        MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+      with:
+        version: #{{ .Config.MiseVersion }}#
+        github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+        cache_save: false
+    - name: Restore Go Cache
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-prerequisites-${{ hashFiles('provider/*.sum', 'upstream/*.sum', 'sdk/go/*.sum', 'sdk/*.sum', '*.sum') }}
+    - name: Prepare local workspace
+      run: make prepare_local_workspace
+      env:
+        GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+    - name: Restore prerequisites
+      uses: ./.github/actions/download-prerequisites
+    - name: Unit-test provider code
+      run: make test_provider
+      env:
+#{{ .Config | renderLocalEnv | indent 8 }}#
+    - name: Upload coverage reports to Codecov
+      uses: #{{ .Config.ActionVersions.Codecov }}#
+      env:
+        CODECOV_TOKEN: ${{ steps.esc-secrets.outputs.CODECOV_TOKEN }}
+
+  build_schema:
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: #{{ .Config.Runner.Prerequisites }}#
+    needs: prerequisites
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write # For ESC secrets.
+    steps:
+    #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
+    # Run as first step so we don't delete things that have just been installed
+    - name: Free Disk Space (Ubuntu)
+      uses: #{{ .Config.ActionVersions.FreeDiskSpace }}#
+      with:
+        tool-cache: false
+        swap-storage: false
+        dotnet: false
+    #{{- end }}#
+    - name: Checkout Repo
+      uses: #{{ .Config.ActionVersions.Checkout }}#
+      with:
+        #{{- if .Config.CheckoutSubmodules }}#
+        submodules: #{{ .Config.CheckoutSubmodules }}#
+        #{{- end }}#
+        persist-credentials: false
+#{{ .Config | renderEscStep | trimPrefix "\n" | indent 4 }}#
+#{{- if .Config.GitHubApp.Enabled }}#
+    - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+      id: app-auth
+      with:
+        app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
+        private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+#{{- end }}#
+    - name: Cache examples generation
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      with:
+        path: |
+          .pulumi/examples-cache
+        key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
+    - name: Setup mise
+      uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+      env:
+        MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+      with:
+        version: #{{ .Config.MiseVersion }}#
+        github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+        cache_save: false
+    - name: Restore Go Cache
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-prerequisites-${{ hashFiles('provider/*.sum', 'upstream/*.sum', 'sdk/go/*.sum', 'sdk/*.sum', '*.sum') }}
+    - name: Prepare local workspace before restoring previously built files
+      run: make prepare_local_workspace
+      env:
+        GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
+    - name: Restore prerequisites
+      uses: ./.github/actions/download-prerequisites
+    - name: Generate schema
+      run: make schema
+      env:
+        PROVIDER_VERSION: ${{ needs.prerequisites.outputs.version }}
+    #{{- if .Config.RegistryDocs }}#
+    - name: Build registry docs
+      run: make build_registry_docs
+    #{{- end }}#
+    - name: Check worktree clean
+      id: worktreeClean
+      uses: pulumi/git-status-check-action@v1
+    - if: github.event_name == 'pull_request'
+      name: Check Schema is Valid
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "SCHEMA_CHANGES<<$EOF";
+          schema-tools compare -r github://api.github.com/#{{ .Config.Organization }}# -p #{{ .Config.Provider }}# -o "${{ github.event.pull_request.base.ref }}" -n --local-path=provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json;
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+    - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+      name: Comment on PR with Details of Schema Check
+      uses: #{{ .Config.ActionVersions.PrComment }}#
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        comment-tag: schemaCheck
+        message: >+
+          ${{ env.SCHEMA_CHANGES }}
+
+
+          Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+#{{- if .Config.EnableConfigurationCheck }}#
+    - if: github.event_name == 'pull_request'
+      name: Check Configuration section
+      run: |
+        sed -n '/## Configuration/,$p' README.md | sed -n '/## Reference/q;p' >> config_section.txt
+        jq -r '.config | select(.variables) | .variables | keys[]' < provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json >> keys.txt
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        {
+          echo "MISSING_CONFIG<<$EOF";
+          xargs -I {} sh -c "grep -q {} config_section.txt || echo \\\`{}\\\` not found in Configuration section" < keys.txt
+          echo "$EOF";
+        } >> "$GITHUB_ENV"
+
+    - if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+      name: Check for missing config
+      run: |
+        if [ ! -z "${{ env.MISSING_CONFIG }}" ]; then
+        cat <<EOF
+        ${{ env.MISSING_CONFIG }}
+        EOF
+        echo 'Please add a description for each of these options to `README.md`.'
+        echo 'Details about them can be found in either the upstream docs or `schema.json`.'
+        exit 1
+        fi
+#{{- end }}#
+#{{- end }}#
 
   #{{ if not .Config.NoSchema -}}#
   build_sdk:
@@ -105,6 +297,10 @@ jobs:
     needs:
     - test
     - build_provider
+    #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
+    - build_schema
+    - test_provider
+    #{{- end }}#
     - license_check
     #{{- if .Config.Lint }}#
     - lint
