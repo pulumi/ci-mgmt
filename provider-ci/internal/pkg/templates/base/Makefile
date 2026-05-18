@@ -312,15 +312,16 @@ lint.fix: upstream
 .PHONY: lint lint.fix
 
 #{{- if .Config.BuildProviderCmd }}#
-build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
-                         #{{ .Config.BuildProviderPre }}#;
-                     #{{- end -}}#
-                     #{{ .Config.BuildProviderCmd }}#
+build_provider_cmd = set -x; \
+#{{ if .Config.BuildProviderPre }}##{{ .Config.BuildProviderPre }}#; \
+#{{ end -}}#
+#{{ .Config.BuildProviderCmd }}#
 #{{- else }}#
-build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
-                         #{{ .Config.BuildProviderPre }}#;
-                     #{{- end -}}#
-                     cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+build_provider_cmd = set -x; \
+#{{ if .Config.BuildProviderPre }}##{{ .Config.BuildProviderPre }}#; \
+#{{ end -}}#
+cd provider && GOOS=$(1) GOARCH=$(2) go mod download; \
+cd provider && GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -v $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
 #{{- end }}#
 
 provider: bin/$(PROVIDER)
