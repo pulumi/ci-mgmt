@@ -39,8 +39,12 @@ jobs:
           github_token: ${{ steps.app-auth.outputs.token }}
       - name: Update root agentic workflows from sources
         run: gh-aw update --force
+        env:
+          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
       - name: Upgrade root agentic workflow tooling
         run: gh-aw upgrade --approve
+        env:
+          GH_TOKEN: ${{ steps.app-auth.outputs.token }}
       - name: Remove unused gh-aw generated files
         run: |
           rm -rf .github/agents
