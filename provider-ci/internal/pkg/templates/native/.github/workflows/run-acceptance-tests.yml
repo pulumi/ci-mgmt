@@ -507,6 +507,8 @@ jobs:
         config: scripts/kind-config.yaml
     - name: Install KinD prerequisites (Calico + MetalLB + Traefik)
       run: ./scripts/setup-kind-cluster.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #{{- else if eq .Config.Provider "kubernetes-cert-manager" }}#
     - name: Setup KinD cluster
       uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0
