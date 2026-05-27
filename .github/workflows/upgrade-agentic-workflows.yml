@@ -37,12 +37,21 @@ jobs:
           version: 2026.3.7
           install: true
           github_token: ${{ steps.app-auth.outputs.token }}
+      - name: Bump gh-aw to the latest release via mise
+        # gh-aw is managed by mise in this repo, not installed as a gh
+        # extension. `gh-aw upgrade` self-upgrades a gh extension and then
+        # re-execs itself, which fails here (pulumi/ci-mgmt#2269): there is no
+        # gh extension to upgrade and the re-exec resolves a stale mise path.
+        # Let mise own the version and regenerate lock files with `gh-aw
+        # compile` instead, which keeps the same weekly auto-upgrade behavior
+        # without the broken self-re-exec.
+        run: mise use github:github/gh-aw@latest
       - name: Update root agentic workflows from sources
         run: gh-aw update --force
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
-      - name: Upgrade root agentic workflow tooling
-        run: gh-aw upgrade --approve
+      - name: Compile agentic workflows
+        run: gh-aw compile
         env:
           GH_TOKEN: ${{ steps.app-auth.outputs.token }}
       - name: Remove unused gh-aw generated files
