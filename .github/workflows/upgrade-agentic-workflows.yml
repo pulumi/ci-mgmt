@@ -45,7 +45,9 @@ jobs:
         # Let mise own the version and regenerate lock files with `gh-aw
         # compile` instead, which keeps the same weekly auto-upgrade behavior
         # without the broken self-re-exec.
-        run: mise use github:github/gh-aw@latest
+        # --pin writes the concrete resolved version into mise.toml (rather than
+        # a floating "latest") so the committed lock files stay reproducible.
+        run: mise use --pin github:github/gh-aw@latest
       - name: Update root agentic workflows from sources
         run: gh-aw update --force
         env:

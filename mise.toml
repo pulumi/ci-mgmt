@@ -8,7 +8,9 @@ dotnet = '8'
 shellcheck = '0.10.0'
 "npm:@anthropic-ai/claude-code" = '2.1.52'
 bun = '1.3.6'
-"github:github/gh-aw"= { version = "latest", bin = "gh-aw" }
+[tools."github:github/gh-aw"]
+version = "0.76.1"
+bin = "gh-aw"
 
 [settings]
 experimental = true
