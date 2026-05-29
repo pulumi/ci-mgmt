@@ -57,7 +57,7 @@ jobs:
         uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
 
       - name: pulumi/esc-action
-        uses: pulumi/esc-action@197ccaa42ab49560ce838a3010eb8345ce086896
+        uses: pulumi/esc-action@f3cfbabf37488463817366338165b92b5f99117e
 
       # Tools
 
