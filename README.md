@@ -106,6 +106,36 @@ To add a new provider:
 
    The generated files will be writen to your current directory.
 
+## Customizing SDK Generation (`sdk-hooks.mk`)
+
+Providers occasionally need to fine-tune `pulumi package gen-sdk` (or legacy codegen) output, for example to delete a stray generated file or patch a type stub after each regeneration. Because ci-mgmt regenerates and overwrites the `Makefile`, editing the generated recipes directly is not regen-safe. The generated `Makefile` therefore exposes a provider-owned escape hatch: an optional `sdk-hooks.mk`.
+
+### Contract
+
+The generated `Makefile` ends with `-include sdk-hooks.mk` (the leading `-` means no error if the file is absent), and invokes two slots around each per-language SDK codegen recipe, in **both** the `gen-sdk` and the legacy codegen branches:
+
+- `PRE_GEN_SDK_<LANG>` runs immediately before the codegen step.
+- `POST_GEN_SDK_<LANG>` runs immediately after codegen, before the recipe's completion sentinel is touched.
+
+`<LANG>` is the uppercased SDK language, giving ten slots in total: `PRE_GEN_SDK_GO` / `POST_GEN_SDK_GO`, and likewise for `NODEJS`, `PYTHON`, `DOTNET`, and `JAVA`. Each slot is a plain make variable expanded as a recipe line, so an unset slot expands to nothing and make skips it entirely. With no `sdk-hooks.mk` present, every slot is unset and behavior is identical to today.
+
+A slot's value is a shell command run from the provider repo root (the same working directory as the codegen recipe). For anything beyond a single command, point the slot at a checked-in script so the logic stays readable and testable.
+
+### Opt-in and regen-safe
+
+`ci-mgmt` never creates `sdk-hooks.mk`; it is entirely opt-in, and regenerating CI does not touch it. To adopt it, copy [`provider-ci/sdk-hooks.mk.example`](./provider-ci/sdk-hooks.mk.example) into your provider repo root as `sdk-hooks.mk`, keep only the slots you need, and commit it.
+
+### Worked example
+
+`pulumi-pulumiservice` needs to drop a generated file from the Go SDK and patch a Python stub after each regeneration. With this `sdk-hooks.mk` in the repo root:
+
+```makefile
+POST_GEN_SDK_GO     = rm -f sdk/go/pulumiservice/internal/unused.go
+POST_GEN_SDK_PYTHON = ./scripts/patch-python-stubs.sh
+```
+
+running `make generate_go` deletes the stray file right after gen-sdk emits it, and `make generate_python` runs the stub patcher. No other language is affected, and removing `sdk-hooks.mk` restores stock behavior.
+
 ## Updating All Bridged Providers
 
 The [Update GH Workflows, ecosystem providers](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-ecosystem-providers.yml)

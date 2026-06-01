@@ -1,0 +1,68 @@
+# sdk-hooks.mk.example
+#
+# Reference example for the provider-owned SDK codegen hooks contract exposed by
+# the ci-mgmt-generated Makefile. This file is NOT consumed by anything: copy it
+# into your provider repo root as `sdk-hooks.mk`, then keep only the slots you
+# need. ci-mgmt never creates `sdk-hooks.mk` for you, and regenerating CI does
+# not overwrite it, so it is a regen-safe escape hatch for fine-tuning
+# `pulumi package gen-sdk` (and legacy codegen) output.
+#
+# Contract
+# --------
+# The generated Makefile `-include`s `sdk-hooks.mk` (the leading `-` means "no
+# error if absent") and invokes two slots around each per-language SDK codegen
+# recipe, in BOTH the gen-sdk and the legacy codegen branches:
+#
+#   PRE_GEN_SDK_<LANG>    runs immediately before the codegen step
+#   POST_GEN_SDK_<LANG>   runs immediately after codegen, before the recipe's
+#                         completion sentinel is touched
+#
+# <LANG> is the uppercased SDK language. The full set of slots is:
+#
+#   PRE_GEN_SDK_GO       POST_GEN_SDK_GO
+#   PRE_GEN_SDK_NODEJS   POST_GEN_SDK_NODEJS
+#   PRE_GEN_SDK_PYTHON   POST_GEN_SDK_PYTHON
+#   PRE_GEN_SDK_DOTNET   POST_GEN_SDK_DOTNET
+#   PRE_GEN_SDK_JAVA     POST_GEN_SDK_JAVA
+#
+# Each slot is a plain make variable expanded as a recipe line. An undefined or
+# empty slot expands to nothing and make skips it entirely, so leaving a slot
+# unset is a true no-op. A slot value is a shell command line; it runs from the
+# provider repo root (the same working directory as the codegen recipe). For
+# anything non-trivial, point the slot at a checked-in script so the Makefile
+# stays readable and the logic is testable on its own:
+#
+#   POST_GEN_SDK_GO = ./scripts/fixup-go-sdk.sh
+#
+# Multiple commands are supported via a recipe-style continuation or by calling
+# out to a script. Prefer a script.
+#
+# Worked example
+# --------------
+# pulumi-pulumiservice needs to drop a generated file from the Go SDK and patch
+# a Python type stub after each regeneration. With `sdk-hooks.mk` in the repo
+# root containing:
+#
+#   POST_GEN_SDK_GO     = rm -f sdk/go/pulumiservice/internal/unused.go
+#   POST_GEN_SDK_PYTHON = ./scripts/patch-python-stubs.sh
+#
+# running `make generate_go` deletes the stray file right after gen-sdk emits
+# it, and `make generate_python` runs the stub patcher. No other language is
+# affected, and removing `sdk-hooks.mk` restores stock behavior.
+
+# --- copy the slots you need below and delete the rest ---
+
+# PRE_GEN_SDK_GO     =
+# POST_GEN_SDK_GO    =
+
+# PRE_GEN_SDK_NODEJS  =
+# POST_GEN_SDK_NODEJS =
+
+# PRE_GEN_SDK_PYTHON  =
+# POST_GEN_SDK_PYTHON =
+
+# PRE_GEN_SDK_DOTNET  =
+# POST_GEN_SDK_DOTNET =
+
+# PRE_GEN_SDK_JAVA    =
+# POST_GEN_SDK_JAVA   =
