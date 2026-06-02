@@ -36,6 +36,13 @@ major-version: 2
 # Only set for 5 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22upstream-provider-repo%22&type=code
 #upstream-provider-repo: terraform-provider-xyz
 
+# disableMajorProviderUpgrades is used in the bridge upgrade config. When true, upgrade-provider will not
+# cross major upstream version boundaries.
+disableMajorProviderUpgrades: false
+
+# disableAgenticWorkflows opts a provider repository out of generated gh-aw review workflows and their support files.
+disableAgenticWorkflows: false
+
 # Customizes the name of the "gen" program.
 # Defaults to "tfgen" for bridged providers and "gen" for generic providers.
 #genName: tfgen
@@ -258,4 +265,4 @@ useNodejsPackageGenSdk: false
 usePythonPackageGenSdk: false
 
 # Version of mise to use
-mise-version: 2026.2.15
+mise-version: 2026.3.7

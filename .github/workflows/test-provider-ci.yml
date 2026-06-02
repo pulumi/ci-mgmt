@@ -22,17 +22,17 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+        uses: pulumi/esc-action@197ccaa42ab49560ce838a3010eb8345ce086896 # v1
       - name: Checkout Repo
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Configure git
         # Set the default branch to silence the warnings about the default branch name changing
         # The branch doesn't matter here because it's only used for a temp repo for actionlint
         run: git config --global init.defaultBranch master
       - name: Install mise
-        uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
+        uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
         with:
-          version: 2026.2.10
+          version: 2026.3.7
       - name: Build & test
         run: cd provider-ci && make all
       - name: Check worktree clean
@@ -66,9 +66,9 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@6cf9520e68354d86f81c455e8d43eabd58f5c9f5 # v1
+        uses: pulumi/esc-action@197ccaa42ab49560ce838a3010eb8345ce086896 # v1
 
-      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-auth
         with:
           app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}

@@ -1,3 +1,0 @@
-name: linear-agent
-runtime: nodejs
-description: AWS Lambda webhook receiver for Linear AI agent sessions

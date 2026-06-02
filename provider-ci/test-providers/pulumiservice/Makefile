@@ -16,6 +16,8 @@ CODEGEN := pulumi-gen-$(PACK)
 PROVIDER := pulumi-resource-$(PACK)
 TESTPARALLELISM := 10
 GOTESTARGS := ""
+TESTTAGS ?= all
+GO_TEST_EXEC ?= go test
 WORKING_DIR := $(shell pwd)
 PULUMI_PROVIDER_BUILD_PARALLELISM ?=
 PULUMI_CONVERT := 0
@@ -232,21 +234,22 @@ install_python_sdk:
 .PHONY: install_dotnet_sdk install_go_sdk install_java_sdk install_nodejs_sdk install_python_sdk
 
 lint: upstream
-	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
+	if git grep -ql 'go:embed' -- provider; then git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'; fi
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml; LINT_EXIT=$$?; \
-	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	if git grep -ql 'goembed'; then git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; fi; \
 	exit $$LINT_EXIT
 
 # `lint.fix` is a utility target meant to be run manually
 # that will run the linter and fix errors when possible.
 lint.fix: upstream
-	git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'
+	if git grep -ql 'go:embed' -- provider; then git grep -l 'go:embed' -- provider | xargs perl -i -pe 's/go:embed/ goembed/g'; fi
 	cd provider && golangci-lint run --path-prefix provider -c ../.golangci.yml --fix; LINT_EXIT=$$?; \
-	git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; \
+	if git grep -ql 'goembed'; then git grep -l 'goembed' | xargs perl -i -pe 's/ goembed/go:embed/g'; fi; \
 	exit $$LINT_EXIT
 
 .PHONY: lint lint.fix
-build_provider_cmd = OS=$(1) ARCH=$(2) OUT=$(3) go build .
+build_provider_cmd = set -x; \
+OS=$(1) ARCH=$(2) OUT=$(3) go build .
 
 provider: bin/$(PROVIDER)
 
@@ -262,13 +265,9 @@ bin/$(PROVIDER):
 
 test: export PATH := $(WORKING_DIR)/bin:$(PATH)
 test:
-	cd examples && go test -v -tags=all -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
+	cd examples && $(GO_TEST_EXEC) -v -tags=$(TESTTAGS) -parallel $(TESTPARALLELISM) -timeout 2h $(value GOTESTARGS)
 .PHONY: test
-test_provider_cmd = cd provider && go test -v -short \
-	-coverprofile="coverage.txt" \
-	-coverpkg="./...,github.com/hashicorp/terraform-provider-..." \
-	-parallel $(TESTPARALLELISM) \
-	./...
+test_provider_cmd = cd provider && $(GO_TEST_EXEC) -v -short -coverprofile="coverage.txt" -coverpkg="./...,github.com/hashicorp/terraform-provider-..." -parallel $(TESTPARALLELISM) ./pkg/...
 test_provider:
 	$(call test_provider_cmd)
 .PHONY: test_provider

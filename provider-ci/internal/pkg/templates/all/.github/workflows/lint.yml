@@ -36,7 +36,7 @@ jobs:
         persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
-    - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+    - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
       id: app-auth
       with:
         app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
@@ -44,7 +44,7 @@ jobs:
         owner: ${{ github.repository_owner }}
 #{{- end }}#
     - name: Setup mise
-      uses: jdx/mise-action@c1a019b8d2586943b4dbebc456323b516910e310
+      uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
