@@ -198,7 +198,7 @@ Steps:
   - NEVER create provider-specific template directory
   - Look for other ways the provider can extend behavior (in the provider's repo, not ci-mgmt):
      - Custom tools specified in mise.toml.
-     - TODO: Custom Makefile target behavior overriding defaults.
+     - Extra prerequisites for a generated Makefile target (e.g. `bin/$(PROVIDER)`) via a recipe-less rule in a `.mk/*.mk` include. The generated Makefile picks these up through `include $(wildcard .mk/*.mk)`; see the comment above that line in `templates/base/Makefile`. Add prerequisites only, a recipe would override the generated target and warn.
 
 **Remember**: Workflow files use `#{{ }}#` delimiters for templates, but GitHub Actions expressions still use `${{ }}`
 
