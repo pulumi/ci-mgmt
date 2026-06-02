@@ -426,7 +426,7 @@ jobs:
       run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
         2h -parallel 4 ./...
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#{{ .Config | renderLocalEnv | indent 8 }}#
     #{{- else }}#
     - name: Run tests
       run: >-
@@ -434,7 +434,7 @@ jobs:
 
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#{{ .Config | renderLocalEnv | indent 8 }}#
     #{{- end }}#
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
