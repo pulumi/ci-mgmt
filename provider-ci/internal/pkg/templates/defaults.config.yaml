@@ -239,6 +239,16 @@ github-app:
   id: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
   private-key: ${{ secrets.PULUMI_PROVIDER_AUTOMATION_SECRET_KEY }}
 
+# Customizing SDK codegen output (sdk-hooks.mk)
+# ----------------------------------------------
+# There is no .ci-mgmt.yaml key for this; it is a provider-owned escape hatch.
+# The generated Makefile `-include`s an optional `sdk-hooks.mk` from the provider
+# repo root and invokes PRE_GEN_SDK_<LANG> / POST_GEN_SDK_<LANG> slots (LANG in
+# GO, NODEJS, PYTHON, DOTNET, JAVA) around each per-language codegen recipe, in
+# both the gen-sdk and legacy branches. Use it to fine-tune `pulumi package
+# gen-sdk` output without forking the generated Makefile. ci-mgmt never creates
+# `sdk-hooks.mk`; it is opt-in and regen-safe. See provider-ci/sdk-hooks.mk.example.
+
 # Enables Java SDK generation via package gen-sdk
 useJavaPackageGenSdk: false
 
