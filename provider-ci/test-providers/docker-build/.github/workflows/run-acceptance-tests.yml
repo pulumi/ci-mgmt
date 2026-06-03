@@ -488,6 +488,9 @@ jobs:
 
         cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
+        ARM_CLIENT_SECRET: ${{ steps.esc-secrets.outputs.ARM_CLIENT_SECRET }}
+        DIGITALOCEAN_TOKEN: ${{ steps.esc-secrets.outputs.DIGITALOCEAN_TOKEN }}
+        DOCKER_HUB_PASSWORD: ${{ steps.esc-secrets.outputs.DOCKER_HUB_PASSWORD }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - if: failure() && github.event_name == 'push'
       name: Notify Slack
