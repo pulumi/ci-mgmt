@@ -99,7 +99,7 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         cache_save: false
     - name: Restore Go Cache
-      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: |
           ~/go/pkg/mod
@@ -156,7 +156,7 @@ jobs:
         owner: ${{ github.repository_owner }}
 #{{- end }}#
     - name: Cache examples generation
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: |
           .pulumi/examples-cache
@@ -170,7 +170,7 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         cache_save: false
     - name: Restore Go Cache
-      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: |
           ~/go/pkg/mod
