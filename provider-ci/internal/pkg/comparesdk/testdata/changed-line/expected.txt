@@ -1,0 +1,8 @@
+shadow-gen diff: example / nodejs
+  1 files compared, 0 identical, 1 differ (0.0% parity)
+  ~ index.ts (1 hunk)
+      @@ -1,3 +1,3 @@
+       export const a = 1;
+      -export const b = 2;
+      +export const b = 99;
+       export const c = 3;

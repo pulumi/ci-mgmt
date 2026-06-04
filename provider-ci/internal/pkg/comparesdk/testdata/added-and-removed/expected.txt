@@ -1,0 +1,4 @@
+shadow-gen diff: example / nodejs
+  3 files compared, 1 identical, 2 differ (33.3% parity)
+  + gensdkOnly.ts (only in gen-sdk)
+  - legacyOnly.ts (only in legacy)
