@@ -132,6 +132,7 @@ help:
 	@echo "  generate_[language]    Generate the SDK files ready for committing"
 	@echo "  build_[language]       Build the SDK to check correctness"
 	@echo "  install_[language]_sdk Install the SDK ready for testing"
+	@echo "  compare_sdk_[language] Compare legacy vs gen-sdk SDK output (shadow-gen diff)"
 	@echo ""
 	@echo "  [language] =#{{ range .Config.Languages }}# #{{ . }}##{{ end }}#"
 	@echo ""
@@ -276,6 +277,27 @@ build_python: .make/build_python
 		../venv/bin/python -m build .
 	@touch $@
 .PHONY: generate_python build_python
+
+#{{- if not .Config.NoSchema }}#
+
+# Shadow-gen diff: generate the SDK both ways (legacy codegen binary vs
+# `pulumi package gen-sdk`) from the same schema.json into isolated temp dirs
+# and report any un-allowlisted difference. Exits non-zero if they disagree.
+# This never touches the committed sdk/ directory.
+#
+# TEMPORARY: this section exists only to verify the migration to
+# `pulumi package gen-sdk`. Once every provider+language has been migrated and
+# verified, this whole section is removed along with the comparison tooling.
+# See pulumi/ci-mgmt#2291.
+compare_sdks:#{{ range .Config.Languages }}# compare_sdk_#{{ . }}##{{ end }}#
+compare_sdk_%: .make/mise_install bin/$(CODEGEN) .make/schema | mise_env
+	go run github.com/pulumi/ci-mgmt/provider-ci@master compare-sdk --language $*
+# Only the aggregate is .PHONY. The compare_sdk_<lang> targets must NOT be: make
+# does not apply a pattern rule's recipe to a target it knows is phony, so
+# marking them phony turns `make compare_sdk_<lang>` into a no-op ("Nothing to be
+# done"). They have no backing file, so they already re-run on every invocation.
+.PHONY: compare_sdks
+#{{- end }}#
 
 #{{- if .Config.RegistryDocs }}#
 # Run the bridge's registry-docs command to generated the content of the installation docs/ folder at provider repo root
