@@ -347,7 +347,7 @@ jobs:
         path: ~/.kube/
     - name: Generate Pulumi Access Token
       id: generate_pulumi_token
-      uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
+      uses: pulumi/auth-actions@066f883c60134e2f0340cbf38f1cf6a11bbc237b # v2.0.0
       with:
         organization: pulumi
         requested-token-type: urn:pulumi:token-type:access_token:organization
@@ -603,7 +603,7 @@ jobs:
         github.run_id }}-${{ github.run_attempt }}' >> "$GITHUB_OUTPUT"
     - name: Generate Pulumi access token for k8s infra
       id: generate_pulumi_token
-      uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
+      uses: pulumi/auth-actions@066f883c60134e2f0340cbf38f1cf6a11bbc237b # v2.0.0
       with:
         organization: ${{ env.PULUMI_TEST_OWNER || 'pulumi' }}
         requested-token-type: urn:pulumi:token-type:access_token:organization
@@ -654,7 +654,7 @@ jobs:
       run: gcloud --quiet auth configure-docker gcr.io,us-central1-docker.pkg.dev # Ensure that all test artifact registry locations are supplied here.
     - name: Generate Pulumi access token for k8s infra
       id: generate_pulumi_token
-      uses: pulumi/auth-actions@1c89817aab0c66407723cdef72b05266e7376640 # v1.0.1
+      uses: pulumi/auth-actions@066f883c60134e2f0340cbf38f1cf6a11bbc237b # v2.0.0
       with:
         organization: ${{ env.PULUMI_TEST_OWNER || 'pulumi' }}
         requested-token-type: urn:pulumi:token-type:access_token:organization
