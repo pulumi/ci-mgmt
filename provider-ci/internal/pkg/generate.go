@@ -41,6 +41,15 @@ type templateContext struct {
 	Splices map[string]string
 }
 
+// DefaultGenName returns the default codegen name for a template: "gen" for
+// generic providers, "tfgen" otherwise.
+func DefaultGenName(templateName string) string {
+	if templateName == "generic" {
+		return "gen"
+	}
+	return "tfgen"
+}
+
 func GeneratePackage(opts GenerateOpts) error {
 	templateDirs, err := getTemplateDirs(opts.TemplateName)
 	if err != nil {
@@ -49,12 +58,7 @@ func GeneratePackage(opts GenerateOpts) error {
 
 	// GenName defaults to "tfgen" for bridged providers and "gen" for others
 	if opts.Config.GenName == "" {
-		switch opts.TemplateName {
-		case "generic":
-			opts.Config.GenName = "gen"
-		default:
-			opts.Config.GenName = "tfgen"
-		}
+		opts.Config.GenName = DefaultGenName(opts.TemplateName)
 	}
 
 	if opts.Config.ToolVersions.PulumiCTL == "" {
