@@ -480,6 +480,11 @@ renovate:
 include scripts/crossbuild.mk
 
 # Permit providers to extend the Makefile with provider-specific Make includes.
+# A *.mk file here may add prerequisites to a generated target using a rule with
+# NO recipe, e.g. to rebuild bin/$(PROVIDER) when embedded data files change:
+#     bin/$(PROVIDER): provider/pkg/cloud/spec.json
+# Add prerequisites only; giving a generated target a recipe here overrides the
+# generated one and triggers make's "overriding commands" warning.
 include $(wildcard .mk/*.mk)
 
 # Optional, provider-owned SDK codegen hooks. When a `sdk-hooks.mk` exists in
