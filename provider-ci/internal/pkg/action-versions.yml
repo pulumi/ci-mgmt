@@ -74,7 +74,7 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
       - name: pulumi/provider-version-action
-        uses: pulumi/provider-version-action@3a647064cf4697c7c6352b9a1d9e554450cbe957 # v1.6.1
+        uses: pulumi/provider-version-action@c4f719182e607d0d8322f148f168d3372838e681 # v2.0.0
 
       - name: pulumi/auth-actions
         uses: pulumi/auth-actions@141415910c3beb54e03b48e9057c204c97b956f2 # v2.1.0
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: pulumi/git-status-check-action
-        uses: pulumi/git-status-check-action@54000b91124a8dd9fd6a872cb41f5dd246a46e7c # v1.1.1
+        uses: pulumi/git-status-check-action@0d90c81496aa8d6a31d9c6a0d6297feea2f54057 # v2.0.0
 
       - name: peter-evans/create-or-update-comment
         uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
