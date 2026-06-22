@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@f3cfbabf37488463817366338165b92b5f99117e # v2
+        uses: pulumi/esc-action@8afe12bb7bb3df0a599e5309ee429ff1079ba85f # v3
       - name: Checkout Repo
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Configure git
@@ -36,7 +36,7 @@ jobs:
       - name: Build & test
         run: cd provider-ci && make all
       - name: Check worktree clean
-        uses: pulumi/git-status-check-action@v1
+        uses: pulumi/git-status-check-action@0d90c81496aa8d6a31d9c6a0d6297feea2f54057 # v2
 
   deploy:
     name: Apply ci-mgmt changes (pulumi/pulumi-${{ matrix.provider }})
@@ -66,7 +66,7 @@ jobs:
     steps:
       - name: Fetch secrets from ESC
         id: esc-secrets
-        uses: pulumi/esc-action@f3cfbabf37488463817366338165b92b5f99117e # v2
+        uses: pulumi/esc-action@8afe12bb7bb3df0a599e5309ee429ff1079ba85f # v3
 
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-auth
