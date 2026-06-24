@@ -18,3 +18,6 @@ freeDiskSpaceBeforeBuild: false
 freeDiskSpaceBeforeTest: false
 freeDiskSpaceBeforeSdkBuild: false
 publishRegistry: false
+# Exercise building the provider binary in the fanout test_provider job for
+# providers whose unit tests load the plugin from ./bin. See pulumi/ci-mgmt#2336.
+testProviderNeedsProviderBinary: true

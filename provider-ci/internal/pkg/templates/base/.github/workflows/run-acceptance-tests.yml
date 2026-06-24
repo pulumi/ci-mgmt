@@ -111,6 +111,14 @@ jobs:
         GITHUB_TOKEN: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
     - name: Restore prerequisites
       uses: ./.github/actions/download-prerequisites
+    #{{- if .Config.TestProviderNeedsProviderBinary }}#
+    # Some providers' unit tests load the built provider plugin from ./bin. The
+    # restored prerequisites artifact only contains the tfgen binary, so build
+    # the provider here. provider_no_deps reuses the restored schema-embed.json
+    # and does not regenerate the schema. See pulumi/ci-mgmt#2336.
+    - name: Build provider binary
+      run: make provider_no_deps
+    #{{- end }}#
     - name: Unit-test provider code
       run: make test_provider
       env:
