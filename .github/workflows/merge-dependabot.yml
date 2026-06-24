@@ -21,7 +21,7 @@ jobs:
       - name: Fetch secrets from ESC
         id: esc-secrets
         uses: pulumi/esc-action@8afe12bb7bb3df0a599e5309ee429ff1079ba85f # v3
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
         working-directory: provider-ci
@@ -37,7 +37,7 @@ jobs:
         id: esc-secrets
         uses: pulumi/esc-action@8afe12bb7bb3df0a599e5309ee429ff1079ba85f # v3
       - name: Clone ci-mgmt
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - run: gh auth setup-git
       - run: git config --global user.email "bot@pulumi.com"
       - run: git config --global user.name "pulumi-bot"
