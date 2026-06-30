@@ -25,8 +25,14 @@ jobs:
         uses: pulumi/esc-action@8afe12bb7bb3df0a599e5309ee429ff1079ba85f # v3
       - name: Checkout Repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Install mise
+        uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
+        with:
+          version: 2026.3.7
+          install: false
+      - name: Install actionlint and shellcheck
+        run: mise install actionlint shellcheck
+        shell: bash
       - name: lint workflows
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
+        run: actionlint -color
         shell: bash

@@ -17,6 +17,13 @@ paths:
       # recognize the `queue` key, so it false-positives this valid syntax.
       - 'unexpected key "queue" for "concurrency" section'
 
+  ".github/workflows/agentics-maintenance.yml":
+    ignore:
+      # gh-aw emits an empty choice option ('') so the optional maintenance
+      # operation can default to "no operation". This is valid GitHub Actions,
+      # but actionlint's syntax-check flags the empty string.
+      - 'string should not be empty'
+
   ".github/workflows/build_provider.yml":
     ignore:
       - 'property ".*" is not defined in object type {}'
