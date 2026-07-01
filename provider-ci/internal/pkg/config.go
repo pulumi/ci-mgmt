@@ -303,6 +303,17 @@ type Config struct {
 	// This function is called without arguments to run unit tests for the provider binary.
 	TestProviderCmd string `yaml:"testProviderCmd"`
 
+	// TestProviderNeedsProviderBinary builds the provider binary in the
+	// standalone acceptance test_provider job before running unit tests. Set
+	// this for providers whose `make test_provider` suite includes tests that
+	// load the built provider plugin from ./bin (e.g. pulumitest program
+	// tests). Defaults to false so the fanout test_provider job stays
+	// lightweight for providers that do not need the binary. The build uses
+	// `make provider_no_deps`, which relies on the schema-embed.json restored
+	// from the prerequisites artifact and so does not regenerate the schema.
+	// See pulumi/ci-mgmt#2336.
+	TestProviderNeedsProviderBinary bool `yaml:"testProviderNeedsProviderBinary"`
+
 	// Customizes the Make function renovate_cmd.
 	//
 	// This function is called by the make renovate target after the Renovate bot has finished updating
