@@ -92,7 +92,7 @@ jobs:
         private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
         owner: ${{ github.repository_owner }}
     - name: Setup mise
-      uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+      uses: jdx/mise-action@bac1315236be56c1098f56aa4f21bb510680fb0c
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
@@ -167,7 +167,7 @@ jobs:
           .pulumi/examples-cache
         key: ${{ runner.os }}-${{ hashFiles('provider/go.sum') }}
     - name: Setup mise
-      uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+      uses: jdx/mise-action@bac1315236be56c1098f56aa4f21bb510680fb0c
       env:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:

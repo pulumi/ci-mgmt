@@ -32,7 +32,7 @@ jobs:
         with:
           token: ${{ steps.app-auth.outputs.token }}
       - name: Install mise
-        uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
+        uses: jdx/mise-action@bac1315236be56c1098f56aa4f21bb510680fb0c
         with:
           version: 2026.3.7
           install: true

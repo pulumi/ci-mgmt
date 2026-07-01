@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Install tools via mise
-        uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
+        uses: jdx/mise-action@bac1315236be56c1098f56aa4f21bb510680fb0c
         with:
           version: 2026.3.7
           install: true
