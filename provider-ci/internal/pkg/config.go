@@ -52,8 +52,8 @@ type Config struct {
 	// upgrade-provider from crossing major upstream version boundaries.
 	DisableMajorProviderUpgrades bool `yaml:"disableMajorProviderUpgrades"`
 
-	// DisableAgenticWorkflows prevents generated gh-aw review workflows and
-	// their support files from being written to the provider repository.
+	// Deprecated: accepted for compatibility with existing provider configs.
+	// Agentic workflows are no longer generated.
 	DisableAgenticWorkflows bool `yaml:"disableAgenticWorkflows"`
 
 	// Lint includes an extra lint job in workflows if enabled (default). Can
