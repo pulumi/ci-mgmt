@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -58,6 +59,55 @@ disableAgenticWorkflows: true
 	}
 	if !config.DisableAgenticWorkflows {
 		t.Fatal("expected local config to preserve deprecated disableAgenticWorkflows value")
+	}
+}
+
+func TestGeneratePackageRendersOpenInspectSettings(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+	config.OpenInspect.Settings = map[string]any{
+		"mode": "provider",
+		"setup": map[string]any{
+			"timeout": 900,
+		},
+	}
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "native",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(outDir, ".openinspect", "settings.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var settings map[string]any
+	if err := json.Unmarshal(data, &settings); err != nil {
+		t.Fatal(err)
+	}
+
+	pathPrepend, ok := settings["pathPrepend"].([]any)
+	if !ok || len(pathPrepend) != 1 || pathPrepend[0] != "~/.local/share/mise/shims" {
+		t.Fatalf("expected default pathPrepend, got %#v", settings["pathPrepend"])
+	}
+	if settings["mode"] != "provider" {
+		t.Fatalf("expected custom setting to be rendered, got %#v", settings["mode"])
+	}
+	setup, ok := settings["setup"].(map[string]any)
+	if !ok || setup["timeout"] != float64(900) {
+		t.Fatalf("expected nested custom setting to be rendered, got %#v", settings["setup"])
 	}
 }
 

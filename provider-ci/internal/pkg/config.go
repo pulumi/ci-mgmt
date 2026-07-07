@@ -56,6 +56,9 @@ type Config struct {
 	// Agentic workflows are no longer generated.
 	DisableAgenticWorkflows bool `yaml:"disableAgenticWorkflows"`
 
+	// OpenInspect allows providers to customize generated OpenInspect config.
+	OpenInspect openInspectConfig `yaml:"openinspect"`
+
 	// Lint includes an extra lint job in workflows if enabled (default). Can
 	// be explicitly set to false. This is false in around 8 provider repos:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22lint%3A+false%22&type=code
@@ -418,6 +421,10 @@ type GitHubApp struct {
 	Enabled    bool
 	ID         string
 	PrivateKey string `yaml:"private-key"`
+}
+
+type openInspectConfig struct {
+	Settings map[string]any `yaml:"settings"`
 }
 
 type plugin struct {

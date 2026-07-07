@@ -136,6 +136,26 @@ POST_GEN_SDK_PYTHON = ./scripts/patch-python-stubs.sh
 
 running `make generate_go` deletes the stray file right after gen-sdk emits it, and `make generate_python` runs the stub patcher. No other language is affected, and removing `sdk-hooks.mk` restores stock behavior.
 
+## OpenInspect Setup
+
+Internal provider templates generate default `.openinspect` files so OpenInspect sandboxes have a consistent bootstrap path. The shared `internal` template owns the common setup:
+
+- `.openinspect/settings.json`
+- `.openinspect/setup.py`
+- `.openinspect/README.md`
+
+The common setup installs and trusts `mise`, then runs optional setup hooks from `.openinspect/setup.d/*.py` and `.openinspect/setup.local.py`. More specific templates can add generated hooks under `setup.d`; for example, `internal-bridged` adds a hook that runs `make prepare_local_workspace`.
+
+Provider repositories should not edit generated `.openinspect` files directly. To customize generated settings, add values to `.ci-mgmt.yaml`:
+
+```yaml
+openinspect:
+  settings:
+    exampleField: exampleValue
+```
+
+To customize setup behavior, add provider-owned hook files such as `.openinspect/setup.local.py` or `.openinspect/setup.d/90-provider-setup.py`.
+
 ## Updating All Bridged Providers
 
 The [Update GH Workflows, ecosystem providers](https://github.com/pulumi/ci-mgmt/actions/workflows/update-workflows-ecosystem-providers.yml)
