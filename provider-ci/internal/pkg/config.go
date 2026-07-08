@@ -133,10 +133,11 @@ type Config struct {
 	// These are not overridden by any providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22runner%3A%22&type=code
 	Runner struct {
-		Default       string `yaml:"default"`
-		Prerequisites string `yaml:"prerequisites"`
-		BuildSDK      string `yaml:"buildSdk"`
-		Publish       string `yaml:"publish"`
+		Default         string `yaml:"default"`
+		Prerequisites   string `yaml:"prerequisites"`
+		BuildSDK        string `yaml:"buildSdk"`
+		Publish         string `yaml:"publish"`
+		UpgradeProvider string `yaml:"upgradeProvider"`
 	} `yaml:"runner"`
 
 	// actionVersions should be used wherever we use external actions to make
