@@ -134,6 +134,7 @@ runner:
   prerequisites: ubuntu-latest
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
+  # upgradeProvider: ubuntu-latest
 
 # publish contains multiple properties relating to the publish jobs.
 # Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code

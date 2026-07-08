@@ -35,7 +35,7 @@ permissions:
 jobs:
   upgrade_provider:
     name: upgrade-provider
-    runs-on: #{{ .Config.Runner.Default }}#
+    runs-on: #{{ if .Config.Runner.UpgradeProvider }}##{{- .Config.Runner.UpgradeProvider }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
     steps:
       #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
       # Run as first step so we don't delete things that have just been installed

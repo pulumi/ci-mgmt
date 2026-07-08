@@ -3,6 +3,7 @@ package pkg
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -157,5 +158,35 @@ func TestGeneratePackageDeletesLegacyProviderPrefixedAgenticWorkflows(t *testing
 		if _, err := os.Stat(filepath.Join(outDir, path)); !os.IsNotExist(err) {
 			t.Fatalf("expected %s to be absent, got err %v", path, err)
 		}
+	}
+}
+
+func TestGeneratePackageUsesUpgradeProviderRunner(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+	config.Runner.UpgradeProvider = "ubuntu-24.04"
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "bridged-provider",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	workflow, err := os.ReadFile(filepath.Join(outDir, ".github/workflows/upgrade-provider.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(workflow), "    runs-on: ubuntu-24.04\n") {
+		t.Fatalf("expected upgrade-provider workflow to use custom runner, got:\n%s", workflow)
 	}
 }
