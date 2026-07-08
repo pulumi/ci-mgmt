@@ -152,6 +152,9 @@ func getDeletedFiles(templateName string) []string {
 			".goreleaser.prerelease.yml",
 			".github/actions/setup-tools",
 			"scripts/plugins.mk",
+			".github/workflows/claude.yml",
+			".claude/CLAUDE.md",
+			".claude/skills/provider-code-review",
 		}
 	case "external-bridged-provider":
 		return []string{
@@ -168,6 +171,11 @@ func getDeletedFiles(templateName string) []string {
 			".upgrade-config.yml", // Previously accidentally generated empty file.
 			".github/actions/setup-tools",
 			"scripts/plugins.mk",
+			".github/workflows/claude.yml",
+		}
+	case "native":
+		return []string{
+			".github/workflows/claude.yml",
 		}
 	case "parameterized-go":
 		return []string{
@@ -185,13 +193,6 @@ func getConfigDeletedFiles(config Config) []string {
 		filepath.Join(".github", "workflows", config.Provider+"-pr-rereview.md"),
 		filepath.Join(".github", "workflows", config.Provider+"-pr-review.lock.yml"),
 		filepath.Join(".github", "workflows", config.Provider+"-pr-review.md"),
-	}
-
-	if !config.DisableAgenticWorkflows {
-		return deletedFiles
-	}
-
-	deletedFiles = append(deletedFiles,
 		filepath.Join(".github", "aw", "actions-lock.json"),
 		".github/workflows/gh-aw-pr-rereview.lock.yml",
 		".github/workflows/gh-aw-pr-rereview.md",
@@ -199,7 +200,7 @@ func getConfigDeletedFiles(config Config) []string {
 		".github/workflows/gh-aw-pr-review.md",
 		filepath.Join(".github", "workflows", "shared", "review.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
-	)
+	}
 	return deletedFiles
 }
 
