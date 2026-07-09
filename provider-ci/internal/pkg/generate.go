@@ -3,6 +3,7 @@ package pkg
 import (
 	"bytes"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
@@ -379,11 +380,12 @@ func parseTemplate(fsys fs.FS, inPath string) (*template.Template, error) {
 	}
 
 	tmpl, err := template.New(inPath).Funcs(template.FuncMap{
-		"toYaml":           toYAML,
-		"renderEscStep":    renderESCStep,
-		"renderGlobalEnv":  renderGlobalEnv,
-		"renderLocalEnv":   renderLocalEnv,
-		"renderPublishEnv": renderPublishEnv,
+		"toYaml":                    toYAML,
+		"renderEscStep":             renderESCStep,
+		"renderGlobalEnv":           renderGlobalEnv,
+		"renderLocalEnv":            renderLocalEnv,
+		"renderOpenInspectSettings": renderOpenInspectSettings,
+		"renderPublishEnv":          renderPublishEnv,
 	}).Funcs(sprig.FuncMap()).Delims("#{{", "}}#").Parse(string(inData))
 	if err != nil {
 		return nil, err
@@ -397,6 +399,26 @@ func toYAML(v interface{}) (string, error) {
 		return "", err
 	}
 	return strings.TrimSuffix(string(data), "\n"), nil
+}
+
+func renderOpenInspectSettings(v any) (string, error) {
+	config, ok := v.(Config)
+	if !ok {
+		return "", fmt.Errorf("expected Config input, got %+v", v)
+	}
+
+	settings := map[string]any{
+		"pathPrepend": []string{"~/.local/share/mise/shims"},
+	}
+	for k, v := range config.OpenInspect.Settings {
+		settings[k] = v
+	}
+
+	data, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 // renderESCStep generates either the real ESC action or our shim action which
