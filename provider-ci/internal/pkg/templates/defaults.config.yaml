@@ -84,7 +84,7 @@ toolVersions:
   gradle: "7.6"
   nodejs: "20.x"
   pulumi: "dev"
-  python: "3.11.8"
+  python: "3.11.15"
 
 # Control which language SDKs get built and published.
 languages:
@@ -134,6 +134,7 @@ runner:
   prerequisites: ubuntu-latest
   # publish: ubuntu-latest
   # buildSdk: ubuntu-latest
+  # upgradeProvider: ubuntu-latest
 
 # publish contains multiple properties relating to the publish jobs.
 # Used by 2 providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publish%3A%22&type=code
