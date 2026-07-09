@@ -84,7 +84,7 @@ toolVersions:
   gradle: "7.6"
   nodejs: "20.x"
   pulumi: "dev"
-  python: "3.11.8"
+  python: "3.11.15"
 
 # Control which language SDKs get built and published.
 languages:
