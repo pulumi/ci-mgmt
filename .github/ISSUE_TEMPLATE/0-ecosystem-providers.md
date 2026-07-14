@@ -60,6 +60,7 @@ assignees: ''
 - [ ] [cloudngfwaws](https://github.com/pulumi/pulumi-cloudngfwaws)
 - [ ] [confluentcloud](https://github.com/pulumi/pulumi-confluentcloud)
 - [ ] [consul](https://github.com/pulumi/pulumi-consul)
+- [ ] [coreweave](https://github.com/pulumi/pulumi-coreweave)
 - [ ] [databricks](https://github.com/pulumi/pulumi-databricks)
 - [ ] [dbtcloud](https://github.com/pulumi/pulumi-dbtcloud)
 - [ ] [dnsimple](https://github.com/pulumi/pulumi-dnsimple)
