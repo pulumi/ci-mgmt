@@ -164,16 +164,28 @@ jobs:
           echo "$EOF";
         } >> "$GITHUB_ENV"
     - if: inputs.acceptance_fanout == false && inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
+      name: Find schema check comment
+      id: find-schema-check-comment
+      uses: #{{ .Config.ActionVersions.FindComment }}#
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body-includes: '"schemaCheck" -->'
+    - if: inputs.acceptance_fanout == false && inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        comment-tag: schemaCheck
-        message: >+
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-id: ${{ steps.find-schema-check-comment.outputs.comment-id }}
+        edit-mode: replace
+        body: >+
           ${{ env.SCHEMA_CHANGES }}
 
 
           Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+          <!-- "schemaCheck" -->
 
 #{{- if .Config.EnableConfigurationCheck }}#
     - if: inputs.acceptance_fanout == false && inputs.is_pr
@@ -233,16 +245,28 @@ jobs:
           echo "$EOF";
         } >> "$GITHUB_ENV"
     - if: inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
+      name: Find schema check comment
+      id: find-schema-check-comment
+      uses: #{{ .Config.ActionVersions.FindComment }}#
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body-includes: '"schemaCheck" -->'
+    - if: inputs.is_pr && inputs.is_automated == false && github.actor != 'dependabot[bot]'
       name: Comment on PR with Details of Schema Check
       uses: #{{ .Config.ActionVersions.PrComment }}#
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        comment-tag: schemaCheck
-        message: >+
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-id: ${{ steps.find-schema-check-comment.outputs.comment-id }}
+        edit-mode: replace
+        body: >+
           ${{ env.SCHEMA_CHANGES }}
 
 
           Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
+
+          <!-- "schemaCheck" -->
 
 #{{- if .Config.EnableConfigurationCheck }}#
     - if: inputs.is_pr

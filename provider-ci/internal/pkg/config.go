@@ -449,6 +449,7 @@ type actionVersions struct {
 	DownloadArtifact        string `yaml:"downloadArtifact"`
 	PathsFilter             string `yaml:"pathsFilter"`
 	PrComment               string `yaml:"prComment"`
+	FindComment             string `yaml:"findComment"`
 	UploadArtifact          string `yaml:"uploadArtifact"`
 	UpgradeProviderAction   string `yaml:"upgradeProviderAction"`
 	FreeDiskSpace           string `yaml:"freeDiskSpace"`
@@ -534,8 +535,10 @@ func loadDefaultConfig() (Config, error) {
 							config.ActionVersions.DownloadArtifact = uses
 						case "dorny/paths-filter":
 							config.ActionVersions.PathsFilter = uses
-						case "thollander/actions-comment-pull-request":
+						case "peter-evans/create-or-update-comment":
 							config.ActionVersions.PrComment = uses
+						case "peter-evans/find-comment":
+							config.ActionVersions.FindComment = uses
 						case "actions/upload-artifact":
 							config.ActionVersions.UploadArtifact = uses
 						case "pulumi/pulumi-upgrade-provider-action":
