@@ -156,6 +156,8 @@ func getDeletedFiles(templateName string) []string {
 			".github/workflows/claude.yml",
 			".claude/CLAUDE.md",
 			".claude/skills/provider-code-review",
+			".claude/skills/pulumi-upgrade-provider",
+			".claude/skills/upstream-patches",
 		}
 	case "external-bridged-provider":
 		return []string{
