@@ -112,13 +112,13 @@ jobs:
       name: Check Schema is Valid
       id: schema-check
       run: |
-        schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > schema-check-report.md
-        if grep -Fq 'Looking good! No breaking changes found.' schema-check-report.md; then
+        schema-tools compare -p ${{ env.PROVIDER }} -o ${{ github.event.repository.default_branch }} -n --local-path=provider/cmd/pulumi-resource-${{ env.PROVIDER }}/schema.json > "$RUNNER_TEMP/schema-check-report.md"
+        if grep -Fq 'Looking good! No breaking changes found.' "$RUNNER_TEMP/schema-check-report.md"; then
           echo "no-breaking-changes=true" >> "$GITHUB_OUTPUT"
         else
           echo "no-breaking-changes=false" >> "$GITHUB_OUTPUT"
         fi
-        cat >> schema-check-report.md <<'EOF'
+        cat >> "$RUNNER_TEMP/schema-check-report.md" <<'EOF'
         <!-- "schemaCheck" -->
         EOF
       env:
@@ -139,7 +139,7 @@ jobs:
         issue-number: ${{ github.event.pull_request.number }}
         comment-id: ${{ steps.find-schema-check-comment.outputs.comment-id }}
         edit-mode: replace
-        body-path: schema-check-report.md
+        body-path: ${{ runner.temp }}/schema-check-report.md
     - if: steps.schema-check.outputs.no-breaking-changes == 'true' &&
         github.actor == 'pulumi-bot'
       name: Add label if no breaking changes

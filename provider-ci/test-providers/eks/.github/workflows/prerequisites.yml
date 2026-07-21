@@ -155,8 +155,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        schema-tools compare -r github://api.github.com/pulumi -p eks -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-eks/schema.json > schema-check-report.md
-        cat >> schema-check-report.md <<'EOF'
+        schema-tools compare -r github://api.github.com/pulumi -p eks -o "${{ inputs.default_branch }}" -n --local-path=provider/cmd/pulumi-resource-eks/schema.json > "$RUNNER_TEMP/schema-check-report.md"
+        cat >> "$RUNNER_TEMP/schema-check-report.md" <<'EOF'
 
         Maintainer note: consult the [runbook](https://github.com/pulumi/platform-providers-team/blob/main/playbooks/tf-provider-updating.md) for dealing with any breaking changes.
 
@@ -178,7 +178,7 @@ jobs:
         issue-number: ${{ github.event.pull_request.number }}
         comment-id: ${{ steps.find-schema-check-comment.outputs.comment-id }}
         edit-mode: replace
-        body-path: schema-check-report.md
+        body-path: ${{ runner.temp }}/schema-check-report.md
 
     - name: Upload artifacts
       uses: ./.github/actions/upload-prerequisites
