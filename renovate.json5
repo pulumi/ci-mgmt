@@ -6,6 +6,11 @@
     fileMatch: [".*/action-versions\\.ya?ml$"],
     ignorePaths: ["provider-ci/test-providers/**"],
   },
+  mise: {
+    // Canonical Mise versions live in the templates. `make build` regenerates
+    // these committed snapshots after Renovate updates a template.
+    ignorePaths: ["provider-ci/test-providers/**"],
+  },
   packageRules: [
     {
       // Re-generate test workflows in case action versions have been bumped.
