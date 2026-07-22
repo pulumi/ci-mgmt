@@ -5,5 +5,5 @@ go 1.24.7
 toolchain go1.26.5
 
 require (
-	github.com/pulumi/pulumi/pkg/v3 v3.252.0
+	github.com/pulumi/pulumi/pkg/v3 v3.253.0
 )
