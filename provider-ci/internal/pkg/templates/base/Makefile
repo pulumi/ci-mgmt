@@ -92,10 +92,16 @@ install_sdks:#{{ range .Config.Languages }}# install_#{{ . }}#_sdk#{{ end }}#
 # every invocation without invalidating the sentinel.
 mise_install: .make/mise_install | mise_env
 
+# `mise trust` marks the generated .config/mise.toml as safe to load. This is
+# required in environments (e.g. Renovate's postUpgradeTasks runner) that
+# haven't already trusted the config, otherwise mise refuses to parse it and
+# every downstream mise/make target fails before doing any work.
 mise_env:
+	@mise trust --yes -q
 	@mise env -q  > /dev/null
 
 .make/mise_install:
+	@mise trust --yes -q
 	@mise install -q
 	@touch $@
 
