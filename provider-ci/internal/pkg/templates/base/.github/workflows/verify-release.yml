@@ -135,12 +135,6 @@ jobs:
 #{{ .Config.Actions.PreTest | toYaml | indent 6 }}#
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Nodejs }}#
-      - name: Setup Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          # we don't set node-version because we install with mise.
-          # this step is needed to setup npm auth
-          registry-url: https://registry.npmjs.org
       - name: Verify nodejs release
         uses: #{{ .Config.ActionVersions.VerifyProviderRelease }}#
         with:
@@ -149,7 +143,6 @@ jobs:
           provider: #{{ .Config.Provider }}#
           providerVersion: ${{ inputs.providerVersion }}
         env:
-          NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
 #{{ .Config | renderLocalEnv | indent 10 }}#
 #{{- end }}#
 #{{- if .Config.ReleaseVerification.Python }}#

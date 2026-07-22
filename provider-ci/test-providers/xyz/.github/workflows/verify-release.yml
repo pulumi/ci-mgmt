@@ -85,12 +85,6 @@ jobs:
             sdk/go/*.sum
             sdk/*.sum
             *.sum
-      - name: Setup Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          # we don't set node-version because we install with mise.
-          # this step is needed to setup npm auth
-          registry-url: https://registry.npmjs.org
       - name: Verify nodejs release
         uses: pulumi/verify-provider-release@679d5e6838ac4f68696bfa1bf9e2c5da94509dd6 # v1.3.1
         with:
@@ -99,5 +93,4 @@ jobs:
           provider: xyz
           providerVersion: ${{ inputs.providerVersion }}
         env:
-          NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
