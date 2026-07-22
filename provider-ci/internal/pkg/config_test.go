@@ -112,6 +112,62 @@ func TestGeneratePackageRendersOpenInspectSettings(t *testing.T) {
 	}
 }
 
+func TestGeneratePackageDeletesLegacyClaudeFiles(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+
+	legacyFiles := []string{
+		".claude/CLAUDE.md",
+		".claude/skills/provider-code-review/SKILL.md",
+		".claude/skills/pulumi-upgrade-provider/SKILL.md",
+		".claude/skills/pulumi-upgrade-provider/references/upgrade-provider-errors.md",
+		".claude/skills/upstream-patches/SKILL.md",
+	}
+	for _, path := range legacyFiles {
+		fullPath := filepath.Join(outDir, path)
+		if err := os.MkdirAll(filepath.Dir(fullPath), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(fullPath, []byte("legacy generated file\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	unmanagedFile := ".claude/skills/provider-owned/SKILL.md"
+	fullUnmanagedPath := filepath.Join(outDir, unmanagedFile)
+	if err := os.MkdirAll(filepath.Dir(fullUnmanagedPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(fullUnmanagedPath, []byte("provider-owned file\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "bridged-provider",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, path := range legacyFiles {
+		if _, err := os.Stat(filepath.Join(outDir, path)); !os.IsNotExist(err) {
+			t.Fatalf("expected %s to be absent, got err %v", path, err)
+		}
+	}
+	if _, err := os.Stat(fullUnmanagedPath); err != nil {
+		t.Fatalf("expected %s to be preserved, got err %v", unmanagedFile, err)
+	}
+}
+
 func TestGeneratePackageDeletesLegacyAgenticWorkflowFiles(t *testing.T) {
 	outDir := t.TempDir()
 
