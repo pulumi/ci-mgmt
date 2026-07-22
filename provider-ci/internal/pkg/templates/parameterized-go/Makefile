@@ -49,17 +49,11 @@ _ := $(shell mkdir -p .make bin .pulumi/bin)
 # every invocation without invalidating the sentinel.
 mise_install: .make/mise_install | mise_env
 
-# `mise trust` marks the generated .config/mise.toml as safe to load. This is
-# required in environments (e.g. Renovate's postUpgradeTasks runner) that
-# haven't already trusted the config, otherwise mise refuses to parse it and
-# every downstream mise/make target fails before doing any work.
 .PHONY: mise_env
 mise_env:
-	@mise trust --yes -q
 	@mise env -q  > /dev/null
 
 .make/mise_install:
-	@mise trust --yes -q
 	@mise install -q
 	@touch $@
 
@@ -160,7 +154,12 @@ ci-mgmt: .ci-mgmt.yaml
 
 #{{- if .Config.RenovateCmd }}#
 renovate_cmd = #{{ .Config.RenovateCmd }}#
+# Renovate's postUpgradeTasks runner doesn't necessarily trust the generated
+# .config/mise.toml, which otherwise causes every mise/make target invoked
+# below to fail before regenerating any artifacts. Trust it here so the hook
+# works regardless of whether the runner has pre-trusted the config.
 renovate:
+	@mise trust --yes -q
 	$(call renovate_cmd)
 .PHONY: renovate
 #{{- end }}#

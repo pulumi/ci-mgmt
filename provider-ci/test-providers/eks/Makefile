@@ -72,16 +72,10 @@ install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_g
 # every invocation without invalidating the sentinel.
 mise_install: .make/mise_install | mise_env
 
-# `mise trust` marks the generated .config/mise.toml as safe to load. This is
-# required in environments (e.g. Renovate's postUpgradeTasks runner) that
-# haven't already trusted the config, otherwise mise refuses to parse it and
-# every downstream mise/make target fails before doing any work.
 mise_env:
-	@mise trust --yes -q
 	@mise env -q  > /dev/null
 
 .make/mise_install:
-	@mise trust --yes -q
 	@mise install -q
 	@touch $@
 
@@ -346,7 +340,12 @@ debug_tfgen:
 	dlv  --listen=:2345 --headless=true --api-version=2  exec $(WORKING_DIR)/bin/$(CODEGEN) -- schema --out provider/cmd/$(PROVIDER)
 .PHONY: debug_tfgen
 renovate_cmd = ./scripts/renovate.sh
+# Renovate's postUpgradeTasks runner doesn't necessarily trust the generated
+# .config/mise.toml, which otherwise causes every mise/make target invoked
+# below to fail before regenerating any artifacts. Trust it here so the hook
+# works regardless of whether the runner has pre-trusted the config.
 renovate:
+	@mise trust --yes -q
 	$(call renovate_cmd)
 .PHONY: renovate
 
