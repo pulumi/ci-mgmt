@@ -5,7 +5,10 @@ import (
 	_ "embed" // For embedding action versions.
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -125,6 +128,11 @@ type Config struct {
 	// IntegrationTestProvider will run e2e tests in the provider as well as in
 	// the examples directory when set to true. Defaults to false.
 	IntegrationTestProvider bool `yaml:"integrationTestProvider"`
+
+	// AcceptanceTestSuites partitions acceptance tests by artifact dependency.
+	// Each suite is independently sharded from one file or directory under
+	// TestFolder. When configured, this replaces the legacy Shards test job.
+	AcceptanceTestSuites []acceptanceTestSuite `yaml:"acceptanceTestSuites"`
 
 	// TestPulumiExamples runs e2e tests using the examples and test suite in
 	// the pulumi/examples repo when set to true. Defaults to false. This is
@@ -415,7 +423,83 @@ func LoadLocalConfig(path string) (Config, error) {
 		config.ModulePath = "provider"
 	}
 
+	if err := validateAcceptanceTestSuites(config); err != nil {
+		return Config{}, err
+	}
+
 	return config, nil
+}
+
+var (
+	acceptanceTestSuiteNamePattern = regexp.MustCompile(`^[a-z][a-z0-9-]*$`)
+	acceptanceTestSuiteRootPattern = regexp.MustCompile(`^[A-Za-z0-9._/+\-]+$`)
+)
+
+type acceptanceTestSuite struct {
+	// Name identifies the suite in generated GitHub Actions job IDs.
+	Name string `yaml:"name"`
+	// Root is a file or directory relative to Config.TestFolder from which
+	// pulumi/shard discovers this suite's tests.
+	Root string `yaml:"root"`
+	// Shards is the number of jobs across which the suite is distributed.
+	Shards int `yaml:"shards"`
+	// RequiresSDKs must be set explicitly. SDK-dependent suites download and
+	// install every configured generated SDK before running tests.
+	RequiresSDKs *bool `yaml:"requiresSDKs"`
+}
+
+// NeedsSDKs exposes the explicitly configured SDK requirement to templates.
+func (s acceptanceTestSuite) NeedsSDKs() bool {
+	return s.RequiresSDKs != nil && *s.RequiresSDKs
+}
+
+func validateAcceptanceTestSuites(config Config) error {
+	if len(config.AcceptanceTestSuites) == 0 {
+		return nil
+	}
+	if config.Shards != 0 {
+		return fmt.Errorf("acceptanceTestSuites cannot be used with shards")
+	}
+
+	names := map[string]struct{}{}
+	roots := make([]string, 0, len(config.AcceptanceTestSuites))
+	for i, suite := range config.AcceptanceTestSuites {
+		prefix := fmt.Sprintf("acceptanceTestSuites[%d]", i)
+		if !acceptanceTestSuiteNamePattern.MatchString(suite.Name) {
+			return fmt.Errorf("%s.name must match %s", prefix, acceptanceTestSuiteNamePattern)
+		}
+		if _, exists := names[suite.Name]; exists {
+			return fmt.Errorf("%s.name %q is duplicated", prefix, suite.Name)
+		}
+		names[suite.Name] = struct{}{}
+
+		if suite.Root == "" {
+			return fmt.Errorf("%s.root is required", prefix)
+		}
+		cleanRoot := path.Clean(suite.Root)
+		if cleanRoot != suite.Root || path.IsAbs(cleanRoot) || cleanRoot == ".." ||
+			strings.HasPrefix(cleanRoot, "../") || !acceptanceTestSuiteRootPattern.MatchString(cleanRoot) {
+			return fmt.Errorf("%s.root %q must be a clean, shell-safe relative path under test-folder", prefix, suite.Root)
+		}
+		for _, otherRoot := range roots {
+			if cleanRoot == otherRoot || cleanRoot == "." || otherRoot == "." ||
+				strings.HasPrefix(cleanRoot, otherRoot+"/") || strings.HasPrefix(otherRoot, cleanRoot+"/") {
+				return fmt.Errorf("%s.root %q overlaps another suite root %q", prefix, suite.Root, otherRoot)
+			}
+		}
+		roots = append(roots, cleanRoot)
+
+		if suite.Shards < 1 {
+			return fmt.Errorf("%s.shards must be greater than zero", prefix)
+		}
+		if suite.RequiresSDKs == nil {
+			return fmt.Errorf("%s.requiresSDKs must be set explicitly", prefix)
+		}
+		if suite.NeedsSDKs() && config.NoSchema {
+			return fmt.Errorf("%s cannot require SDKs when noSchema is true", prefix)
+		}
+	}
+	return nil
 }
 
 type GitHubApp struct {

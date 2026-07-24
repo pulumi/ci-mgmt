@@ -331,7 +331,16 @@ jobs:
     permissions:
       statuses: write
     needs:
+    #{{- if .Config.AcceptanceTestSuites }}#
+    #{{- range $_, $suite := .Config.AcceptanceTestSuites }}#
+    - acceptance_#{{ $suite.Name }}#
+    #{{- end }}#
+    #{{- if not .Config.NoSchema }}#
+    - build_sdk
+    #{{- end }}#
+    #{{- else }}#
     - test
+    #{{- end }}#
     - build_provider
     #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
     - build_schema
@@ -355,6 +364,34 @@ jobs:
         # otherwise use the current SHA for any other type of build.
         sha: ${{ github.event.pull_request.head.sha || github.sha }}
 
+#{{- if .Config.AcceptanceTestSuites }}#
+#{{- range $_, $suite := .Config.AcceptanceTestSuites }}#
+
+  acceptance_#{{ $suite.Name }}#:
+    # Don't run tests on PRs from forks.
+    if: github.event_name == 'repository_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/test.yml
+    needs:
+      - prerequisites
+      - build_provider
+#{{- if $suite.NeedsSDKs }}#
+      - build_sdk
+#{{- end }}#
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+      suite_root: #{{ $suite.Root | quote }}#
+      shard_count: #{{ $suite.Shards }}#
+      shard_indices: '#{{ until $suite.Shards | toJson }}#'
+      requires_sdks: #{{ $suite.NeedsSDKs }}#
+
+#{{- end }}#
+#{{- else }}#
+
   test:
     # Don't run tests on PRs from forks.
     if: github.event_name == 'repository_dispatch' ||
@@ -372,6 +409,8 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+
+#{{- end }}#
 
   license_check:
     name: License Check
