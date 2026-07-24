@@ -472,7 +472,12 @@ debug_tfgen:
 
 #{{- if .Config.RenovateCmd }}#
 renovate_cmd = #{{ .Config.RenovateCmd }}#
+# Renovate's postUpgradeTasks runner doesn't necessarily trust the generated
+# .config/mise.toml, which otherwise causes every mise/make target invoked
+# below to fail before regenerating any artifacts. Trust it here so the hook
+# works regardless of whether the runner has pre-trusted the config.
 renovate:
+	@mise trust --yes -q
 	$(call renovate_cmd)
 .PHONY: renovate
 #{{- end }}#
