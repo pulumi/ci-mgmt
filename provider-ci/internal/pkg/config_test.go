@@ -267,6 +267,258 @@ func TestGeneratePackageDeletesLegacyProviderPrefixedAgenticWorkflows(t *testing
 	}
 }
 
+func TestLoadLocalConfigValidatesAcceptanceTestSuites(t *testing.T) {
+	tests := []struct {
+		name    string
+		config  string
+		wantErr string
+	}{
+		{
+			name: "valid",
+			config: `provider: aws
+acceptanceTestSuites:
+  - name: provider
+    root: provider-tests
+    shards: 4
+    requiresSDKs: false
+  - name: sdk
+    root: sdk-smoke
+    shards: 2
+    requiresSDKs: true
+`,
+		},
+		{
+			name: "legacy shards conflict",
+			config: `provider: aws
+shards: 8
+acceptanceTestSuites:
+  - name: provider
+    root: provider-tests
+    shards: 4
+    requiresSDKs: false
+`,
+			wantErr: "acceptanceTestSuites cannot be used with shards",
+		},
+		{
+			name: "SDK requirement omitted",
+			config: `provider: aws
+acceptanceTestSuites:
+  - name: provider
+    root: provider-tests
+    shards: 4
+`,
+			wantErr: "requiresSDKs must be set explicitly",
+		},
+		{
+			name: "overlapping roots",
+			config: `provider: aws
+acceptanceTestSuites:
+  - name: all
+    root: tests
+    shards: 4
+    requiresSDKs: false
+  - name: sdk
+    root: tests/sdk
+    shards: 2
+    requiresSDKs: true
+`,
+			wantErr: "overlaps another suite root",
+		},
+		{
+			name: "invalid job name",
+			config: `provider: aws
+acceptanceTestSuites:
+  - name: SDK_Smoke
+    root: sdk-smoke
+    shards: 2
+    requiresSDKs: true
+`,
+			wantErr: "name must match",
+		},
+		{
+			name: "shell-unsafe root",
+			config: `provider: aws
+acceptanceTestSuites:
+  - name: sdk
+    root: sdk$(touch-bad)
+    shards: 2
+    requiresSDKs: true
+`,
+			wantErr: "shell-safe relative path",
+		},
+		{
+			name: "SDKs unavailable",
+			config: `provider: aws
+noSchema: true
+acceptanceTestSuites:
+  - name: sdk
+    root: sdk-smoke
+    shards: 2
+    requiresSDKs: true
+`,
+			wantErr: "cannot require SDKs when noSchema is true",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			configPath := filepath.Join(t.TempDir(), ".ci-mgmt.yaml")
+			if err := os.WriteFile(configPath, []byte(tt.config), 0o600); err != nil {
+				t.Fatal(err)
+			}
+
+			config, err := LoadLocalConfig(configPath)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Fatal(err)
+				}
+				if len(config.AcceptanceTestSuites) != 2 || config.AcceptanceTestSuites[0].NeedsSDKs() ||
+					!config.AcceptanceTestSuites[1].NeedsSDKs() {
+					t.Fatalf("unexpected suites: %#v", config.AcceptanceTestSuites)
+				}
+				return
+			}
+			if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+				t.Fatalf("expected error containing %q, got %v", tt.wantErr, err)
+			}
+		})
+	}
+}
+
+func TestGeneratePackagePartitionsAcceptanceTestSuites(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+	config.GenerateNightlyTestWorkflow = true
+	requiresSDKs := true
+	doesNotRequireSDKs := false
+	config.AcceptanceTestSuites = []acceptanceTestSuite{
+		{Name: "provider", Root: "provider-tests", Shards: 4, RequiresSDKs: &doesNotRequireSDKs},
+		{Name: "sdk", Root: "sdk-smoke", Shards: 2, RequiresSDKs: &requiresSDKs},
+	}
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "bridged-provider",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	readWorkflow := func(name string) string {
+		t.Helper()
+		workflow, err := os.ReadFile(filepath.Join(outDir, ".github", "workflows", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(workflow)
+	}
+
+	testWorkflow := readWorkflow("test.yml")
+	for _, want := range []string{
+		"suite_root:\n",
+		"if: inputs.requires_sdks\n",
+		"SUITE_ROOT: ${{ inputs.suite_root }}",
+		`--root "$SUITE_ROOT"`,
+		"current-shard: ${{ fromJSON(inputs.shard_indices) }}",
+	} {
+		if !strings.Contains(testWorkflow, want) {
+			t.Errorf("test workflow does not contain %q", want)
+		}
+	}
+
+	for _, name := range []string{"run-acceptance-tests.yml", "master.yml", "nightly-test.yml", "prerelease.yml", "release.yml"} {
+		workflow := readWorkflow(name)
+		if !strings.Contains(workflow, "  acceptance_provider:\n") || !strings.Contains(workflow, "  acceptance_sdk:\n") {
+			t.Errorf("%s does not call both configured suites", name)
+		}
+		providerStart := strings.Index(workflow, "  acceptance_provider:\n")
+		sdkStart := strings.Index(workflow, "  acceptance_sdk:\n")
+		providerJob := workflow[providerStart:sdkStart]
+		if strings.Contains(providerJob, "      - build_sdk\n") {
+			t.Errorf("%s makes the provider-only suite wait for build_sdk", name)
+		}
+		sdkJob := workflow[sdkStart:]
+		if !strings.Contains(sdkJob, "      - build_sdk\n") {
+			t.Errorf("%s does not make the SDK suite wait for build_sdk", name)
+		}
+	}
+
+	acceptanceWorkflow := readWorkflow("run-acceptance-tests.yml")
+	if !strings.Contains(acceptanceWorkflow, "    - acceptance_provider\n    - acceptance_sdk\n    - build_sdk\n") {
+		t.Errorf("acceptance sentinel does not require every suite and the SDK build")
+	}
+}
+
+func TestGeneratePackageRejectsAcceptanceTestSuitesForNativeTemplates(t *testing.T) {
+	requiresSDKs := false
+	config := Config{
+		AcceptanceTestSuites: []acceptanceTestSuite{
+			{Name: "provider", Root: ".", Shards: 1, RequiresSDKs: &requiresSDKs},
+		},
+	}
+
+	for _, templateName := range []string{"native", "external-native-provider"} {
+		t.Run(templateName, func(t *testing.T) {
+			err := GeneratePackage(GenerateOpts{
+				OutDir:       t.TempDir(),
+				TemplateName: templateName,
+				Config:       config,
+			})
+			if err == nil || !strings.Contains(err.Error(), "not supported by native workflow templates") {
+				t.Fatalf("expected native template error, got %v", err)
+			}
+		})
+	}
+}
+
+func TestGeneratePackagePreservesLegacyShardedTestWorkflow(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+	config.Shards = 8
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "bridged-provider",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	testWorkflow, err := os.ReadFile(filepath.Join(outDir, ".github", "workflows", "test.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(testWorkflow), "suite_root") {
+		t.Fatal("legacy test workflow unexpectedly contains suite inputs")
+	}
+
+	acceptanceWorkflow, err := os.ReadFile(filepath.Join(outDir, ".github", "workflows", "run-acceptance-tests.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"  test:\n", "    - test\n", "      - build_sdk\n"} {
+		if !strings.Contains(string(acceptanceWorkflow), want) {
+			t.Errorf("legacy acceptance workflow does not contain %q", want)
+		}
+	}
+}
+
 func TestGeneratePackageUsesUpgradeProviderRunner(t *testing.T) {
 	outDir := t.TempDir()
 

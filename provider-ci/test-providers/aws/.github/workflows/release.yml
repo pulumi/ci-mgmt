@@ -63,7 +63,9 @@ jobs:
     needs:
       - prerequisites
       - build_provider
-      - test
+      - build_sdk
+      - acceptance_yaml
+      - acceptance_sdk
       - license_check
     uses: ./.github/workflows/publish.yml
     secrets: inherit
@@ -73,7 +75,23 @@ jobs:
       # Only tags on the default branch should set the release as `latest`; backported releases (tagged on a feature branch) should not.
       setLatestRelease: ${{ github.event.base_ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 
-  test:
+  acceptance_yaml:
+    uses: ./.github/workflows/test.yml
+    needs:
+      - prerequisites
+      - build_provider
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+      suite_root: "examples_yaml_test.go"
+      shard_count: 8
+      shard_indices: '[0,1,2,3,4,5,6,7]'
+      requires_sdks: false
+
+  acceptance_sdk:
     uses: ./.github/workflows/test.yml
     needs:
       - prerequisites
@@ -85,3 +103,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+      suite_root: "examples_test.go"
+      shard_count: 2
+      shard_indices: '[0,1]'
+      requires_sdks: true
