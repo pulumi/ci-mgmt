@@ -52,9 +52,17 @@ func DefaultGenName(templateName string) string {
 }
 
 func GeneratePackage(opts GenerateOpts) error {
+	if err := validateAcceptanceTestSuites(opts.Config); err != nil {
+		return fmt.Errorf("invalid acceptance test suites: %w", err)
+	}
+
 	templateDirs, err := getTemplateDirs(opts.TemplateName)
 	if err != nil {
 		return fmt.Errorf("error getting template directories: %w", err)
+	}
+	if len(opts.Config.AcceptanceTestSuites) > 0 &&
+		(opts.TemplateName == "native" || opts.TemplateName == "external-native-provider") {
+		return fmt.Errorf("acceptanceTestSuites is not supported by native workflow templates")
 	}
 
 	// GenName defaults to "tfgen" for bridged providers and "gen" for others

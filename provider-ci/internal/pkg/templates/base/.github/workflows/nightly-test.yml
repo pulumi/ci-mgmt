@@ -40,6 +40,31 @@ jobs:
       version: ${{ needs.prerequisites.outputs.version }}
   #{{- end }}#
 
+#{{- if .Config.AcceptanceTestSuites }}#
+#{{- range $_, $suite := .Config.AcceptanceTestSuites }}#
+
+  acceptance_#{{ $suite.Name }}#:
+    uses: ./.github/workflows/test.yml
+    needs:
+      - prerequisites
+      - build_provider
+#{{- if $suite.NeedsSDKs }}#
+      - build_sdk
+#{{- end }}#
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit
+    with:
+      version: ${{ needs.prerequisites.outputs.version }}
+      suite_root: #{{ $suite.Root | quote }}#
+      shard_count: #{{ $suite.Shards }}#
+      shard_indices: '#{{ until $suite.Shards | toJson }}#'
+      requires_sdks: #{{ $suite.NeedsSDKs }}#
+
+#{{- end }}#
+#{{- else }}#
+
   test:
     uses: ./.github/workflows/test.yml
     needs:
@@ -54,6 +79,8 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerequisites.outputs.version }}
+
+#{{- end }}#
 
 name: cron
 on:

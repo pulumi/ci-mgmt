@@ -124,8 +124,27 @@ integrationTestProvider: false
 # This is unused: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22testPulumiExamples%3A%22&type=code
 testPulumiExamples: false
 
-# How many shared to execute integration tests with. If omitted, shard behavior defaults to language-based sharding.
+# How many shards to execute integration tests with. If omitted, shard behavior defaults to language-based sharding.
+# This legacy option cannot be combined with acceptanceTestSuites.
 shards: 0
+
+# Optionally partition acceptance tests into independently sharded suites according to whether they consume
+# generated SDK artifacts. Suite roots may be files or directories and are shell-safe paths relative to test-folder.
+# Roots must not overlap, so no top-level test is selected by more than one suite; providers remain responsible for
+# covering every intended test. Each root must declare at least as many top-level tests as its shard count; pulumi/shard
+# does not support empty shards for arbitrary roots. requiresSDKs is mandatory. File roots filter which tests run, but
+# Go still compiles sibling files in the package and runs package initialization/TestMain; use separate directories or
+# packages when generated SDKs affect compilation or setup. When configured, these suites replace the legacy
+# language/shards test job in every generated workflow.
+#acceptanceTestSuites:
+#  - name: provider
+#    root: provider-tests
+#    shards: 4
+#    requiresSDKs: false
+#  - name: sdk
+#    root: sdk-smoke
+#    shards: 2
+#    requiresSDKs: true
 
 # runner defines the runs-on property for various stages of the build
 # These are not overridden by any providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22runner%3A%22&type=code
