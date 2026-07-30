@@ -1,48 +1,61 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["github>pulumi/renovate-config//default.json5"],
-  "github-actions": {
-    // Extend our matching to maintain our default action versions.
-    fileMatch: [".*/action-versions\\.ya?ml$"],
-    ignorePaths: ["provider-ci/test-providers/**"],
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'github>pulumi/renovate-config//default.json5',
+  ],
+  'github-actions': {
+    managerFilePatterns: [
+      '/.*/action-versions\\.ya?ml$/',
+    ],
+    ignorePaths: [
+      'provider-ci/test-providers/**',
+    ],
   },
   packageRules: [
     {
-      // Re-generate test workflows in case action versions have been bumped.
-      matchPackageNames: ["*"],
+      matchPackageNames: [
+        '*',
+      ],
       postUpgradeTasks: {
-        commands: ["make build"],
-        executionMode: "branch", // Only run once.
+        commands: [
+          'make build',
+        ],
+        executionMode: 'branch',
       },
     },
     {
-      matchManagers: ["github-actions"],
-      // Automatically submit PRs to bump GitHub actions.
+      matchManagers: [
+        'github-actions',
+      ],
       dependencyDashboardApproval: false,
-      // Only bump to releases older than 7 days since these will include
-      // third-party / untrusted actions.
-      minimumReleaseAge: "7 days",
-    },
-    // Pins
-    {
-      // GoReleases has backwards-incompatible changes in v6.
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["goreleaser/goreleaser-action"],
-      allowedVersions: "^5",
+      minimumReleaseAge: '7 days',
     },
     {
-      // v7 only supports golangci-lint version 2.0 which requires config migration.
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["golangci/golangci-lint-action"],
-      allowedVersions: "^6",
+      matchManagers: [
+        'github-actions',
+      ],
+      matchPackageNames: [
+        'goreleaser/goreleaser-action',
+      ],
+      allowedVersions: '^5',
     },
     {
-      // Until we get our change merged upstream, Renovate should track
-      // pose/chores/better-stack-traces branch instead of main.
-      // See: https://github.com/pulumi/ci-mgmt/issues/1987
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["pose/stale-issue-cleanup"],
-      enabled: false
-    }
+      matchManagers: [
+        'github-actions',
+      ],
+      matchPackageNames: [
+        'golangci/golangci-lint-action',
+      ],
+      allowedVersions: '^6',
+    },
+    {
+      matchManagers: [
+        'github-actions',
+      ],
+      matchPackageNames: [
+        'pose/stale-issue-cleanup',
+      ],
+      enabled: false,
+    },
   ],
 }
