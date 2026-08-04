@@ -219,6 +219,15 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22generate-nightly-test-workflow%3A%22&type=code
 	GenerateNightlyTestWorkflow bool `yaml:"generate-nightly-test-workflow"`
 
+	// MaintenanceBranch is the name of the current long-term-support branch of the
+	// previous major version for this provider, if any.
+	MaintenanceBranch string `yaml:"maintenanceBranch"`
+
+	// MaintenanceReleaseDay is the day of the month the security patch ticket
+	// opens, 1-28. Defaults to 1. Set it per provider so releases do not all land
+	// on the same day; the day the current major shipped is a reasonable choice.
+	MaintenanceReleaseDay int `yaml:"maintenanceReleaseDay"`
+
 	// License lists package paths to ignore when running the license check
 	License struct {
 		Ignore []string `yaml:"ignore"`

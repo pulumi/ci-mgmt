@@ -70,6 +70,10 @@ func GeneratePackage(opts GenerateOpts) error {
 		opts.Config.TestFolder = "examples"
 	}
 
+	if opts.Config.MaintenanceReleaseDay == 0 {
+		opts.Config.MaintenanceReleaseDay = 1
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		err := cleanGithubWorkflows(opts.OutDir, opts.Config.Provider)

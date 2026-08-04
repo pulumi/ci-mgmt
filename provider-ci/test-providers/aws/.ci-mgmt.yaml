@@ -2,6 +2,8 @@ provider: aws
 disableMajorProviderUpgrades: true
 lint: false
 major-version: 7
+maintenanceBranch: v6-security-patch
+maintenanceReleaseDay: 18
 parallel: 1
 shards: 8
 timeout: 150
