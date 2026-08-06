@@ -1,4 +1,5 @@
-SHELL := /bin/bash -o pipefail
+SHELL := /bin/bash
+.SHELLFLAGS := -eo pipefail -c
 NAME ?= all
 PROVIDERS := $(patsubst %/, %, $(wildcard providers/*/))
 PROVIDER_REPOS := $(addsuffix /repo, $(PROVIDERS))
