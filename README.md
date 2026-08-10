@@ -138,13 +138,13 @@ running `make generate_go` deletes the stray file right after gen-sdk emits it, 
 
 ## OpenInspect Setup
 
-Internal provider templates generate default `.openinspect` files so OpenInspect sandboxes have a consistent bootstrap path. The shared `internal` template owns the common setup:
+Internal provider templates generate the `.openinspect` directory so OpenInspect sandboxes have a consistent bootstrap path. The shared `internal` template owns it.
 
-- `.openinspect/settings.json`
-- `.openinspect/setup.py`
-- `.openinspect/README.md`
+The common setup installs and trusts `mise`, then runs optional setup hooks from `.openinspect/setup.d/*.py` and `.openinspect/setup.local.py`. `start.py` runs the equivalent hooks from `.openinspect/start.d/*.py` and `.openinspect/start.local.py`. More specific templates can add generated hooks under either directory; for example, `internal-bridged` adds a setup hook that runs `make prepare_local_workspace`.
 
-The common setup installs and trusts `mise`, then runs optional setup hooks from `.openinspect/setup.d/*.py` and `.openinspect/setup.local.py`. More specific templates can add generated hooks under `setup.d`; for example, `internal-bridged` adds a hook that runs `make prepare_local_workspace`.
+Setup and start answer different questions, and neither implies the other. Setup runs when an image is built, and on a fresh boot with no image — it is what gets baked. Start runs on every session boot except image builds — it is what has to be true for the session in front of you. A fresh session with no image is the only case where both run.
+
+Their time budgets differ accordingly — setup gets a long one, start a short one — so expensive work belongs in `setup.d` and `start.d` should stay a quick session entrypoint. See the generated `.openinspect/README.md` for the hook-authoring details, including the stdout trap that makes a backgrounded process look like a hung start hook.
 
 Provider repositories should not edit generated `.openinspect` files directly. To customize generated settings, add values to `.ci-mgmt.yaml`:
 
@@ -154,7 +154,7 @@ openinspect:
     exampleField: exampleValue
 ```
 
-To customize setup behavior, add provider-owned hook files such as `.openinspect/setup.local.py` or `.openinspect/setup.d/90-provider-setup.py`.
+To customize setup or start behavior, add provider-owned hook files such as `.openinspect/setup.local.py`, `.openinspect/setup.d/90-provider-setup.py`, or their `start` equivalents. A failed start hook is fatal to the session, so a hook whose failure the session can survive should catch its own errors.
 
 ## Updating All Bridged Providers
 

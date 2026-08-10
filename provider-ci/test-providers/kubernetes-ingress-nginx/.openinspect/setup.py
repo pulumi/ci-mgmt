@@ -62,8 +62,20 @@ def phase(name: str, description: str = ""):
         _current_phase = prev
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-OPENINSPECT_DIR = REPO_ROOT / ".openinspect"
+# Resolved once, here, and exported for every hook this script runs, so no hook
+# has to count directories up from its own location. The sandbox runs this with
+# the checkout as the working directory.
+REPO_ROOT = Path.cwd()
+OPENINSPECT_ROOT = REPO_ROOT / ".openinspect"
+if not OPENINSPECT_ROOT.is_dir():
+    # Without this the script dispatches nothing and still exits 0, which reads
+    # as "no hooks configured" rather than "run from the wrong directory".
+    sys.exit(f"run this from the repository root; {OPENINSPECT_ROOT} does not exist")
+os.environ["REPO_ROOT"] = str(REPO_ROOT)
+os.environ["OPENINSPECT_ROOT"] = str(OPENINSPECT_ROOT)
+# Hooks import sibling modules by path; without this CPython litters the
+# checkout with __pycache__, which the generated .gitignore does not cover.
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 
 
 def run(cmd, **kwargs):
@@ -106,13 +118,13 @@ def run_hook(path: Path):
 
 
 def run_setup_hooks():
-    hooks_dir = OPENINSPECT_DIR / "setup.d"
+    hooks_dir = OPENINSPECT_ROOT / "setup.d"
     if hooks_dir.exists():
         for hook in sorted(hooks_dir.glob("*.py")):
             with phase("hook", f"Run {hook.relative_to(REPO_ROOT)}"):
                 run_hook(hook)
 
-    local_hook = OPENINSPECT_DIR / "setup.local.py"
+    local_hook = OPENINSPECT_ROOT / "setup.local.py"
     if local_hook.exists():
         with phase("hook", f"Run {local_hook.relative_to(REPO_ROOT)}"):
             run_hook(local_hook)
