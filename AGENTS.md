@@ -333,7 +333,8 @@ Before creating a PR, ensure:
 4. ✓ **Test providers updated**: All 15 test providers regenerate deterministically
 5. ✓ **Diffs reviewed**: Check generated workflow diffs in `test-providers/`
 6. ✓ **Migrations tested**: If adding migration, test against real provider locally
-7. ✓ **Docs updated**: If making large changes or refactors, update CLAUDE.md (and AGENTS.md, which is a symlink to it) to reflect new architecture
+7. ✓ **Real providers verified**: If the change alters generated workflow behavior (as opposed to a pure refactor that produces no diff in `test-providers/`), generate provider PRs from your branch and report their check results in the PR body. See [Verification Against Real Providers](#verification-against-real-providers)
+8. ✓ **Docs updated**: If making large changes or refactors, update CLAUDE.md (and AGENTS.md, which is a symlink to it) to reflect new architecture
 
 ### What Each Test Validates
 
@@ -357,6 +358,34 @@ Before creating a PR, ensure:
 - Deploy to xyz and pulumi-provider-boilerplate test repos
 - Run full provider CI pipeline
 - Verify tests pass with generated workflows
+
+### Verification Against Real Providers
+
+`make all` proves that generation is deterministic and that the YAML is well formed. It does not prove that the generated workflows pass CI, because the fixtures under `provider-ci/test-providers/` are never executed by any CI system. For changes that alter generated workflow behavior, verify against real provider repos by generating provider PRs straight from your ci-mgmt branch:
+
+```bash
+gh workflow run update-workflows-single-bridged-provider.yml \
+  --ref <your-ci-mgmt-branch> \
+  -f provider_name=<name without the pulumi- prefix> \
+  -f automerge=false
+```
+
+That workflow delegates to `update-workflows.yml`, which checks out ci-mgmt at the dispatched ref, runs `go run ./... generate` against the real provider repo, and opens a PR there via `peter-evans/create-pull-request`. The CI on that PR then runs your candidate templates for real. Despite the "bridged" in the workflow name, it works for native providers too.
+
+**Choosing providers:**
+- Pick providers that actually exercise the changed template path.
+- Cover both a bridged and a native provider when the change touches shared ground.
+- Say which provider covers which edit, so a reviewer can see the coverage is real.
+
+**Reporting results:**
+- Wait for the checks to finish, including the `Sentinel` job.
+- Report per-provider results in the ci-mgmt PR body. Mirror the "Verification against real providers" section of pulumi/ci-mgmt#2415, which is the canonical worked example: a table of provider, type, PR link, and the specific check that matters.
+- Close the verification PRs afterwards. They exist only as evidence and are not meant to merge.
+- The `downstream` job on the ci-mgmt PR is not evidence in either direction, see pulumi/ci-mgmt#2416. Do not cite it as verification.
+
+**Expect this side effect**: `update-workflows.yml` runs a "Close obsolete PRs started by this workflow" step that closes every open PR in the target repo whose title matches `/Update GitHub Actions workflows/i`. A pending nightly rollout PR in that repo will therefore be closed by your run. The nightly job recreates it, so nothing is lost, but do not be surprised by it.
+
+**Coverage limit**: a PR-triggered run only exercises jobs that run on `pull_request`. Steps confined to push or tag events, such as publishing and releasing, are not covered. State that gap explicitly in the ci-mgmt PR body rather than leaving it implicit.
 
 ### Test Providers
 
