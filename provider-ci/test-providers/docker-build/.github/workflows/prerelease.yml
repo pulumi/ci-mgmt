@@ -13,6 +13,8 @@ env:
   PYTHONVERSION: "3.11.15"
   DOTNETVERSION: "8.0.x"
   JAVAVERSION: "11"
+  MISE_ENV: test
+  GO_TEST_EXEC: "gotestsum --format github-actions --"
   ARM_CLIENT_ID: 30e520fa-12b4-4e21-b473-9426c5ac2e1e
   ARM_SUBSCRIPTION_ID: 0282681f-7a9e-424b-80b2-96babd57a8a1
   ARM_TENANT_ID: 706143bc-e1d4-4593-aee2-c9dc60ab9be7
@@ -338,16 +340,11 @@ jobs:
       uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       with:
         install_components: gke-gcloud-auth-plugin
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        version: v2.5.0
-        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Run tests
       run: >-
         set -euo pipefail
 
-        cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+        cd examples && $GO_TEST_EXEC -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
         ARM_CLIENT_SECRET: ${{ steps.esc-secrets.outputs.ARM_CLIENT_SECRET }}
         DIGITALOCEAN_TOKEN: ${{ steps.esc-secrets.outputs.DIGITALOCEAN_TOKEN }}

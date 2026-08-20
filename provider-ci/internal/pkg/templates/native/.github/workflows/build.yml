@@ -22,6 +22,8 @@ env:
   PYTHONVERSION: #{{ .Config.ToolVersions.Python | quote }}#
   DOTNETVERSION: #{{ .Config.ToolVersions.Dotnet | quote }}#
   JAVAVERSION: #{{ .Config.ToolVersions.Java | quote }}#
+  MISE_ENV: test
+  GO_TEST_EXEC: "gotestsum --format github-actions --"
 #{{ .Config | renderPublishEnv | indent 2 }}#
 
 jobs:
@@ -408,11 +410,6 @@ jobs:
       with:
         install_components: gke-gcloud-auth-plugin
     #{{- end }}#
-    - name: Install gotestfmt
-      uses: GoTestTools/gotestfmt-action@v2
-      with:
-        version: v2.5.0
-        token: ${{ secrets.GITHUB_TOKEN }}
     #{{- if eq .Config.Provider "kubernetes-cert-manager" }}#
     - name: Setup KinD cluster
       uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0
@@ -435,7 +432,7 @@ jobs:
     #{{- end }}#
     #{{- if eq .Config.Provider "kubernetes" }}#
     - name: Run tests
-      run: cd tests/sdk/${{ matrix.language }} && go test -v -count=1 -cover -timeout
+      run: cd tests/sdk/${{ matrix.language }} && $GO_TEST_EXEC -v -count=1 -cover -timeout
         2h -parallel 4 ./...
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
@@ -444,7 +441,7 @@ jobs:
       run: >-
         set -euo pipefail
 
-        cd examples && go test -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
+        cd examples && $GO_TEST_EXEC -count=1 -cover -timeout 2h -tags=${{ matrix.language }} -parallel 4 .
       env:
 #{{ .Config | renderLocalEnv | indent 8 }}#
     #{{- end }}#
