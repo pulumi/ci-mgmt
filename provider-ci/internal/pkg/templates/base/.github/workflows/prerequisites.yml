@@ -84,6 +84,13 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         # only saving the cache in the prerequisites job
         cache_save: true
+#{{- if .Config.FullGoCache }}#
+    - name: Setup Go cache
+      uses: ./.github/actions/setup-go-cache
+      with:
+        cache-key: prerequisites
+        prime-modules: true
+#{{- else }}#
     #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
     - name: Setup Go Cache
       if: inputs.acceptance_fanout
@@ -114,6 +121,7 @@ jobs:
           sdk/*.sum
           *.sum
     #{{- end }}#
+#{{- end }}#
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:

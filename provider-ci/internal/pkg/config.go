@@ -175,6 +175,10 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22goBuildParallelism%22&type=code
 	GoBuildParallelism int `yaml:"goBuildParallelism"`
 
+	// FullGoCache enables the shared Go module and build cache strategy in generated
+	// bridged-provider workflows. It does not configure repository cache storage.
+	FullGoCache bool `yaml:"fullGoCache"`
+
 	// PulumiConvert sets PULUMI_CONVERT to 1 if truthy. PulumiConvert is set
 	// to "1" in 74 providers:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22pulumiConvert%22&type=code

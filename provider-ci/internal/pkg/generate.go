@@ -208,6 +208,9 @@ func getConfigDeletedFiles(config Config) []string {
 		filepath.Join(".github", "workflows", "shared", "review.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
 	}
+	if !config.FullGoCache {
+		deletedFiles = append(deletedFiles, filepath.Join(".github", "actions", "setup-go-cache", "action.yml"))
+	}
 	return deletedFiles
 }
 
