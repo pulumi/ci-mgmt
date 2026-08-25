@@ -186,7 +186,7 @@ build_go: .make/build_go
 	@touch $@
 #{{- end }}#
 .make/build_go: .make/generate_go
-	cd sdk && go list "$$(grep -e "^module" go.mod | cut -d ' ' -f 2)/go/..." | xargs -I {} bash -c 'go build {} && go clean -i {}'
+	cd sdk && go build ./go/...
 	@touch $@
 .PHONY: generate_go build_go
 
