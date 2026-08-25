@@ -17,10 +17,6 @@ inputs:
     description: Download dependencies for the checked-out Go modules before saving the module cache
     required: false
     default: "false"
-  save:
-    description: Save caches when the job succeeds
-    required: false
-    default: "true"
 
 runs:
   using: composite
@@ -52,17 +48,7 @@ runs:
         rm -rf -- "$MODULE_CACHE"
 
     - name: Restore and save Go module cache
-      if: inputs.save == 'true'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-      with:
-        path: ${{ steps.cache-config.outputs.module-cache }}
-        key: go-mod-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          go-mod-v2-${{ runner.os }}-${{ runner.arch }}-
-
-    - name: Restore Go module cache
-      if: inputs.save != 'true'
-      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
         path: ${{ steps.cache-config.outputs.module-cache }}
         key: go-mod-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/go.sum') }}
@@ -82,18 +68,7 @@ runs:
         done < <(find . -type f -name go.sum -not -path './.git/*' -print0 | sort -z)
 
     - name: Restore and save Go build cache
-      if: inputs.save == 'true'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
-      with:
-        path: ${{ steps.cache-config.outputs.build-cache }}
-        key: go-build-v2-${{ steps.cache-config.outputs.target-os }}-${{ steps.cache-config.outputs.target-arch }}-${{ steps.cache-config.outputs.go-version }}-${{ inputs.cache-key }}-${{ hashFiles('**/*.go', '**/go.sum') }}
-        restore-keys: |
-          go-build-v2-${{ steps.cache-config.outputs.target-os }}-${{ steps.cache-config.outputs.target-arch }}-${{ steps.cache-config.outputs.go-version }}-${{ inputs.cache-key }}-
-          go-build-v2-${{ steps.cache-config.outputs.target-os }}-${{ steps.cache-config.outputs.target-arch }}-${{ steps.cache-config.outputs.go-version }}-
-
-    - name: Restore Go build cache
-      if: inputs.save != 'true'
-      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
         path: ${{ steps.cache-config.outputs.build-cache }}
         key: go-build-v2-${{ steps.cache-config.outputs.target-os }}-${{ steps.cache-config.outputs.target-arch }}-${{ steps.cache-config.outputs.go-version }}-${{ inputs.cache-key }}-${{ hashFiles('**/*.go', '**/go.sum') }}

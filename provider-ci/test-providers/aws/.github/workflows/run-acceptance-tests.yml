@@ -173,10 +173,6 @@ jobs:
         version: 2026.3.7
         github_token: ${{ steps.app-auth.outputs.token }}
         cache_save: false
-    - name: Setup Go cache
-      uses: ./.github/actions/setup-go-cache
-      with:
-        cache-key: schema
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:

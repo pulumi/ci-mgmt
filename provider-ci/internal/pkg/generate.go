@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"text/template"
 
@@ -95,6 +96,13 @@ func GeneratePackage(opts GenerateOpts) error {
 		}
 	}
 	for _, deletedFile := range getConfigDeletedFiles(opts.Config) {
+		err = os.RemoveAll(filepath.Join(opts.OutDir, deletedFile))
+		if err != nil {
+			return fmt.Errorf("error deleting file %s: %w", deletedFile, err)
+		}
+	}
+	if !opts.Config.FullGoCache && slices.Contains(templateDirs, base) {
+		deletedFile := filepath.Join(".github", "actions", "setup-go-cache", "action.yml")
 		err = os.RemoveAll(filepath.Join(opts.OutDir, deletedFile))
 		if err != nil {
 			return fmt.Errorf("error deleting file %s: %w", deletedFile, err)
@@ -207,9 +215,6 @@ func getConfigDeletedFiles(config Config) []string {
 		".github/workflows/gh-aw-pr-review.md",
 		filepath.Join(".github", "workflows", "shared", "review.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
-	}
-	if !config.FullGoCache {
-		deletedFiles = append(deletedFiles, filepath.Join(".github", "actions", "setup-go-cache", "action.yml"))
 	}
 	return deletedFiles
 }

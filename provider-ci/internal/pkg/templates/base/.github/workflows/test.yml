@@ -52,7 +52,6 @@ jobs:
         private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
         owner: ${{ github.repository_owner }}
 #{{- end }}#
-#{{- if not .Config.FullGoCache }}#
     - name: Checkout p/examples
       #{{- if not .Config.Shards }}#
       if: matrix.testTarget == 'pulumiExamples'
@@ -61,7 +60,6 @@ jobs:
       with:
         repository: pulumi/examples
         path: p-examples
-#{{- end }}#
     - name: Setup mise
       uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
       env:
@@ -72,28 +70,6 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         # also save this cache since we are using a different mise env.
         cache_save: true
-#{{- if .Config.FullGoCache }}#
-    - name: Setup Go cache
-      #{{- if not .Config.Shards }}#
-      if: matrix.language == 'go' || contains(matrix.language, 'go')
-      #{{- end }}#
-      uses: ./.github/actions/setup-go-cache
-      with:
-        cache-key: integration-tests
-        #{{- if .Config.Shards }}#
-        save: ${{ matrix.current-shard == 0 }}
-        #{{- end }}#
-#{{- end }}#
-#{{- if .Config.FullGoCache }}#
-    - name: Checkout p/examples
-      #{{- if not .Config.Shards }}#
-      if: matrix.testTarget == 'pulumiExamples'
-      #{{- end }}#
-      uses: #{{ .Config.ActionVersions.Checkout }}#
-      with:
-        repository: pulumi/examples
-        path: p-examples
-#{{- end }}#
     - name: Prepare local workspace
       run: make prepare_local_workspace
       env:
