@@ -76,7 +76,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Download bin
       uses: ./.github/actions/download-provider
-    #{{- if not .Config.Shards }}#
+#{{- if not .Config.Shards }}#
     - name: Setup Go Cache
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
       if: matrix.language == 'go' || contains(matrix.language, 'go')
@@ -87,6 +87,8 @@ jobs:
           sdk/go/*.sum
           sdk/*.sum
           *.sum
+#{{- end }}#
+    #{{- if not .Config.Shards }}#
     - name: Download SDK
       uses: ./.github/actions/download-sdk
       with:
