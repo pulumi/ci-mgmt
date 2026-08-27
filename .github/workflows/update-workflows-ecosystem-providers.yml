@@ -34,8 +34,16 @@ jobs:
       - id: get-providers
         run: echo "providers=$(jq . providers.json --compact-output)" >> "$GITHUB_OUTPUT"
         working-directory: provider-ci
+      # Flatten the provider to branches map in tracked-branches.json into a
+      # flat list of {provider, branch} objects, one per extra branch, so it can
+      # be consumed directly as a matrix include.
+      - id: get-tracked-branches
+        run: |
+          echo "tracked_branches=$(jq '[to_entries[] | .key as $provider | .value[] | {provider: $provider, branch: .}]' tracked-branches.json --compact-output)" >> "$GITHUB_OUTPUT"
+        working-directory: provider-ci
     outputs:
       providers: ${{ steps.get-providers.outputs.providers }}
+      tracked_branches: ${{ steps.get-tracked-branches.outputs.tracked_branches }}
   deploy:
     needs: generate-providers-list
     strategy:
@@ -50,6 +58,29 @@ jobs:
     secrets: inherit
     with:
       provider_name: ${{ matrix.provider }}
+      automerge: ${{ github.event.inputs.automerge == 'true' || github.event_name == 'schedule' }}
+      caller_workflow: update-workflows-ecosystem-providers
+      called_by: "@${{ github.actor }}"
+  # The deploy job above updates each provider's default branch. This one
+  # additionally updates the long lived branches listed in
+  # provider-ci/tracked-branches.json, so they do not drift from current tooling
+  # while they are open.
+  deploy-tracked-branches:
+    needs: generate-providers-list
+    if: needs.generate-providers-list.outputs.tracked_branches != '[]'
+    strategy:
+      fail-fast: false
+      # GitHub recommends only issuing 1 API request per second, and never
+      # concurrently.  For more information, see:
+      # https://docs.github.com/en/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits
+      max-parallel: 1
+      matrix:
+        include: ${{ fromJson(needs.generate-providers-list.outputs.tracked_branches ) }}
+    uses: ./.github/workflows/update-workflows.yml
+    secrets: inherit
+    with:
+      provider_name: ${{ matrix.provider }}
+      tracking_branch_name: ${{ matrix.branch }}
       automerge: ${{ github.event.inputs.automerge == 'true' || github.event_name == 'schedule' }}
       caller_workflow: update-workflows-ecosystem-providers
       called_by: "@${{ github.actor }}"
