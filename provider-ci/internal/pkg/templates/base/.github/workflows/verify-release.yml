@@ -80,12 +80,6 @@ jobs:
           version: #{{ .Config.MiseVersion }}#
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache_save: false
-#{{- if .Config.FullGoCache }}#
-      - name: Setup Go cache
-        uses: ./.github/actions/setup-go-cache
-        with:
-          cache-key: verify-release
-#{{- else }}#
       - name: Setup Go Cache
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:
@@ -95,7 +89,6 @@ jobs:
             sdk/go/*.sum
             sdk/*.sum
             *.sum
-#{{- end }}#
 #{{- if .Config.ReleaseVerification }}#
       #{{- if .Config.AWS }}#
       - name: Generate Pulumi Access Token

@@ -103,12 +103,6 @@ jobs:
         version: #{{ .Config.MiseVersion }}#
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         cache_save: false
-#{{- if .Config.FullGoCache }}#
-    - name: Setup Go cache
-      uses: ./.github/actions/setup-go-cache
-      with:
-        cache-key: test-provider
-#{{- else }}#
     - name: Restore Go Cache
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
@@ -116,7 +110,6 @@ jobs:
           ~/go/pkg/mod
           ~/.cache/go-build
         key: ${{ runner.os }}-go-prerequisites-${{ hashFiles('provider/*.sum', 'upstream/*.sum', 'sdk/go/*.sum', 'sdk/*.sum', '*.sum') }}
-#{{- end }}#
     - name: Prepare local workspace
       run: make prepare_local_workspace
       env:
@@ -189,7 +182,6 @@ jobs:
         version: #{{ .Config.MiseVersion }}#
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         cache_save: false
-#{{- if not .Config.FullGoCache }}#
     - name: Restore Go Cache
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
@@ -197,7 +189,6 @@ jobs:
           ~/go/pkg/mod
           ~/.cache/go-build
         key: ${{ runner.os }}-go-prerequisites-${{ hashFiles('provider/*.sum', 'upstream/*.sum', 'sdk/go/*.sum', 'sdk/*.sum', '*.sum') }}
-#{{- end }}#
     - name: Prepare local workspace before restoring previously built files
       run: make prepare_local_workspace
       env:
