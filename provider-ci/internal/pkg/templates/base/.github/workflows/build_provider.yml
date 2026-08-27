@@ -78,14 +78,6 @@ jobs:
           github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
           # only saving the cache in the prerequisites job
           cache_save: false
-#{{- if .Config.FullGoCache }}#
-      - name: Setup Go cache
-        uses: ./.github/actions/setup-go-cache
-        with:
-          cache-key: provider
-          target-os: ${{ matrix.platform.os }}
-          target-arch: ${{ matrix.platform.arch }}
-#{{- else }}#
       # Based on https://github.com/actions/cache/blob/main/examples.md#go---modules
       - name: Get GOCACHE
         id: gocache
@@ -106,7 +98,6 @@ jobs:
           key: go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-${{ hashFiles('#{{ .Config.ModulePath }}#/go.sum') }}
           restore-keys: |
             go-provider-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-
-#{{- end }}#
       - name: Prepare local workspace before restoring previously built
         run: make prepare_local_workspace
         env:
