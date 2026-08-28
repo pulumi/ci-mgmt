@@ -16,6 +16,11 @@ name: Update GH workflows, single provider
         required: true
         type: boolean
         default: false
+      tracking_branch_name:
+        description: Branch of the provider repo to update. Leave empty for the repository's default branch.
+        required: false
+        type: string
+        default: ''
 env:
   ESC_ACTION_OIDC_AUTH: true
   ESC_ACTION_OIDC_ORGANIZATION: pulumi
@@ -31,3 +36,4 @@ jobs:
       automerge: ${{ github.event.inputs.automerge == 'true' }}
       caller_workflow: "update-workflows-single-bridged-provider"
       called_by: "@${{ github.actor }}"
+      tracking_branch_name: ${{ github.event.inputs.tracking_branch_name }}

@@ -425,6 +425,7 @@ The 15 test providers in `provider-ci/test-providers/`:
 - `.github/workflows/update-workflows-ecosystem-providers.yml` - Nightly all-provider updates
 - `.github/workflows/update-workflows-single-bridged-provider.yml` - Manual single provider updates
 - `provider-ci/providers.json` - Inventory of managed providers (~86 as of early 2026)
+- `provider-ci/tracked-branches.json` - Extra long lived provider branches to update alongside each default branch
 
 ### Common Tasks
 
