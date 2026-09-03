@@ -126,6 +126,13 @@ type Config struct {
 	// the examples directory when set to true. Defaults to false.
 	IntegrationTestProvider bool `yaml:"integrationTestProvider"`
 
+	// DisableIntegrationTests replaces the body of the "test" job with a no-op
+	// when set to true. The job is kept rather than removed so that the
+	// workflows declaring `needs: test` stay green. Intended for LTS branches
+	// whose acceptance tests can no longer run. Unit tests are unaffected:
+	// they run from prerequisites.yml.
+	DisableIntegrationTests bool `yaml:"disableIntegrationTests"`
+
 	// TestPulumiExamples runs e2e tests using the examples and test suite in
 	// the pulumi/examples repo when set to true. Defaults to false. This is
 	// unused but potentially useful for azure-native onboarding:
