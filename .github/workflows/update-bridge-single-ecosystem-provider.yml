@@ -32,7 +32,7 @@ jobs:
         uses: pulumi/esc-action@32dda43ffe7a2ab21e6bce11c781b44a3e5623cf # v3
       - name: pulumi-${{ github.event.inputs.provider }} main
         id: upgrade-on-main
-        uses: benc-uk/workflow-dispatch@31e2b3319479a63f0ab15bf800eff9e913504e26 # v1.3.2
+        uses: benc-uk/workflow-dispatch@d004979be141727c7a17c28f603e2facc40d0855 # v1.3.3
         continue-on-error: true
         with:
           workflow: upgrade-bridge.yml
@@ -42,7 +42,7 @@ jobs:
       - name: pulumi-${{ github.event.inputs.provider }} master
         id: upgrade-on-master
         if: steps.upgrade-on-main.outcome == 'failure'
-        uses: benc-uk/workflow-dispatch@31e2b3319479a63f0ab15bf800eff9e913504e26 # v1.3.2
+        uses: benc-uk/workflow-dispatch@d004979be141727c7a17c28f603e2facc40d0855 # v1.3.3
         with:
           workflow: upgrade-bridge.yml
           token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
