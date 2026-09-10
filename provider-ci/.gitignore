@@ -1,2 +1,4 @@
 bin/
+!internal/pkg/templates/base/bin/
+!internal/pkg/templates/base/bin/mise
 providers/*/repo
