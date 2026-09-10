@@ -427,6 +427,16 @@ func renderOpenInspectSettings(v any) (string, error) {
 	return string(data), nil
 }
 
+// trimActionComment returns just the action reference from an action-versions
+// entry, dropping the trailing "# vX.Y.Z" comment Renovate maintains alongside
+// the pinned SHA. Templates interpolate these entries directly into YAML, where
+// the comment stays a comment, but a step built in Go is marshalled as a scalar
+// and would otherwise carry the comment text into the value itself.
+func trimActionComment(uses string) string {
+	ref, _, _ := strings.Cut(uses, "#")
+	return strings.TrimSpace(ref)
+}
+
 // renderESCStep generates either the real ESC action or our shim action which
 // re-exports the existing environment.
 func renderESCStep(v any) (string, error) {
@@ -454,7 +464,7 @@ func renderESCStep(v any) (string, error) {
 	step := map[string]any{
 		"name": "Fetch secrets from ESC",
 		"id":   "esc-secrets",
-		"uses": "pulumi/esc-action@9eb774255b1a4afb7855678ae8d4a77359da0d9b",
+		"uses": trimActionComment(config.ActionVersions.ESCAction),
 		"env":  env,
 	}
 	return yaml(step)
