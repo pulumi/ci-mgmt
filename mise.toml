@@ -1,6 +1,6 @@
 [tools]
 go = '1.26.4'
-golangci-lint = '2.12.2'
+golangci-lint = '2.13.2'
 node = '24.1.0'
 "github:pulumi/pulumi" = '3.263.0'
 yarn = '1.22.22'
