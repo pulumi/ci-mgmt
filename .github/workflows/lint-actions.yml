@@ -28,7 +28,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@c6a35e2d7dc8cf1493e7465af7460b4748cd4806
         with:
-          version: 2026.3.7
+          version: 2026.9.4
           install: false
       - name: Install actionlint and shellcheck
         run: mise install actionlint shellcheck
