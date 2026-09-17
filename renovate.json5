@@ -23,6 +23,12 @@
       // third-party / untrusted actions.
       minimumReleaseAge: "7 days",
     },
+    {
+      // Keep the linter current as providers adopt new Go versions.
+      matchManagers: ["mise"],
+      matchDepNames: ["golangci-lint"],
+      dependencyDashboardApproval: false,
+    },
     // Pins
     {
       // GoReleases has backwards-incompatible changes in v6.
