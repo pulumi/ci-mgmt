@@ -29,7 +29,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
         with:
-          version: 2026.9.7
+          version: 2026.9.8
 
       - name: Install dependencies
         working-directory: infra/providers
