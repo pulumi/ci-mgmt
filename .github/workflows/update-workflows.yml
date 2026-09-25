@@ -82,7 +82,7 @@ jobs:
       - name: Install mise
         uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
         with:
-          version: 2026.9.10
+          version: 2026.9.11
           install_args: go golangci-lint
           cache_key_prefix: mise-v0-${{ inputs.provider_name}}-
           working_directory: pulumi-${{ inputs.provider_name }}
