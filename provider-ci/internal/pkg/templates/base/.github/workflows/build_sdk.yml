@@ -173,4 +173,104 @@ jobs:
         uses: ./.github/actions/upload-sdk
         with:
           language: ${{ matrix.language }}
+#{{- if .Config.RenovateCmd }}#
+
+  # Regenerate the files that a dependency bump invalidates but that the
+  # per-language SDK build above does not cover, principally lock files. This
+  # replaces a Renovate `postUpgradeTasks` hook: doing it here keeps repo code
+  # off the Renovate workers, and turns a failure into a visible job rather
+  # than a warning that silently ships a half-updated PR.
+  #
+  # Not a matrix job, and no `needs:` on build_sdk. It races the language jobs
+  # deliberately; they commit under sdk/ and this commits everything else, so
+  # the paths are disjoint and the retry loop below reconciles the pushes.
+  renovate_artifacts:
+    name: renovate_artifacts
+    if: contains(github.actor, 'renovate') && github.event_name == 'pull_request'
+    runs-on: #{{ if .Config.Runner.BuildSDK }}##{{- .Config.Runner.BuildSDK }}##{{ else }}##{{- .Config.Runner.Default }}##{{ end }}#
+    permissions:
+      contents: write # To push the regenerated files back to the PR.
+      id-token: write # For ESC secrets.
+    steps:
+      - name: Checkout Repo
+        uses: #{{ .Config.ActionVersions.Checkout }}#
+        with:
+          #{{- if .Config.CheckoutSubmodules }}#
+          submodules: #{{ .Config.CheckoutSubmodules }}#
+          #{{- end }}#
+          persist-credentials: false
+      #{{- .Config | renderEscStep | indent 6 }}#
+      # Always the bot token, unlike build_sdk above, which prefers the
+      # GitHub App token when one is configured. This job does not render the
+      # app-auth step, so `steps.app-auth` does not exist here. The bot token
+      # is what pushes the commit in either case.
+      - name: Setup mise
+        uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+        env:
+          MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
+        with:
+          version: #{{ .Config.MiseVersion }}#
+          github_token: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+          cache_save: false
+      - name: Prepare local workspace
+        run: make prepare_local_workspace
+        env:
+          GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
+      - name: Download prerequisites
+        uses: ./.github/actions/download-prerequisites
+      - name: Update path
+        run: echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+      - name: Restore makefile progress
+        run: make --touch provider schema
+      - name: Regenerate Renovate artifacts
+        run: make renovate
+
+      - name: Commit regenerated artifacts for Renovate
+        shell: bash
+        run: |
+          git config --global user.email "bot@pulumi.com"
+          git config --global user.name "pulumi-bot"
+
+          # Stash local changes and check out the PR's branch directly. Fetch
+          # only that ref: a bare fetch pulls every branch in the repo, and
+          # on-demand submodule recursion then tries to resolve the submodule
+          # gitlink of every commit it pulls, including long-dead branches
+          # pointing at commits the submodule's remote no longer serves.
+          git stash
+          git fetch --no-recurse-submodules origin "+refs/heads/$HEAD_REF:refs/remotes/origin/$HEAD_REF"
+          git checkout "origin/$HEAD_REF"
+          git stash pop
+
+          # Everything except the paths build_sdk owns, so the two jobs never
+          # touch the same file and their commits rebase cleanly past each other.
+          git add -A -- ':!sdk' ':!provider/cmd/pulumi-resource-#{{ .Config.Provider }}#/schema.json'
+          if git diff --cached --quiet; then
+            echo "No regenerated artifacts to commit."
+            exit 0
+          fi
+          git commit -m 'Commit regenerated artifacts for Renovate'
+
+          # Push with pulumi-bot credentials to trigger a re-run of the
+          # workflow. https://github.com/orgs/community/discussions/25702
+          for attempt in 1 2 3; do
+            if git push https://pulumi-bot:${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}@github.com/${{ github.repository }} \
+                "HEAD:$HEAD_REF"; then
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt); rebasing onto the current tip."
+            git fetch --no-recurse-submodules origin "+refs/heads/$HEAD_REF:refs/remotes/origin/$HEAD_REF"
+            # --autostash because the always-changing files left modified above
+            # would otherwise make rebase refuse a dirty tree.
+            if ! git rebase --autostash "refs/remotes/origin/$HEAD_REF"; then
+              echo "::error::Rebase onto $HEAD_REF failed; the regenerated artifacts must be committed by hand."
+              exit 1
+            fi
+          done
+          echo "::error::Could not push the regenerated artifacts after 3 attempts."
+          exit 1
+        env:
+          # head_ref is untrusted so it's recommended to pass via env var to
+          # avoid injections.
+          HEAD_REF: ${{ github.head_ref }}
+#{{- end }}#
 #{{ end -}}#
