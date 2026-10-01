@@ -57,6 +57,10 @@ providerDefaultBranch: master
 # This is disabled in 5 repos: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publishRegistry%3A%22&type=code
 publishRegistry: true
 
+# npmTrustedPublishing publishes npm packages with GitHub Actions OIDC instead of NODE_AUTH_TOKEN.
+# Keep this disabled until each npm package is configured for trusted publishing.
+npmTrustedPublishing: false
+
 # checkoutSubmodules is used for all checkouts during CI
 # Only 3 providers use submodules: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22checkoutSubmodules%3A%22&type=code
 checkoutSubmodules: false
