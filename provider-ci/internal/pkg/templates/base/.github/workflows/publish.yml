@@ -180,7 +180,7 @@ jobs:
       with:
         sdk: #{{ .Config.Publish.SDK }}#
         version: ${{ inputs.version }}
-        npmTokenPublishing: #{{ not .Config.NPMTrustedPublishing }}#
+        npmTrustedPublishing: #{{ .Config.NPMTrustedPublishing }}#
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
@@ -201,7 +201,7 @@ jobs:
       with:
         sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}
-        npmTokenPublishing: #{{ not .Config.NPMTrustedPublishing }}#
+        npmTrustedPublishing: #{{ .Config.NPMTrustedPublishing }}#
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
