@@ -2,18 +2,7 @@
 
 name: main # For consistency with bridged providers.
 on:
-  push:
-    branches:
-    - master
-    - main
-    - feature-**
-    paths-ignore:
-    - CHANGELOG.md
-    tags-ignore:
-    - v*
-    - sdk/*
-    - "**"
-  workflow_dispatch: {}
+  workflow_call: {}
 env:
   PROVIDER: aws-native
   TRAVIS_OS_NAME: linux
@@ -32,6 +21,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.repository == 'pulumi/pulumi-aws-native'
     runs-on: ubuntu-latest
     name: prerequisites
     permissions:
