@@ -181,7 +181,7 @@ jobs:
       with:
         sdk: all
         version: ${{ inputs.version }}
-        npmTokenPublishing: true
+        npmTrustedPublishing: false
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
@@ -198,7 +198,7 @@ jobs:
       with:
         sdk: all,!java
         version: ${{ inputs.version }}
-        npmTokenPublishing: true
+        npmTrustedPublishing: false
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
