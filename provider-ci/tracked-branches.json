@@ -1,3 +1,4 @@
 {
-    "gcp": ["upgrade-to-v10-major"]
+    "gcp": ["upgrade-to-v10-major"],
+    "azuread": ["v5"]
 }
