@@ -498,6 +498,9 @@ type publish struct {
 	PublisherAction string `yaml:"publisherAction"`
 	SDK             string `yaml:"sdk"`
 	CDN             bool   `yaml:"cdn"`
+	// NpmDistTag, when set, is added as an npm dist-tag to every stable
+	// release of the Node.js SDK, e.g. latest-v9 on a maintenance branch.
+	NpmDistTag string `yaml:"npmDistTag"`
 }
 
 func loadDefaultConfig() (Config, error) {
