@@ -1,3 +1,3 @@
 {
-    "gcp": ["upgrade-to-v10-major"]
+    "gcp": ["v9"]
 }
