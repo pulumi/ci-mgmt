@@ -146,7 +146,7 @@ publish:
   cdn: true
   # Extra npm dist-tag added to each stable release of the Node.js SDK. Set it
   # on a maintenance branch (e.g. latest-v9) so the old major stays installable
-  # by tag while `latest` tracks the current major.
+  # by tag while `latest` tracks the current major. Requires nodejs in `sdk`.
   npmDistTag: ""
 
 # Enables automatic registry index doc file generation. Intended for use with Tier 2/3 providers.

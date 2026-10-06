@@ -74,6 +74,10 @@ func GeneratePackage(opts GenerateOpts) error {
 		opts.Config.MaintenanceReleaseDay = 1
 	}
 
+	if opts.Config.Publish.NpmDistTag != "" && !publishesNodejs(opts.Config.Publish.SDK) {
+		return fmt.Errorf("publish.npmDistTag requires nodejs in publish.sdk, got %q", opts.Config.Publish.SDK)
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		err := cleanGithubWorkflows(opts.OutDir, opts.Config.Provider)
@@ -109,6 +113,21 @@ func GeneratePackage(opts GenerateOpts) error {
 	}
 
 	return nil
+}
+
+// publishesNodejs reports whether a pulumi-package-publisher sdk input such as
+// "all", "all,!python" or "nodejs,go" includes the Node.js SDK.
+func publishesNodejs(sdk string) bool {
+	included := false
+	for _, s := range strings.Split(sdk, ",") {
+		switch strings.TrimSpace(s) {
+		case "all", "nodejs":
+			included = true
+		case "!nodejs":
+			return false
+		}
+	}
+	return included
 }
 
 // workflowCleanAllowList contains workflow directory entries that should never

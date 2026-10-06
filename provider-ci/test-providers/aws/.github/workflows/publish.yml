@@ -204,6 +204,13 @@ jobs:
         SIGNING_KEY_ID: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_PASSWORD }}
         NUGET_PUBLISH_KEY: ${{ steps.esc-secrets.outputs.NUGET_PUBLISH_KEY }}
+    - name: Add npm dist-tag latest-v6
+      if: inputs.isPrerelease == false
+      working-directory: sdk/nodejs/bin
+      env:
+        NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+        VERSION: ${{ inputs.version }}
+      run: npm dist-tag add "$(jq -r .name package.json)@${VERSION}" latest-v6
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
       with:

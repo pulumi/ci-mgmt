@@ -35,3 +35,5 @@ releaseVerification:
     dotnet: examples/webserver-cs
     go: examples/webserver-go
 autoMergeProviderUpgrades: false
+publish:
+    npmDistTag: latest-v6

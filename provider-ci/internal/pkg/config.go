@@ -500,6 +500,7 @@ type publish struct {
 	CDN             bool   `yaml:"cdn"`
 	// NpmDistTag, when set, is added as an npm dist-tag to every stable
 	// release of the Node.js SDK, e.g. latest-v9 on a maintenance branch.
+	// Requires nodejs to be included in SDK.
 	NpmDistTag string `yaml:"npmDistTag"`
 }
 
