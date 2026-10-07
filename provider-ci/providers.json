@@ -78,7 +78,6 @@
     "std",
     "tailscale",
     "terraform",
-    "terraform-module",
     "tf-provider-boilerplate",
     "tls",
     "vault",
