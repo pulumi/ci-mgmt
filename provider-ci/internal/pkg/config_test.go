@@ -296,3 +296,106 @@ func TestGeneratePackageUsesUpgradeProviderRunner(t *testing.T) {
 		t.Fatalf("expected upgrade-provider workflow to use custom runner, got:\n%s", workflow)
 	}
 }
+
+func TestLoadLocalConfigParsesPublishNpmDistTag(t *testing.T) {
+	dir := t.TempDir()
+
+	configPath := filepath.Join(dir, ".ci-mgmt.yaml")
+	if err := os.WriteFile(configPath, []byte(`provider: aws
+publish:
+  npmDistTag: latest-v6
+`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	config, err := LoadLocalConfig(configPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if config.Publish.NpmDistTag != "latest-v6" {
+		t.Fatalf("expected publish.npmDistTag to be latest-v6, got %q", config.Publish.NpmDistTag)
+	}
+	if config.Publish.SDK != "all" {
+		t.Fatalf("expected publish.sdk to keep its default, got %q", config.Publish.SDK)
+	}
+}
+
+func TestGeneratePackageValidatesNpmDistTagSDK(t *testing.T) {
+	tests := []struct {
+		sdk     string
+		wantErr bool
+	}{
+		{sdk: "all"},
+		{sdk: "all,!python"},
+		{sdk: "nodejs,go"},
+		{sdk: "all,!nodejs", wantErr: true},
+		{sdk: "python,go", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.sdk, func(t *testing.T) {
+			config, err := loadDefaultConfig()
+			if err != nil {
+				t.Fatal(err)
+			}
+			config.Provider = "aws"
+			config.ESC.Enabled = true
+			config.Publish.SDK = tt.sdk
+			config.Publish.NpmDistTag = "latest-v6"
+
+			err = GeneratePackage(GenerateOpts{
+				RepositoryName: "pulumi/pulumi-aws",
+				OutDir:         t.TempDir(),
+				TemplateName:   "bridged-provider",
+				Config:         config,
+				SkipMigrations: true,
+			})
+			if tt.wantErr && err == nil {
+				t.Fatal("expected an error for npmDistTag without nodejs in publish.sdk")
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestGeneratePackageValidatesNpmDistTag(t *testing.T) {
+	tests := []struct {
+		name    string
+		tag     string
+		wantErr bool
+	}{
+		{name: "unset", tag: ""},
+		{name: "latest-major", tag: "latest-v6"},
+		{name: "dots and underscores", tag: "v6.x_lts"},
+		{name: "space", tag: "latest v6", wantErr: true},
+		{name: "semicolon", tag: "latest-v6;id", wantErr: true},
+		{name: "command substitution", tag: "$(id)", wantErr: true},
+		{name: "newline", tag: "latest-v6\nid", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config, err := loadDefaultConfig()
+			if err != nil {
+				t.Fatal(err)
+			}
+			config.Provider = "aws"
+			config.ESC.Enabled = true
+			config.Publish.NpmDistTag = tt.tag
+
+			err = GeneratePackage(GenerateOpts{
+				RepositoryName: "pulumi/pulumi-aws",
+				OutDir:         t.TempDir(),
+				TemplateName:   "bridged-provider",
+				Config:         config,
+				SkipMigrations: true,
+			})
+			if tt.wantErr && err == nil {
+				t.Fatalf("expected an error for publish.npmDistTag %q", tt.tag)
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}

@@ -144,6 +144,14 @@ publish:
   sdk: all
   # Publish the plugin binaries to the Pulumi CDN (get.pulumi.com) - requires AWS credentials for S3 upload
   cdn: true
+  # Extra npm dist-tag added to each stable release of the Node.js SDK. Set it
+  # on a maintenance branch (e.g. latest-v9) so the old major stays installable
+  # by tag while `latest` tracks the current major. Requires nodejs in `sdk`.
+  # The tag is moved with `npm dist-tag add` using NODE_AUTH_TOKEN (ESC
+  # NPM_TOKEN), which needs write access. Under npm trusted publishing (OIDC)
+  # it needs "Allow npm dist-tag" on the trusted publisher and npm CLI
+  # >= 11.21.0 (>= 12.2.0 on 12.x). See https://docs.npmjs.com/trusted-publishers/
+  npmDistTag: ""
 
 # Enables automatic registry index doc file generation. Intended for use with Tier 2/3 providers.
 registryDocs: false
