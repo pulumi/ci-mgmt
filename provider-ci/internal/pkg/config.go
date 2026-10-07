@@ -500,7 +500,15 @@ type publish struct {
 	CDN             bool   `yaml:"cdn"`
 	// NpmDistTag, when set, is added as an npm dist-tag to every stable
 	// release of the Node.js SDK, e.g. latest-v9 on a maintenance branch.
-	// Requires nodejs to be included in SDK.
+	// Requires nodejs to be included in SDK. May only contain letters,
+	// digits, '.', '_' and '-'.
+	//
+	// The tag is moved with `npm dist-tag add`, authenticated by the same
+	// NODE_AUTH_TOKEN (ESC NPM_TOKEN) as the publish step, so that token
+	// needs write access to the package. Under npm trusted publishing (OIDC),
+	// dist-tag commands only work if the trusted publisher has "Allow npm
+	// dist-tag" enabled and the job's npm CLI is >= 11.21.0 (>= 12.2.0 on
+	// 12.x). See https://docs.npmjs.com/trusted-publishers/.
 	NpmDistTag string `yaml:"npmDistTag"`
 }
 

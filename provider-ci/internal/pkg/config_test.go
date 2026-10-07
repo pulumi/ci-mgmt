@@ -358,3 +358,44 @@ func TestGeneratePackageValidatesNpmDistTagSDK(t *testing.T) {
 		})
 	}
 }
+
+func TestGeneratePackageValidatesNpmDistTag(t *testing.T) {
+	tests := []struct {
+		name    string
+		tag     string
+		wantErr bool
+	}{
+		{name: "unset", tag: ""},
+		{name: "latest-major", tag: "latest-v6"},
+		{name: "dots and underscores", tag: "v6.x_lts"},
+		{name: "space", tag: "latest v6", wantErr: true},
+		{name: "semicolon", tag: "latest-v6;id", wantErr: true},
+		{name: "command substitution", tag: "$(id)", wantErr: true},
+		{name: "newline", tag: "latest-v6\nid", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config, err := loadDefaultConfig()
+			if err != nil {
+				t.Fatal(err)
+			}
+			config.Provider = "aws"
+			config.ESC.Enabled = true
+			config.Publish.NpmDistTag = tt.tag
+
+			err = GeneratePackage(GenerateOpts{
+				RepositoryName: "pulumi/pulumi-aws",
+				OutDir:         t.TempDir(),
+				TemplateName:   "bridged-provider",
+				Config:         config,
+				SkipMigrations: true,
+			})
+			if tt.wantErr && err == nil {
+				t.Fatalf("expected an error for publish.npmDistTag %q", tt.tag)
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}

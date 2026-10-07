@@ -211,7 +211,8 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
         VERSION: ${{ inputs.version }}
-      run: npm dist-tag add "$(jq -r .name package.json)@${VERSION}" #{{ .Config.Publish.NpmDistTag }}#
+        NPM_DIST_TAG: #{{ .Config.Publish.NpmDistTag }}#
+      run: npm dist-tag add "$(jq -r .name package.json)@${VERSION}" "$NPM_DIST_TAG"
 #{{- end }}#
     - name: Download Go SDK
       uses: ./.github/actions/download-sdk
