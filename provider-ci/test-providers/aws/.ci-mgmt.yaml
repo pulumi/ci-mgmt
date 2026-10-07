@@ -1,4 +1,5 @@
 provider: aws
+npmTrustedPublishing: true
 disableMajorProviderUpgrades: true
 lint: false
 major-version: 7
