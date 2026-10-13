@@ -19,6 +19,12 @@ env:
 
 jobs:
   test:
+#{{- if .Config.DisableIntegrationTests }}#
+    runs-on: ubuntu-latest
+    steps:
+    - name: Integration tests disabled
+      run: echo "Integration tests are disabled for this branch."
+#{{- else }}#
     permissions:
       contents: read
       id-token: write
@@ -222,4 +228,5 @@ jobs:
         #{{- else }}#
         testTarget: [local]
         #{{- end }}#
+#{{- end }}#
 #{{- end }}#
