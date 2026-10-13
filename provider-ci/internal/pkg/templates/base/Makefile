@@ -370,7 +370,9 @@ build_provider_cmd = set -x; \
 #{{ if .Config.BuildProviderPre }}##{{ .Config.BuildProviderPre }}#; \
 #{{ end -}}#
 cd provider && GOOS=$(1) GOARCH=$(2) go mod download && \
-GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -v $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER)
+if [ "$(1)" = "windows" ]; then $(call embed_windows_resources,cmd/$(PROVIDER),$(2)); fi && \
+GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -v $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(PROJECT)/$(PROVIDER_PATH)/cmd/$(PROVIDER); \
+buildrc=$$?; rm -f cmd/$(PROVIDER)/rsrc_windows_*.syso; exit $$buildrc
 #{{- end }}#
 
 provider: bin/$(PROVIDER)

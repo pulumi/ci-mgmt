@@ -2,6 +2,61 @@
 
 SHELL := /bin/bash -o pipefail
 
+# `go build` embeds no VERSIONINFO resource or application manifest in Windows
+# binaries by default, and a missing product/version makes the .exe look more
+# suspicious to some antivirus heuristics. go-winres
+# (https://github.com/tc-hib/go-winres, installed via mise) generates a
+# rsrc_windows_<arch>.syso file that `go build` picks up automatically, so we
+# (re)generate it right before every windows build instead of committing one
+# to the provider repo. Field values mirror the CLI's own bundle, see
+# pulumi/pulumi#IAC-4166.
+define PULUMI_WINRES_JSON
+{
+  "RT_MANIFEST": {
+    "#1": {
+      "0409": {
+        "minimum-os": "win7",
+        "execution-level": "as invoker"
+      }
+    }
+  },
+  "RT_VERSION": {
+    "#1": {
+      "0000": {
+        "fixed": {
+          "file_version": "$(PROVIDER_VERSION)",
+          "product_version": "$(PROVIDER_VERSION)"
+        },
+        "info": {
+          "0409": {
+            "CompanyName": "Pulumi Corporation",
+            "ProductName": "Pulumi Xyz",
+            "FileDescription": "Pulumi Xyz resource provider plugin",
+            "OriginalFilename": "$(PROVIDER).exe",
+            "InternalName": "$(PROVIDER).exe",
+            "FileVersion": "$(PROVIDER_VERSION)",
+            "ProductVersion": "$(PROVIDER_VERSION)"
+          }
+        }
+      }
+    }
+  }
+}
+endef
+export PULUMI_WINRES_JSON
+
+# $(1) is the directory containing the main package to embed resources into,
+# relative to the cwd `go build` is about to run from (e.g. cmd/$(PROVIDER)).
+# $(2) is the GOARCH to build the resource for (amd64 or arm64), which must
+# match the GOARCH of the `go build` invocation that follows so the right
+# rsrc_windows_<arch>.syso gets linked in and no stale ones are left behind
+# for other architectures.
+embed_windows_resources = \
+	winresjson=$$(mktemp) && \
+	printf '%s' "$$PULUMI_WINRES_JSON" > "$$winresjson" && \
+	go-winres make --in "$$winresjson" --arch $(2) --out $(1)/rsrc && \
+	rm -f "$$winresjson"
+
 # Set these variables to enable signing of the windows binary with Azure Trusted Signing.
 AZURE_SIGNING_CLIENT_ID ?=
 AZURE_SIGNING_CLIENT_SECRET ?=
