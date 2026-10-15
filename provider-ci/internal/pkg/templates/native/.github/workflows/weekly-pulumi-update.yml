@@ -6,7 +6,6 @@ on:
   - cron: 35 12 * * 4
   workflow_dispatch: {}
 env:
-  GITHUB_TOKEN: ${{ secrets.PULUMI_BOT_TOKEN }}
   PROVIDER: #{{ .Config.Provider }}#
   TRAVIS_OS_NAME: linux
   GOVERSION: #{{ .Config.ToolVersions.Go | quote }}#
@@ -40,6 +39,8 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
     - name: Update Pulumi/Pulumi
       id: gomod
+      env:
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       run: >-
         git config --local user.email 'bot@pulumi.com'
 
@@ -56,10 +57,14 @@ jobs:
         if ! git diff-files --quiet; then echo changes=1 >> "$GITHUB_OUTPUT"; fi
     #{{- if .Config.CheckoutSubmodules }}#
     - name: Initialize submodules
+      env:
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       run: make init_submodules
     #{{- end }}#
     - name: Provider with Pulumi Upgrade
       if: steps.gomod.outputs.changes != 0
+      env:
+        GITHUB_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       run: >-
         #{{ if eq .Config.Provider "kubernetes" }}#make build
 
