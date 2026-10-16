@@ -80,7 +80,6 @@ assignees: ''
 - [ ] [linode](https://github.com/pulumi/pulumi-linode)
 - [ ] [mailgun](https://github.com/pulumi/pulumi-mailgun)
 - [ ] [meraki](https://github.com/pulumi/pulumi-meraki)
-- [ ] [minio](https://github.com/pulumi/pulumi-minio)
 - [ ] [mysql](https://github.com/pulumi/pulumi-mysql)
 - [ ] [newrelic](https://github.com/pulumi/pulumi-newrelic)
 - [ ] [nomad](https://github.com/pulumi/pulumi-nomad)
