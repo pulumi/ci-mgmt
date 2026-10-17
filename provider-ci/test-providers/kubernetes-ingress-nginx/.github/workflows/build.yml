@@ -2,18 +2,7 @@
 
 name: main # For consistency with bridged providers.
 on:
-  push:
-    branches:
-    - master
-    - main
-    - feature-**
-    paths-ignore:
-    - CHANGELOG.md
-    tags-ignore:
-    - v*
-    - sdk/*
-    - "**"
-  workflow_dispatch: {}
+  workflow_call: {}
 env:
   PROVIDER: kubernetes-ingress-nginx
   TRAVIS_OS_NAME: linux
@@ -38,6 +27,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.repository == 'pulumi/pulumi-kubernetes-ingress-nginx'
     runs-on: ubuntu-latest
     name: prerequisites
     permissions:
@@ -553,6 +543,7 @@ jobs:
       env:
         SLACK_WEBHOOK_URL: ${{ steps.esc-secrets.outputs.SLACK_WEBHOOK_URL }}
   lint:
+    if: github.repository == 'pulumi/pulumi-kubernetes-ingress-nginx'
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
