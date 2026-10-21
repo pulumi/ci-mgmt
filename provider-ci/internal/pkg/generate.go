@@ -466,37 +466,40 @@ func trimActionComment(uses string) string {
 	return strings.TrimSpace(ref)
 }
 
-// renderESCStep generates either the real ESC action or our shim action which
-// re-exports the existing environment.
+// renderESCStep generates the steps that exchange the job's OIDC token for a
+// Pulumi Cloud access token and then open the provider's ESC environment.
 func renderESCStep(v any) (string, error) {
 	config, ok := v.(Config)
 	if !ok {
 		return "", fmt.Errorf("expected Config input, got %+v", v)
 	}
 
-	yaml := func(v any) (string, error) {
-		s, err := toYAML([]any{v})
-		return "\n" + s, err
-	}
-
 	if !config.ESC.Enabled {
 		return "", fmt.Errorf("`esc: { enabled: true } is required for Pulumi providers`")
 	}
 
-	env := map[string]string{
-		"ESC_ACTION_OIDC_AUTH":                    "true",
-		"ESC_ACTION_OIDC_ORGANIZATION":            "pulumi",
-		"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE":    "urn:pulumi:token-type:access_token:organization",
-		"ESC_ACTION_ENVIRONMENT":                  config.ESC.Environment,
-		"ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES": "false",
+	auth := map[string]any{
+		"name": "Authenticate with Pulumi Cloud",
+		"id":   "esc-auth",
+		"uses": trimActionComment(config.ActionVersions.ESCAuth),
+		"with": map[string]string{
+			"organization":                 "pulumi",
+			"requested-token-type":         "urn:pulumi:token-type:access_token:organization",
+			"export-environment-variables": "false",
+		},
 	}
-	step := map[string]any{
+	secrets := map[string]any{
 		"name": "Fetch secrets from ESC",
 		"id":   "esc-secrets",
 		"uses": trimActionComment(config.ActionVersions.ESCAction),
-		"env":  env,
+		"with": map[string]string{
+			"environment":                  config.ESC.Environment,
+			"export-environment-variables": "false",
+			"pulumi-access-token":          "${{ steps.esc-auth.outputs.pulumi-access-token }}",
+		},
 	}
-	return yaml(step)
+	s, err := toYAML([]any{auth, secrets})
+	return "\n" + s, err
 }
 
 // renderGlobalEnv is used to generate environment variables shared by all
