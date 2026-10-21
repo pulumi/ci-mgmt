@@ -6,6 +6,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.repository == '#{{ .Repository }}#'
     permissions:
       contents: read
       pull-requests: write
@@ -42,12 +43,14 @@ jobs:
 
   #{{ if .Config.Lint -}}#
   lint:
+    if: github.repository == '#{{ .Repository }}#'
     name: lint
     uses: ./.github/workflows/lint.yml
     secrets: inherit
   #{{ end -}}#
 
   license_check:
+    if: github.repository == '#{{ .Repository }}#'
     name: License Check
     uses: ./.github/workflows/license.yml
     secrets: inherit
@@ -87,9 +90,4 @@ jobs:
 
 name: prerelease
 on:
-  push:
-    tags:
-    - v*.*.*-**
-#{{- if .Config.TestMasterAndReleaseWorkflows }}#
-  pull_request:
-#{{ end }}#
+  workflow_call: {}
