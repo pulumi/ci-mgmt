@@ -117,7 +117,9 @@ build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
 build_provider_cmd = #{{ if .Config.BuildProviderPre -}}#
                          #{{ .Config.BuildProviderPre }}#;
                      #{{- end -}}#
-                     GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
+                     if [ "$(1)" = "windows" ]; then $(call embed_windows_resources,cmd/$(PROVIDER),$(2)); fi && \
+                     GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER); \
+                     buildrc=$$?; rm -f cmd/$(PROVIDER)/rsrc_windows_*.syso; exit $$buildrc
 #{{- end }}#
 
 .PHONY: provider
