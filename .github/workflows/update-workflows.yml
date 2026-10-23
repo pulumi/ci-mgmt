@@ -167,7 +167,11 @@ jobs:
           branch: "update-github-actions-workflows-${{ github.run_number }}${{ inputs.tracking_branch_name != '' && format('-{0}', inputs.tracking_branch_name) || '' }}"
           committer: Pulumi Bot <bot@pulumi.com>
           commit-message: "[internal] Update GitHub Actions workflow files"
-          labels: "impact/no-changelog-required"
+          # automation/merge marks the PR for auto-merge, which lets the provider's
+          # auto-approve workflow approve it (see autoApproveAutomationPRs). Runs
+          # with automerge: false, such as tests, don't get it, so they wait for a
+          # human.
+          labels: ${{ inputs.automerge && 'impact/no-changelog-required,automation/merge' || 'impact/no-changelog-required' }}
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}${{ inputs.tracking_branch_name != '' && format('[{0}] ', inputs.tracking_branch_name) || '' }}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ steps.app-auth.outputs.token }}
