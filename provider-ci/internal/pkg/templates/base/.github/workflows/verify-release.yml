@@ -80,6 +80,8 @@ jobs:
           version: #{{ .Config.MiseVersion }}#
           github_token: ${{ secrets.GITHUB_TOKEN }}
           cache_save: false
+      - name: Install project dependencies
+        run: mise deps install
       - name: Setup Go Cache
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
         with:

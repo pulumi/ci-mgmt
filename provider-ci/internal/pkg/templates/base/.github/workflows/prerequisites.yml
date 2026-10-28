@@ -84,6 +84,8 @@ jobs:
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         # only saving the cache in the prerequisites job
         cache_save: true
+    - name: Install project dependencies
+      run: mise deps install
     #{{- if and (not .Config.NoSchema) (not .Config.UseProviderBinarySchemaGen) }}#
     - name: Setup Go Cache
       if: inputs.acceptance_fanout
