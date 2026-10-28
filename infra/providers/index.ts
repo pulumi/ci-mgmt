@@ -23,6 +23,13 @@ const branchProtectionImports: Record<string, string> = {
   pulumiservice: "pulumi-pulumiservice:main",
 };
 
+// Providers whose default branch requires an approving review, which admins
+// can bypass. Bot PRs still merge without a human: pulumi-renovate-approve
+// approves Renovate's, and the auto-approve workflow approves ci-mgmt's
+// workflow-update PRs. Every provider here must set
+// `autoApproveAutomationPRs: true` in its .ci-mgmt.yaml to get that workflow.
+const reviewRequiredProviders = new Set(["pulumiservice"]);
+
 function tfProviderProtection(provider: string) {
   const requiredChecks: string[] = [
     // Sentinel is responsible for encapsulating CI checks.
@@ -30,6 +37,7 @@ function tfProviderProtection(provider: string) {
   ];
 
   const repo = `pulumi-${provider}`;
+  const requireReview = reviewRequiredProviders.has(provider);
 
   new github.BranchProtection(
     `${provider}-default`,
@@ -38,7 +46,7 @@ function tfProviderProtection(provider: string) {
       pattern: github.BranchDefault.get(provider, repo, undefined, {
         provider: gh,
       }).branch,
-      enforceAdmins: true,
+      enforceAdmins: !requireReview,
       requiredStatusChecks: [
         {
           strict: false,
@@ -47,9 +55,9 @@ function tfProviderProtection(provider: string) {
       ],
       requiredPullRequestReviews: [
         {
-          // We want to make sure that pulumi-bot can auto-merge PRs, so we
-          // explicitly remove review requirements.
-          requiredApprovingReviewCount: 0,
+          // Other providers require no review so that pulumi-bot can
+          // auto-merge PRs without the auto-approve workflow.
+          requiredApprovingReviewCount: requireReview ? 1 : 0,
         },
       ],
     },
