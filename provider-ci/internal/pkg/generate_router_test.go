@@ -246,6 +246,20 @@ func TestReusableFlowsGuardRepository(t *testing.T) {
 			flows:    []string{"master.yml", "prerelease.yml", "release.yml"},
 		},
 		{
+			name:     "generic",
+			template: "generic",
+			config:   "provider: pulumiservice\nproviderDefaultBranch: main\ntemplate: generic\nlint: true\nesc:\n  enabled: true\n",
+			repo:     "pulumi/pulumi-pulumiservice",
+			flows:    []string{"main.yml", "prerelease.yml", "release.yml"},
+		},
+		{
+			name:     "parameterized-go",
+			template: "parameterized-go",
+			config:   "provider: terraform-module\nproviderDefaultBranch: main\ntemplate: parameterized-go\nlint: true\nesc:\n  enabled: true\n",
+			repo:     "pulumi/pulumi-terraform-module",
+			flows:    []string{"main.yml", "prerelease.yml", "release.yml"},
+		},
+		{
 			name:     "native",
 			template: "native",
 			config:   "provider: docker-build\ntemplate: native\nlint: true\nesc:\n  enabled: true\n",
@@ -272,6 +286,40 @@ func TestReusableFlowsGuardRepository(t *testing.T) {
 					t.Errorf("%s/%s: jobs are not gated on github.repository == %q, "+
 						"neither directly nor through needs: %s",
 						tc.template, flow, tc.repo, strings.Join(ungated, ", "))
+				}
+			}
+		})
+	}
+}
+
+// TestRouterTestMasterAndReleaseWorkflows asserts that testMasterAndReleaseWorkflows
+// adds a pull_request trigger to ci.yml and that the route job's `all` target
+// fans out to every flow, while the default keeps pull requests out of ci.yml.
+func TestRouterTestMasterAndReleaseWorkflows(t *testing.T) {
+	for _, enabled := range []bool{true, false} {
+		t.Run(fmt.Sprintf("enabled=%v", enabled), func(t *testing.T) {
+			config := routerTestConfig(t, fmt.Sprintf(
+				"provider: aws\nproviderDefaultBranch: master\ntestMasterAndReleaseWorkflows: %v\nesc:\n  enabled: true\n", enabled))
+			ci := routerWorkflow(t, routerGenerate(t, "bridged-provider", config), "ci.yml")
+
+			var parsed struct {
+				On   map[string]any       `yaml:"on"`
+				Jobs map[string]routerJob `yaml:"jobs"`
+			}
+			if err := yaml.Unmarshal([]byte(ci), &parsed); err != nil {
+				t.Fatalf("parsing ci.yml: %v", err)
+			}
+
+			if _, ok := parsed.On["pull_request"]; ok != enabled {
+				t.Errorf("ci.yml pull_request trigger present = %v, want %v:\n%s", ok, enabled, ci)
+			}
+			for _, flow := range []string{"main", "prerelease", "release"} {
+				job, ok := parsed.Jobs[flow]
+				if !ok {
+					t.Fatalf("ci.yml has no %s job:\n%s", flow, ci)
+				}
+				if !strings.Contains(job.If, "needs.route.outputs.target == 'all'") {
+					t.Errorf("ci.yml %s job does not run for target all: %q", flow, job.If)
 				}
 			}
 		})
