@@ -151,8 +151,8 @@ jobs:
         if: github.event_name == 'merge_group' && steps.pr_opened.outputs.pull_request_created == 'true'
         id: main_build
         run: |
-          until (gh run list --repo "${{ matrix.repo }}" --workflow main --json headSha | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
-          database_id=$(gh run list --repo "${{ matrix.repo }}" --workflow main --json "number,headSha,databaseId" | jq '.[] | select(.headSha == "${{ steps.merge_commit.outputs.oid }}") | .databaseId')
+          until (gh run list --repo "${{ matrix.repo }}" --workflow ci.yml --event push --json headSha | grep -q "${{ steps.merge_commit.outputs.oid }}"); do sleep 1; done
+          database_id=$(gh run list --repo "${{ matrix.repo }}" --workflow ci.yml --event push --json "number,headSha,databaseId" | jq '.[] | select(.headSha == "${{ steps.merge_commit.outputs.oid }}") | .databaseId')
           echo "Main build started with database id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
         timeout-minutes: 5
@@ -184,8 +184,8 @@ jobs:
         id: release_workflow
         timeout-minutes: 10
         run: |
-          until (gh run list --repo "${{ matrix.repo }}" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
-          database_id=$(gh run list --repo "${{ matrix.repo }}" --workflow release --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" --jq '.[0].databaseId')
+          until (gh run list --repo "${{ matrix.repo }}" --workflow ci.yml --branch "${{ steps.release_tag.outputs.tag }}" --json headBranch | grep -q "${{ steps.release_tag.outputs.tag }}"); do sleep 1; done
+          database_id=$(gh run list --repo "${{ matrix.repo }}" --workflow ci.yml --branch "${{ steps.release_tag.outputs.tag }}" --json "databaseId" --jq '.[0].databaseId')
           echo "Release workflow started with id ${database_id}"
           echo "id=${database_id}" >> "${GITHUB_OUTPUT}"
         env:
