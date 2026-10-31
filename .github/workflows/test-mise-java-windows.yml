@@ -1,0 +1,68 @@
+# Temporary verification for the Windows Java dependency fix. Remove after verification.
+name: Test mise Java on Windows
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  java-dependency:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        pulumi: ["3.268.0", "3.272.0"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Prepare generated Java dependency
+        shell: pwsh
+        env:
+          TEST_PULUMI_VERSION: ${{ matrix.pulumi }}
+        run: |
+          New-Item -ItemType Directory -Force .config | Out-Null
+          Copy-Item provider-ci/test-providers/aws/.config/install-pulumi-java.sh .config/
+          $fixture = Get-Content provider-ci/test-providers/aws/.config/mise.toml -Raw
+          $dependency = [regex]::Match($fixture, '(?ms)^\[hooks\]\r?\n.*?(?=^\[settings\])').Value
+          if (-not $dependency.Contains('[deps.pulumi-java]')) {
+            throw 'Generated fixture is missing the Java dependency'
+          }
+          $config = @"
+          [tools]
+          "github:pulumi/pulumi" = "$env:TEST_PULUMI_VERSION"
+          [settings]
+          experimental = true
+          "@
+          Set-Content mise.toml "$config`n$dependency"
+      - name: Setup mise and run postinstall hook
+        uses: jdx/mise-action@8d3b0ba20a9cea7b883d922ea958553c941ab082
+        with:
+          version: 2026.10.21
+          add_shims_to_path: false
+          cache: false
+      - name: Install project dependencies
+        # Keep the default Windows shell. The dependency itself must invoke Bash.
+        run: mise deps install
+      - name: Verify selected CLI and Java plugin
+        shell: pwsh
+        env:
+          TEST_PULUMI_VERSION: ${{ matrix.pulumi }}
+        run: |
+          $version = pulumi version
+          if ($LASTEXITCODE -ne 0 -or $version -ne "v$env:TEST_PULUMI_VERSION") {
+            throw "Unexpected Pulumi version: $version"
+          }
+          $plugins = pulumi plugin ls --json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not list plugins' }
+          $java = @($plugins | ConvertFrom-Json | Where-Object { $_.kind -eq 'language' -and $_.name -eq 'java' })
+          if ($env:TEST_PULUMI_VERSION -eq '3.272.0' -and $java.Count -eq 0) {
+            throw 'Java language plugin was not installed'
+          }
+          if ($env:TEST_PULUMI_VERSION -eq '3.268.0' -and $java.Count -ne 0) {
+            throw 'Older CLI should use bundled Java, not install a language plugin'
+          }
