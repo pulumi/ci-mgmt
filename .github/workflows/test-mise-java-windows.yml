@@ -60,6 +60,23 @@ jobs:
           Get-ChildItem $miseRoot -Recurse -File -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -in @('pulumi.exe', 'pulumi-language-nodejs.exe') } |
             Format-List FullName, LinkType, Target, Length
+          # Match the Go path resolution used by Pulumi's bundled-plugin lookup.
+          $probe = @'
+          package main
+          import ("fmt"; "os"; "path/filepath")
+          func main() {
+            input := os.Args[1]
+            resolved, err := filepath.EvalSymlinks(input)
+            fmt.Printf("EvalSymlinks(%q) = %q, error = %v\n", input, resolved, err)
+            for _, p := range []string{input, resolved} {
+              plugin := filepath.Join(filepath.Dir(p), "pulumi-language-nodejs.exe")
+              info, err := os.Stat(plugin)
+              fmt.Printf("Stat(%q) = %v, error = %v\n", plugin, info, err)
+            }
+          }
+          '@
+          Set-Content "$env:RUNNER_TEMP/plugin-path-probe.go" $probe
+          go run "$env:RUNNER_TEMP/plugin-path-probe.go" $cli
           & $cli version
           $plugin = Join-Path (Split-Path $cli) 'pulumi-language-nodejs.exe'
           if (Test-Path $plugin) {
