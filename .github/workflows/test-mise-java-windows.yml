@@ -110,6 +110,7 @@ jobs:
         run: |
           $cli = (Get-Command pulumi -CommandType Application | Select-Object -First 1).Source
           Set-Location nodejs-test
+          New-Item -ItemType Directory -Force "$env:RUNNER_TEMP/direct-backend" | Out-Null
           & $cli login "file://$($env:RUNNER_TEMP.Replace('\', '/'))/direct-backend"
           if ($LASTEXITCODE -ne 0) { throw 'Login failed' }
           & $cli stack init direct --non-interactive
