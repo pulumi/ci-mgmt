@@ -16,6 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         pulumi: ["3.268.0", "3.272.0"]
+        layout: ["identity", "legacy"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -24,6 +25,7 @@ jobs:
         shell: pwsh
         env:
           TEST_PULUMI_VERSION: ${{ matrix.pulumi }}
+          TEST_INSTALL_LAYOUT: ${{ matrix.layout }}
         run: |
           New-Item -ItemType Directory -Force .config | Out-Null
           Copy-Item provider-ci/test-providers/aws/.config/install-pulumi-java.sh .config/
@@ -38,6 +40,7 @@ jobs:
           node = "24.18.0"
           [settings]
           experimental = true
+          install_layout = "$env:TEST_INSTALL_LAYOUT"
           "@
           Set-Content mise.toml "$config`n$dependency"
       - name: Setup mise and run postinstall hook
