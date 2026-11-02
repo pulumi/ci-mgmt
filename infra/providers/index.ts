@@ -23,11 +23,7 @@ const branchProtectionImports: Record<string, string> = {
   pulumiservice: "pulumi-pulumiservice:main",
 };
 
-// Providers whose default branch requires an approving review, which admins
-// can bypass. Bot PRs still merge without a human: pulumi-renovate-approve
-// approves Renovate's, and the auto-approve workflow approves ci-mgmt's
-// workflow-update PRs. Every provider here must set
-// `autoApproveAutomationPRs: true` in its .ci-mgmt.yaml to get that workflow.
+// Provider repos that require an approving review on their default branch.
 const reviewRequiredProviders = new Set(["pulumiservice"]);
 
 function tfProviderProtection(provider: string) {
