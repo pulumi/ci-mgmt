@@ -2,10 +2,7 @@
 
 name: release
 on:
-  push:
-    tags:
-    - v*.*.*
-    - "!v*.*.*-**"
+  workflow_call: {}
 env:
   PROVIDER: #{{ .Config.Provider }}#
   TRAVIS_OS_NAME: linux
@@ -20,6 +17,7 @@ env:
 
 jobs:
   prerequisites:
+    if: github.repository == '#{{ .Repository }}#'
     runs-on: #{{ if .Config.Runner.Prerequisites }}##{{ .Config.Runner.Prerequisites }}##{{ else }}#ubuntu-latest#{{ end }}#
     name: prerequisites
     permissions:
@@ -707,6 +705,7 @@ jobs:
 #{{- end }}#
 #{{- if eq .Config.Provider "kubernetes" }}#
   build-test-cluster:
+    if: github.repository == '#{{ .Repository }}#'
     runs-on: ubuntu-latest
     name: build-test-cluster
     outputs:
@@ -769,7 +768,7 @@ jobs:
     needs:
     - build-test-cluster
     - test
-    if: ${{ always() && github.repository_owner == 'pulumi' }}
+    if: ${{ always() && github.repository_owner == 'pulumi' && github.repository == '#{{ .Repository }}#' }}
     permissions:
       contents: read
       id-token: write # For Pulumi access token OIDC.
