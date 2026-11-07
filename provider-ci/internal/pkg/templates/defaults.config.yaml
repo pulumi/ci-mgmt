@@ -210,6 +210,12 @@ checkUpstreamUpgrade: true
 # Used in 11  providers: https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22generate-nightly-test-workflow%3A%22&type=code
 #generate-nightly-test-workflow: false
 
+# Set to true to include the auto-approve workflow, which approves ci-mgmt's
+# auto-merging workflow-update PRs (those labeled automation/merge). Required on
+# providers whose default branch requires an approving review; see
+# reviewRequiredProviders in infra/providers/index.ts.
+#autoApproveAutomationPRs: false
+
 # Package paths to ignore when running the license check
 #license:
 #  ignore:
