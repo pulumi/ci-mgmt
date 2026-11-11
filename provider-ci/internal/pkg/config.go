@@ -75,6 +75,11 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22publishRegistry%3A%22&type=code
 	PublishRegistry bool `yaml:"publishRegistry"`
 
+	// NPMTrustedPublishing publishes npm packages with GitHub Actions OIDC instead
+	// of NODE_AUTH_TOKEN. Defaults to false so providers opt in only after their
+	// npm packages are configured for trusted publishing.
+	NPMTrustedPublishing bool `yaml:"npmTrustedPublishing"`
+
 	// CheckoutSubmodules is used for all checkouts during CI. Defaults to
 	// false. Only 3 providers use submodules:
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22checkoutSubmodules%3A%22&type=code
