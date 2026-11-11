@@ -127,7 +127,7 @@ jobs:
         uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
 
       - name: helm/kind-action
-        uses: helm/kind-action@1544676c07bb3570fcb70166beaa07c4528fd4aa # v1.15.1
+        uses: helm/kind-action@ea822c7bf1874f08e5a491df991c228edffc3376 # v1.15.2
 
       - name: guibranco/github-status-action-v2
         uses: guibranco/github-status-action-v2@77639353504055053524efa7a3719aaf0b731ce9 # v1.2.4
