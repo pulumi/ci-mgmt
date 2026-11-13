@@ -224,6 +224,10 @@ type Config struct {
 	// https://github.com/search?q=org%3Apulumi+path%3A.ci-mgmt.yaml+%22generate-nightly-test-workflow%3A%22&type=code
 	GenerateNightlyTestWorkflow bool `yaml:"generate-nightly-test-workflow"`
 
+	// AutoApproveAutomationPRs generates a workflow that approves ci-mgmt's
+	// auto-merging workflow-update PRs, for providers that require a review.
+	AutoApproveAutomationPRs bool `yaml:"autoApproveAutomationPRs"`
+
 	// MaintenanceBranch is the name of the current long-term-support branch of the
 	// previous major version for this provider, if any.
 	MaintenanceBranch string `yaml:"maintenanceBranch"`
