@@ -18,7 +18,6 @@ env:
 providerDefaultBranch: main
 template: generic
 shards: 6
-autoApproveAutomationPRs: true
 useProviderBinarySchemaGen: true
 testProviderCmd: >-
   cd provider && $(GO_TEST_EXEC) -v -short
