@@ -167,14 +167,19 @@ jobs:
           branch: "update-github-actions-workflows-${{ github.run_number }}${{ inputs.tracking_branch_name != '' && format('-{0}', inputs.tracking_branch_name) || '' }}"
           committer: Pulumi Bot <bot@pulumi.com>
           commit-message: "[internal] Update GitHub Actions workflow files"
-          # automation/merge is the label we put on PRs that merge automatically, and
-          # a provider's auto-approve workflow only approves PRs that carry it.
-          # Running with automerge: false lets you test this workflow without the PR
-          # getting approved and merged.
-          labels: ${{ inputs.automerge && 'impact/no-changelog-required,automation/merge' || 'impact/no-changelog-required' }}
+          labels: "impact/no-changelog-required"
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}${{ inputs.tracking_branch_name != '' && format('[{0}] ', inputs.tracking_branch_name) || '' }}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ steps.app-auth.outputs.token }}
+      - name: Approve PR
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
+        # Some provider repos require an approving review (see reviewRequiredProviders
+        # in infra/providers). The PR's author can't approve it, so pulumi-bot does.
+        # A failed approval only means the PR waits for a human, so don't fail the run.
+        continue-on-error: true
+        run: gh pr review --approve "${{ steps.create-pr.outputs.pull-request-url }}"
+        env:
+          GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       - name: "Set PR to auto-merge"
         if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
         # Not all providers have auto-merge enabled, and we don't want to fail providers
