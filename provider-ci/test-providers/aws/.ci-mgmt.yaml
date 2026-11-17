@@ -38,3 +38,4 @@ releaseVerification:
 autoMergeProviderUpgrades: false
 publish:
     npmDistTag: latest-v6
+    pulumiVersion: 3.274.1

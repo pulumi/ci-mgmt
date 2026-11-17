@@ -142,6 +142,11 @@ jobs:
     name: publish_sdk
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
+#{{- if .Config.Publish.PulumiVersion }}#
+    env:
+      # Layers .config/mise.publish.toml over .config/mise.toml to pin the Pulumi CLI (publish.pulumiVersion).
+      MISE_ENV: publish
+#{{- end }}#
     outputs:
       python_version: ${{ steps.python_version.outputs.version }}
     steps:

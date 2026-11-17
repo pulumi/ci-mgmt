@@ -515,6 +515,16 @@ type publish struct {
 	// dist-tag" enabled and the job's npm CLI is >= 11.21.0 (>= 12.2.0 on
 	// 12.x). See https://docs.npmjs.com/trusted-publishers/.
 	NpmDistTag string `yaml:"npmDistTag"`
+	// PulumiVersion, when set, overrides the Pulumi CLI version used by the
+	// publish_sdk job, e.g. 3.274.1. By default mise installs the CLI version
+	// matching the github.com/pulumi/pulumi/pkg/v3 version in go.mod. This
+	// lets a maintenance branch whose go.mod pins an older pkg version publish
+	// SDKs with a newer CLI (for example one required by
+	// pulumi-package-publisher) without bumping go.mod. It is rendered into
+	// .config/mise.publish.toml, which the publish_sdk job layers over
+	// .config/mise.toml via MISE_ENV=publish. Must be an exact version such
+	// as 3.274.1.
+	PulumiVersion string `yaml:"pulumiVersion"`
 }
 
 func loadDefaultConfig() (Config, error) {
