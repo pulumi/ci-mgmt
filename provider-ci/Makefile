@@ -56,9 +56,11 @@ format:
 .PHONY: test-providers test-provider/% mise-plugins
 
 # Pre-install mise plugins to avoid race conditions during parallel test execution
+# The pinned URL comes from the template so Renovate bumps it in one place.
+VFOX_PULUMI_URL := $(shell mise config get -f internal/pkg/templates/all/.config/mise.toml plugins.vfox-pulumi)
 mise-plugins:
 	@echo "Installing mise plugins..."
-	@mise plugins install vfox-pulumi https://github.com/pulumi/vfox-pulumi 2>/dev/null || mise plugins update vfox-pulumi || true
+	@mise plugins install --force vfox-pulumi $(VFOX_PULUMI_URL) || true
 
 test-providers: mise-plugins test-provider/aws test-provider/docker test-provider/cloudflare test-provider/eks test-provider/terraform-module test-provider/command test-provider/aws-native test-provider/kubernetes-coredns test-provider/docker-build test-provider/kubernetes test-provider/kubernetes-cert-manager test-provider/kubernetes-ingress-nginx test-provider/xyz test-provider/pulumi-provider-boilerplate test-provider/pulumiservice
 
