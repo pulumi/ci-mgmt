@@ -84,6 +84,10 @@ func GeneratePackage(opts GenerateOpts) error {
 		}
 	}
 
+	if v := opts.Config.Publish.PulumiVersion; v != "" && !pulumiVersionPattern.MatchString(v) {
+		return fmt.Errorf("publish.pulumiVersion %q is invalid: it must be an exact version such as 3.274.1", v)
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		err := cleanGithubWorkflows(opts.OutDir, opts.Config.Provider)
@@ -124,6 +128,11 @@ func GeneratePackage(opts GenerateOpts) error {
 // npmDistTagPattern restricts publish.npmDistTag to characters that are safe
 // to render into the publish workflow.
 var npmDistTagPattern = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
+
+// pulumiVersionPattern restricts publish.pulumiVersion to an exact version,
+// optionally with a prerelease suffix, so it is safe to render into the
+// publish workflow and does not float like "latest".
+var pulumiVersionPattern = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$`)
 
 // publishesNodejs reports whether a pulumi-package-publisher sdk input such as
 // "all", "all,!python" or "nodejs,go" includes the Node.js SDK.
@@ -236,6 +245,10 @@ func getConfigDeletedFiles(config Config) []string {
 		".github/workflows/gh-aw-pr-review.md",
 		filepath.Join(".github", "workflows", "shared", "review.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
+	}
+	if config.Publish.PulumiVersion == "" {
+		// Only generated while publish.pulumiVersion is set.
+		deletedFiles = append(deletedFiles, filepath.Join(".config", "mise.publish.toml"))
 	}
 	return deletedFiles
 }

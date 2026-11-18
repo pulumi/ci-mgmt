@@ -156,6 +156,11 @@ publish:
   # it needs "Allow npm dist-tag" on the trusted publisher and npm CLI
   # >= 11.21.0 (>= 12.2.0 on 12.x). See https://docs.npmjs.com/trusted-publishers/
   npmDistTag: ""
+  # Exact Pulumi CLI version used by the publish_sdk job (e.g. 3.274.1), written
+  # to .config/mise.publish.toml and loaded with MISE_ENV=publish. Empty uses the CLI version derived from the
+  # pulumi/pkg/v3 version in go.mod. Set it on a maintenance branch whose
+  # go.mod pins an older pkg version when publishing needs a newer CLI.
+  pulumiVersion: ""
 
 # Enables automatic registry index doc file generation. Intended for use with Tier 2/3 providers.
 registryDocs: false
