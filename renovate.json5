@@ -12,6 +12,18 @@
       'provider-ci/test-providers/**',
     ],
   },
+  customManagers: [
+    {
+      // mise [plugins] entries pinned as URL#<sha>, with the tracked ref in a trailing comment.
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^provider-ci/internal/pkg/templates/all/\\.config/mise\\.toml$/',
+      ],
+      matchStrings: [
+        '"(?<depName>https://[^"#]+)#(?<currentDigest>[0-9a-f]{40})" # renovate: datasource=(?<datasource>git-refs|git-tags) ref=(?<currentValue>\\S+)',
+      ],
+    },
+  ],
   packageRules: [
     {
       // Re-generate test workflows in case action versions have been bumped.
