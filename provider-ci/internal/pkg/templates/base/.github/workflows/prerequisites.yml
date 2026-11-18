@@ -22,6 +22,9 @@ on:
       version:
         description: "Provider version being built"
         value: ${{ jobs.prerequisites.outputs.version }}
+      is_latest:
+        description: "Whether the provider version being built is the highest stable version ('true' or 'false')"
+        value: ${{ jobs.prerequisites.outputs.is_latest }}
 
 env:
 #{{ .Config | renderGlobalEnv | indent 2 }}#
@@ -36,6 +39,7 @@ jobs:
       id-token: write # For ESC secrets.
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
+      is_latest: ${{ steps.provider-version.outputs.is-latest }}
     steps:
 #{{- if .Config.FreeDiskSpaceBeforeBuild }}#
     # Run as first step so we don't delete things that have just been installed
