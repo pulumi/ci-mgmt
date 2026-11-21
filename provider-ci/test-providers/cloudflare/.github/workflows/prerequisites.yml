@@ -22,6 +22,9 @@ on:
       version:
         description: "Provider version being built"
         value: ${{ jobs.prerequisites.outputs.version }}
+      is_latest:
+        description: "Whether the provider version being built is the highest stable version ('true' or 'false')"
+        value: ${{ jobs.prerequisites.outputs.is_latest }}
 
 env:
   PULUMI_API: https://api.pulumi-staging.io
@@ -40,6 +43,7 @@ jobs:
       id-token: write # For ESC secrets.
     outputs:
       version: ${{ steps.provider-version.outputs.version }}
+      is_latest: ${{ steps.provider-version.outputs.is-latest }}
     steps:
     # Run as first step so we don't delete things that have just been installed
     - name: Free Disk Space (Ubuntu)
@@ -72,7 +76,7 @@ jobs:
         app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
         private-key: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_PRIVATE_KEY }}
         owner: ${{ github.repository_owner }}
-    - uses: pulumi/provider-version-action@c4f719182e607d0d8322f148f168d3372838e681 # v2.0.0
+    - uses: pulumi/provider-version-action@eb23498ae6546853a18d2acdf0e9233720cd9784 # is-latest-output (pulumi/provider-version-action#21), replace with v2.1.0
       id: provider-version
       with:
         major-version: 6
