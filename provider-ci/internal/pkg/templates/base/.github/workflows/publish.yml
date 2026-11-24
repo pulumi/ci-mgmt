@@ -46,7 +46,7 @@ jobs:
         persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
-    - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+    - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       id: app-auth
       with:
         app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
@@ -59,8 +59,11 @@ jobs:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
         version: #{{ .Config.MiseVersion }}#
+        add_shims_to_path: false
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         cache_save: false
+    - name: Install project dependencies
+      run: mise deps install
 #{{- if .Config.Publish.CDN }}#
     - name: Configure AWS Credentials
       uses: #{{ .Config.ActionVersions.ConfigureAwsCredentials }}#
@@ -115,7 +118,7 @@ jobs:
       run: aws s3 cp dist s3://get.pulumi.com/releases/plugins/ --recursive
 #{{- end }}#
     - name: Create GH Release
-      uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+      uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3
       if: inputs.isPrerelease == false
       with:
         tag_name: v${{ inputs.version }}
@@ -139,6 +142,11 @@ jobs:
     name: publish_sdk
     needs: publish
     runs-on: #{{ .Config.Runner.Default }}#
+#{{- if .Config.Publish.PulumiVersion }}#
+    env:
+      # Layers .config/mise.publish.toml over .config/mise.toml to pin the Pulumi CLI (publish.pulumiVersion).
+      MISE_ENV: publish
+#{{- end }}#
     outputs:
       python_version: ${{ steps.python_version.outputs.version }}
     steps:
@@ -152,7 +160,7 @@ jobs:
         persist-credentials: true
     #{{- .Config | renderEscStep | indent 4 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
-    - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+    - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       id: app-auth
       with:
         app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
@@ -165,25 +173,33 @@ jobs:
         MISE_FETCH_REMOTE_VERSIONS_TIMEOUT: 30s
       with:
         version: #{{ .Config.MiseVersion }}#
+        add_shims_to_path: false
         github_token: #{{ if .Config.GitHubApp.Enabled }}#${{ steps.app-auth.outputs.token }}#{{ else }}#${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}#{{ end }}#
         # only saving the cache in the prerequisites job
         cache_save: false
+    - name: Install project dependencies
+      run: mise deps install
     - name: Setup Node
-      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
       with:
         # we don't set node-version because we install with mise.
         # this step is needed to setup npm auth
         registry-url: https://registry.npmjs.org
     - name: Publish SDKs
       if: inputs.skipJavaSdk == false
-      uses: pulumi/pulumi-package-publisher@3ec1409d3e894142b9825c7859be8e57d362762a # v0.0.23
+      uses: pulumi/pulumi-package-publisher@v0.1.0
       with:
         sdk: #{{ .Config.Publish.SDK }}#
         version: ${{ inputs.version }}
+        npmTrustedPublishing: #{{ .Config.NPMTrustedPublishing }}#
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
+        #{{- if .Config.NPMTrustedPublishing }}#
+        NODE_AUTH_TOKEN: ""
+        #{{- else }}#
         NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+        #{{- end }}#
         SIGNING_KEY: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY }}
         SIGNING_KEY_ID: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_PASSWORD }}
@@ -192,14 +208,19 @@ jobs:
         NUGET_PUBLISH_KEY: ${{ steps.esc-secrets.outputs.NUGET_PUBLISH_KEY }}
     - name: Publish SDKs (except Java)
       if: inputs.skipJavaSdk == true
-      uses: pulumi/pulumi-package-publisher@3ec1409d3e894142b9825c7859be8e57d362762a # v0.0.23
+      uses: pulumi/pulumi-package-publisher@v0.1.0
       with:
         sdk: #{{ .Config.Publish.SDK }}#,!java
         version: ${{ inputs.version }}
+        npmTrustedPublishing: #{{ .Config.NPMTrustedPublishing }}#
       env:
         PYPI_USERNAME: __token__
         PYPI_PASSWORD: ${{ steps.esc-secrets.outputs.PYPI_API_TOKEN }}
+        #{{- if .Config.NPMTrustedPublishing }}#
+        NODE_AUTH_TOKEN: ""
+        #{{- else }}#
         NODE_AUTH_TOKEN: ${{ steps.esc-secrets.outputs.NPM_TOKEN }}
+        #{{- end }}#
         SIGNING_KEY: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY }}
         SIGNING_KEY_ID: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ steps.esc-secrets.outputs.JAVA_SIGNING_PASSWORD }}
@@ -255,7 +276,7 @@ jobs:
           persist-credentials: false
       #{{- .Config | renderEscStep | indent 6 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
-      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: app-auth
         with:
           app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}
@@ -293,7 +314,7 @@ jobs:
         persist-credentials: false
     #{{- .Config | renderEscStep | indent 4 }}#
 #{{- if .Config.GitHubApp.Enabled }}#
-    - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+    - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
       id: app-auth
       with:
         app-id: ${{ steps.esc-secrets.outputs.PULUMI_PROVIDER_AUTOMATION_APP_ID }}

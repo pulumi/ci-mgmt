@@ -84,6 +84,10 @@ func GeneratePackage(opts GenerateOpts) error {
 		}
 	}
 
+	if v := opts.Config.Publish.PulumiVersion; v != "" && !pulumiVersionPattern.MatchString(v) {
+		return fmt.Errorf("publish.pulumiVersion %q is invalid: it must be an exact version such as 3.274.1", v)
+	}
+
 	// Clean up old workflows if requested
 	if opts.Config.CleanGithubWorkflows {
 		err := cleanGithubWorkflows(opts.OutDir, opts.Config.Provider)
@@ -124,6 +128,11 @@ func GeneratePackage(opts GenerateOpts) error {
 // npmDistTagPattern restricts publish.npmDistTag to characters that are safe
 // to render into the publish workflow.
 var npmDistTagPattern = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
+
+// pulumiVersionPattern restricts publish.pulumiVersion to an exact version,
+// optionally with a prerelease suffix, so it is safe to render into the
+// publish workflow and does not float like "latest".
+var pulumiVersionPattern = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$`)
 
 // publishesNodejs reports whether a pulumi-package-publisher sdk input such as
 // "all", "all,!python" or "nodejs,go" includes the Node.js SDK.
@@ -236,6 +245,10 @@ func getConfigDeletedFiles(config Config) []string {
 		".github/workflows/gh-aw-pr-review.md",
 		filepath.Join(".github", "workflows", "shared", "review.md"),
 		filepath.Join(".github", "workflows", "shared", "plugins", "code-review", "code-review.md"),
+	}
+	if config.Publish.PulumiVersion == "" {
+		// Only generated while publish.pulumiVersion is set.
+		deletedFiles = append(deletedFiles, filepath.Join(".config", "mise.publish.toml"))
 	}
 	return deletedFiles
 }
@@ -466,37 +479,40 @@ func trimActionComment(uses string) string {
 	return strings.TrimSpace(ref)
 }
 
-// renderESCStep generates either the real ESC action or our shim action which
-// re-exports the existing environment.
+// renderESCStep generates the steps that exchange the job's OIDC token for a
+// Pulumi Cloud access token and then open the provider's ESC environment.
 func renderESCStep(v any) (string, error) {
 	config, ok := v.(Config)
 	if !ok {
 		return "", fmt.Errorf("expected Config input, got %+v", v)
 	}
 
-	yaml := func(v any) (string, error) {
-		s, err := toYAML([]any{v})
-		return "\n" + s, err
-	}
-
 	if !config.ESC.Enabled {
 		return "", fmt.Errorf("`esc: { enabled: true } is required for Pulumi providers`")
 	}
 
-	env := map[string]string{
-		"ESC_ACTION_OIDC_AUTH":                    "true",
-		"ESC_ACTION_OIDC_ORGANIZATION":            "pulumi",
-		"ESC_ACTION_OIDC_REQUESTED_TOKEN_TYPE":    "urn:pulumi:token-type:access_token:organization",
-		"ESC_ACTION_ENVIRONMENT":                  config.ESC.Environment,
-		"ESC_ACTION_EXPORT_ENVIRONMENT_VARIABLES": "false",
+	auth := map[string]any{
+		"name": "Authenticate with Pulumi Cloud",
+		"id":   "esc-auth",
+		"uses": trimActionComment(config.ActionVersions.ESCAuth),
+		"with": map[string]string{
+			"organization":                 "pulumi",
+			"requested-token-type":         "urn:pulumi:token-type:access_token:organization",
+			"export-environment-variables": "false",
+		},
 	}
-	step := map[string]any{
+	secrets := map[string]any{
 		"name": "Fetch secrets from ESC",
 		"id":   "esc-secrets",
 		"uses": trimActionComment(config.ActionVersions.ESCAction),
-		"env":  env,
+		"with": map[string]string{
+			"environment":                  config.ESC.Environment,
+			"export-environment-variables": "false",
+			"pulumi-access-token":          "${{ steps.esc-auth.outputs.pulumi-access-token }}",
+		},
 	}
-	return yaml(step)
+	s, err := toYAML([]any{auth, secrets})
+	return "\n" + s, err
 }
 
 // renderGlobalEnv is used to generate environment variables shared by all

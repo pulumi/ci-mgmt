@@ -399,3 +399,80 @@ func TestGeneratePackageValidatesNpmDistTag(t *testing.T) {
 		})
 	}
 }
+
+func TestGeneratePackageValidatesPublishPulumiVersion(t *testing.T) {
+	tests := []struct {
+		name    string
+		version string
+		wantErr bool
+	}{
+		{name: "unset", version: ""},
+		{name: "release", version: "3.274.1"},
+		{name: "prerelease", version: "3.275.0-alpha.1"},
+		{name: "latest", version: "latest", wantErr: true},
+		{name: "v prefix", version: "v3.274.1", wantErr: true},
+		{name: "partial", version: "3.274", wantErr: true},
+		{name: "quote", version: `3.274.1"`, wantErr: true},
+		{name: "newline", version: "3.274.1\nFOO = 1", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config, err := loadDefaultConfig()
+			if err != nil {
+				t.Fatal(err)
+			}
+			config.Provider = "aws"
+			config.ESC.Enabled = true
+			config.Publish.PulumiVersion = tt.version
+
+			err = GeneratePackage(GenerateOpts{
+				RepositoryName: "pulumi/pulumi-aws",
+				OutDir:         t.TempDir(),
+				TemplateName:   "bridged-provider",
+				Config:         config,
+				SkipMigrations: true,
+			})
+			if tt.wantErr && err == nil {
+				t.Fatalf("expected an error for publish.pulumiVersion %q", tt.version)
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+// The test-providers snapshots regenerate from an empty directory, so they
+// never see a provider that unsets publish.pulumiVersion after setting it.
+func TestGeneratePackageDeletesStaleMisePublishConfig(t *testing.T) {
+	outDir := t.TempDir()
+
+	config, err := loadDefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	config.Provider = "aws"
+	config.ESC.Enabled = true
+
+	stale := filepath.Join(outDir, ".config", "mise.publish.toml")
+	if err := os.MkdirAll(filepath.Dir(stale), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(stale, []byte("[tools]\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := GeneratePackage(GenerateOpts{
+		RepositoryName: "pulumi/pulumi-aws",
+		OutDir:         outDir,
+		TemplateName:   "bridged-provider",
+		Config:         config,
+		SkipMigrations: true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Stat(stale); !os.IsNotExist(err) {
+		t.Fatalf("expected .config/mise.publish.toml to be absent, got err %v", err)
+	}
+}

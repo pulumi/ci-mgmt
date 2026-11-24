@@ -1,4 +1,5 @@
 provider: aws
+npmTrustedPublishing: true
 disableMajorProviderUpgrades: true
 lint: false
 major-version: 7
@@ -37,3 +38,4 @@ releaseVerification:
 autoMergeProviderUpgrades: false
 publish:
     npmDistTag: latest-v6
+    pulumiVersion: 3.274.1

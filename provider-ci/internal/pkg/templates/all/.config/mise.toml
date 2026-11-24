@@ -21,15 +21,33 @@ java = 'corretto-11'
 "github:pulumi/schema-tools" = "0.8.1"
 "go:github.com/pulumi/upgrade-provider" = "main"
 "aqua:gradle/gradle-distributions" = '7.6.6'
-golangci-lint = "2.14.0" # See note about about overrides if you need to customize this.
+golangci-lint = "2.15.0" # See note about about overrides if you need to customize this.
 "npm:yarn" = "1.22.22"
 
+[hooks]
+# Also install project dependencies during local setup. CI runs this explicitly
+# after mise-action because hook failures only produce warnings.
+postinstall = "mise deps install"
+
+#{{ if has "java" .Config.Languages -}}#
+[deps.pulumi-java]
+# Let the selected CLI choose Java's version. With no sources or outputs this
+# also checks warm caches, without running before every mise exec or mise run.
+# Explicit Bash also works on Windows, where mise defaults to cmd.exe.
+run = 'bash "{{config_root}}/.config/install-pulumi-java.sh"'
+
+#{{ end -}}#
 [settings]
 experimental = true # Required for Go binaries (e.g. pulumictl).
+# Windows identity-layout junctions break Go's bundled-plugin path resolution.
+install_layout = "legacy"
 lockfile = false
 http_retries = 3
 pin = true # `mise use` should pin versions instead of defaulting to latest.
 fetch_remote_versions_cache = "24h" # Mise queries versions even if they're pinned to confirm they exist. Reduce GitHub API calls by doing that less often.
 
 [plugins]
-vfox-pulumi = "https://github.com/pulumi/vfox-pulumi"
+# Pinned to full commit SHAs so a moved upstream tag or branch cannot change what we run.
+# Renovate bumps the SHA to the branch or tag named in the trailing comment.
+vfox-pulumi = "https://github.com/pulumi/vfox-pulumi#b79776a6fabfcfe1fe2e8eda2cfb2c9c7a02a433" # renovate: datasource=git-refs ref=main
+vfox-version-fox-vfox-dotnet = "https://github.com/version-fox/vfox-dotnet#1612af8a9a6da8913387e47fda92cdd72dded44c" # renovate: datasource=git-tags ref=v0.3.0
