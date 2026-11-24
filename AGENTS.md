@@ -321,6 +321,15 @@ After:  native/build.yml calls reusable base/build_provider.yml
 
 ---
 
+## Pull Request Guidelines
+
+- Keep PR descriptions short and to the point: a one or two sentence summary of what changed and why is enough.
+- Use a few short bullets only when a PR bundles multiple distinct changes. Skip narrative explanations, alternatives considered, and restating what is already visible in the diff.
+- Reference a related issue (e.g. `Fixes #1234`) instead of re-explaining it.
+- Real-provider verification results (see [Verification Against Real Providers](#verification-against-real-providers)) are the exception: report them as a compact table, not prose.
+
+---
+
 ## Validation & Testing
 
 ### Pre-PR Checklist
