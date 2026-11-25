@@ -24,8 +24,6 @@ const branchProtectionImports: Record<string, string> = {
 };
 
 // Provider repos that require an approving review on their default branch.
-// update-workflows.yml approves ci-mgmt's PRs and pulumi-renovate-approve
-// approves Renovate's, so both still auto-merge.
 const reviewRequiredProviders = new Set(["pulumiservice"]);
 
 function tfProviderProtection(provider: string) {
@@ -44,7 +42,7 @@ function tfProviderProtection(provider: string) {
       pattern: github.BranchDefault.get(provider, repo, undefined, {
         provider: gh,
       }).branch,
-      enforceAdmins: !requireReview,
+      enforceAdmins: true,
       requiredStatusChecks: [
         {
           strict: false,
@@ -53,8 +51,6 @@ function tfProviderProtection(provider: string) {
       ],
       requiredPullRequestReviews: [
         {
-          // Other providers require no review so that bot PRs that nothing
-          // approves can still auto-merge.
           requiredApprovingReviewCount: requireReview ? 1 : 0,
         },
       ],
