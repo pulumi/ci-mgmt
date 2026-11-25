@@ -171,6 +171,12 @@ jobs:
           title: "${{ inputs.downstream_test == true && '[DOWNSTREAM TEST] ' || ''}}${{ inputs.tracking_branch_name != '' && format('[{0}] ', inputs.tracking_branch_name) || '' }}Update GitHub Actions workflows."
           path: pulumi-${{ inputs.provider_name }}
           token: ${{ steps.app-auth.outputs.token }}
+      - name: Provide the approval that auto-merge needs on repos that require reviews
+        if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
+        continue-on-error: true
+        run: gh pr review --approve "${{ steps.create-pr.outputs.pull-request-url }}"
+        env:
+          GH_TOKEN: ${{ steps.esc-secrets.outputs.PULUMI_BOT_TOKEN }}
       - name: "Set PR to auto-merge"
         if: steps.create-pr.outputs.pull-request-operation == 'created' && inputs.automerge
         # Not all providers have auto-merge enabled, and we don't want to fail providers

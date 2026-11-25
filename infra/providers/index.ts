@@ -23,6 +23,9 @@ const branchProtectionImports: Record<string, string> = {
   pulumiservice: "pulumi-pulumiservice:main",
 };
 
+// Provider repos that require an approving review on their default branch.
+const reviewRequiredProviders = new Set(["pulumiservice"]);
+
 function tfProviderProtection(provider: string) {
   const requiredChecks: string[] = [
     // Sentinel is responsible for encapsulating CI checks.
@@ -30,6 +33,7 @@ function tfProviderProtection(provider: string) {
   ];
 
   const repo = `pulumi-${provider}`;
+  const requireReview = reviewRequiredProviders.has(provider);
 
   new github.BranchProtection(
     `${provider}-default`,
@@ -47,9 +51,7 @@ function tfProviderProtection(provider: string) {
       ],
       requiredPullRequestReviews: [
         {
-          // We want to make sure that pulumi-bot can auto-merge PRs, so we
-          // explicitly remove review requirements.
-          requiredApprovingReviewCount: 0,
+          requiredApprovingReviewCount: requireReview ? 1 : 0,
         },
       ],
     },
