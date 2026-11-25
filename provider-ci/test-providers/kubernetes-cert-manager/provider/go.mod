@@ -4,4 +4,4 @@ go 1.23
 
 toolchain go1.26.11
 
-require github.com/pulumi/pulumi/pkg/v3 v3.268.0
+require github.com/pulumi/pulumi/pkg/v3 v3.278.0
