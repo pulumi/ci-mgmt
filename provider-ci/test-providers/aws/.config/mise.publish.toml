@@ -3,4 +3,4 @@
 # Set publish.pulumiVersion in .ci-mgmt.yaml to change it.
 
 [tools]
-"github:pulumi/pulumi" = "3.274.1"
+"github:pulumi/pulumi" = "3.278.0"
