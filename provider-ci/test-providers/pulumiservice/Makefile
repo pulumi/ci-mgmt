@@ -73,10 +73,10 @@ install_sdks: install_nodejs_sdk install_python_sdk install_dotnet_sdk install_g
 mise_install: .make/mise_install | mise_env
 
 mise_env:
-	@mise env -q  > /dev/null
+	@./bin/mise env -q  > /dev/null
 
 .make/mise_install:
-	@mise install -q
+	@./bin/mise install -q
 	@touch $@
 
 
@@ -227,7 +227,7 @@ compare_sdk_%: .make/mise_install bin/$(CODEGEN) .make/schema | mise_env
 
 clean:
 	rm -rf sdk/{dotnet,nodejs,go,python}
-	rm -rf bin/*
+	find bin -mindepth 1 ! -name mise -delete
 	rm -rf .make/*
 	rm -rf "$(GEN_PULUMI_CONVERT_EXAMPLES_CACHE_DIR)"
 	if dotnet nuget list source | grep "$(WORKING_DIR)/nuget"; then \
