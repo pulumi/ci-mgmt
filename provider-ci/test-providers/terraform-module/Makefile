@@ -99,7 +99,9 @@ lint.fix:
 	golangci-lint run -c .golangci.yml --fix
 
 .PHONY: lint lint.fix
-build_provider_cmd = GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER)
+build_provider_cmd = if [ "$(1)" = "windows" ]; then $(call embed_windows_resources,cmd/$(PROVIDER),$(2)); fi && \
+                     GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build $(PULUMI_PROVIDER_BUILD_PARALLELISM) -o "$(3)" -ldflags "$(LDFLAGS)" $(GO_MODULE)/cmd/$(PROVIDER); \
+                     buildrc=$$?; rm -f cmd/$(PROVIDER)/rsrc_windows_*.syso; exit $$buildrc
 
 .PHONY: provider
 provider: bin/$(PROVIDER)
