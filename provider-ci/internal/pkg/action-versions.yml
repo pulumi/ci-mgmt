@@ -74,7 +74,7 @@ jobs:
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
       - name: pulumi/provider-version-action
-        uses: pulumi/provider-version-action@c4f719182e607d0d8322f148f168d3372838e681 # v2.0.0
+        uses: pulumi/provider-version-action@eb23498ae6546853a18d2acdf0e9233720cd9784 # is-latest-output (pulumi/provider-version-action#21), replace with v2.1.0
 
       - name: pulumi/auth-actions
         uses: pulumi/auth-actions@141415910c3beb54e03b48e9057c204c97b956f2 # v2.1.0
